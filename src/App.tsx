@@ -2,15 +2,20 @@ import { useEffect } from "react";
 import "./styles/main.scss";
 import AOS from "aos";
 import "aos/dist/aos.css";
-import { Outlet } from "react-router-dom";
+import { Outlet, useLocation } from "react-router-dom";
 import Navbar from "./components/Navbar";
 import Footer from "./components/Footer";
 import FloatingContact from "./components/FloatingContact";
 import { AuthProvider } from "./context/AuthContext";
 
 function App() {
-  
-    useEffect(() => {
+  const { pathname } = useLocation();
+
+  useEffect(() => {
+    window.scrollTo(0, 0);
+  }, [pathname]);
+
+  useEffect(() => {
     AOS.init({
       duration: 700,
       once: true,
@@ -18,7 +23,7 @@ function App() {
       easing: "ease-out-cubic",
     });
   }, []);
-  
+
   return (
     <AuthProvider>
       <Navbar />
@@ -27,7 +32,6 @@ function App() {
       <FloatingContact />
     </AuthProvider>
   );
-  
 }
 
 export default App

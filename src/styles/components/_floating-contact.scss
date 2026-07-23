@@ -71,6 +71,36 @@
       }
     }
 
+    &--scroll-top {
+      background: linear-gradient(135deg, $primary-color, $primary-color-dark);
+      border: none;
+      cursor: pointer;
+      opacity: 0;
+      visibility: hidden;
+      transform: scale(0.6) translateY(15px);
+      transition: all 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+      pointer-events: none;
+
+      &.show {
+        opacity: 1;
+        visibility: visible;
+        transform: scale(1) translateY(0);
+        pointer-events: auto;
+      }
+
+      &::before {
+        animation-delay: 0.5s;
+        background: $primary-color;
+        box-shadow: 0 0 0 0 rgba($primary-color, 0.7);
+      }
+
+      &:hover {
+        background: linear-gradient(135deg, $primary-color-light, $primary-color);
+        transform: translateY(-5px) scale(1.1);
+        box-shadow: 0 8px 25px rgba(#2e7d32, 0.4);
+      }
+    }
+
     &--zalo {
       background: #0068FF; // Official Zalo blue
       
