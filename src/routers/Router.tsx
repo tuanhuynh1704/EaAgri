@@ -8,12 +8,15 @@ import Login from "../pages/Login";
 import AccountManagement from "../pages/AccountManagement";
 import ManageNews from "../pages/ManageNews";
 
+import ArchitecturePage from "../pages/ArchitecturePage";
+
 export const router = createBrowserRouter([
   {
     path: "/",
     element: <App />,
     children: [
       { path: "/", element: <HomePage /> },
+      { path: "/architecture", element: <ArchitecturePage /> },
       { path: "/news", element: <NewsList /> },
       { path: "/news/:id", element: <NewsDetail /> },
       { path: "/news/create", element: <UploadNews /> },

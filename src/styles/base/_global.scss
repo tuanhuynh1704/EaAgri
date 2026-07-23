@@ -87,6 +87,94 @@ section {
   position: relative;
 }
 
+// ================================
+// SECTION BACKGROUND VARIANTS
+// ================================
+
+[class^="section-bg--"] {
+  position: relative;
+  z-index: 1;
+  padding-block: 1rem;
+  transition: background 0.4s ease;
+  background: transparent !important; // Forces the wrapper to be transparent
+
+  // The pseudo-element holds the actual background color and masks the top/bottom edges
+  &::before {
+    content: '';
+    position: absolute;
+    inset: 0;
+    z-index: -1;
+    pointer-events: none;
+    
+    // Creates a smooth gradient fade at the top and bottom to seamlessly blend sections
+    mask-image: linear-gradient(to bottom, transparent 0px, black 120px, black calc(100% - 120px), transparent 100%);
+    -webkit-mask-image: linear-gradient(to bottom, transparent 0px, black 120px, black calc(100% - 120px), transparent 100%);
+    
+    // Smoothly transition background if it changes dynamically
+    transition: background 0.4s ease;
+  }
+}
+
+.section-bg--white::before {
+  background: $white;
+}
+
+.section-bg--light::before {
+  background: $extra-light;
+}
+
+.section-bg--gradient-soft::before {
+  background: linear-gradient(
+    180deg,
+    #f0faf0 0%,
+    #ffffff 100%
+  );
+}
+
+.section-bg--gradient-teal::before {
+  background: linear-gradient(
+    180deg,
+    #e0f7f4 0%,
+    #f4faf4 100%
+  );
+}
+
+.section-bg--gradient-warm::before {
+  background: linear-gradient(
+    180deg,
+    #f9fbe7 0%,
+    #f1f8e9 50%,
+    #ffffff 100%
+  );
+}
+
+.section-bg--gradient-mint::before {
+  background: linear-gradient(
+    135deg,
+    #e8f5e9 0%,
+    #e0f2f1 50%,
+    #f1f8e9 100%
+  );
+}
+
+.section-bg--dark-green {
+  color: $white;
+  
+  &::before {
+    background: linear-gradient(
+      135deg,
+      #1b5e20 0%,
+      #2e7d32 50%,
+      #388e3c 100%
+    );
+  }
+
+  .section__header,
+  .section__description {
+    color: $white;
+  }
+}
+
 ::selection {
   background: rgba($primary-color, 0.2);
 }

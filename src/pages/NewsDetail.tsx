@@ -2,6 +2,7 @@ import { useEffect, useState } from "react";
 import { useParams, useNavigate, Link } from "react-router-dom";
 import { supabase } from "../utils/supabase/client";
 import { useAuth } from "../context/AuthContext";
+import "react-quill-new/dist/quill.snow.css";
 
 interface NewsItem {
   id: string;
@@ -176,9 +177,10 @@ export default function NewsDetail() {
             </div>
 
             {/* Main Content */}
-            <div className="news-detail__content">
-              {article.content}
-            </div>
+            <div 
+              className="news-detail__content ql-editor"
+              dangerouslySetInnerHTML={{ __html: article.content }}
+            />
 
           </div>
         </article>

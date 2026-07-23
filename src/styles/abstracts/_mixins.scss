@@ -41,14 +41,17 @@
   cursor: pointer;
 
   color: $white;
-  background-color: $primary-color;
-
+  // Sleek dark gradient instead of the standard green
+  background: linear-gradient(135deg, #2d3748, #1a202c);
+  
   border-radius: $radius-sm;
 
   transition: $transition;
 
   &:hover {
-    background-color: $primary-color-dark;
+    background: linear-gradient(135deg, #4a5568, #2d3748);
+    transform: translateY(-2px);
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
   }
 }
 

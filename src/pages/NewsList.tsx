@@ -13,6 +13,12 @@ interface NewsItem {
   created_at: string;
 }
 
+// Strip HTML tags for search and snippet preview
+const stripHtml = (html: string) => {
+  const doc = new DOMParser().parseFromString(html, "text/html");
+  return doc.body.textContent || "";
+};
+
 export default function NewsList() {
   const [news, setNews] = useState<NewsItem[]>([]);
   const [loading, setLoading] = useState(true);
@@ -81,9 +87,11 @@ export default function NewsList() {
   const filteredNews = news.filter((item) => {
     const matchesCategory =
       selectedCategory === "Tất cả" || item.category === selectedCategory;
+    
+    const plainContent = stripHtml(item.content);
     const matchesSearch =
       item.title.toLowerCase().includes(searchQuery.toLowerCase()) ||
-      item.content.toLowerCase().includes(searchQuery.toLowerCase()) ||
+      plainContent.toLowerCase().includes(searchQuery.toLowerCase()) ||
       item.author.toLowerCase().includes(searchQuery.toLowerCase());
 
     return matchesCategory && matchesSearch;
@@ -189,7 +197,7 @@ export default function NewsList() {
                   </Link>
 
                   {/* Snippet */}
-                  <p className="news-list__card-snippet">{item.content}</p>
+                  <p className="news-list__card-snippet">{stripHtml(item.content)}</p>
 
                   {/* Card Footer Actions */}
                   <div className="news-list__card-footer">

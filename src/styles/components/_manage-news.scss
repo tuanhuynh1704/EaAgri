@@ -629,9 +629,50 @@
   }
 
   .modal-textarea {
-    min-height: 180px;
     resize: vertical;
-    line-height: 1.5;
+    min-height: 120px;
+  }
+
+  // ReactQuill Custom Styles
+  .modal-quill-editor {
+    display: flex;
+    flex-direction: column;
+    flex: 1;
+
+    .ql-toolbar {
+      border: 1px solid rgba(0, 0, 0, 0.1);
+      border-top-left-radius: 8px;
+      border-top-right-radius: 8px;
+      background-color: #f8f9fa;
+      font-family: inherit;
+    }
+
+    .ql-container {
+      border: 1px solid rgba(0, 0, 0, 0.1);
+      border-bottom-left-radius: 8px;
+      border-bottom-right-radius: 8px;
+      border-top: none;
+      font-family: inherit;
+      font-size: 1rem;
+      flex: 1;
+      display: flex;
+      flex-direction: column;
+    }
+
+    .ql-editor {
+      min-height: 250px;
+      padding: 1rem;
+      
+      &:focus {
+        outline: none;
+      }
+
+      // Reset image display to inline-block so Quill's text-align classes can center them
+      img {
+        display: inline-block;
+        max-width: 100%;
+      }
+    }
   }
 
   &__footer {
