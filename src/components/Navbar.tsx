@@ -21,7 +21,7 @@ const Navbar = () => {
     <nav data-aos="fade-down">
       <div className="nav__logo" onClick={() => navigate("/")} style={{ cursor: "pointer" }}>
         <img
-          src="/logo2.png"
+          src="/logo_navbar.png"
           alt="EaAgri Logo"
           title="EaAgri Logo"
         />
