@@ -28,9 +28,20 @@ const Navbar = () => {
 
       <div className="nav__btns">
         
-        <div onClick={handleHome}>
-          <button className="btn">Trang chủ</button>
-        </div>
+        <button className="btn" onClick={handleHome}>
+          <span>
+            <i className="ri-home-smile-line"></i>
+          </span>
+          <span>Trang chủ</span>
+        </button>
+
+        {/* Architecture Button */}
+        <button className="btn" onClick={() => navigate("/architecture")}>
+          <span>
+            <i className="ri-layout-3-line"></i>
+          </span>
+          <span>Kiến trúc</span>
+        </button>
 
         {/* News Button */}
         <button className="btn" onClick={handleNew}>

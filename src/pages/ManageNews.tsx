@@ -4,6 +4,8 @@ import { Link,
  } from "react-router-dom";
 import { supabase } from "../utils/supabase/client";
 import { useAuth } from "../context/AuthContext";
+import ReactQuill from "react-quill-new";
+import "react-quill-new/dist/quill.snow.css";
 
 interface NewsItem {
   id: string;
@@ -61,6 +63,30 @@ export default function ManageNews() {
   ];
 
   const filterCategories = ["Tất cả", ...categories];
+
+  const quillModules = {
+    toolbar: [
+      [{ header: [1, 2, 3, 4, 5, 6, false] }],
+      ["bold", "italic", "underline", "strike"],
+      [{ list: "ordered" }, { list: "bullet" }],
+      [{ align: [] }],
+      ["link", "image"],
+      ["clean"],
+    ],
+  };
+
+  const quillFormats = [
+    "header",
+    "bold",
+    "italic",
+    "underline",
+    "strike",
+    "list",
+    "bullet",
+    "align",
+    "link",
+    "image",
+  ];
 
   // Fetch all articles
   const fetchNews = async () => {
@@ -649,16 +675,17 @@ export default function ManageNews() {
                   </div>
 
                   {/* Content */}
-                  <div className="modal-field">
+                  <div className="modal-field modal-field--full" style={{ gridColumn: "1 / -1", minHeight: "350px", display: "flex", flexDirection: "column" }}>
                     <label htmlFor="modal-content">Nội dung chi tiết <span className="required">*</span></label>
-                    <textarea
-                      id="modal-content"
-                      placeholder="Nhập nội dung bài viết..."
+                    <ReactQuill
+                      theme="snow"
                       value={formContent}
-                      onChange={(e) => setFormContent(e.target.value)}
-                      className="modal-textarea"
-                      required
-                      disabled={isSaving}
+                      onChange={setFormContent}
+                      modules={quillModules}
+                      formats={quillFormats}
+                      readOnly={isSaving}
+                      placeholder="Nhập nội dung bài viết..."
+                      style={{ flex: 1, display: "flex", flexDirection: "column" }}
                     />
                   </div>
 

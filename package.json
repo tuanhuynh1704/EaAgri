@@ -16,6 +16,8 @@
     "dotenv": "^17.4.2",
     "react": "^19.2.0",
     "react-dom": "^19.2.0",
+    "react-markdown": "^10.1.0",
+    "react-quill-new": "^3.8.3",
     "react-router-dom": "^7.17.0",
     "remixicon": "^4.9.1",
     "scrollreveal": "^4.0.9"

@@ -225,6 +225,12 @@
     p {
       margin-bottom: 1.5rem;
     }
+
+    // Reset image display to inline-block so Quill's text-align classes can center them
+    img {
+      display: inline-block;
+      max-width: 100%;
+    }
   }
 }
 

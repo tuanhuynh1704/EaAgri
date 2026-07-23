@@ -15,75 +15,509 @@
   }
 }
 
-header {
-  // min-height: 100vh;
+@keyframes orbFloat {
 
+  0%,
+  100% {
+    transform: translate(0, 0) scale(1);
+  }
+
+  25% {
+    transform: translate(45px, -30px) scale(1.08);
+  }
+
+  50% {
+    transform: translate(-25px, -50px) scale(0.92);
+  }
+
+  75% {
+    transform: translate(30px, 20px) scale(1.05);
+  }
+}
+
+@keyframes particleFloat {
+
+  0%,
+  100% {
+    opacity: 0.2;
+    transform: translateY(0) scale(1);
+  }
+
+  50% {
+    opacity: 0.8;
+    transform: translateY(-40px) scale(1.4);
+  }
+}
+
+@keyframes radarPulse {
+  0% {
+    transform: scale(0.85);
+    opacity: 0.5;
+  }
+
+  100% {
+    transform: scale(1.3);
+    opacity: 0;
+  }
+}
+
+@keyframes floatBadge1 {
+
+  0%,
+  100% {
+    transform: translateY(0px) rotate(-1deg);
+  }
+
+  50% {
+    transform: translateY(-8px) rotate(1deg);
+  }
+}
+
+@keyframes floatBadge2 {
+
+  0%,
+  100% {
+    transform: translateY(0px) rotate(1deg);
+  }
+
+  50% {
+    transform: translateY(-12px) rotate(-1deg);
+  }
+}
+
+@keyframes floatBadge3 {
+
+  0%,
+  100% {
+    transform: translateY(0px) rotate(0deg);
+  }
+
+  50% {
+    transform: translateY(-6px) rotate(2deg);
+  }
+}
+
+// ================================
+// HERO SECTION - Dynamic Gradient Background
+// ================================
+
+.hero-section {
+  position: relative;
+  overflow: hidden;
   display: grid;
   align-items: center;
   gap: 4rem;
   padding: 7rem 0;
+
+  // Rich layered green gradient representing high-tech green agriculture
+  background:
+    radial-gradient(circle at 10% 20%, rgba(#e8f5e9, 0.8) 0%, transparent 40%),
+    radial-gradient(circle at 90% 80%, rgba(#e0f2f1, 0.8) 0%, transparent 40%),
+    linear-gradient(135deg,
+      #f1f8e9 0%,
+      #e8f5e9 30%,
+      #e0f7fa 60%,
+      #f9fbe7 100%);
 }
 
-.header__img {
-  display: flex;
-  justify-content: center;
+// ================================
+// DECORATIVE BACKGROUND ELEMENTS
+// ================================
 
-  img {
-    max-width: 550px;
-    width: 100%;
+.hero-bg-decor {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  z-index: 0;
+  overflow: hidden;
+}
 
-    margin-inline: auto;
+// Glow orbs
+.hero-orb {
+  position: absolute;
+  border-radius: 50%;
+  filter: blur(90px);
+  opacity: 0.35;
+  animation: orbFloat 16s ease-in-out infinite;
 
-    animation: floatImage 5s ease-in-out infinite;
+  &--1 {
+    width: 450px;
+    height: 450px;
+    background: radial-gradient(circle, rgba($primary-color, 0.4), transparent 70%);
+    top: -100px;
+    left: -80px;
+    animation-delay: 0s;
+  }
 
-    transition:
-      transform 0.5s ease,
-      filter 0.5s ease;
+  &--2 {
+    width: 380px;
+    height: 380px;
+    background: radial-gradient(circle, rgba(#81c784, 0.35), transparent 70%);
+    bottom: -80px;
+    right: -60px;
+    animation-delay: -3s;
+  }
 
-    &:hover {
-      transform: scale(1.05);
+  &--3 {
+    width: 300px;
+    height: 300px;
+    background: radial-gradient(circle, rgba(#00acc1, 0.25), transparent 70%);
+    top: 35%;
+    left: 45%;
+    animation-delay: -6s;
+  }
+
+  &--4 {
+    width: 250px;
+    height: 250px;
+    background: radial-gradient(circle, rgba(#c0ca33, 0.3), transparent 70%);
+    top: 10%;
+    right: 15%;
+    animation-delay: -9s;
+  }
+
+  &--5 {
+    width: 320px;
+    height: 320px;
+    background: radial-gradient(circle, rgba(#4db6ac, 0.25), transparent 70%);
+    bottom: 20%;
+    left: 20%;
+    animation-delay: -12s;
+  }
+}
+
+// Subtle grid overlay
+.hero-grid-pattern {
+  position: absolute;
+  inset: 0;
+  background-image:
+    linear-gradient(rgba($primary-color, 0.04) 1px, transparent 1px),
+    linear-gradient(90deg, rgba($primary-color, 0.04) 1px, transparent 1px);
+  background-size: 40px 40px;
+  opacity: 0.9;
+}
+
+// Elegant diagonal lines
+.hero-diagonal-shape {
+  position: absolute;
+  top: -20%;
+  left: -20%;
+  width: 140%;
+  height: 50%;
+  background: linear-gradient(135deg, rgba($white, 0.4) 0%, transparent 60%);
+  transform: rotate(-5deg);
+}
+
+// Dynamic wave visual at bottom
+.hero-wave-shape {
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  width: 100%;
+  height: 100px;
+  background: linear-gradient(to top, rgba($white, 0.8), transparent);
+}
+
+// Particles floating
+.hero-particles {
+  position: absolute;
+  inset: 0;
+
+  span {
+    position: absolute;
+    display: block;
+    border-radius: 50%;
+    background: linear-gradient(135deg, $primary-color-light, $primary-color);
+    opacity: 0.3;
+    animation: particleFloat 7s ease-in-out infinite;
+
+    &:nth-child(1) {
+      width: 12px;
+      height: 12px;
+      top: 12%;
+      left: 18%;
+      animation-delay: 0s;
+    }
+
+    &:nth-child(2) {
+      width: 6px;
+      height: 6px;
+      top: 55%;
+      left: 78%;
+      animation-delay: -1.5s;
+    }
+
+    &:nth-child(3) {
+      width: 14px;
+      height: 14px;
+      top: 75%;
+      left: 32%;
+      animation-delay: -3s;
+    }
+
+    &:nth-child(4) {
+      width: 8px;
+      height: 8px;
+      top: 25%;
+      left: 82%;
+      animation-delay: -2s;
+    }
+
+    &:nth-child(5) {
+      width: 9px;
+      height: 9px;
+      top: 42%;
+      left: 8%;
+      animation-delay: -4s;
+    }
+
+    &:nth-child(6) {
+      width: 5px;
+      height: 5px;
+      top: 68%;
+      left: 58%;
+      animation-delay: -5s;
+    }
+
+    &:nth-child(7) {
+      width: 11px;
+      height: 11px;
+      top: 85%;
+      left: 88%;
+      animation-delay: -1s;
+    }
+
+    &:nth-child(8) {
+      width: 7px;
+      height: 7px;
+      top: 5%;
+      left: 45%;
+      animation-delay: -2.5s;
+    }
+
+    &:nth-child(9) {
+      width: 10px;
+      height: 10px;
+      top: 90%;
+      left: 15%;
+      animation-delay: -3.5s;
+    }
+
+    &:nth-child(10) {
+      width: 6px;
+      height: 6px;
+      top: 35%;
+      left: 65%;
+      animation-delay: -4.5s;
     }
   }
 }
 
+// ================================
+// HERO IMAGE & BACKDROP EFFECT
+// ================================
+
+.header__img {
+  position: relative;
+  z-index: 1;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  padding: 2rem 0;
+
+  .main-hero-image {
+    max-width: 520px;
+    width: 100%;
+    height: auto;
+    object-fit: contain;
+    margin-inline: auto;
+    filter: drop-shadow(0 15px 30px rgba($text-dark, 0.12));
+    animation: floatImage 5s ease-in-out infinite;
+    z-index: 2;
+    transition: transform 0.5s ease;
+
+    &:hover {
+      transform: scale(1.03);
+    }
+  }
+}
+
+// Glow effect behind image
+.image-glow-backdrop {
+  position: absolute;
+  width: 80%;
+  height: 80%;
+  border-radius: 50%;
+  background: radial-gradient(circle, rgba($primary-color-light, 0.45), transparent 70%);
+  filter: blur(40px);
+  z-index: 1;
+  pointer-events: none;
+}
+
+// Pulsing agricultural radar
+.image-radar-ring {
+  position: absolute;
+  width: 80%;
+  height: 80%;
+  border: 1.5px solid rgba($primary-color, 0.25);
+  border-radius: 50%;
+  z-index: 1;
+  pointer-events: none;
+  animation: radarPulse 4s cubic-bezier(0.215, 0.61, 0.355, 1) infinite;
+
+  &--delayed {
+    animation-delay: 2s;
+  }
+}
+
+// ================================
+// FLOATING STATS BADGES
+// ================================
+
+.floating-badge {
+  position: absolute;
+  z-index: 3;
+  display: flex;
+  align-items: center;
+  gap: 0.85rem;
+  padding: 0.75rem 1rem;
+  background: rgba($white, 0.85);
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+  border: 1px solid rgba($white, 0.6);
+  border-radius: 16px;
+  box-shadow:
+    0 10px 30px rgba($text-dark, 0.08),
+    0 1px 3px rgba($text-dark, 0.02);
+  transition: all 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+  user-select: none;
+
+  &:hover {
+    transform: translateY(-5px) scale(1.05) !important;
+    background: rgba($white, 0.95);
+    box-shadow: 0 15px 35px rgba($primary-color-dark, 0.15);
+    border-color: rgba($primary-color, 0.3);
+  }
+
+  .badge__icon {
+    font-size: 1.4rem;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+
+  .badge__content {
+    display: flex;
+    flex-direction: column;
+    text-align: left;
+  }
+
+  .badge__title {
+    font-size: 0.75rem;
+    font-weight: 500;
+    color: $text-light;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+  }
+
+  .badge__value {
+    font-size: 0.9rem;
+    font-weight: 700;
+    color: $text-dark;
+  }
+
+  .text-success {
+    color: $primary-color-dark !important;
+  }
+
+  .text-primary {
+    color: #0288d1 !important;
+  }
+
+  // Positioning
+  &.badge--ai {
+    top: 15%;
+    left: 5%;
+    animation: floatBadge1 5s ease-in-out infinite;
+  }
+
+  &.badge--moisture {
+    bottom: 25%;
+    right: 5%;
+    animation: floatBadge2 6s ease-in-out infinite;
+  }
+
+  &.badge--iot {
+    bottom: 12%;
+    left: 8%;
+    animation: floatBadge3 5.5s ease-in-out infinite;
+  }
+}
+
+// ================================
+// HERO CONTENT
+// ================================
+
 .header__content {
+  position: relative;
+  z-index: 2;
   text-align: center;
+
+  .hero-subtitle {
+    display: inline-block;
+    padding: 0.4rem 1rem;
+    background: rgba($primary-color, 0.1);
+    color: $primary-color-dark;
+    font-size: 0.75rem;
+    font-weight: 700;
+    letter-spacing: 1.5px;
+    border-radius: 99px;
+    margin-bottom: 1.25rem;
+    border: 1px solid rgba($primary-color, 0.15);
+  }
 
   h1 {
     margin-bottom: 1.5rem;
-
     font-size: 2.75rem;
-    // font-weight: 800;
-
     line-height: 1.15;
-
-    background: linear-gradient(
-      135deg,
-      $primary-color,
-      $primary-color-dark
-    );
-
-
+    font-weight: 800;
+    // background: linear-gradient(135deg, $primary-color, $primary-color-dark );
+    background: rgba(0, 0, 0, 0.5);
     -webkit-background-clip: text;
     -webkit-text-fill-color: transparent;
     background-clip: text;
+
+    .text-ea {
+      background: linear-gradient(135deg, #7ecb1f, #558b2f);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background-clip: text;
+    }
+
+    .text-agri {
+      background: linear-gradient(135deg, #29b6f6, #0277bd);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background-clip: text;
+    }
   }
+
+
 
   .section__description {
     max-width: 650px;
-
     margin-inline: auto;
     margin-bottom: 2rem;
-
     font-size: 1.05rem;
     line-height: 1.9;
+    color: $text-light;
   }
 }
 
 .header__links {
   @include flex-center;
-
   gap: 1rem;
+  z-index: 2;
 
   li {
     transition: transform 0.3s ease;
@@ -95,24 +529,27 @@ header {
 
   img {
     width: 150px;
-
     transition:
       transform 0.3s ease,
       box-shadow 0.3s ease;
-
     border-radius: 14px;
 
     &:hover {
-      box-shadow: 0 12px 25px rgba(0, 0, 0, 0.15);
+      box-shadow: 0 12px 25px rgba($text-dark, 0.15);
     }
   }
 }
 
+// ================================
+// RESPONSIVE STYLES
+// ================================
+
 @include tablet {
-  header {
+  .hero-section {
     grid-template-columns: 1fr 1fr;
     gap: 5rem;
     padding-top: 8.5rem;
+    padding-bottom: 9rem;
   }
 
   .header__content {
@@ -130,12 +567,63 @@ header {
   .header__links {
     justify-content: flex-start;
   }
+
+  .floating-badge {
+    &.badge--ai {
+      top: 15%;
+      left: 2%;
+    }
+
+    &.badge--moisture {
+      bottom: 30%;
+      right: 2%;
+    }
+
+    &.badge--iot {
+      bottom: 10%;
+      left: 4%;
+    }
+  }
 }
 
 @media (max-width: 768px) {
   .header__img {
-    img {
-      max-width: 420px;
+    padding: 1.5rem 0;
+
+    .main-hero-image {
+      max-width: 380px;
+    }
+  }
+
+  .floating-badge {
+    padding: 0.5rem 0.85rem;
+    border-radius: 12px;
+
+    .badge__icon {
+      font-size: 1.15rem;
+    }
+
+    .badge__title {
+      font-size: 0.65rem;
+    }
+
+    .badge__value {
+      font-size: 0.8rem;
+    }
+
+    &.badge--ai {
+      top: 10%;
+      left: 2%;
+    }
+
+    &.badge--moisture {
+      bottom: 18%;
+      right: 2%;
+    }
+
+    &.badge--iot {
+      bottom: 8%;
+      left: 2%;
     }
   }
 

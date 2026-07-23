@@ -36,6 +36,8 @@ img, video, iframe {
 
   border-radius: $radius-lg;
 
+  border-top: 3px solid rgba($primary-color, 0.4);
+
   box-shadow: $shadow-sm;
 
   transition:

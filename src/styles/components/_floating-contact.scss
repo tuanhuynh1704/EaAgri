@@ -1,0 +1,108 @@
+@use "../abstracts/variables" as *;
+
+.floating-contact {
+  position: fixed;
+  bottom: 2rem;
+  right: 2rem;
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+  z-index: 9999;
+
+  @media (max-width: $mobile) {
+    bottom: 1.5rem;
+    right: 1.5rem;
+  }
+
+  &__btn {
+    width: 60px;
+    height: 60px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: $white;
+    text-decoration: none;
+    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.15);
+    transition: all 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+    position: relative;
+
+    @media (max-width: $mobile) {
+      width: 50px;
+      height: 50px;
+    }
+
+    &::before {
+      content: '';
+      position: absolute;
+      inset: 0;
+      border-radius: 50%;
+      background: inherit;
+      z-index: -1;
+      animation: pulse 2s infinite;
+    }
+
+    &:hover {
+      transform: translateY(-5px) scale(1.05);
+      box-shadow: 0 8px 25px rgba(0, 0, 0, 0.2);
+    }
+
+    i {
+      font-size: 2rem;
+      
+      @media (max-width: $mobile) {
+        font-size: 1.6rem;
+      }
+    }
+
+    .zalo-text {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      width: 100%;
+      height: 100%;
+      font-weight: 800;
+      font-size: 1.1rem;
+      font-family: 'Inter', 'Roboto', sans-serif;
+      letter-spacing: 0.5px;
+      
+      @media (max-width: $mobile) {
+        font-size: 0.95rem;
+      }
+    }
+
+    &--zalo {
+      background: #0068FF; // Official Zalo blue
+      
+      &::before {
+        animation-delay: 0s;
+        box-shadow: 0 0 0 0 rgba(#0068FF, 0.7);
+      }
+    }
+
+    &--messenger {
+      background: linear-gradient(45deg, #00B2FF, #006AFF); // Messenger gradient
+      
+      &::before {
+        animation-delay: 1s;
+        background: #006AFF;
+        box-shadow: 0 0 0 0 rgba(#006AFF, 0.7);
+      }
+    }
+  }
+}
+
+@keyframes pulse {
+  0% {
+    transform: scale(0.95);
+    opacity: 0.8;
+  }
+  70% {
+    transform: scale(1.4);
+    opacity: 0;
+  }
+  100% {
+    transform: scale(0.95);
+    opacity: 0;
+  }
+}

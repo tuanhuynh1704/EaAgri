@@ -3,6 +3,20 @@
 
 .video__section {
   text-align: center;
+  position: relative;
+
+  &::before {
+    content: "";
+    position: absolute;
+    top: 0;
+    left: 50%;
+    transform: translateX(-50%);
+    width: 80px;
+    height: 4px;
+    border-radius: 2px;
+    background: linear-gradient(90deg, $primary-color, $primary-color-light);
+    opacity: 0.6;
+  }
 }
 
 .video__description {

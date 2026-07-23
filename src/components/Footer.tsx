@@ -91,7 +91,7 @@ const Footer = () => {
       </div>
 
       <div className="footer__bar">
-        Copyright © 2026 EaAgri Team.
+        Copyright © 2026 Ea Agri Team.
         All rights reserved.
       </div>
     </footer>
