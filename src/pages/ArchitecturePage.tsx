@@ -1,4 +1,3 @@
-import React from 'react';
 import VideoSection from "../components/VideoSection";
 import StoryFeatureSection from "../components/StoryFeatureSection";
 import FeatureGrid from "../components/FeatureGrid";
