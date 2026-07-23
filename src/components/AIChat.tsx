@@ -352,7 +352,7 @@ export default function AIChat() {
               className="ai-chat__model-select"
               value={modelProvider}
               onChange={(e) => setModelProvider(e.target.value)}
-              disabled={!!user && limitReached}
+              disabled={user && limitReached}
             >
               <option value="gemini">Ea AI Tiêu chuẩn</option>
               <option value="deepseek">Ea AI Chuyên sâu</option>
@@ -444,7 +444,7 @@ export default function AIChat() {
                   onClick={handleMicrophone}
                   style={{ color: isRecording ? '#ef5350' : '' }}
                   title="Nhập bằng giọng nói"
-                  disabled={!!user && limitReached}
+                  disabled={user && limitReached}
                 >
                   <i className={isRecording ? "ri-mic-fill" : "ri-mic-line"}></i>
                 </button>
@@ -455,7 +455,7 @@ export default function AIChat() {
                   placeholder={limitReached ? "Bạn đã hết lượt hỏi hôm nay..." : "Nhập câu hỏi của bạn..."}
                   value={inputValue}
                   onChange={(e) => setInputValue(e.target.value)}
-                  disabled={!!user && limitReached}
+                  disabled={user && limitReached}
                   onKeyDown={(e) => {
                     if (e.key === 'Enter' && !e.shiftKey) {
                       e.preventDefault();
@@ -467,7 +467,7 @@ export default function AIChat() {
                 <button
                   className="ai-chat__send-btn"
                   onClick={() => sendMessage(inputValue)}
-                  disabled={!inputValue.trim() || (!!user && limitReached)}
+                  disabled={!inputValue.trim() || (user && limitReached)}
                 >
                   <i className="ri-send-plane-fill"></i>
                 </button>

@@ -1,4 +1,3 @@
-
 export default function FloatingContact() {
   return (
     <div className="floating-contact">
@@ -28,3 +27,5 @@ export default function FloatingContact() {
     </div>
   );
 }
+
+
