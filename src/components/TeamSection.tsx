@@ -1,7 +1,7 @@
 import { useState, useEffect } from "react";
 
 const appScreenshots = [
-  "/assets/1.jpg",
+  "/assets/main screen.jpg",
   "/assets/2.jpg",
   "/assets/3.jpg",
   "/assets/4.jpg",
