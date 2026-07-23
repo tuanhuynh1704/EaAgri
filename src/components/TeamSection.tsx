@@ -49,7 +49,7 @@ const TeamSection = () => {
     }, 4000); // Rotate every 4s
 
     return () => clearInterval(interval);
-  }, []);
+  }, [currentIndex]);
 
   const getVisibleScreenshots = () => {
     const total = appScreenshots.length;

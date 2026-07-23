@@ -1,3 +1,5 @@
+import { useState, useEffect } from "react";
+
 interface StoryFeatureSectionProps {
   title: string;
   description: string;
@@ -16,6 +18,29 @@ const StoryFeatureSection = ({
   list,
   reverse = false,
 }: StoryFeatureSectionProps) => {
+  const images = Array.isArray(image) ? image : [image];
+  const [currentIndex, setCurrentIndex] = useState(0);
+
+  const handlePrev = () => {
+    setCurrentIndex((prev) => (prev - 1 + images.length) % images.length);
+  };
+
+  const handleNext = () => {
+    setCurrentIndex((prev) => (prev + 1) % images.length);
+  };
+
+  const handleDotClick = (idx: number) => {
+    setCurrentIndex(idx);
+  };
+
+  useEffect(() => {
+    if (images.length <= 1) return;
+    const interval = setInterval(() => {
+      setCurrentIndex((prev) => (prev + 1) % images.length);
+    }, 4000);
+    return () => clearInterval(interval);
+  }, [currentIndex, images.length]);
+
   return (
     <section
       className={`story__container section__container ${
@@ -45,14 +70,31 @@ const StoryFeatureSection = ({
         className="story__image"
         data-aos={reverse ? "fade-right" : "fade-left"}
       >
-        {Array.isArray(image) ? (
-          <div className="story__image-grid">
-            {image.map((img, i) => (
-              <img key={i} src={img} alt={title} />
-            ))}
+        {images.length > 1 ? (
+          <div className="story__slider">
+            <button className="story__slider-btn story__slider-btn--prev" onClick={handlePrev} aria-label="Previous image">
+              <i className="ri-arrow-left-s-line"></i>
+            </button>
+            
+            <img src={images[currentIndex]} alt={`${title} ${currentIndex + 1}`} />
+            
+            <button className="story__slider-btn story__slider-btn--next" onClick={handleNext} aria-label="Next image">
+              <i className="ri-arrow-right-s-line"></i>
+            </button>
+            
+            <div className="story__slider-dots">
+              {images.map((_, idx) => (
+                <button
+                  key={idx}
+                  className={`story__slider-dot ${idx === currentIndex ? "active" : ""}`}
+                  onClick={() => handleDotClick(idx)}
+                  aria-label={`Go to slide ${idx + 1}`}
+                />
+              ))}
+            </div>
           </div>
         ) : (
-          <img src={image} alt={title} />
+          <img src={images[0]} alt={title} />
         )}
       </div>
     </section>
