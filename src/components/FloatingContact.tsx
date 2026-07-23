@@ -39,7 +39,7 @@ export default function FloatingContact() {
 
       {/* Zalo Button */}
       <a
-        href="+84 397 594 024"
+        href="https://zalo.me/0397594024"
         target="_blank"
         rel="noreferrer"
         className="floating-contact__btn floating-contact__btn--zalo"

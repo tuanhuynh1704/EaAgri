@@ -94,7 +94,7 @@ const Hero = () => {
           </li>
 
           <li>
-            <a href="https://play.google.com/store/apps/details?id=com.eaagri.app">
+            <a href="https://play.google.com/store/apps/details?id=com.eaagri.app&hl=vi">
               <img
                 src="/assets/google.png"
                 alt="Google Play"
