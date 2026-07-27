@@ -1,4 +1,12 @@
+import { useNavigate } from "react-router-dom";
+
 const RoadmapSection = () => {
+  const navigate = useNavigate();
+
+  const linkHandle = () => {
+    navigate('https://www.facebook.com/profile.php?id=61577351045350')
+  }
+
   return (
     <section
       className="membership__container section__container"
@@ -35,9 +43,9 @@ const RoadmapSection = () => {
         </p>
 
         <div className="membership__btn">
-          <button className="btn">
+          <a href="https://www.facebook.com/profile.php?id=61577351045350" target="blank" className="btn">
             Liên Hệ Hợp Tác
-          </button>
+          </a>
         </div>
       </div>
     </section>

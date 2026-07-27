@@ -358,7 +358,7 @@ export default function AIChat() {
               <option value="deepseek">Ea AI Chuyên sâu</option>
             </select>
 
-            <div style={{ position: 'relative' }}>
+            {/* <div style={{ position: 'relative' }}>
               <button
                 className={`ai-chat__icon-btn ${showThemePicker ? 'active' : ''}`}
                 onClick={() => setShowThemePicker(!showThemePicker)}
@@ -379,7 +379,7 @@ export default function AIChat() {
                   ))}
                 </div>
               )}
-            </div>
+            </div> */}
           </div>
         </div>
 

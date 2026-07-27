@@ -17,9 +17,9 @@ const StorySection = ({
   imageAlt,
   descriptions,
   reverse = false,
-  showButton = false,
-  buttonText = "Xem Chi Tiết Đề Tài",
-  buttonLink = "#",
+  // showButton = false,
+  // buttonText = "Xem Chi Tiết Đề Tài",
+  // buttonLink = "#",
 }: StorySectionProps) => {
   const images = Array.isArray(image) ? image : [image];
   const [currentIndex, setCurrentIndex] = useState(0);
@@ -102,11 +102,11 @@ const StorySection = ({
           </div>
         ))}
 
-        {showButton && (
+        {/* {showButton && (
           <div className="story__link">
             <a href={buttonLink}>{buttonText}</a>
           </div>
-        )}
+        )} */}
       </div>
     </section>
   );
