@@ -65,7 +65,7 @@
 }
 
 .team-showcase__desc {
-  font-size: 0.9rem;
+  font-size: 1.05rem;
   line-height: 1.8;
   color: $text-light;
   max-width: 520px;
@@ -469,6 +469,10 @@
   .team-showcase__cards {
     grid-template-columns: 1fr;
     max-width: 400px;
+  }
+
+  .team-showcase__desc{
+    font-size: 0.9rem;
   }
 
   .carousel-3d {
