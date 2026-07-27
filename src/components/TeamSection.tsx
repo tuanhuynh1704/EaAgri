@@ -34,7 +34,7 @@ const teamMembers: TeamMember[] = [
     id: "2311559215",
   },
   {
-    name: "Nguyễn Anh Giang",
+    name: "Nguyễn Anh Giảng",
     roleTag: "Core Member",
     roleTitle: "CORE MEMBER",
     task: "AI, dữ liệu và phát triển giải pháp.",
@@ -47,7 +47,7 @@ const teamMembers: TeamMember[] = [
     roleTitle: "CORE MEMBER",
     task: "Hỗ trợ kỹ thuật và khảo sát.",
     major: "Khoa học dữ liệu",
-    id: "2311558913",
+    id: "2311559253",
   },
   {
     name: "Huỳnh Anh Tuấn",
