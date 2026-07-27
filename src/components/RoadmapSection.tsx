@@ -1,11 +1,5 @@
-import { useNavigate } from "react-router-dom";
 
 const RoadmapSection = () => {
-  const navigate = useNavigate();
-
-  const linkHandle = () => {
-    navigate('https://www.facebook.com/profile.php?id=61577351045350')
-  }
 
   return (
     <section
