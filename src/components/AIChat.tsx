@@ -35,21 +35,21 @@ const FAQS = [
   }
 ];
 
-const THEMES = [
-  { id: 'theme-pastel', color: '#ebedee', name: 'Pastel' },
-  { id: 'theme-dark-space', color: '#243b55', name: 'Dark Space' },
-  { id: 'theme-mystic', color: '#4b6cb7', name: 'Mystic Purple' },
-  { id: 'theme-nature', color: '#96e6a1', name: 'Nature Green' },
-  { id: 'theme-warm', color: '#fda085', name: 'Warm Sunset' }
-];
+// const THEMES = [
+//   { id: 'theme-pastel', color: '#ebedee', name: 'Pastel' },
+//   { id: 'theme-dark-space', color: '#243b55', name: 'Dark Space' },
+//   { id: 'theme-mystic', color: '#4b6cb7', name: 'Mystic Purple' },
+//   { id: 'theme-nature', color: '#96e6a1', name: 'Nature Green' },
+//   { id: 'theme-warm', color: '#fda085', name: 'Warm Sunset' }
+// ];
 
 export default function AIChat() {
   const { user, profile } = useAuth();
   const navigate = useNavigate();
 
   const [activeTab, setActiveTab] = useState<'chat' | 'faq'>('chat');
-  const [theme, setTheme] = useState('theme-pastel');
-  const [showThemePicker, setShowThemePicker] = useState(false);
+  // const [theme, setTheme] = useState('theme-pastel');
+  // const [showThemePicker, setShowThemePicker] = useState(false);
   const [modelProvider, setModelProvider] = useState('gemini');
 
   const defaultMessage: Message = {
@@ -297,7 +297,8 @@ export default function AIChat() {
   const remaining = isUserRole ? Math.max(0, 5 - usageCount) : 'Vô hạn';
 
   return (
-    <section className={`ai-chat-section ${theme}`} id="ai-chat">
+    // <section className={`ai-chat-section ${theme}`} id="ai-chat">
+    <section className={`ai-chat-section`} id="ai-chat">
       <div className="ai-chat" data-aos="fade-up">
 
         {/* Login Prompt Overlay */}
