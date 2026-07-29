@@ -11,6 +11,8 @@
   <meta property="og:type" content="website">
   <meta property="og:url" content="https://www.eaagri.id.vn/">
   <meta property="og:image" content="https://www.eaagri.id.vn/logo2.png">
+  <meta itemprop="image" content="https://www.eaagri.id.vn/logo2.png">
+  <meta name="thumbnail" content="https://www.eaagri.id.vn/logo2.png">
 
   <meta name="twitter:card" content="summary_large_image">
   <meta name="twitter:title" content="Ea Agri - Nông nghiệp Thông Minh">
@@ -22,9 +24,20 @@
   <script type="application/ld+json">
     {
       "@context": "https://schema.org",
-      "@type": "Organization",
-      "url": "https://www.eaagri.id.vn/",
-      "logo": "https://www.eaagri.id.vn/logo2.png"
+      "@graph": [
+        {
+          "@type": "Organization",
+          "url": "https://www.eaagri.id.vn/",
+          "logo": "https://www.eaagri.id.vn/logo2.png",
+          "image": "https://www.eaagri.id.vn/logo2.png"
+        },
+        {
+          "@type": "WebSite",
+          "url": "https://www.eaagri.id.vn/",
+          "name": "Ea Agri - Nông nghiệp Thông Minh",
+          "image": "https://www.eaagri.id.vn/logo2.png"
+        }
+      ]
     }
   </script>
 </head>
