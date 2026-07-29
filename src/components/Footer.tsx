@@ -80,7 +80,7 @@ const Footer = () => {
           </li>
 
           <li>
-            <a href="##">
+            <a href="https://play.google.com/store/apps/details?id=com.eaagri.app&hl=vi">
               <img
                 src="/assets/google.png"
                 alt="Google Play"
