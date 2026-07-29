@@ -19,7 +19,7 @@ export default function HomePage() {
                 <TeamSection />
             </div>
 
-            <AIChat />
+            {/* <AIChat /> */}
 
             <div className="section-bg--gradient-soft">
                 <StorySection
