@@ -3,6 +3,7 @@ import { useParams, useNavigate, Link } from "react-router-dom";
 import { supabase } from "../utils/supabase/client";
 import { useAuth } from "../context/AuthContext";
 import "react-quill-new/dist/quill.snow.css";
+import { cleanContent } from "../utils/cleanContent";
 
 interface NewsItem {
   id: string;
@@ -61,7 +62,7 @@ export default function NewsDetail() {
     if (!article) return;
 
     const confirmDelete = window.confirm(
-      `Bạn có chắc chắn muốn xóa bài viết "${article.title}"? Hành động này không thể hoàn tác.`
+      `Bạn có chắc chắn muốn xóa bài viết "${cleanContent(article.title)}"? Hành động này không thể hoàn tác.`
     );
     if (!confirmDelete) return;
 
@@ -152,7 +153,7 @@ export default function NewsDetail() {
           {/* Cover Image or Category Badge */}
           {article.image_url ? (
             <div className="news-detail__hero">
-              <img src={article.image_url} alt={article.title} />
+              <img src={article.image_url} alt={cleanContent(article.title)} />
               <div className="news-detail__category-badge">{article.category}</div>
             </div>
           ) : (
@@ -163,7 +164,7 @@ export default function NewsDetail() {
 
           {/* Article Header Content */}
           <div className="news-detail__body">
-            <h1 className="news-detail__title">{article.title}</h1>
+            <h1 className="news-detail__title">{cleanContent(article.title)}</h1>
 
             <div className="news-detail__meta">
               <div className="news-detail__meta-item">
@@ -179,7 +180,7 @@ export default function NewsDetail() {
             {/* Main Content */}
             <div 
               className="news-detail__content ql-editor"
-              dangerouslySetInnerHTML={{ __html: article.content }}
+              dangerouslySetInnerHTML={{ __html: cleanContent(article.content) }}
             />
 
           </div>

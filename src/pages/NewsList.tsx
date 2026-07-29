@@ -2,6 +2,7 @@ import { useEffect, useState } from "react";
 import { Link } from "react-router-dom";
 import { supabase } from "../utils/supabase/client";
 import { useAuth } from "../context/AuthContext";
+import { cleanContent } from "../utils/cleanContent";
 
 interface NewsItem {
   id: string;
@@ -15,8 +16,8 @@ interface NewsItem {
 
 // Strip HTML tags for search and snippet preview
 const stripHtml = (html: string) => {
-  const doc = new DOMParser().parseFromString(html, "text/html");
-  return doc.body.textContent || "";
+  const doc = new DOMParser().parseFromString(cleanContent(html), "text/html");
+  return cleanContent(doc.body.textContent || "");
 };
 
 export default function NewsList() {
@@ -90,7 +91,7 @@ export default function NewsList() {
     
     const plainContent = stripHtml(item.content);
     const matchesSearch =
-      item.title.toLowerCase().includes(searchQuery.toLowerCase()) ||
+      cleanContent(item.title).toLowerCase().includes(searchQuery.toLowerCase()) ||
       plainContent.toLowerCase().includes(searchQuery.toLowerCase()) ||
       item.author.toLowerCase().includes(searchQuery.toLowerCase());
 
@@ -169,7 +170,7 @@ export default function NewsList() {
                 {/* Card Image */}
                 <Link to={`/news/${item.id}`} className="news-list__card-image-wrapper">
                   {item.image_url ? (
-                    <img src={item.image_url} alt={item.title} />
+                    <img src={item.image_url} alt={cleanContent(item.title)} />
                   ) : (
                     <div className="placeholder">
                       <i className="ri-image-line"></i>
@@ -193,7 +194,7 @@ export default function NewsList() {
 
                   {/* Title */}
                   <Link to={`/news/${item.id}`} style={{ textDecoration: "none" }}>
-                    <h2 className="news-list__card-title">{item.title}</h2>
+                    <h2 className="news-list__card-title">{cleanContent(item.title)}</h2>
                   </Link>
 
                   {/* Snippet */}
@@ -211,7 +212,7 @@ export default function NewsList() {
 
                     {isSA && (
                       <button
-                        onClick={(e) => handleDelete(item.id, item.title, e)}
+                        onClick={(e) => handleDelete(item.id, cleanContent(item.title), e)}
                         className="news-list__delete-btn"
                         title="Xóa bài viết"
                       >

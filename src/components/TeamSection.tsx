@@ -18,44 +18,79 @@ const appScreenshots = [
 interface TeamMember {
   name: string;
   roleTag: string;
-  roleTitle: string;
+  // roleTitle: string;
   task: string;
   major: string;
   id: string;
+  avatar: string;
 }
 
+// const teamMembers: TeamMember[] = [
+//   {
+//     name: "Phan Đăng Huy",
+//     roleTag: "Leader",
+//     roleTitle: "LEADER",
+//     task: "Điều phối dự án, phát triển sản phẩm và kiểm thử.",
+//     major: "Khoa học dữ liệu",
+//     id: "2311559215",
+//   },
+//   {
+//     name: "Nguyễn Anh Giảng",
+//     roleTag: "Core Member",
+//     roleTitle: "CORE MEMBER",
+//     task: "AI, dữ liệu và phát triển giải pháp.",
+//     major: "Khoa học dữ liệu",
+//     id: "2311558913",
+//   },
+//   {
+//     name: "Đặng Văn Chung",
+//     roleTag: "Core Member",
+//     roleTitle: "CORE MEMBER",
+//     task: "Hỗ trợ kỹ thuật và khảo sát.",
+//     major: "Khoa học dữ liệu",
+//     id: "2311559253",
+//   },
+//   {
+//     name: "Huỳnh Anh Tuấn",
+//     roleTag: "Core Member",
+//     roleTitle: "CORE MEMBER",
+//     task: "Nội dung, truyền thông và vận hành.",
+//     major: "Kỹ thuật phần mềm",
+//     id: "2200005725",
+//   },
+// ];
 const teamMembers: TeamMember[] = [
   {
     name: "Phan Đăng Huy",
-    roleTag: "Leader",
-    roleTitle: "LEADER",
-    task: "Điều phối dự án, phát triển sản phẩm và kiểm thử.",
+    roleTag: "Founder & Project Leader",
+    task: "Nhà sáng lập - Điều phối dự án, phát triển sản phẩm và kiểm thử.",
     major: "Khoa học dữ liệu",
     id: "2311559215",
+    avatar: "/huy.jpg",
   },
   {
     name: "Nguyễn Anh Giảng",
     roleTag: "Core Member",
-    roleTitle: "CORE MEMBER",
     task: "AI, dữ liệu và phát triển giải pháp.",
     major: "Khoa học dữ liệu",
     id: "2311558913",
+    avatar: "/giang.jpg",
   },
   {
     name: "Đặng Văn Chung",
     roleTag: "Core Member",
-    roleTitle: "CORE MEMBER",
     task: "Hỗ trợ kỹ thuật và khảo sát.",
     major: "Khoa học dữ liệu",
     id: "2311559253",
+    avatar: "/chung.jpg",
   },
   {
     name: "Huỳnh Anh Tuấn",
     roleTag: "Core Member",
-    roleTitle: "CORE MEMBER",
     task: "Nội dung, truyền thông và vận hành.",
     major: "Kỹ thuật phần mềm",
     id: "2200005725",
+    avatar: "/tuan.png",
   },
 ];
 
@@ -147,14 +182,26 @@ const TeamSection = () => {
               </div>
 
               <div className="team-card__avatar">
-                {member.name.charAt(0)}
+                {member.avatar ? (
+                  <img
+                    src={member.avatar}
+                    alt={member.name}
+                    style={{
+                      width: "100%",
+                      height: "100%",
+                      objectFit: "cover",
+                    }}
+                  />
+                ) : (
+                  member.name.charAt(0)
+                )}
               </div>
 
               <h3 className="team-card__name">{member.name}</h3>
 
-              <div className="team-card__role-pill">
+              {/* <div className="team-card__role-pill">
                 {member.roleTitle}
-              </div>
+              </div> */}
 
               <p className="team-card__task">{member.task}</p>
 

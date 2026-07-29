@@ -6,6 +6,8 @@ import { supabase } from "../utils/supabase/client";
 import { useAuth } from "../context/AuthContext";
 import ReactQuill from "react-quill-new";
 import "react-quill-new/dist/quill.snow.css";
+import { cleanContent } from "../utils/cleanContent";
+import { quillModules, quillFormats } from "../utils/quillConfig";
 
 interface NewsItem {
   id: string;
@@ -63,30 +65,6 @@ export default function ManageNews() {
   ];
 
   const filterCategories = ["Tất cả", ...categories];
-
-  const quillModules = {
-    toolbar: [
-      [{ header: [1, 2, 3, 4, 5, 6, false] }],
-      ["bold", "italic", "underline", "strike"],
-      [{ list: "ordered" }, { list: "bullet" }],
-      [{ align: [] }],
-      ["link", "image"],
-      ["clean"],
-    ],
-  };
-
-  const quillFormats = [
-    "header",
-    "bold",
-    "italic",
-    "underline",
-    "strike",
-    "list",
-    "bullet",
-    "align",
-    "link",
-    "image",
-  ];
 
   // Fetch all articles
   const fetchNews = async () => {
@@ -196,10 +174,10 @@ export default function ManageNews() {
   const handleOpenEdit = (item: NewsItem) => {
     setModalMode("edit");
     setEditingId(item.id);
-    setFormTitle(item.title);
+    setFormTitle(cleanContent(item.title));
     setFormAuthor(item.author);
     setFormCategory(item.category);
-    setFormContent(item.content);
+    setFormContent(cleanContent(item.content));
     setFormImageUrl(item.image_url || "");
     setFormImageFile(null);
     // If there is an existing image URL, set it as preview
@@ -285,8 +263,8 @@ export default function ManageNews() {
           .from("news")
           .insert([
             {
-              title: formTitle.trim(),
-              content: formContent.trim(),
+              title: cleanContent(formTitle.trim()),
+              content: cleanContent(formContent.trim()),
               author: formAuthor.trim(),
               category: formCategory,
               image_url: finalImageUrl || null
@@ -315,8 +293,8 @@ export default function ManageNews() {
         const { data, error } = await supabase
           .from("news")
           .update({
-            title: formTitle.trim(),
-            content: formContent.trim(),
+            title: cleanContent(formTitle.trim()),
+            content: cleanContent(formContent.trim()),
             author: formAuthor.trim(),
             category: formCategory,
             image_url: finalImageUrl || null
@@ -465,7 +443,7 @@ export default function ManageNews() {
                       <td style={{ width: "80px" }}>
                         <div className="manage-news__thumb">
                           {item.image_url ? (
-                            <img src={item.image_url} alt={item.title} />
+                            <img src={item.image_url} alt={cleanContent(item.title)} />
                           ) : (
                             <div className="manage-news__thumb-placeholder">
                               <i className="ri-image-line"></i>
@@ -478,7 +456,7 @@ export default function ManageNews() {
                       <td>
                         <div className="manage-news__item-title">
                           <Link to={`/news/${item.id}`} className="title-link">
-                            {item.title}
+                            {cleanContent(item.title)}
                           </Link>
                         </div>
                       </td>

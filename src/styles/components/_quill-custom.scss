@@ -1,0 +1,61 @@
+@use "../abstracts/variables" as *;
+
+// Global custom styles for ReactQuill Editor (ManageNews & UploadNews)
+.ql-snow .ql-picker.ql-lineheight {
+  width: 135px;
+
+  .ql-picker-label::before,
+  .ql-picker-item::before {
+    content: 'Giãn dòng: 1.5';
+  }
+
+  .ql-picker-label[data-value="1.0"]::before,
+  .ql-picker-item[data-value="1.0"]::before {
+    content: 'Dòng: 1.0 (Đơn)';
+  }
+
+  .ql-picker-label[data-value="1.2"]::before,
+  .ql-picker-item[data-value="1.2"]::before {
+    content: 'Dòng: 1.2';
+  }
+
+  .ql-picker-label[data-value="1.5"]::before,
+  .ql-picker-item[data-value="1.5"]::before {
+    content: 'Dòng: 1.5 (Vừa)';
+  }
+
+  .ql-picker-label[data-value="1.8"]::before,
+  .ql-picker-item[data-value="1.8"]::before {
+    content: 'Dòng: 1.8 (Chuẩn)';
+  }
+
+  .ql-picker-label[data-value="2.0"]::before,
+  .ql-picker-item[data-value="2.0"]::before {
+    content: 'Dòng: 2.0 (Kép)';
+  }
+
+  .ql-picker-label[data-value="2.5"]::before,
+  .ql-picker-item[data-value="2.5"]::before {
+    content: 'Dòng: 2.5';
+  }
+
+  .ql-picker-label[data-value="3.0"]::before,
+  .ql-picker-item[data-value="3.0"]::before {
+    content: 'Dòng: 3.0 (Rộng)';
+  }
+}
+
+// Enhance default editor formatting for comfortable line spacing when typing ("khi thêm nội dung")
+.ql-container.ql-snow {
+  font-family: inherit;
+}
+
+.ql-editor {
+  line-height: 1.75;
+  font-size: 1.05rem;
+  color: #2c3e31;
+
+  p {
+    margin-bottom: 0.85rem;
+  }
+}

@@ -2,6 +2,10 @@ import React, { useState, useRef } from "react";
 import { Link } from "react-router-dom";
 import { supabase } from "../utils/supabase/client";
 import { useAuth } from "../context/AuthContext";
+import ReactQuill from "react-quill-new";
+import "react-quill-new/dist/quill.snow.css";
+import { cleanContent } from "../utils/cleanContent";
+import { quillModules, quillFormats } from "../utils/quillConfig";
 
 interface AlertState {
   type: "success" | "error" | null;
@@ -133,7 +137,7 @@ export default function UploadNews() {
       setAlert({ type: "error", message: "Vui lòng nhập tên tác giả." });
       return;
     }
-    if (!content.trim()) {
+    if (!content.trim() || content.replace(/<[^>]*>/g, '').trim() === '') {
       setAlert({ type: "error", message: "Vui lòng nhập nội dung bài viết." });
       return;
     }
@@ -172,8 +176,8 @@ export default function UploadNews() {
       // 2. Insert post metadata to database
       const { error: insertError } = await supabase.from("news").insert([
         {
-          title: title.trim(),
-          content: content.trim(),
+          title: cleanContent(title.trim()),
+          content: cleanContent(content.trim()),
           author: author.trim(),
           category,
           image_url: finalImageUrl || null
@@ -351,13 +355,13 @@ export default function UploadNews() {
               {/* Content / Body */}
               <div className="upload-news__group">
                 <label htmlFor="content">Nội dung chi tiết <span style={{ color: "#c62828" }}>*</span></label>
-                <textarea
-                  id="content"
-                  placeholder="Viết nội dung bài chia sẻ của bạn vào đây..."
-                  className="upload-news__textarea"
+                <ReactQuill
+                  theme="snow"
                   value={content}
-                  onChange={(e) => setContent(e.target.value)}
-                  required
+                  onChange={setContent}
+                  modules={quillModules}
+                  formats={quillFormats}
+                  placeholder="Viết nội dung bài chia sẻ của bạn vào đây..."
                 />
               </div>
 
