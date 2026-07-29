@@ -2,7 +2,7 @@
 // import Footer from "../components/Footer";
 import Hero from "../components/Hero";
 import TeamSection from "../components/TeamSection";
-import AIChat from "../components/AIChat";
+// import AIChat from "../components/AIChat";
 import StorySection from "../components/StorySection";
 import VideoSection from "../components/VideoSection";
 import ResultSection from "../components/ResultSection";
