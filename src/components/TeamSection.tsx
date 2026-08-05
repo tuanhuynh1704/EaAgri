@@ -90,7 +90,7 @@ const teamMembers: TeamMember[] = [
     task: "Nội dung, truyền thông và vận hành.",
     major: "Kỹ thuật phần mềm",
     id: "2200005725",
-    avatar: "/tuan_vest.png",
+    avatar: "/tuan_vest.jpg",
   },
 ];
 
