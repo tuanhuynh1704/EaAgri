@@ -66,7 +66,7 @@ const teamMembers: TeamMember[] = [
     task: "Nhà sáng lập - Điều phối dự án, phát triển sản phẩm và kiểm thử.",
     major: "Khoa học dữ liệu",
     id: "2311559215",
-    avatar: "/huy.jpg",
+    avatar: "/huy_vest.jpg",
   },
   {
     name: "Nguyễn Anh Giảng",
@@ -74,7 +74,7 @@ const teamMembers: TeamMember[] = [
     task: "AI, dữ liệu và phát triển giải pháp.",
     major: "Khoa học dữ liệu",
     id: "2311558913",
-    avatar: "/giang.jpg",
+    avatar: "/giang_vest.jpg",
   },
   {
     name: "Đặng Văn Chung",
@@ -82,7 +82,7 @@ const teamMembers: TeamMember[] = [
     task: "Hỗ trợ kỹ thuật và khảo sát.",
     major: "Khoa học dữ liệu",
     id: "2311559253",
-    avatar: "/chung.jpg",
+    avatar: "/chung_vest.jpg",
   },
   {
     name: "Huỳnh Anh Tuấn",
@@ -90,7 +90,7 @@ const teamMembers: TeamMember[] = [
     task: "Nội dung, truyền thông và vận hành.",
     major: "Kỹ thuật phần mềm",
     id: "2200005725",
-    avatar: "/tuan.png",
+    avatar: "/tuan_vest.png",
   },
 ];
 
