@@ -181,33 +181,28 @@ const TeamSection = () => {
                 {member.roleTag}
               </div>
 
-              <div className="team-card__avatar">
+              <div className="team-card__portrait">
                 {member.avatar ? (
                   <img
                     src={member.avatar}
                     alt={member.name}
-                    style={{
-                      width: "100%",
-                      height: "100%",
-                      objectFit: "cover",
-                    }}
                   />
                 ) : (
-                  member.name.charAt(0)
+                  <div className="team-card__portrait-placeholder">
+                    {member.name.charAt(0)}
+                  </div>
                 )}
               </div>
 
-              <h3 className="team-card__name">{member.name}</h3>
+              <div className="team-card__info">
+                <h3 className="team-card__name">{member.name}</h3>
 
-              {/* <div className="team-card__role-pill">
-                {member.roleTitle}
-              </div> */}
+                <p className="team-card__task">{member.task}</p>
 
-              <p className="team-card__task">{member.task}</p>
-
-              <div className="team-card__meta">
-                <span className="team-card__major">{member.major}</span>
-                <span className="team-card__id">MSSV: {member.id}</span>
+                <div className="team-card__meta">
+                  <span className="team-card__major">{member.major}</span>
+                  <span className="team-card__id">MSSV: {member.id}</span>
+                </div>
               </div>
             </div>
           ))}
