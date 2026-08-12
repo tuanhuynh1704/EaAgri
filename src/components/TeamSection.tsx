@@ -201,7 +201,7 @@ const TeamSection = () => {
 
                 <div className="team-card__meta">
                   <span className="team-card__major">{member.major}</span>
-                  <span className="team-card__id">MSSV: {member.id}</span>
+                  {/* <span className="team-card__id">MSSV: {member.id}</span> */}
                 </div>
               </div>
             </div>

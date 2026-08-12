@@ -28,7 +28,7 @@ const Navbar = () => {
       </div>
 
       <div className="nav__btns">
-        
+
         <button className="btn" onClick={handleHome}>
           <span>
             <i className="ri-home-smile-line"></i>
@@ -86,9 +86,9 @@ const Navbar = () => {
                 </button>
               </>
             )}
-            
+
             <div className="nav__user-greeting" style={{ fontSize: "0.85rem", color: "#1b3323", fontWeight: "600", marginLeft: "0.5rem" }}>
-              {profile?.full_name || user.email?.split("@")[0]} 
+              {profile?.full_name || user.email?.split("@")[0]}
               {/* ({profile ? `Role: ${profile.role}` : authError ? `Lỗi: ${authError}` : "Đang tải profile..."}) */}
             </div>
 
