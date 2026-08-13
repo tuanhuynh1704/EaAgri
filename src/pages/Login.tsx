@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useMemo } from "react";
 import { useNavigate, useLocation } from "react-router-dom";
 import { useAuth } from "../context/AuthContext";
 import { supabase } from "../utils/supabase/client";
@@ -9,10 +9,8 @@ interface AlertState {
 }
 
 export default function Login() {
-  const [isLogin, setIsLogin] = useState(true);
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
-  const [fullName, setFullName] = useState("");
   const [isLoading, setIsLoading] = useState(false);
   const [alert, setAlert] = useState<AlertState>({ type: null, message: "" });
 
@@ -27,6 +25,32 @@ export default function Login() {
       navigate(from, { replace: true });
     }
   }, [user, navigate, from]);
+
+  // Generate falling leaves layout across the screen
+  const fallingLeaves = useMemo(() => (
+    Array.from({ length: 15 }, (_, index) => {
+      const depth = Math.random();
+      const size = 18 + depth * 32;
+      const rotationDirection = Math.random() > 0.5 ? 1 : -1;
+
+      return {
+        id: index,
+        style: {
+          "--leaf-left": `${Math.random() * 95}%`,
+          "--leaf-size": `${size}px`,
+          "--leaf-duration": `${12 + (1 - depth) * 10 + Math.random() * 5}s`,
+          "--leaf-delay": `${-Math.random() * 24}s`,
+          "--leaf-opacity": `${0.25 + depth * 0.55}`,
+          "--leaf-drift-a": `${-80 + Math.random() * 160}px`,
+          "--leaf-drift-b": `${-130 + Math.random() * 260}px`,
+          "--leaf-drift-c": `${-100 + Math.random() * 200}px`,
+          "--leaf-rotation": `${rotationDirection * (200 + Math.random() * 400)}deg`,
+          "--leaf-flutter-duration": `${2.2 + Math.random() * 2.2}s`,
+          "--leaf-blur": `${(1 - depth) * 1.1}px`,
+        } as React.CSSProperties,
+      };
+    })
+  ), []);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -43,56 +67,21 @@ export default function Login() {
       return;
     }
 
-    if (!isLogin && !fullName.trim()) {
-      setAlert({ type: "error", message: "Vui lòng nhập họ và tên của bạn." });
-      return;
-    }
-
     setIsLoading(true);
 
     try {
-      if (isLogin) {
-        // Handle Login
-        const { error } = await supabase.auth.signInWithPassword({
-          email: email.trim(),
-          password
-        });
+      const { error } = await supabase.auth.signInWithPassword({
+        email: email.trim(),
+        password
+      });
 
-        if (error) throw error;
-
-        setAlert({ type: "success", message: "Đăng nhập thành công! Đang chuyển hướng..." });
-      } else {
-        // Handle Registration
-        const { error } = await supabase.auth.signUp({
-          email: email.trim(),
-          password,
-          options: {
-            data: {
-              full_name: fullName.trim(),
-              role: "user" // Standard sign-up gets 'user' role by default
-            }
-          }
-        });
-
-        if (error) throw error;
-
-        setAlert({
-          type: "success",
-          message: "Đăng ký thành công! Bạn hiện đã có thể đăng nhập vào hệ thống."
-        });
-        
-        // Reset states and switch to login
-        setIsLogin(true);
-        setPassword("");
-        setFullName("");
-      }
+      if (error) throw error;
+      setAlert({ type: "success", message: "Đăng nhập thành công! Đang chuyển hướng..." });
     } catch (err: any) {
       console.error("Auth action error:", err);
       let errMsg = err.message || "Đã xảy ra lỗi trong quá trình xác thực.";
       if (errMsg.includes("Invalid login credentials")) {
         errMsg = "Email hoặc mật khẩu không chính xác.";
-      } else if (errMsg.includes("User already registered")) {
-        errMsg = "Tài khoản email này đã được đăng ký từ trước.";
       }
       setAlert({ type: "error", message: errMsg });
     } finally {
@@ -102,123 +91,125 @@ export default function Login() {
 
   return (
     <section className="auth-page">
-      <div className="auth-page__card" data-aos="zoom-in">
-        
-        {/* Toggle Title */}
-        <div className="auth-page__header">
-          <h1>{isLogin ? "Đăng Nhập" : "Đăng Ký"}</h1>
-          <p>
-            {isLogin 
-              ? "Chào mừng bạn quay trở lại với hệ thống EaAgri!" 
-              : "Tạo tài khoản mới để trải nghiệm đầy đủ các tính năng nông nghiệp."
-            }
-          </p>
-        </div>
+      <button
+        type="button"
+        className="auth-page__back"
+        onClick={() => navigate("/")}
+        aria-label="Quay lại trang chủ"
+      >
+        <i className="ri-arrow-left-line"></i>
+        <span>Quay lại trang chủ</span>
+      </button>
 
-        {/* Status Alert */}
-        {alert.type && (
-          <div style={{ marginBottom: "1.5rem" }}>
-            <div className={`auth-page__alert auth-page__alert--${alert.type}`}>
-              <i className={alert.type === "success" ? "ri-checkbox-circle-line" : "ri-error-warning-line"}></i>
-              <span>{alert.message}</span>
-            </div>
+      {/* Full-screen Background Banner Image */}
+      <div className="auth-page__bg" style={{ backgroundImage: "url('/Banner 3.png')" }}></div>
+      <div className="auth-page__overlay"></div>
+      
+      {/* Animated Falling Leaves across the entire viewport */}
+      <div className="auth-page__leaves" aria-hidden="true">
+        {fallingLeaves.map((leaf) => (
+          <span className="auth-leaf" style={leaf.style} key={leaf.id}>
+            <img src="/assets/floating-leaf.png" alt="" className="auth-leaf-img" />
+          </span>
+        ))}
+      </div>
+
+      {/* Centered layout wrapper */}
+      <div className="auth-page__card-wrapper">
+        <aside className="auth-page__intro" data-aos="fade-right">
+          <span className="auth-page__intro-label"><i className="ri-sparkling-2-line" /> EA AGRI ECOSYSTEM</span>
+          <img src="/logo_navbar.png" alt="Ea Agri" className="auth-page__intro-logo" />
+          <h2>Kiến tạo tương lai<br /><span>nông nghiệp thông minh.</span></h2>
+          <p>Website giới thiệu dự án Ea Agri — nền tảng kết nối AI, IoT và tri thức chuyên gia cho chuỗi giá trị sầu riêng Tây Nguyên.</p>
+          <div className="auth-page__signals">
+            <span><i className="ri-brain-line" /> AI đa phương thức</span>
+            <span><i className="ri-radar-line" /> IoT thời gian thực</span>
+            <span><i className="ri-team-line" /> Hợp tác nhà nông</span>
           </div>
-        )}
-
-        {/* Authentication Form */}
-        <form onSubmit={handleSubmit} className="auth-page__form">
+          <div className="auth-page__online"><i /> Hệ thống đang hoạt động ổn định</div>
+        </aside>
+        <div className="auth-page__card" data-aos="zoom-in">
           
-          {/* Full Name (Only for Registration) */}
-          {!isLogin && (
-            <div className="auth-page__group">
-              <label htmlFor="fullName">Họ và tên</label>
-              <div className="auth-page__input-wrapper">
-                <i className="ri-user-line"></i>
-                <input
-                  type="text"
-                  id="fullName"
-                  placeholder="Ví dụ: Nguyễn Văn A"
-                  className="auth-page__input"
-                  value={fullName}
-                  onChange={(e) => setFullName(e.target.value)}
-                  required={!isLogin}
-                />
+
+
+          {/* Toggle Title */}
+          <div className="auth-page__header">
+            <h1>Đăng Nhập</h1>
+            <p>Khu vực dành cho thành viên quản trị nội dung Ea Agri.</p>
+          </div>
+
+          {/* Status Alert */}
+          {alert.type && (
+            <div style={{ marginBottom: "1.5rem" }}>
+              <div className={`auth-page__alert auth-page__alert--${alert.type}`}>
+                <i className={alert.type === "success" ? "ri-checkbox-circle-line" : "ri-error-warning-line"}></i>
+                <span>{alert.message}</span>
               </div>
             </div>
           )}
 
-          {/* Email */}
-          <div className="auth-page__group">
-            <label htmlFor="email">Email</label>
-            <div className="auth-page__input-wrapper">
-              <i className="ri-mail-line"></i>
-              <input
-                type="email"
-                id="email"
-                placeholder="email@example.com"
-                className="auth-page__input"
-                value={email}
-                onChange={(e) => setEmail(e.target.value)}
-                required
-              />
+          {/* Authentication Form */}
+          <form onSubmit={handleSubmit} className="auth-page__form">
+            
+            {/* Email */}
+            <div className="auth-page__group">
+              <label htmlFor="email">Email</label>
+              <div className="auth-page__input-wrapper">
+                <i className="ri-mail-line"></i>
+                <input
+                  type="email"
+                  id="email"
+                  placeholder="email@example.com"
+                  className="auth-page__input"
+                  value={email}
+                  onChange={(e) => setEmail(e.target.value)}
+                  required
+                />
+              </div>
             </div>
+
+            {/* Password */}
+            <div className="auth-page__group">
+              <label htmlFor="password">Mật khẩu</label>
+              <div className="auth-page__input-wrapper">
+                <i className="ri-lock-line"></i>
+                <input
+                  type="password"
+                  id="password"
+                  placeholder="Tối thiểu 6 ký tự..."
+                  className="auth-page__input"
+                  value={password}
+                  onChange={(e) => setPassword(e.target.value)}
+                  required
+                />
+              </div>
+            </div>
+
+            {/* Submit Button */}
+            <button 
+              type="submit" 
+              className="auth-page__submit" 
+              disabled={isLoading}
+            >
+              {isLoading ? (
+                <span className="upload-news__spinner"></span>
+              ) : (
+                <>
+                  <i className="ri-login-box-line"></i>
+                  <span>Đăng Nhập</span>
+                </>
+              )}
+            </button>
+
+          </form>
+
+          <div className="auth-page__toggle">
+            <span><i className="ri-shield-keyhole-line"></i> Tài khoản được cấp bởi quản trị viên Ea Agri</span>
           </div>
 
-          {/* Password */}
-          <div className="auth-page__group">
-            <label htmlFor="password">Mật khẩu</label>
-            <div className="auth-page__input-wrapper">
-              <i className="ri-lock-line"></i>
-              <input
-                type="password"
-                id="password"
-                placeholder="Tối thiểu 6 ký tự..."
-                className="auth-page__input"
-                value={password}
-                onChange={(e) => setPassword(e.target.value)}
-                required
-              />
-            </div>
-          </div>
-
-          {/* Submit Button */}
-          <button 
-            type="submit" 
-            className="auth-page__submit" 
-            disabled={isLoading}
-          >
-            {isLoading ? (
-              <span className="upload-news__spinner"></span>
-            ) : (
-              <>
-                <i className={isLogin ? "ri-login-box-line" : "ri-user-add-line"}></i>
-                <span>{isLogin ? "Đăng Nhập" : "Đăng Ký Tài Khoản"}</span>
-              </>
-            )}
-          </button>
-
-        </form>
-
-        {/* Toggle Button */}
-        <div className="auth-page__toggle">
-          {isLogin ? (
-            <span>
-              Chưa có tài khoản?{" "}
-              <button type="button" onClick={() => { setIsLogin(false); setAlert({ type: null, message: "" }); }}>
-                Đăng ký ngay
-              </button>
-            </span>
-          ) : (
-            <span>
-              Đã có tài khoản?{" "}
-              <button type="button" onClick={() => { setIsLogin(true); setAlert({ type: null, message: "" }); }}>
-                Đăng nhập
-              </button>
-            </span>
-          )}
         </div>
-
       </div>
+
     </section>
   );
 }

@@ -4,15 +4,14 @@ import FeatureGrid from "../components/FeatureGrid";
 
 export default function ArchitecturePage() {
     return (
-        <div style={{ paddingTop: '80px' }}>
-            <div className="section-bg--white">
-                <VideoSection
-                    title="Kiến Trúc Hệ Thống"
-                    description="Mô hình Hybrid kết hợp giữa sức mạnh AI, IoT và chuyên gia con người."
-                    videoUrl="https://www.youtube.com/embed/QgVPizuOCdg?rel=0"
-                    fallbackUrl="https://www.youtube.com/watch?v=QgVPizuOCdg"
-                />
-            </div>
+        <div className="section-bg--gradient-soft" style={{ paddingTop: '90px' }}>
+            <VideoSection
+                tag="EAAGRI HYBRID SYSTEM"
+                title="Kiến Trúc Hệ Thống"
+                description="Mô hình Hybrid kết hợp giữa sức mạnh AI, IoT và chuyên gia con người."
+                videoUrl="https://www.youtube.com/embed/QgVPizuOCdg?rel=0"
+                fallbackUrl="https://www.youtube.com/watch?v=QgVPizuOCdg"
+            />
 
             <div className="section-bg--gradient-teal">
                 <StoryFeatureSection

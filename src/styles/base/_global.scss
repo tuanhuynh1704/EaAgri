@@ -2,31 +2,59 @@
 @use "../abstracts/mixins" as *;
 
 html {
+  margin: 0;
+  padding: 0;
+  overflow-x: hidden;
+  overflow-y: overlay; // Enable overlay scrollbar to float on top of content and eliminate gutters
   scroll-behavior: smooth;
+  scroll-snap-type: y proximity;
 }
 
 body {
+  margin: 0;
+  padding: 0;
   overflow-x: hidden;
-
+  overflow-y: visible;
+  scrollbar-width: none;
   background: linear-gradient(
     to bottom,
     #ffffff,
     #f8fcf8
   );
-
   color: $text-dark;
 }
 
 #root {
   min-height: 100vh;
-  background-color: #00b3ff08;
+  background-color: transparent;
+  overflow: visible;
+}
+
+.fullpage-slide {
+  scroll-snap-align: start;
+  scroll-snap-stop: always;
+  min-height: 100vh;
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  overflow: hidden;
+
+  @media (min-width: #{$tablet + 1px}) {
+    height: 100vh;
+    height: 100svh;
+  }
+
+  @media (max-width: $tablet) {
+    height: auto;
+    min-height: auto;
+    scroll-snap-align: none;
+  }
 }
 
 .section__container {
   max-width: $max-width;
-
   margin-inline: auto;
-
   padding-block: 1rem;
   padding-inline: 1rem;
 }
@@ -34,9 +62,7 @@ body {
 .container {
   width: 100%;
   max-width: $max-width;
-
   margin-inline: auto;
-
   padding-inline: 1rem;
 }
 
@@ -46,18 +72,12 @@ body {
   display: inline-flex;
   align-items: center;
   justify-content: center;
-
   gap: 0.6rem;
-
   padding: 0.5rem 0.5rem;
-
   font-size: 0.95rem;
   font-weight: 600;
-
   border-radius: $radius-full;
-
   box-shadow: $shadow-md;
-
   transition:
     transform 0.3s ease,
     box-shadow 0.3s ease,
@@ -65,16 +85,13 @@ body {
 
   &:hover {
     transform: translateY(-3px);
-
     box-shadow: $shadow-lg;
   }
 }
 
 img {
   display: block;
-
   max-width: 100%;
-
   user-select: none;
   -webkit-user-drag: none;
 }
@@ -96,21 +113,14 @@ section {
   z-index: 1;
   padding-block: 1rem;
   transition: background 0.4s ease;
-  background: transparent !important; // Forces the wrapper to be transparent
+  background: transparent !important;
 
-  // The pseudo-element holds the actual background color and masks the top/bottom edges
   &::before {
     content: '';
     position: absolute;
     inset: 0;
     z-index: -1;
     pointer-events: none;
-    
-    // Creates a smooth gradient fade at the top and bottom to seamlessly blend sections
-    mask-image: linear-gradient(to bottom, transparent 0px, black 120px, black calc(100% - 120px), transparent 100%);
-    -webkit-mask-image: linear-gradient(to bottom, transparent 0px, black 120px, black calc(100% - 120px), transparent 100%);
-    
-    // Smoothly transition background if it changes dynamically
     transition: background 0.4s ease;
   }
 }
@@ -179,21 +189,57 @@ section {
   background: rgba($primary-color, 0.2);
 }
 
-::-webkit-scrollbar {
-  width: 10px;
+// ================================
+// SINGLE SLEEK SCROLLBAR
+// ================================
+
+html::-webkit-scrollbar {
+  width: 6px !important;
+  height: 0px !important;
 }
 
-::-webkit-scrollbar-track {
-  background: #f3f7f3;
+*::-webkit-scrollbar {
+  width: 6px !important;
+  height: 6px !important;
 }
 
-// ::-webkit-scrollbar-thumb {
-//   background: $primary-color;
-//   border-radius: 999px;
-// }
+html::-webkit-scrollbar-track,
+*::-webkit-scrollbar-track {
+  background: transparent !important;
+}
 
-::-webkit-scrollbar-thumb:hover {
-  background: $primary-color-dark;
+html::-webkit-scrollbar-thumb,
+*::-webkit-scrollbar-thumb {
+  background: rgba(46, 125, 50, 0.4) !important;
+  border-radius: 99px !important;
+
+  &:hover {
+    background: rgba(46, 125, 50, 0.8) !important;
+  }
+}
+
+html::-webkit-scrollbar-button,
+*::-webkit-scrollbar-button {
+  display: none !important;
+  width: 0 !important;
+  height: 0 !important;
+}
+
+html::-webkit-scrollbar-corner,
+*::-webkit-scrollbar-corner {
+  background: transparent !important;
+}
+
+body::-webkit-scrollbar {
+  display: none;
+  width: 0;
+  height: 0;
+}
+
+/* Firefox Support */
+* {
+  scrollbar-width: thin;
+  scrollbar-color: rgba(46, 125, 50, 0.4) transparent;
 }
 
 @include tablet {

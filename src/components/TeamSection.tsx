@@ -15,82 +15,97 @@ const appScreenshots = [
   "/assets/12.jpg",
 ];
 
+const appSlideContent = [
+  ["Tổng quan Ea Agri", "Quản lý toàn bộ hoạt động canh tác trong một giao diện."],
+  ["Trợ lý Ea AI", "Tư vấn kỹ thuật dựa trên dữ liệu thực tế của khu vườn."],
+  ["Câu hỏi thường gặp", "Tra cứu nhanh các tình huống phổ biến trong canh tác."],
+  ["Kho tri thức", "Tra cứu nhanh các tình huống thường gặp trong canh tác."],
+  ["Lịch tưới thông minh", "Điều phối lượng nước theo điều kiện môi trường."],
+  ["Nhật ký nông hộ", "Ghi nhận hoạt động và lịch sử chăm sóc mùa vụ."],
+  ["Phân tích cây trồng", "Nhận diện và đánh giá tình trạng cây bằng AI."],
+  ["Phân tích hình ảnh", "Theo dõi dấu hiệu bất thường trực tiếp từ khu vườn."],
+  ["Cộng đồng nhà nông", "Chia sẻ kinh nghiệm và kết nối người dùng Ea Agri."],
+  ["Quản lý mùa vụ", "Theo dõi tiến độ từ chăm sóc đến thu hoạch."],
+  ["Dữ liệu thời gian thực", "Giám sát cảm biến IoT ngay trên điện thoại."],
+  ["Hệ sinh thái số", "Một nền tảng xuyên suốt cho nông nghiệp thông minh."],
+];
+
 interface TeamMember {
   name: string;
   roleTag: string;
-  // roleTitle: string;
   task: string;
   major: string;
   id: string;
   avatar: string;
+  themeColor: "green" | "blue" | "purple" | "orange";
+  topIcon: string;
+  roleIcon: string;
+  skillIcon: string;
+  decorIcon1: string;
+  decorIcon2: string;
+  memberCode: string;
 }
 
-// const teamMembers: TeamMember[] = [
-//   {
-//     name: "Phan Đăng Huy",
-//     roleTag: "Leader",
-//     roleTitle: "LEADER",
-//     task: "Điều phối dự án, phát triển sản phẩm và kiểm thử.",
-//     major: "Khoa học dữ liệu",
-//     id: "2311559215",
-//   },
-//   {
-//     name: "Nguyễn Anh Giảng",
-//     roleTag: "Core Member",
-//     roleTitle: "CORE MEMBER",
-//     task: "AI, dữ liệu và phát triển giải pháp.",
-//     major: "Khoa học dữ liệu",
-//     id: "2311558913",
-//   },
-//   {
-//     name: "Đặng Văn Chung",
-//     roleTag: "Core Member",
-//     roleTitle: "CORE MEMBER",
-//     task: "Hỗ trợ kỹ thuật và khảo sát.",
-//     major: "Khoa học dữ liệu",
-//     id: "2311559253",
-//   },
-//   {
-//     name: "Huỳnh Anh Tuấn",
-//     roleTag: "Core Member",
-//     roleTitle: "CORE MEMBER",
-//     task: "Nội dung, truyền thông và vận hành.",
-//     major: "Kỹ thuật phần mềm",
-//     id: "2200005725",
-//   },
-// ];
 const teamMembers: TeamMember[] = [
   {
-    name: "Phan Đăng Huy",
+    name: "PHAN ĐĂNG HUY",
     roleTag: "Founder & Project Leader",
     task: "Nhà sáng lập - Điều phối dự án, phát triển sản phẩm và kiểm thử.",
     major: "Khoa học dữ liệu",
     id: "2311559215",
-    avatar: "/huy.jpg",
+    avatar: "/huy_vest_nobg.png",
+    themeColor: "green",
+    topIcon: "ri-shield-star-line",
+    roleIcon: "ri-vip-crown-fill",
+    skillIcon: "ri-database-2-fill",
+    decorIcon1: "ri-leaf-fill",
+    decorIcon2: "ri-leaf-line",
+    memberCode: "EA-01",
   },
   {
-    name: "Nguyễn Anh Giảng",
-    roleTag: "Core Member",
+    name: "NGUYỄN ANH GIẢNG",
+    roleTag: "AI & Data Engineer",
     task: "AI, dữ liệu và phát triển giải pháp.",
     major: "Khoa học dữ liệu",
     id: "2311558913",
-    avatar: "/giang.jpg",
+    avatar: "/giang_vest_nobg.png",
+    themeColor: "blue",
+    topIcon: "ri-brain-line",
+    roleIcon: "ri-user-fill",
+    skillIcon: "ri-database-2-fill",
+    decorIcon1: "ri-bubble-chart-fill",
+    decorIcon2: "ri-checkbox-blank-circle-fill",
+    memberCode: "EA-02",
   },
   {
-    name: "Đặng Văn Chung",
-    roleTag: "Core Member",
+    name: "ĐẶNG VĂN CHUNG",
+    roleTag: "Technical Engineer",
     task: "Hỗ trợ kỹ thuật và khảo sát.",
     major: "Khoa học dữ liệu",
     id: "2311559253",
-    avatar: "/chung.jpg",
+    avatar: "/chung_vest_nobg.png",
+    themeColor: "purple",
+    topIcon: "ri-code-s-slash-line",
+    roleIcon: "ri-user-fill",
+    skillIcon: "ri-settings-4-fill",
+    decorIcon1: "ri-leaf-fill",
+    decorIcon2: "ri-leaf-line",
+    memberCode: "EA-03",
   },
   {
-    name: "Huỳnh Anh Tuấn",
-    roleTag: "Core Member",
+    name: "HUỲNH ANH TUẤN",
+    roleTag: "Product & Communication",
     task: "Nội dung, truyền thông và vận hành.",
     major: "Kỹ thuật phần mềm",
     id: "2200005725",
-    avatar: "/tuan.png",
+    avatar: "/tuan_vest_nobg.png",
+    themeColor: "orange",
+    topIcon: "ri-megaphone-line",
+    roleIcon: "ri-user-fill",
+    skillIcon: "ri-stack-fill",
+    decorIcon1: "ri-leaf-fill",
+    decorIcon2: "ri-leaf-line",
+    memberCode: "EA-04",
   },
 ];
 
@@ -98,14 +113,16 @@ const TeamSection = () => {
   const [currentIndex, setCurrentIndex] = useState(0);
   const [touchStart, setTouchStart] = useState<number | null>(null);
   const [touchEnd, setTouchEnd] = useState<number | null>(null);
+  const [isCarouselPaused, setIsCarouselPaused] = useState(false);
 
   useEffect(() => {
+    if (isCarouselPaused) return;
     const interval = setInterval(() => {
       setCurrentIndex((prev) => (prev + 1) % appScreenshots.length);
     }, 4000); // Rotate every 4s
 
     return () => clearInterval(interval);
-  }, [currentIndex]);
+  }, [currentIndex, isCarouselPaused]);
 
   const getVisibleScreenshots = () => {
     const total = appScreenshots.length;
@@ -155,66 +172,86 @@ const TeamSection = () => {
   };
 
   return (
-    <section className="team-showcase">
-      <div className="team-showcase__container">
-        {/* TOP: Team Info */}
+    <>
+      <section id="section-team" className="team-showcase fullpage-slide">
+        <div className="team-showcase__container">
+        {/* TOP: Team Info Header */}
         <div className="team-showcase__header" data-aos="fade-up">
-          <span className="team-showcase__label">OUR TEAM</span>
-          <h2 className="team-showcase__title">Đội Ngũ Thực Hiện</h2>
+          <span className="team-showcase__label">
+            <span className="team-showcase__status-dot"></span>
+            EAAGRI / CORE TEAM
+          </span>
+          <h2 className="team-showcase__title">
+            Đội Ngũ <span className="team-showcase__title-highlight">Thực Hiện<i className="ri-cpu-line team-title-tech-icon"></i><span className="team-title-underline"></span></span>
+          </h2>
           <p className="team-showcase__desc">
-            Dự án được thực hiện bởi sinh viên Khoa Công nghệ Thông tin —
-            Trường Đại học Nguyễn Tất Thành.
+            Dự án được thực hiện bởi sinh viên <span className="team-desc-highlight">Khoa Công nghệ Thông tin</span> — <span className="team-desc-highlight">Trường Đại học Nguyễn Tất Thành</span>.
           </p>
         </div>
 
-        {/* Member Cards */}
+        {/* Member Cards Grid (Rectangular Photo Header - Image Top, Text Below) */}
         <div className="team-showcase__cards" data-aos="fade-up" data-aos-delay="100">
           {teamMembers.map((member, index) => (
             <div
-              className={`team-card ${member.roleTag === "Leader" ? "team-card--leader" : ""}`}
+              className={`team-card team-card--${member.themeColor}`}
               key={index}
               data-aos="fade-up"
               data-aos-delay={150 + index * 80}
             >
-              <div className="team-card__top-badge">
-                <span className="team-card__top-badge-dot"></span>
-                {member.roleTag}
+              {/* Top Rounded Rectangular Image Box */}
+              <div className="team-card__image-box">
+                <span className="team-card__circuit-line" aria-hidden="true"></span>
+                {/* Floating Top Left Glass Badge Icon */}
+                <div className="team-card__top-icon">
+                  <i className={member.topIcon}></i>
+                </div>
+                <span className="team-card__member-code">{member.memberCode}</span>
+
+                {/* Rectangular Photo Avatar */}
+                <img
+                  src={member.avatar}
+                  alt={member.name}
+                  className="team-card__rect-avatar-img"
+                />
+
+                {/* Role Pill Badge anchored at base of image */}
+                <div className="team-card__role-pill">
+                  <span>{member.roleTag}</span>
+                </div>
               </div>
 
-              <div className="team-card__avatar">
-                {member.avatar ? (
-                  <img
-                    src={member.avatar}
-                    alt={member.name}
-                    style={{
-                      width: "100%",
-                      height: "100%",
-                      objectFit: "cover",
-                    }}
-                  />
-                ) : (
-                  member.name.charAt(0)
-                )}
-              </div>
+              {/* Text Content Below Image */}
+              <div className="team-card__body">
+                {/* Member Name */}
+                <h3 className="team-card__name">{member.name}</h3>
 
-              <h3 className="team-card__name">{member.name}</h3>
+                {/* Symmetrical Underline Accent */}
+                <div className="team-card__name-accent"></div>
 
-              {/* <div className="team-card__role-pill">
-                {member.roleTitle}
-              </div> */}
+                {/* Task description */}
+                <p className="team-card__task">{member.task}</p>
 
-              <p className="team-card__task">{member.task}</p>
-
-              <div className="team-card__meta">
-                <span className="team-card__major">{member.major}</span>
-                <span className="team-card__id">MSSV: {member.id}</span>
+                {/* Bottom Skill Capsule Badge */}
+                <div className="team-card__skill-pill">
+                  <i className={member.skillIcon}></i>
+                  <span>{member.major}</span>
+                </div>
               </div>
             </div>
           ))}
         </div>
+      </div>
+    </section>
 
-        {/* BOTTOM: 3D Carousel Phone Showcase */}
-        <div className="team-showcase__carousel-area" data-aos="fade-up" data-aos-delay="300">
+    {/* BOTTOM: 3D Carousel Phone Showcase (Separate 100vh fullpage slide) */}
+    <section className="app-showcase-slide fullpage-slide">
+      <div
+        className="team-showcase__carousel-area"
+        data-aos="fade-up"
+        data-aos-delay="300"
+        onMouseEnter={() => setIsCarouselPaused(true)}
+        onMouseLeave={() => setIsCarouselPaused(false)}
+      >
           <div 
             className="carousel-3d"
             onTouchStart={onTouchStart}
@@ -252,13 +289,9 @@ const TeamSection = () => {
               );
             })}
 
-            {/* FIXED CENTER FRAME */}
-            <div className="phone-mockup__fixed-wrapper">
-              <img
-                src="/iPhone 14 Pro Max Mockup HD PNG.png"
-                alt="Phone frame"
-                className="phone-mockup__frame"
-              />
+            {/* Fixed transparent device frame over the 9:20 screenshot */}
+            <div className="phone-mockup__fixed-wrapper" aria-hidden="true">
+              <img src="/Iphone.png" alt="" className="phone-mockup__frame" />
             </div>
 
             <button className="carousel-btn carousel-btn--next" onClick={handleNext} aria-label="Next">
@@ -266,20 +299,18 @@ const TeamSection = () => {
             </button>
           </div>
 
-          {/* Dot indicators */}
-          <div className="phone-mockup__dots mt-5">
-            {appScreenshots.map((_, index) => (
-              <button
-                key={index}
-                className={`phone-mockup__dot ${index === currentIndex ? "active" : ""}`}
-                onClick={() => setCurrentIndex(index)}
-                aria-label={`Go to screenshot ${index + 1}`}
-              />
-            ))}
+          <div className="app-showcase__caption" aria-live="polite">
+            <strong>{appSlideContent[currentIndex][0]}</strong>
+            <span>{appSlideContent[currentIndex][1]}</span>
+          </div>
+          <div className="app-showcase__progress">
+            <span>{String(currentIndex + 1).padStart(2, "0")}</span>
+            <div className="app-showcase__progress-track"><i style={{ width: `${((currentIndex + 1) / appScreenshots.length) * 100}%` }}></i></div>
+            <span>{String(appScreenshots.length).padStart(2, "0")}</span>
           </div>
         </div>
-      </div>
-    </section>
+      </section>
+    </>
   );
 };
 
