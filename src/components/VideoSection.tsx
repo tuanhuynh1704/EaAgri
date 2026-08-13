@@ -2,6 +2,7 @@ import { useState, useEffect } from "react";
 import { createPortal } from "react-dom";
 
 interface VideoSectionProps {
+  tag?: string;
   title: string;
   description: string;
   videoUrl: string;
@@ -15,6 +16,7 @@ const getYoutubeId = (url: string) => {
 };
 
 const VideoSection = ({
+  tag,
   title,
   description,
   videoUrl,
@@ -47,6 +49,12 @@ const VideoSection = ({
       className="section__container video__section"
       data-aos="fade-up"
     >
+      {tag && (
+        <span className="video__tag">
+          <i className="ri-cpu-line"></i> {tag}
+        </span>
+      )}
+
       <h2 className="section__header">
         {title}
       </h2>
@@ -60,12 +68,12 @@ const VideoSection = ({
           <>
             <img src={thumbnailUrl} alt={title} className="video__thumbnail" />
             <div className="video__play-btn">
-              <i className="ri-play-circle-fill"></i>
+              <i className="ri-play-fill"></i>
             </div>
           </>
         ) : (
           <div className="video__play-btn">
-            <i className="ri-play-circle-fill"></i>
+            <i className="ri-play-fill"></i>
           </div>
         )}
       </div>

@@ -1,0 +1,458 @@
+@use "../abstracts/variables" as *;
+@use "../abstracts/mixins" as *;
+
+.awards-section__container {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  width: 100%;
+  max-width: 1200px;
+  margin-inline: auto;
+  padding-top: 8.5rem; // Space for fixed navbar!
+  padding-bottom: 1.5rem;
+  padding-inline: 1.5rem; // Padding on sides to prevent edge touching
+  box-sizing: border-box;
+
+  @media (max-height: 820px) {
+    padding-top: 7rem; // Reduce top padding on short laptop screens
+  }
+
+  @media (max-width: $tablet) {
+    padding-top: 6rem;
+    padding-bottom: 3rem;
+  }
+}
+
+.awards-section__grid {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 3rem;
+  align-items: center;
+
+  @media (max-width: $tablet) {
+    text-align: center;
+  }
+
+  @media (min-width: #{$tablet + 1px}) {
+    grid-template-columns: 4.5fr 5.5fr;
+    gap: 4rem;
+  }
+}
+
+// ==========================================
+// IMAGE SIDE (Left)
+// ==========================================
+.awards-section__image-side {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  position: relative;
+  width: 100%;
+
+  @media (max-width: $tablet) {
+    margin-bottom: 1.5rem;
+  }
+}
+
+.awards-section__card-wrapper {
+  position: relative;
+  width: 85%;
+  max-width: 380px;
+  perspective: 1000px;
+
+  @media (max-width: $tablet) {
+    width: 75%;
+  }
+
+  @media (max-width: $mobile) {
+    width: 85%;
+    max-width: 300px;
+  }
+}
+
+.awards-section__certificate-card {
+  position: relative;
+  background: rgba(255, 255, 255, 0.85);
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+  border: 1px solid rgba(255, 255, 255, 0.4);
+  padding: 1rem;
+  border-radius: 20px;
+  box-shadow: 
+    0 20px 40px rgba(0, 0, 0, 0.08),
+    0 1px 3px rgba(0, 0, 0, 0.02),
+    inset 0 1px 0 rgba(255, 255, 255, 0.6);
+  transform-style: preserve-3d;
+  transition: transform 0.6s cubic-bezier(0.165, 0.84, 0.44, 1), box-shadow 0.6s ease;
+  overflow: hidden;
+
+  &::before {
+    content: '';
+    position: absolute;
+    inset: 0;
+    border-radius: 20px;
+    padding: 2px;
+    background: linear-gradient(135deg, rgba(212, 175, 55, 0.3), rgba(67, 160, 71, 0.1), rgba(212, 175, 55, 0.3));
+    -webkit-mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
+    -webkit-mask-composite: xor;
+    mask-composite: exclude;
+    pointer-events: none;
+  }
+
+  &:hover {
+    transform: rotateY(-8deg) rotateX(4deg) translateY(-8px);
+    box-shadow: 
+      0 30px 60px rgba(27, 51, 35, 0.14),
+      0 4px 10px rgba(212, 175, 55, 0.1);
+
+    .awards-section__shine {
+      transform: translateX(100%) rotate(45deg);
+    }
+  }
+}
+
+.awards-section__shine {
+  position: absolute;
+  top: 0;
+  left: -50%;
+  width: 200%;
+  height: 100%;
+  background: linear-gradient(
+    to right,
+    rgba(255, 255, 255, 0) 0%,
+    rgba(255, 255, 255, 0.3) 30%,
+    rgba(255, 255, 255, 0) 60%
+  );
+  transform: rotate(45deg);
+  transition: transform 0.8s ease;
+  pointer-events: none;
+  z-index: 2;
+}
+
+.awards-section__img {
+  width: 100%;
+  height: auto;
+  border-radius: 12px;
+  display: block;
+  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.05);
+  border: 1px solid rgba(0, 0, 0, 0.05);
+}
+
+.awards-section__badge-ribbon {
+  position: absolute;
+  top: 20px;
+  right: -5px;
+  background: linear-gradient(135deg, #d4af37, #aa7c11);
+  color: #fff;
+  padding: 0.4rem 1rem;
+  border-radius: 8px 0 0 8px;
+  font-weight: 700;
+  font-size: 0.75rem;
+  box-shadow: 0 4px 10px rgba(170, 124, 17, 0.3);
+  display: flex;
+  align-items: center;
+  gap: 0.4rem;
+  z-index: 3;
+
+  &::after {
+    content: '';
+    position: absolute;
+    right: 0;
+    bottom: -5px;
+    border-top: 5px solid #684a04;
+    border-right: 5px solid transparent;
+  }
+
+  i {
+    font-size: 0.9rem;
+    color: #fff;
+  }
+}
+
+// Floating Badges
+.awards-section__floating-badge {
+  position: absolute;
+  background: rgba(255, 255, 255, 0.92);
+  backdrop-filter: blur(8px);
+  -webkit-backdrop-filter: blur(8px);
+  border: 1px solid rgba(255, 255, 255, 0.8);
+  border-radius: 16px;
+  padding: 0.6rem 1rem;
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  box-shadow: 0 10px 25px rgba(0, 0, 0, 0.05);
+  z-index: 5;
+  transition: all 0.3s ease;
+  animation: awardFloat 6s ease-in-out infinite;
+
+  &:hover {
+    transform: scale(1.05) translateY(-3px);
+    box-shadow: 0 12px 30px rgba(67, 160, 71, 0.12);
+    border-color: rgba($primary-color, 0.3);
+  }
+
+  i {
+    font-size: 1.5rem;
+    background: linear-gradient(135deg, #d4af37, #f39c12);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+  }
+
+  div {
+    display: flex;
+    flex-direction: column;
+
+    strong {
+      font-size: 0.85rem;
+      color: $text-dark;
+      font-weight: 700;
+    }
+
+    span {
+      font-size: 0.7rem;
+      color: $text-light;
+    }
+  }
+
+  &--1 {
+    top: -15px;
+    left: -25px;
+    animation-delay: 0s;
+  }
+
+  &--2 {
+    bottom: -15px;
+    right: -25px;
+    animation-delay: 3s;
+
+    i {
+      background: linear-gradient(135deg, $primary-color, $primary-color-dark);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+    }
+  }
+
+  @media (max-width: $tablet) {
+    padding: 0.4rem 0.75rem;
+    gap: 0.5rem;
+
+    i {
+      font-size: 1.25rem;
+    }
+
+    div {
+      strong {
+        font-size: 0.75rem;
+      }
+      span {
+        font-size: 0.65rem;
+      }
+    }
+  }
+
+  @media (max-width: $mobile) {
+    &--1 {
+      left: -15px;
+      top: -10px;
+    }
+    &--2 {
+      right: -15px;
+      bottom: -10px;
+    }
+  }
+
+  @media (max-width: 360px) {
+    &--1 {
+      left: -5px;
+    }
+    &--2 {
+      right: -5px;
+    }
+  }
+}
+
+// ==========================================
+// CONTENT SIDE (Right)
+// ==========================================
+.awards-section__content-side {
+  display: flex;
+  flex-direction: column;
+}
+
+.awards-section__tag {
+  align-self: flex-start;
+  background: rgba($primary-color, 0.08);
+  border: 1px solid rgba($primary-color, 0.15);
+  color: $primary-color-dark;
+  padding: 0.4rem 1rem;
+  border-radius: 99px;
+  font-size: 0.8rem;
+  font-weight: 600;
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+  margin-bottom: 1.25rem;
+
+  i {
+    font-size: 0.95rem;
+  }
+
+  @media (max-width: $tablet) {
+    align-self: center;
+  }
+}
+
+.awards-section__title {
+  font-size: 2.25rem;
+  font-weight: 800;
+  line-height: 1.25;
+  color: $text-dark;
+  margin-bottom: 1.25rem;
+
+  .highlight {
+    background: linear-gradient(to right, $primary-color-dark, #0284c7);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+  }
+
+  @media (max-width: $tablet) {
+    font-size: 1.8rem;
+    text-align: center;
+  }
+
+  @media (max-width: $mobile) {
+    font-size: 1.5rem;
+  }
+}
+
+.awards-section__subtitle {
+  font-size: 1rem;
+  line-height: 1.7;
+  color: $text-light;
+  margin-bottom: 1.25rem; // Reduced from 2rem
+  
+  strong {
+    color: $primary-color-dark;
+    font-weight: 600;
+  }
+
+  @media (max-width: $tablet) {
+    text-align: center;
+  }
+
+  @media (max-height: 820px) {
+    margin-bottom: 0.8rem;
+    font-size: 0.95rem;
+  }
+}
+
+.awards-section__points {
+  display: flex;
+  flex-direction: column;
+  gap: 1rem; // Reduced from 1.5rem
+
+  @media (max-height: 820px) {
+    gap: 0.75rem;
+  }
+}
+
+.awards-section__point-card {
+  display: flex;
+  gap: 1.25rem;
+  align-items: flex-start;
+  background: rgba(255, 255, 255, 0.5);
+  border: 1px solid rgba(255, 255, 255, 0.5);
+  padding: 0.9rem 1.1rem; // Reduced from 1.2rem
+  border-radius: 16px;
+  transition: all 0.3s ease;
+  text-align: left;
+
+  &:hover {
+    background: #ffffff;
+    border-color: rgba($primary-color, 0.15);
+    box-shadow: 0 10px 25px rgba(27, 51, 35, 0.04);
+    transform: translateX(6px);
+
+    .awards-section__point-icon {
+      background: $primary-color;
+      color: #fff;
+      transform: scale(1.05);
+    }
+  }
+
+  @media (max-height: 820px) {
+    padding: 0.75rem 1rem;
+    border-radius: 12px;
+  }
+
+  @media (max-width: $mobile) {
+    gap: 1rem;
+    padding: 1rem;
+  }
+}
+
+.awards-section__point-icon {
+  width: 44px;
+  height: 44px;
+  border-radius: 12px;
+  background: rgba($primary-color, 0.08);
+  color: $primary-color-dark;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+  font-size: 1.25rem;
+  transition: all 0.3s ease;
+
+  @media (max-height: 820px) {
+    width: 38px;
+    height: 38px;
+    font-size: 1.1rem;
+    border-radius: 10px;
+  }
+
+  @media (max-width: $mobile) {
+    width: 38px;
+    height: 38px;
+    font-size: 1.1rem;
+    border-radius: 10px;
+  }
+}
+
+.awards-section__point-info {
+  h3 {
+    font-size: 0.95rem;
+    font-weight: 700;
+    color: $text-dark;
+    margin-bottom: 0.3rem; // Reduced from 0.4rem
+  }
+
+  p {
+    font-size: 0.85rem;
+    line-height: 1.5; // Reduced from 1.6
+    color: $text-light;
+    margin: 0;
+  }
+
+  @media (max-height: 820px) {
+    h3 {
+      font-size: 0.9rem;
+      margin-bottom: 0.2rem;
+    }
+    p {
+      font-size: 0.8rem;
+      line-height: 1.4;
+    }
+  }
+}
+
+// Animations
+@keyframes awardFloat {
+  0%, 100% {
+    transform: translateY(0);
+  }
+  50% {
+    transform: translateY(-8px);
+  }
+}

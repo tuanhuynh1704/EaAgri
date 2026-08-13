@@ -1,360 +1,217 @@
-// @use "../abstracts/variables" as *;
-// @use "../abstracts/mixins" as *;
-
-// .feature__container {
-//   text-align: center;
-// }
-
-// .feature__columns {
-//   display: grid;
-//   grid-template-columns: repeat(2, 1fr);
-
-//   gap: 2rem;
-
-//   margin-top: 4rem;
-// }
-
-// .feature__column {
-//   display: flex;
-//   flex-direction: column;
-//   gap: 2rem;
-// }
-
-// .feature__card {
-//   display: flex;
-//   gap: 1.25rem;
-
-//   padding: 1.75rem;
-
-//   text-align: left;
-
-//   background: $white;
-
-//   border-radius: $radius-lg;
-
-//   box-shadow: $shadow-md;
-
-//   transition:
-//     transform 0.3s ease,
-//     box-shadow 0.3s ease;
-
-//   &:hover {
-//     transform: translateY(-8px);
-
-//     box-shadow: $shadow-lg;
-//   }
-
-//   span {
-//     flex-shrink: 0;
-
-//     font-size: 3rem;
-//     font-weight: 800;
-
-//     line-height: 1;
-
-//     color: rgba($primary-color, 0.25);
-//   }
-
-//   h4 {
-//     margin-bottom: 0.75rem;
-
-//     font-size: 1.2rem;
-
-//     color: $text-dark;
-//   }
-
-//   p {
-//     color: $text-light;
-//     line-height: 1.8;
-//   }
-// }
-
-// .feature__column:first-child {
-//   margin-top: 0;
-// }
-
-// .feature__column:last-child {
-//   margin-top: 5rem;
-// }
-
-// @media (max-width: 768px) {
-//   .feature__columns {
-//     grid-template-columns: 1fr;
-//   }
-
-//   .feature__column:last-child {
-//     margin-top: 0;
-//   }
-
-//   .feature__card {
-//     span {
-//       font-size: 2.5rem;
-//     }
-//   }
-// }
-
-// @use "../abstracts/variables" as *;
-// @use "../abstracts/mixins" as *;
-
-// .feature__container {
-//   text-align: center;
-// }
-
-// // ================================
-// // MOBILE
-// // ================================
-
-// .feature__columns {
-//   display: grid;
-//   grid-template-columns: 1fr;
-
-//   gap: 3rem;
-
-//   margin-top: 4rem;
-// }
-
-// .feature__column {
-//   display: flex;
-//   flex-direction: column;
-
-//   gap: 3rem;
-// }
-
-// .feature__card {
-//   display: flex;
-//   align-items: flex-start;
-
-//   gap: 1rem;
-
-//   text-align: left;
-
-//   transition: transform 0.3s ease;
-
-//   &:hover {
-//     transform: translateY(-5px);
-//   }
-
-//   span {
-//     flex-shrink: 0;
-
-//     font-size: 3.5rem;
-//     font-weight: 900;
-
-//     line-height: 1;
-
-//     color: $primary-color;
-
-//     text-shadow: 2px 2px 0 rgba($primary-color-dark, 0.5);
-//   }
-
-//   h4 {
-//     margin-bottom: 0.5rem;
-
-//     font-size: 1.3rem;
-//     font-weight: 700;
-
-//     color: $text-dark;
-//   }
-
-//   p {
-//     line-height: 1.7;
-
-//     color: $text-light;
-//   }
-// }
-
-
-// // ================================
-// // TABLET
-// // ================================
-
-// @include tablet {
-//   .feature__columns {
-//     grid-template-columns: repeat(2, 1fr);
-
-//     gap: 5rem;
-//   }
-
-//   .feature__column {
-//     gap: 4rem;
-//   }
-
-//   // Tạo hiệu ứng cột phải thấp hơn giống ảnh
-//   .feature__column:last-child {
-//     margin-top: 4rem;
-//   }
-
-//   .feature__card {
-//     gap: 1.5rem;
-
-//     span {
-//       font-size: 4.5rem;
-//     }
-
-//     h4 {
-//       font-size: 1.6rem;
-//     }
-
-//     p {
-//       font-size: 1.05rem;
-//     }
-//   }
-// }
-
-
-// // ================================
-// // LAPTOP
-// // ================================
-
-// @include laptop {
-//   .feature__columns {
-//     gap: 8rem;
-//   }
-
-//   .feature__column:last-child {
-//     margin-top: 5rem;
-//   }
-
-//   .feature__card {
-//     span {
-//       font-size: 5rem;
-//     }
-
-//     h4 {
-//       font-size: 1.8rem;
-//     }
-
-//     p {
-//       font-size: 1.15rem;
-//       line-height: 1.8;
-//     }
-//   }
-// }
-
 @use "../abstracts/variables" as *;
 @use "../abstracts/mixins" as *;
 
-// ================================
-// CONTAINER
-// ================================
-
 .feature__container {
+  padding-block: 5.5rem;
+  position: relative;
+  
+  // Grid blueprint pattern in background
+  background-image: radial-gradient(rgba(46, 125, 50, 0.06) 1.2px, transparent 1.2px);
+  background-size: 24px 24px;
+}
+
+.feature__header-wrapper {
   text-align: center;
-}
-
-// ================================
-// GRID
-// ================================
-
-.feature__grid {
-  display: grid;
-  grid-template-columns: 1fr;
-
-  gap: 3rem;
-
-  margin-top: 4rem;
-}
-
-// ================================
-// CARD
-// ================================
-
-.feature__card {
+  margin-bottom: 3.5rem;
   display: flex;
-  align-items: flex-start;
+  flex-direction: column;
+  align-items: center;
 
-  gap: 1rem;
+  .section__header {
+    font-size: 2.5rem;
+    font-weight: 850;
+    letter-spacing: -0.75px;
+    background: linear-gradient(135deg, #163620 0%, #2e7d32 100%);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    margin-bottom: 0.85rem;
+    line-height: 1.2;
 
-  text-align: left;
-
-  transition: transform 0.3s ease;
-
-  &:hover {
-    transform: translateY(-5px);
+    @media (max-width: $mobile) {
+      font-size: 2rem;
+    }
   }
 
-  span {
-    flex-shrink: 0;
-
-    font-size: 3.5rem;
-    font-weight: 900;
-
-    line-height: 1;
-
-    color: $primary-color;
-
-    text-shadow: 2px 2px 0 rgba($primary-color-dark, 0.5);
-  }
-
-  h4 {
-    margin-bottom: 0.5rem;
-
-    font-size: 1.25rem;
-    font-weight: 700;
-
-    color: $text-dark;
-  }
-
-  p {
-    line-height: 1.8;
-
+  .section__description {
+    max-width: 600px;
+    margin-inline: auto;
+    font-size: 0.95rem;
+    line-height: 1.7;
     color: $text-light;
   }
 }
 
-// ================================
-// TABLET
-// ================================
+.feature__meta-tag {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.4rem;
+  background: rgba($primary-color, 0.08);
+  border: 1px solid rgba($primary-color, 0.18);
+  color: $primary-color-dark;
+  font-size: 0.72rem;
+  font-weight: 800;
+  text-transform: uppercase;
+  letter-spacing: 1px;
+  padding: 0.4rem 1rem;
+  border-radius: 99px;
+  margin-bottom: 1.25rem;
+  font-family: monospace, sans-serif;
 
-@include tablet {
-  .feature__grid {
+  i {
+    font-size: 0.85rem;
+    color: $primary-color;
+  }
+}
+
+// ==========================================
+// TECH STACK GRID
+// ==========================================
+.feature__tech-grid {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 2rem;
+  max-width: 1200px;
+  margin-inline: auto;
+
+  @media (min-width: 580px) {
     grid-template-columns: repeat(2, 1fr);
-
-    gap: 4rem 5rem;
   }
 
-  // Tạo hiệu ứng lệch cột giống thiết kế
-  .feature__card:nth-child(even) {
-    margin-top: 4rem;
+  @media (min-width: 992px) {
+    grid-template-columns: repeat(3, 1fr);
   }
+}
 
-  .feature__card {
-    span {
-      font-size: 4.5rem;
+.feature__tech-card {
+  position: relative;
+  overflow: hidden;
+  background: rgba(255, 255, 255, 0.65);
+  backdrop-filter: blur(16px);
+  -webkit-backdrop-filter: blur(16px);
+  border: 1px solid rgba(46, 125, 50, 0.08);
+  border-radius: 24px;
+  padding: 2.25rem 2rem;
+  box-shadow: 
+    0 12px 30px rgba(27, 51, 35, 0.02),
+    0 1px 3px rgba(27, 51, 35, 0.01);
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  min-height: 280px;
+  transition: all 0.4s cubic-bezier(0.165, 0.84, 0.44, 1);
+
+  &:hover {
+    transform: translateY(-6px);
+    border-color: rgba($primary-color, 0.25);
+    box-shadow: 
+      0 20px 40px rgba(27, 51, 35, 0.08),
+      0 0 25px rgba($primary-color, 0.08);
+
+    .feature__tech-watermark {
+      color: rgba($primary-color, 0.12);
+      transform: scale(1.15) rotate(-8deg);
     }
 
-    h4 {
-      font-size: 1.5rem;
+    .feature__tech-icon-box {
+      background: $primary-color;
+      border-color: $primary-color;
+      color: #ffffff;
+      box-shadow: 0 0 15px rgba($primary-color, 0.35);
+      transform: rotate(5deg) scale(1.05);
+    }
+
+    .feature__tech-accent-bar {
+      opacity: 1;
+      width: 100%;
     }
   }
 }
 
-// ================================
-// LAPTOP
-// ================================
+.feature__tech-watermark {
+  position: absolute;
+  top: 1.5rem;
+  right: 1.75rem;
+  font-size: 4rem;
+  font-weight: 900;
+  line-height: 1;
+  color: rgba($primary-color, 0.04);
+  font-family: monospace, sans-serif;
+  pointer-events: none;
+  transition: all 0.4s ease;
+}
 
-@include laptop {
-  .feature__grid {
-    gap: 5rem 7rem;
-  }
+.feature__tech-header {
+  display: flex;
+  align-items: center;
+  gap: 0.85rem;
+  margin-bottom: 1.5rem;
+}
 
-  .feature__card:nth-child(even) {
-    margin-top: 5rem;
-  }
+.feature__tech-icon-box {
+  width: 48px;
+  height: 48px;
+  border-radius: 14px;
+  background: #0f172a; // High tech dark core
+  border: 1px solid rgba($primary-color, 0.25);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: $primary-color-light;
+  font-size: 1.35rem;
+  transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.05);
+}
 
-  .feature__card {
-    gap: 1.5rem;
+.feature__tech-tag {
+  font-size: 0.65rem;
+  font-weight: 800;
+  color: $primary-color;
+  letter-spacing: 0.5px;
+  font-family: monospace, sans-serif;
+  background: rgba($primary-color, 0.06);
+  padding: 0.25rem 0.65rem;
+  border-radius: 6px;
+  border: 1px solid rgba($primary-color, 0.12);
+}
 
-    span {
-      font-size: 5rem;
-    }
+.feature__tech-body {
+  flex-grow: 1;
+  display: flex;
+  flex-direction: column;
+}
 
-    h4 {
-      font-size: 1.8rem;
-    }
+.feature__tech-title {
+  font-size: 1.25rem;
+  font-weight: 800;
+  color: $text-dark;
+  margin-bottom: 0.2rem;
+}
 
-    p {
-      font-size: 1.05rem;
-    }
-  }
+.feature__tech-subtitle {
+  font-size: 0.75rem;
+  font-weight: 800;
+  color: $primary-color-dark;
+  opacity: 0.85;
+  margin-bottom: 0.85rem;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  font-family: monospace, sans-serif;
+}
+
+.feature__tech-desc {
+  font-size: 0.88rem;
+  line-height: 1.6;
+  color: $text-light;
+  margin: 0;
+}
+
+.feature__tech-accent-bar {
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  width: 0;
+  height: 4px;
+  background: linear-gradient(90deg, $primary-color, $primary-color-light);
+  opacity: 0;
+  transition: all 0.4s cubic-bezier(0.165, 0.84, 0.44, 1);
 }

@@ -10,26 +10,31 @@ import { AuthProvider } from "./context/AuthContext";
 
 function App() {
   const { pathname } = useLocation();
+  const isAuthPage = pathname === "/login";
 
   useEffect(() => {
+    if ('scrollRestoration' in window.history) {
+      window.history.scrollRestoration = 'manual';
+    }
     window.scrollTo(0, 0);
   }, [pathname]);
 
   useEffect(() => {
     AOS.init({
-      duration: 700,
+      duration: 500,
       once: true,
-      offset: 100,
+      offset: 50,
       easing: "ease-out-cubic",
     });
+    AOS.refresh();
   }, []);
 
   return (
     <AuthProvider>
-      <Navbar />
+      {!isAuthPage && <Navbar />}
       <Outlet />
-      <Footer />
-      <FloatingContact />
+      {!isAuthPage && <Footer />}
+      {!isAuthPage && <FloatingContact />}
     </AuthProvider>
   );
 }
