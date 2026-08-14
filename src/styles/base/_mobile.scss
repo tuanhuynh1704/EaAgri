@@ -1,0 +1,313 @@
+@use "../abstracts/variables" as *;
+
+// Mobile system overrides — loaded last so every route shares one stable baseline.
+@media (max-width: 768px) {
+  html {
+    scroll-snap-type: none;
+    overflow-x: clip;
+  }
+
+  body,
+  #root {
+    width: 100%;
+    max-width: 100%;
+    overflow-x: clip;
+  }
+
+  .fullpage-slide {
+    display: block;
+    width: 100%;
+    height: auto;
+    min-height: 0;
+    overflow: visible;
+    scroll-snap-align: none;
+  }
+
+  .section__container {
+    width: 100%;
+    max-width: 100%;
+    padding-inline: 1rem;
+  }
+
+  .section__header {
+    font-size: clamp(1.75rem, 8vw, 2.2rem);
+    line-height: 1.18;
+    overflow-wrap: anywhere;
+  }
+
+  .section__description { font-size: .92rem; line-height: 1.65; }
+
+  [data-aos="fade-left"],
+  [data-aos="fade-right"] { transform: translate3d(0, 20px, 0); }
+
+  // Compact navigation: recognizable logo + touch-friendly icon tabs.
+  nav.navbar-container {
+    top: .65rem;
+    width: calc(100% - 1rem);
+    gap: .35rem;
+  }
+
+  .navbar-container.is-inner-page { top: .65rem; }
+
+  .navbar-container.is-scrolled .nav__logo,
+  .navbar-container.is-inner-page .nav__logo {
+    min-height: 50px;
+    padding: .3rem .55rem;
+    border-radius: 16px;
+
+    .nav__logo-img { width: 72px; height: auto; }
+  }
+
+  .nav__logo .nav__logo-img { width: 76px; height: auto; }
+  .nav__right-capsule { margin-left: auto; gap: .35rem !important; }
+
+  .navbar-container.is-scrolled .nav__right-capsule {
+    .nav__menu,
+    .nav__actions {
+      min-height: 50px;
+      border-radius: 16px;
+      padding: .2rem;
+    }
+  }
+
+  .nav__menu { gap: 0; }
+  .nav__link { min-height: 42px; padding: .35rem; }
+  .nav__link .nav__link-icon { width: 30px; height: 30px; font-size: 1.05rem; }
+  .nav__link.active::after { left: .35rem; right: .35rem; bottom: 1px; }
+  .nav__actions { gap: .25rem; }
+  .nav__actions .btn { min-height: 42px; padding: .45rem .65rem; }
+
+  // Homepage hero becomes a natural vertical story.
+  .hero-section {
+    min-height: 100svh;
+    height: auto;
+    padding: 6.1rem 1rem 2.5rem;
+    overflow: hidden;
+  }
+
+  .hero-grid-layout {
+    display: flex;
+    flex-direction: column;
+    gap: 1.6rem;
+  }
+
+  .hero__content { order: 1; }
+  .hero__visual { order: 2; }
+  .hero-badge { margin-bottom: .8rem; padding: .35rem .75rem; }
+  .hero-title { margin-bottom: 1rem; }
+  .hero-title .text-ea-agri { font-size: clamp(2.65rem, 14vw, 3.25rem); letter-spacing: -2px; }
+  .hero-title .text-sub { font-size: clamp(1.45rem, 7vw, 1.8rem); }
+  .hero-description { margin-bottom: 1.2rem; font-size: .9rem; line-height: 1.65; }
+  .hero__visual .image-wrapper-container { width: min(88vw, 350px); }
+  .hero-download-links { gap: .55rem; }
+  .hero-download-links .download-btn { flex: 1; max-width: 165px; padding: .48rem .65rem; gap: .45rem; }
+  .hero-download-links .download-btn__icon { font-size: 1.55rem; }
+  .hero-download-links .download-btn__small { font-size: .48rem; }
+  .hero-download-links .download-btn__store { font-size: .72rem; }
+  .scroll-down-hint, .features-bar-section { display: none; }
+  .hero-leaf:nth-child(n+9), .iot-data-node:nth-child(n+4) { display: none; }
+
+  // Team cards: one clean column with consistent photo crop.
+  .team-showcase {
+    height: auto;
+    min-height: 0;
+    padding: 6rem .75rem 2.5rem;
+    overflow: visible;
+  }
+
+  .team-showcase__container { height: auto; gap: 1.4rem; }
+  .team-showcase__header { padding-inline: .4rem; }
+  .team-showcase__label { font-size: .58rem; letter-spacing: 1.3px; }
+  .team-showcase__title { font-size: clamp(1.8rem, 9vw, 2.25rem); letter-spacing: -1px; }
+  .team-title-tech-icon { display: none; }
+  .team-showcase__desc { font-size: .84rem; line-height: 1.55; }
+  .team-showcase__cards { grid-template-columns: 1fr; max-width: 430px; gap: 1.1rem; }
+  .team-card { border-radius: 20px; }
+  .team-card__image-box { height: clamp(275px, 78vw, 320px); }
+  .team-card__body { padding: 1rem .9rem; }
+  .team-card__task { min-height: 0; margin-bottom: .9rem; }
+
+  // Product screenshots: center phone only, swipe-friendly controls.
+  .team-showcase__carousel-area {
+    height: auto;
+    min-height: 680px;
+    padding: 5.3rem .5rem 1.5rem;
+    overflow: hidden;
+  }
+
+  .carousel-3d { width: 100%; height: 500px; margin-bottom: .8rem; }
+  .phone-mockup,
+  .phone-mockup__fixed-wrapper { width: min(225px, 62vw) !important; }
+  .phone-mockup.left,
+  .phone-mockup.right,
+  .phone-mockup.far-left,
+  .phone-mockup.far-right { opacity: 0; pointer-events: none; }
+  .carousel-btn { width: 42px; height: 42px; font-size: 1.15rem; }
+  .carousel-btn--prev { left: .25rem; }
+  .carousel-btn--next { right: .25rem; }
+  .app-showcase__caption { min-width: min(310px, 86vw); max-width: 86vw; }
+  .app-showcase__progress { grid-template-columns: auto min(130px, 38vw) auto; }
+
+  // Home content sections: natural document flow and compact cards.
+  .awards-section__container,
+  .problem-solution__container,
+  .video-gallery__container,
+  .result-section,
+  .roadmap__container {
+    padding-top: 5.5rem;
+    padding-bottom: 3rem;
+  }
+
+  .awards-section__grid,
+  .problem-solution__grid { gap: 2rem; }
+  .awards-section__card-wrapper { width: min(88vw, 390px); }
+  .awards-section__floating-badge { max-width: 82%; }
+  .awards-section__content-side,
+  .problem-solution__content-side { text-align: left; }
+  .awards-section__title,
+  .problem-solution__title { font-size: clamp(1.8rem, 8vw, 2.2rem); }
+  .awards-section__point-card,
+  .problem-solution__card { padding: 1rem; border-radius: 18px; }
+  .problem-solution__widget { display: none; }
+
+  .video-gallery__header { margin-bottom: 1.5rem; }
+  .video-gallery__grid { grid-template-columns: 1fr; gap: 1rem; }
+  .video-gallery__card { border-radius: 18px; }
+  .video-gallery__info { padding: 1rem; }
+  .video__modal { padding: .65rem; }
+  .video__modal-content { width: 100%; border-radius: 14px; }
+
+  .result__header .section__header { font-size: clamp(1.8rem, 8.5vw, 2.3rem); }
+  .result__stats { grid-template-columns: 1fr; gap: .7rem; }
+  .stat__card { min-height: 88px; padding: .8rem; }
+  .result__gallery { grid-template-columns: 1fr; height: auto; gap: .8rem; }
+  .result__photo { height: min(72vw, 300px); }
+
+  .roadmap__grid { gap: 2rem; }
+  .roadmap__illustration-side { order: 2; }
+  .roadmap__timeline-side { order: 1; }
+  .roadmap__mascot-card { padding: 1.2rem; }
+  .roadmap__mascot-img-wrap { width: 120px; height: 120px; margin-bottom: .8rem; }
+  .roadmap__timeline { padding-left: 2rem; gap: .9rem; }
+  .roadmap__timeline-item .roadmap__timeline-icon { left: -2rem; }
+  .roadmap__timeline-content { padding: .9rem; }
+  .roadmap__timeline-meta { flex-wrap: wrap; gap: .4rem; }
+
+  // Architecture route.
+  .video__section { padding: 2.5rem 1rem 3rem; }
+  .architecture__video { width: 100%; border-radius: 18px; }
+  .video__tag { font-size: .62rem; letter-spacing: 1px; }
+  .video__description { margin-bottom: 1.3rem; }
+
+  .story__container {
+    grid-template-columns: 1fr;
+    gap: 1.75rem;
+    padding: 3rem 1rem;
+  }
+  .story__container.reverse .story__content,
+  .story__container.reverse .story__image-panel { order: initial; }
+  .story__sub-tag { max-width: 100%; font-size: .58rem; letter-spacing: .7px; overflow-wrap: anywhere; }
+  .story__cards-list { gap: .7rem; }
+  .story__card-item { padding: .9rem; border-radius: 16px; gap: .75rem; }
+  .story__card-badge { width: 40px; min-width: 40px; height: 40px; }
+  .story__card-info h3 { font-size: .92rem; }
+  .story__card-info p { font-size: .8rem; line-height: 1.55; }
+  .story__browser-frame { border-radius: 16px; }
+  .story__browser-body { min-height: 240px; }
+  .story__single-img,
+  .story__slider-img { width: 100%; height: auto; max-height: 400px; object-fit: contain; }
+
+  .feature__container { padding: 3rem 1rem; }
+  .feature__header-wrapper { margin-bottom: 1.7rem; }
+  .feature__tech-grid { grid-template-columns: 1fr; gap: .9rem; }
+  .feature__tech-card { min-height: 0; padding: 1.25rem; border-radius: 18px; }
+
+  // News listing and article detail.
+  .news-list { padding: 6.3rem .8rem 3rem; background-attachment: scroll; }
+  .news-list__header { margin-bottom: 1.5rem; }
+  .news-list__header::before { font-size: .58rem; letter-spacing: 1px; }
+  .news-list__header h1 { font-size: clamp(2rem, 10vw, 2.5rem); margin-bottom: .6rem; }
+  .news-list__header p { font-size: .9rem; }
+  .news-list__toolbar { gap: .8rem; margin-bottom: 1.5rem; padding: .8rem; border-radius: 14px; }
+  .news-list__search { max-width: none; }
+  .news-list__categories { flex-wrap: nowrap; overflow-x: auto; padding: .15rem .05rem .45rem; scrollbar-width: none; }
+  .news-list__categories::-webkit-scrollbar { display: none; }
+  .news-list__categories button { padding: .48rem .85rem; font-size: .78rem; }
+  .news-list__grid { grid-template-columns: 1fr; gap: 1rem; }
+  .news-list__card { border-radius: 18px; }
+  .news-list__card-content { padding: 1rem; }
+  .news-list__card-meta { gap: .7rem; flex-wrap: wrap; font-size: .72rem; }
+  .news-list__card-title { height: auto; font-size: 1.15rem; }
+
+  .news-detail { padding: 6.2rem .75rem 3rem; }
+  .news-detail__container { width: 100%; }
+  .news-detail__actions { margin-bottom: 1rem; }
+  .news-detail__back-link,
+  .news-detail__delete-btn { padding: .55rem .8rem; font-size: .8rem; }
+  .news-detail__card { border-radius: 18px; }
+  .news-detail__hero { aspect-ratio: 16 / 10; }
+  .news-detail__hero img { width: 100%; height: 100%; object-fit: cover; }
+  .news-detail__category-badge { left: 12px; bottom: 12px; }
+  .news-detail__body { padding: 1rem; }
+  .news-detail__title { font-size: clamp(1.55rem, 8vw, 2rem); line-height: 1.3; }
+  .news-detail__meta { flex-direction: column; gap: .55rem; font-size: .78rem; }
+  .news-detail__content { font-size: 1rem; line-height: 1.72; overflow-wrap: anywhere; }
+  .news-detail__content img,
+  .news-detail__content iframe,
+  .news-detail__content video { max-width: 100%; height: auto; }
+  .news-detail__content table { display: block; max-width: 100%; overflow-x: auto; }
+
+  // Footer becomes an accordion-like visual stack without tiny columns.
+  .footer__container { grid-template-columns: 1fr; gap: 1.8rem; padding: 3rem 1rem 2rem; }
+  .footer__brand-col,
+  .footer__nav-col,
+  .footer__social-col,
+  .footer__download-col { align-items: center; text-align: center; }
+  .footer__links { align-items: center; }
+  .footer__social-cards,
+  .footer__download-row { justify-content: center; }
+  .footer__bar { padding-block: 1rem; }
+  .footer__bar-content { padding-inline: 1rem; text-align: center; }
+
+  // Admin/editor routes retain usability instead of desktop-width panels.
+  .upload-news,
+  .manage-news,
+  .ac-mgmt { padding-inline: .75rem; padding-top: 6.2rem; }
+
+  .ql-toolbar,
+  .ql-container { max-width: 100%; }
+}
+
+@media (max-width: 390px) {
+  nav.navbar-container { width: calc(100% - .6rem); }
+  .navbar-container.is-scrolled .nav__logo,
+  .navbar-container.is-inner-page .nav__logo { padding-inline: .35rem; }
+  .nav__logo .nav__logo-img,
+  .navbar-container.is-inner-page .nav__logo .nav__logo-img { width: 62px; }
+  .nav__link { padding-inline: .22rem; }
+  .nav__link .nav__link-icon { width: 28px; height: 28px; }
+  .nav__actions .btn { padding-inline: .5rem; }
+
+  .hero-download-links .download-btn { padding-inline: .45rem; }
+  .team-showcase { padding-inline: .55rem; }
+  .team-card__image-box { height: 280px; }
+  .phone-mockup,
+  .phone-mockup__fixed-wrapper { width: 205px !important; }
+  .carousel-3d { height: 455px; }
+  .team-showcase__carousel-area { min-height: 635px; }
+}
+
+@media (hover: none) and (pointer: coarse) {
+  .team-card:hover,
+  .news-list__card:hover,
+  .result__photo:hover,
+  .feature__tech-card:hover { transform: none; }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after {
+    scroll-behavior: auto !important;
+    animation-duration: .01ms !important;
+    animation-iteration-count: 1 !important;
+  }
+}
