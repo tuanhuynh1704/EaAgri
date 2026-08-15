@@ -23,8 +23,8 @@
   }
 
   @media (max-width: $mobile) {
-    bottom: 1.5rem;
-    right: 1.5rem;
+    bottom: 0.8rem;
+    right: 0.55rem;
   }
 }
 
@@ -45,8 +45,8 @@
   outline: none;
 
   @media (max-width: $mobile) {
-    width: 50px;
-    height: 50px;
+    width: 44px;
+    height: 44px;
   }
 
   &:hover {
@@ -106,6 +106,10 @@
       background: linear-gradient(135deg, #23834a 0%, #119172 50%, #07909a 100%);
       transform: translateY(-3px) scale(1.06);
       box-shadow: 0 10px 25px rgba(8, 124, 133, 0.28);
+    }
+
+    @media (max-width: $mobile) {
+      display: none;
     }
   }
 

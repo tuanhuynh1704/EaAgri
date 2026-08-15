@@ -234,7 +234,7 @@
 .team-card__image-box {
   position: relative;
   width: 100%;
-  height: clamp(210px, 25vh, 250px);
+  height: clamp(255px, 29vh, 305px);
   overflow: hidden;
   display: flex;
   flex-direction: column;
@@ -268,8 +268,8 @@
   inset: 0;
   width: 100%;
   height: 100%;
-  object-fit: contain;
-  object-position: center bottom;
+  object-fit: cover;
+  object-position: center 34%;
   z-index: 1;
   padding-top: 0.4rem;
   transition: transform 0.4s ease;
@@ -766,7 +766,21 @@
   .team-showcase__cards {
     grid-template-columns: 1fr;
     max-width: 400px;
+    gap: 1.15rem;
   }
+
+  .team-card { height: auto; }
+
+  .team-card__image-box {
+    height: clamp(275px, 78vw, 320px);
+  }
+
+  .team-card__rect-avatar-img {
+    padding-top: 0;
+    object-position: center 32%;
+  }
+
+  .team-card__body { padding-bottom: 1rem; }
 
   .team-showcase__desc{
     font-size: 0.9rem;
