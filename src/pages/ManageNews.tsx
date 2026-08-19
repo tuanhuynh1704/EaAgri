@@ -8,6 +8,7 @@ import ReactQuill from "react-quill-new";
 import "react-quill-new/dist/quill.snow.css";
 import { cleanContent } from "../utils/cleanContent";
 import { quillModules, quillFormats } from "../utils/quillConfig";
+import { parseImageUrlAndPosition, buildImageUrlWithPosition } from "../utils/imageUtils";
 
 interface NewsItem {
   id: string;
@@ -47,11 +48,17 @@ export default function ManageNews() {
   const [formCategory, setFormCategory] = useState("Kỹ thuật");
   const [formContent, setFormContent] = useState("");
   const [formImageUrl, setFormImageUrl] = useState("");
+  const [formImagePosX, setFormImagePosX] = useState(50);
+  const [formImagePosY, setFormImagePosY] = useState(50);
   
   // Upload states
   const [formImageFile, setFormImageFile] = useState<File | null>(null);
   const [formImagePreview, setFormImagePreview] = useState<string | null>(null);
   const [isSaving, setIsSaving] = useState(false);
+  
+  // Drag to pan states
+  const [isDragging, setIsDragging] = useState(false);
+  const [dragStart, setDragStart] = useState({ x: 0, y: 0 });
   
   const fileInputRef = useRef<HTMLInputElement>(null);
 
@@ -164,6 +171,8 @@ export default function ManageNews() {
     setFormCategory("Kỹ thuật");
     setFormContent("");
     setFormImageUrl("");
+    setFormImagePosX(50);
+    setFormImagePosY(50);
     setFormImageFile(null);
     setFormImagePreview(null);
     setAlertState({ type: null, message: "" });
@@ -178,10 +187,15 @@ export default function ManageNews() {
     setFormAuthor(item.author);
     setFormCategory(item.category);
     setFormContent(cleanContent(item.content));
-    setFormImageUrl(item.image_url || "");
+    
+    const parsed = parseImageUrlAndPosition(item.image_url);
+    setFormImageUrl(parsed.url || "");
+    setFormImagePosX(parsed.posX);
+    setFormImagePosY(parsed.posY);
+    
     setFormImageFile(null);
     // If there is an existing image URL, set it as preview
-    setFormImagePreview(item.image_url);
+    setFormImagePreview(parsed.url);
     setAlertState({ type: null, message: "" });
     setIsModalOpen(true);
   };
@@ -209,6 +223,26 @@ export default function ManageNews() {
     if (fileInputRef.current) {
       fileInputRef.current.value = "";
     }
+  };
+
+  // Drag handlers
+  const handleMouseDown = (e: React.MouseEvent) => {
+    setIsDragging(true);
+    setDragStart({ x: e.clientX, y: e.clientY });
+  };
+
+  const handleMouseMove = (e: React.MouseEvent) => {
+    if (!isDragging) return;
+    const deltaX = e.clientX - dragStart.x;
+    const deltaY = e.clientY - dragStart.y;
+    
+    setFormImagePosX(prev => Math.max(0, Math.min(100, prev - (deltaX * 0.3))));
+    setFormImagePosY(prev => Math.max(0, Math.min(100, prev - (deltaY * 0.3))));
+    setDragStart({ x: e.clientX, y: e.clientY });
+  };
+
+  const handleMouseUp = () => {
+    setIsDragging(false);
   };
 
   // Handle Submit Form (Add/Update)
@@ -257,6 +291,8 @@ export default function ManageNews() {
         finalImageUrl = "";
       }
 
+      const finalImageUrlWithPos = finalImageUrl ? buildImageUrlWithPosition(finalImageUrl, formImagePosX, formImagePosY) : null;
+
       if (modalMode === "create") {
         // Insert new post
         const { data, error } = await supabase
@@ -267,7 +303,7 @@ export default function ManageNews() {
               content: cleanContent(formContent.trim()),
               author: formAuthor.trim(),
               category: formCategory,
-              image_url: finalImageUrl || null
+              image_url: finalImageUrlWithPos
             }
           ])
           .select();
@@ -297,7 +333,7 @@ export default function ManageNews() {
             content: cleanContent(formContent.trim()),
             author: formAuthor.trim(),
             category: formCategory,
-            image_url: finalImageUrl || null
+            image_url: finalImageUrlWithPos
           })
           .eq("id", editingId)
           .select();
@@ -443,7 +479,7 @@ export default function ManageNews() {
                       <td style={{ width: "80px" }}>
                         <div className="manage-news__thumb">
                           {item.image_url ? (
-                            <img src={item.image_url} alt={cleanContent(item.title)} />
+                            <img src={parseImageUrlAndPosition(item.image_url).url!} alt={cleanContent(item.title)} style={{ objectPosition: `${parseImageUrlAndPosition(item.image_url).posX}% ${parseImageUrlAndPosition(item.image_url).posY}%` }} />
                           ) : (
                             <div className="manage-news__thumb-placeholder">
                               <i className="ri-image-line"></i>
@@ -559,7 +595,16 @@ export default function ManageNews() {
                     
                     {formImagePreview ? (
                       <div className="preview-container">
-                        <img src={formImagePreview} alt="Preview" />
+                        <img 
+                          src={formImagePreview} 
+                          alt="Preview" 
+                          onMouseDown={handleMouseDown}
+                          onMouseMove={handleMouseMove}
+                          onMouseUp={handleMouseUp}
+                          onMouseLeave={handleMouseUp}
+                          draggable={false}
+                          style={{ objectPosition: `${formImagePosX}% ${formImagePosY}%`, width: '100%', height: '250px', objectFit: 'cover', borderRadius: '12px', cursor: isDragging ? 'grabbing' : 'grab' }} 
+                        />
                         <button 
                           className="remove-btn" 
                           onClick={removeSelectedImage} 
@@ -594,6 +639,43 @@ export default function ManageNews() {
                       disabled={formImageFile !== null || isSaving}
                     />
                   </div>
+
+                  {/* Image Position Sliders */}
+                  {(formImagePreview || formImageUrl) && (
+                    <div className="upload-news__group" style={{ marginTop: '1.5rem', background: '#f8faf9', padding: '1rem', borderRadius: '12px', border: '1px solid #e1e8e3' }}>
+                      <label style={{ marginBottom: '1rem', display: 'block', fontWeight: 600 }}>Căn chỉnh vị trí ảnh bìa</label>
+                      
+                      <div style={{ marginBottom: '1rem' }}>
+                        <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: '0.85rem', marginBottom: '0.5rem', color: '#1b3323' }}>
+                          <span>Ngang (Trái ↔ Phải)</span>
+                          <strong>{formImagePosX}%</strong>
+                        </div>
+                        <input 
+                          type="range" 
+                          min="0" 
+                          max="100" 
+                          value={formImagePosX} 
+                          onChange={(e) => setFormImagePosX(parseInt(e.target.value))}
+                          style={{ width: '100%', accentColor: '#43a047', height: '6px' }}
+                        />
+                      </div>
+
+                      <div>
+                        <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: '0.85rem', marginBottom: '0.5rem', color: '#1b3323' }}>
+                          <span>Dọc (Lên ↕ Xuống)</span>
+                          <strong>{formImagePosY}%</strong>
+                        </div>
+                        <input 
+                          type="range" 
+                          min="0" 
+                          max="100" 
+                          value={formImagePosY} 
+                          onChange={(e) => setFormImagePosY(parseInt(e.target.value))}
+                          style={{ width: '100%', accentColor: '#43a047', height: '6px' }}
+                        />
+                      </div>
+                    </div>
+                  )}
                 </div>
 
                 {/* Form fields section */}

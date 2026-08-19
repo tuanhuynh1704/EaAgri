@@ -4,6 +4,7 @@ import { supabase } from "../utils/supabase/client";
 import { useAuth } from "../context/AuthContext";
 import "react-quill-new/dist/quill.snow.css";
 import { cleanContent } from "../utils/cleanContent";
+import { parseImageUrlAndPosition } from "../utils/imageUtils";
 
 interface NewsItem {
   id: string;
@@ -153,7 +154,11 @@ export default function NewsDetail() {
           {/* Cover Image or Category Badge */}
           {article.image_url ? (
             <div className="news-detail__hero">
-              <img src={article.image_url} alt={cleanContent(article.title)} />
+              <img 
+                src={parseImageUrlAndPosition(article.image_url).url!} 
+                alt={cleanContent(article.title)} 
+                style={{ objectPosition: `${parseImageUrlAndPosition(article.image_url).posX}% ${parseImageUrlAndPosition(article.image_url).posY}%`, width: '100%', height: '100%', objectFit: 'cover' }} 
+              />
               <div className="news-detail__category-badge">{article.category}</div>
             </div>
           ) : (

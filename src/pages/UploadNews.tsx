@@ -6,6 +6,7 @@ import ReactQuill from "react-quill-new";
 import "react-quill-new/dist/quill.snow.css";
 import { cleanContent } from "../utils/cleanContent";
 import { quillModules, quillFormats } from "../utils/quillConfig";
+import { buildImageUrlWithPosition } from "../utils/imageUtils";
 
 interface AlertState {
   type: "success" | "error" | null;
@@ -20,10 +21,16 @@ export default function UploadNews() {
   const [category, setCategory] = useState("Kỹ thuật");
   const [content, setContent] = useState("");
   const [imageUrl, setImageUrl] = useState("");
+  const [imagePosX, setImagePosX] = useState(50);
+  const [imagePosY, setImagePosY] = useState(50);
   
   // File upload state
   const [imageFile, setImageFile] = useState<File | null>(null);
   const [imagePreview, setImagePreview] = useState<string | null>(null);
+  
+  // Drag to pan states
+  const [isDragging, setIsDragging] = useState(false);
+  const [dragStart, setDragStart] = useState({ x: 0, y: 0 });
   
   const [isLoading, setIsLoading] = useState(false);
   const [alert, setAlert] = useState<AlertState>({ type: null, message: "" });
@@ -125,6 +132,26 @@ export default function UploadNews() {
     }
   };
 
+  // Drag handlers
+  const handleMouseDown = (e: React.MouseEvent) => {
+    setIsDragging(true);
+    setDragStart({ x: e.clientX, y: e.clientY });
+  };
+
+  const handleMouseMove = (e: React.MouseEvent) => {
+    if (!isDragging) return;
+    const deltaX = e.clientX - dragStart.x;
+    const deltaY = e.clientY - dragStart.y;
+    
+    setImagePosX(prev => Math.max(0, Math.min(100, prev - (deltaX * 0.3))));
+    setImagePosY(prev => Math.max(0, Math.min(100, prev - (deltaY * 0.3))));
+    setDragStart({ x: e.clientX, y: e.clientY });
+  };
+
+  const handleMouseUp = () => {
+    setIsDragging(false);
+  };
+
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     
@@ -173,6 +200,9 @@ export default function UploadNews() {
         finalImageUrl = data.publicUrl;
       }
 
+      // Append position to the URL
+      const finalImageUrlWithPos = finalImageUrl ? buildImageUrlWithPosition(finalImageUrl, imagePosX, imagePosY) : null;
+
       // 2. Insert post metadata to database
       const { error: insertError } = await supabase.from("news").insert([
         {
@@ -180,7 +210,7 @@ export default function UploadNews() {
           content: cleanContent(content.trim()),
           author: author.trim(),
           category,
-          image_url: finalImageUrl || null
+          image_url: finalImageUrlWithPos
         }
       ]);
 
@@ -201,6 +231,8 @@ export default function UploadNews() {
       setImageUrl("");
       setImageFile(null);
       setImagePreview(null);
+      setImagePosX(50);
+      setImagePosY(50);
       if (fileInputRef.current) {
         fileInputRef.current.value = "";
       }
@@ -264,8 +296,18 @@ export default function UploadNews() {
                 
                 {imagePreview ? (
                   <div className="upload-news__preview-wrapper">
-                    <img src={imagePreview} alt="Preview" className="upload-news__preview" />
-                    <button className="upload-news__remove-file" onClick={removeSelectedImage} title="Xóa ảnh">
+                    <img 
+                      src={imagePreview} 
+                      alt="Preview" 
+                      className="upload-news__preview" 
+                      onMouseDown={handleMouseDown}
+                      onMouseMove={handleMouseMove}
+                      onMouseUp={handleMouseUp}
+                      onMouseLeave={handleMouseUp}
+                      draggable={false}
+                      style={{ objectPosition: `${imagePosX}% ${imagePosY}%`, width: '100%', height: '250px', objectFit: 'cover', borderRadius: '12px', cursor: isDragging ? 'grabbing' : 'grab' }} 
+                    />
+                    <button type="button" className="upload-news__remove-file" onClick={removeSelectedImage} title="Xóa ảnh">
                       <i className="ri-close-line"></i>
                     </button>
                   </div>
@@ -297,6 +339,43 @@ export default function UploadNews() {
                   />
                 </div>
               </div>
+
+              {/* Image Position Sliders */}
+              {(imagePreview || imageUrl) && (
+                <div className="upload-news__group" style={{ marginTop: '1.5rem', background: '#f8faf9', padding: '1rem', borderRadius: '12px', border: '1px solid #e1e8e3' }}>
+                  <label style={{ marginBottom: '1rem', display: 'block', fontWeight: 600 }}>Căn chỉnh vị trí ảnh bìa</label>
+                  
+                  <div style={{ marginBottom: '1rem' }}>
+                    <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: '0.85rem', marginBottom: '0.5rem', color: '#1b3323' }}>
+                      <span>Ngang (Trái ↔ Phải)</span>
+                      <strong>{imagePosX}%</strong>
+                    </div>
+                    <input 
+                      type="range" 
+                      min="0" 
+                      max="100" 
+                      value={imagePosX} 
+                      onChange={(e) => setImagePosX(parseInt(e.target.value))}
+                      style={{ width: '100%', accentColor: '#43a047', height: '6px' }}
+                    />
+                  </div>
+
+                  <div>
+                    <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: '0.85rem', marginBottom: '0.5rem', color: '#1b3323' }}>
+                      <span>Dọc (Lên ↕ Xuống)</span>
+                      <strong>{imagePosY}%</strong>
+                    </div>
+                    <input 
+                      type="range" 
+                      min="0" 
+                      max="100" 
+                      value={imagePosY} 
+                      onChange={(e) => setImagePosY(parseInt(e.target.value))}
+                      style={{ width: '100%', accentColor: '#43a047', height: '6px' }}
+                    />
+                  </div>
+                </div>
+              )}
             </div>
 
             {/* Right Column: Form Inputs */}

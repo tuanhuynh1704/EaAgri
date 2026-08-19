@@ -3,6 +3,7 @@ import { Link } from "react-router-dom";
 import { supabase } from "../utils/supabase/client";
 import { useAuth } from "../context/AuthContext";
 import { cleanContent } from "../utils/cleanContent";
+import { parseImageUrlAndPosition } from "../utils/imageUtils";
 
 interface NewsItem {
   id: string;
@@ -170,7 +171,11 @@ export default function NewsList() {
                 {/* Card Image */}
                 <Link to={`/news/${item.id}`} className="news-list__card-image-wrapper">
                   {item.image_url ? (
-                    <img src={item.image_url} alt={cleanContent(item.title)} />
+                    <img 
+                      src={parseImageUrlAndPosition(item.image_url).url!} 
+                      alt={cleanContent(item.title)} 
+                      style={{ objectPosition: `${parseImageUrlAndPosition(item.image_url).posX}% ${parseImageUrlAndPosition(item.image_url).posY}%` }} 
+                    />
                   ) : (
                     <div className="placeholder">
                       <i className="ri-image-line"></i>
