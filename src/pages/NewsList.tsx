@@ -146,6 +146,31 @@ export default function NewsList() {
 
         </div>
 
+        <article className="news-list__institutional-feature" data-aos="fade-up" data-aos-delay="140">
+          <a
+            href="https://cntt.ntt.edu.vn/nghien-cuu-khoa-hoc/phat-trien-san-pham/ea-agri-xuat-sac-gianh-giai-nhat-vong-ban-ket-nttu-innovation-startup-challenge-2026-bang-cong-nghe-nong-nghiep-va-cong-nghe-thuc-pham/"
+            target="_blank"
+            rel="noopener noreferrer"
+            className="news-list__institutional-image"
+          >
+            <img src="/Khởi nghiệp 3.jpg" alt="Ea Agri đạt Giải Nhất Vòng Bán kết Bảng 1C" />
+            <span><i className="ri-verified-badge-fill" /> Tin từ nhà trường</span>
+          </a>
+          <div className="news-list__institutional-content">
+            <small>KHOA CNTT · ĐẠI HỌC NGUYỄN TẤT THÀNH</small>
+            <h2>Ea Agri giành Giải Nhất Vòng Bán kết NTTU Innovation Startup Challenge 2026</h2>
+            <p>Đội thi Ea Agri, mã số NTT-144, được nhà trường ghi nhận tại Bảng 1C — Công nghệ Nông nghiệp và Công nghệ Thực phẩm.</p>
+            <div className="news-list__institutional-actions">
+              <a href="https://cntt.ntt.edu.vn/nghien-cuu-khoa-hoc/phat-trien-san-pham/ea-agri-xuat-sac-gianh-giai-nhat-vong-ban-ket-nttu-innovation-startup-challenge-2026-bang-cong-nghe-nong-nghiep-va-cong-nghe-thuc-pham/" target="_blank" rel="noopener noreferrer">
+                Đọc bài chính thức <i className="ri-arrow-right-up-line" />
+              </a>
+              <a href="https://www.facebook.com/share/p/1CA44S7p5M/" target="_blank" rel="noopener noreferrer" className="is-facebook">
+                <i className="ri-facebook-circle-fill" /> Facebook
+              </a>
+            </div>
+          </div>
+        </article>
+
         {/* News Grid */}
         {loading ? (
           <div className="news-list__loading">

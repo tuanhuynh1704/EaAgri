@@ -21,8 +21,9 @@
 .team-showcase {
   position: relative;
   overflow: hidden;
-  height: 100vh;
-  padding: clamp(7.5rem, 14vh, 9rem) 1.5rem clamp(1rem, 2vh, 1.5rem);
+  height: auto;
+  min-height: auto;
+  padding: clamp(7.5rem, 11vw, 9rem) 1.5rem clamp(3.5rem, 6vw, 5.5rem);
   display: flex;
   align-items: center;
   justify-content: center;
@@ -36,7 +37,7 @@
   align-items: center;
   justify-content: center;
   gap: clamp(1.75rem, 4vh, 3rem);
-  height: 100%;
+  height: auto;
   width: 100%;
 }
 
@@ -499,9 +500,50 @@
 }
 
 .app-showcase-slide {
+  // The carousel area already owns the navbar clearance and its bottom gap.
+  // Extra section padding created a large empty band after the caption.
+  padding: 0;
   background:
     radial-gradient(circle at 50% 54%, rgba(26, 166, 113, 0.1), transparent 28%),
     linear-gradient(180deg, #fff 0%, #f8fcfa 100%);
+}
+
+.team-advisors {
+  width: 100%;
+  max-width: 1240px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 1.25rem;
+  padding: 0.85rem 1rem;
+  border: 1px solid rgba(18, 132, 91, 0.14);
+  border-radius: 18px;
+  background: linear-gradient(110deg, rgba(240, 250, 246, 0.92), rgba(243, 250, 251, 0.76));
+  box-shadow: 0 12px 30px rgba(20, 83, 65, 0.06);
+}
+
+.team-advisors__intro,
+.team-advisors__list,
+.team-advisors__list span { display: flex; align-items: center; }
+
+.team-advisors__intro { gap: 0.7rem; flex-shrink: 0; }
+.team-advisors__icon { display: grid; place-items: center; width: 40px; height: 40px; border-radius: 12px; color: #087f63; background: #fff; box-shadow: 0 5px 15px rgba(15, 100, 72, 0.09); font-size: 1.15rem; }
+.team-advisors__intro div { display: flex; flex-direction: column; }
+.team-advisors__intro small { color: #648176; font: 700 0.58rem/1.2 monospace; letter-spacing: 1px; }
+.team-advisors__intro strong { margin-top: 0.15rem; color: #174c3a; font-size: 0.88rem; }
+.team-advisors__list { justify-content: flex-end; gap: 0.55rem; flex-wrap: wrap; }
+.team-advisors__list span { gap: 0.35rem; padding: 0.45rem 0.65rem; border-radius: 99px; color: #356456; background: rgba(255,255,255,.78); font-size: 0.7rem; font-weight: 650; }
+.team-advisors__list i { color: #15946c; }
+
+@media (max-width: 900px) {
+  .team-advisors { flex-direction: column; align-items: stretch; }
+  .team-advisors__list { justify-content: flex-start; }
+}
+
+@media (max-width: 600px) {
+  .team-advisors { padding: 0.85rem; }
+  .team-advisors__list { display: grid; grid-template-columns: 1fr; }
+  .team-advisors__list span { border-radius: 10px; }
 }
 
 .carousel-3d {
