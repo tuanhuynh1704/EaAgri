@@ -37,6 +37,12 @@ interface TeamMember {
   major: string;
   id: string;
   avatar: string;
+  themeColor: string;
+  topIcon: string;
+  roleIcon: string;
+  skillIcon: string;
+  decorIcon1: string;
+  decorIcon2: string;
   memberCode: string;
 }
 
@@ -48,6 +54,12 @@ const teamMembers: TeamMember[] = [
     major: "Khoa học dữ liệu",
     id: "2311559215",
     avatar: "/huy.jpg",
+    themeColor: "green",
+    topIcon: "ri-shield-star-line",
+    roleIcon: "ri-vip-crown-fill",
+    skillIcon: "ri-database-2-fill",
+    decorIcon1: "ri-leaf-fill",
+    decorIcon2: "ri-leaf-line",
     memberCode: "EA-01",
   },
   {
@@ -57,6 +69,12 @@ const teamMembers: TeamMember[] = [
     major: "Khoa học dữ liệu",
     id: "2311558913",
     avatar: "/Giảng.jpg",
+    themeColor: "blue",
+    topIcon: "ri-brain-line",
+    roleIcon: "ri-user-fill",
+    skillIcon: "ri-database-2-fill",
+    decorIcon1: "ri-bubble-chart-fill",
+    decorIcon2: "ri-checkbox-blank-circle-fill",
     memberCode: "EA-02",
   },
   {
@@ -66,6 +84,12 @@ const teamMembers: TeamMember[] = [
     major: "Khoa học dữ liệu",
     id: "2311559253",
     avatar: "/chung.jpg",
+    themeColor: "purple",
+    topIcon: "ri-code-s-slash-line",
+    roleIcon: "ri-user-fill",
+    skillIcon: "ri-settings-4-fill",
+    decorIcon1: "ri-leaf-fill",
+    decorIcon2: "ri-leaf-line",
     memberCode: "EA-03",
   },
   {
@@ -75,6 +99,12 @@ const teamMembers: TeamMember[] = [
     major: "Kỹ thuật phần mềm",
     id: "2200005725",
     avatar: "/Tuấn.jpg",
+    themeColor: "orange",
+    topIcon: "ri-megaphone-line",
+    roleIcon: "ri-user-fill",
+    skillIcon: "ri-stack-fill",
+    decorIcon1: "ri-leaf-fill",
+    decorIcon2: "ri-leaf-line",
     memberCode: "EA-04",
   },
 ];
@@ -147,12 +177,15 @@ const TeamSection = () => {
         <div className="team-showcase__container">
           {/* TOP: Team Info Header */}
           <div className="team-showcase__header" data-aos="fade-up">
-            <span className="team-showcase__label">ĐỘI NGŨ PHÁT TRIỂN</span>
+            <span className="team-showcase__label">
+              <span className="team-showcase__status-dot"></span>
+              EAAGRI / CORE TEAM
+            </span>
             <h2 className="team-showcase__title">
-              Năng lực <span className="team-showcase__title-highlight">Thực thi</span>
+              Đội Ngũ <span className="team-showcase__title-highlight">Thực Hiện<i className="ri-cpu-line team-title-tech-icon"></i><span className="team-title-underline"></span></span>
             </h2>
             <p className="team-showcase__desc">
-              Dự án được thực hiện bởi đội ngũ sinh viên từ Khoa Công nghệ Thông tin — Trường Đại học Nguyễn Tất Thành, với chuyên môn sâu rộng về Khoa học Dữ liệu và Kỹ thuật Phần mềm.
+              Dự án được thực hiện bởi sinh viên <span className="team-desc-highlight">Khoa Công nghệ Thông tin</span> — <span className="team-desc-highlight">Trường Đại học Nguyễn Tất Thành</span>.
             </p>
           </div>
 
@@ -166,6 +199,10 @@ const TeamSection = () => {
                 data-aos-delay={150 + index * 80}
               >
                 <div className="team-card__image-box">
+                  <div className="team-card__top-icon">
+                    <i className={member.topIcon}></i>
+                  </div>
+                  <span className="team-card__member-code">{member.memberCode}</span>
                   <img
                     src={member.avatar}
                     alt={member.name}
@@ -177,6 +214,10 @@ const TeamSection = () => {
                   <h3 className="team-card__name">{member.name}</h3>
                   <div className="team-card__divider"></div>
                   <p className="team-card__task">{member.task}</p>
+                  <div className="team-card__skill-pill">
+                    <i className={member.skillIcon}></i>
+                    <span>{member.major}</span>
+                  </div>
                 </div>
               </div>
             ))}
