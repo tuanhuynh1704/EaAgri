@@ -37,12 +37,6 @@ interface TeamMember {
   major: string;
   id: string;
   avatar: string;
-  themeColor: "green" | "blue" | "purple" | "orange";
-  topIcon: string;
-  roleIcon: string;
-  skillIcon: string;
-  decorIcon1: string;
-  decorIcon2: string;
   memberCode: string;
 }
 
@@ -54,12 +48,6 @@ const teamMembers: TeamMember[] = [
     major: "Khoa học dữ liệu",
     id: "2311559215",
     avatar: "/huy.jpg",
-    themeColor: "green",
-    topIcon: "ri-shield-star-line",
-    roleIcon: "ri-vip-crown-fill",
-    skillIcon: "ri-database-2-fill",
-    decorIcon1: "ri-leaf-fill",
-    decorIcon2: "ri-leaf-line",
     memberCode: "EA-01",
   },
   {
@@ -69,12 +57,6 @@ const teamMembers: TeamMember[] = [
     major: "Khoa học dữ liệu",
     id: "2311558913",
     avatar: "/Giảng.jpg",
-    themeColor: "blue",
-    topIcon: "ri-brain-line",
-    roleIcon: "ri-user-fill",
-    skillIcon: "ri-database-2-fill",
-    decorIcon1: "ri-bubble-chart-fill",
-    decorIcon2: "ri-checkbox-blank-circle-fill",
     memberCode: "EA-02",
   },
   {
@@ -84,12 +66,6 @@ const teamMembers: TeamMember[] = [
     major: "Khoa học dữ liệu",
     id: "2311559253",
     avatar: "/chung.jpg",
-    themeColor: "purple",
-    topIcon: "ri-code-s-slash-line",
-    roleIcon: "ri-user-fill",
-    skillIcon: "ri-settings-4-fill",
-    decorIcon1: "ri-leaf-fill",
-    decorIcon2: "ri-leaf-line",
     memberCode: "EA-03",
   },
   {
@@ -99,12 +75,6 @@ const teamMembers: TeamMember[] = [
     major: "Kỹ thuật phần mềm",
     id: "2200005725",
     avatar: "/Tuấn.jpg",
-    themeColor: "orange",
-    topIcon: "ri-megaphone-line",
-    roleIcon: "ri-user-fill",
-    skillIcon: "ri-stack-fill",
-    decorIcon1: "ri-leaf-fill",
-    decorIcon2: "ri-leaf-line",
     memberCode: "EA-04",
   },
 ];
@@ -175,83 +145,58 @@ const TeamSection = () => {
     <>
       <section id="section-team" className="team-showcase fullpage-slide">
         <div className="team-showcase__container">
-        {/* TOP: Team Info Header */}
-        <div className="team-showcase__header" data-aos="fade-up">
-          <span className="team-showcase__label">
-            <span className="team-showcase__status-dot"></span>
-            EAAGRI / CORE TEAM
-          </span>
-          <h2 className="team-showcase__title">
-            Đội Ngũ <span className="team-showcase__title-highlight">Thực Hiện<i className="ri-cpu-line team-title-tech-icon"></i><span className="team-title-underline"></span></span>
-          </h2>
-          <p className="team-showcase__desc">
-            Dự án được thực hiện bởi sinh viên <span className="team-desc-highlight">Khoa Công nghệ Thông tin</span> — <span className="team-desc-highlight">Trường Đại học Nguyễn Tất Thành</span>.
-          </p>
-        </div>
+          {/* TOP: Team Info Header */}
+          <div className="team-showcase__header" data-aos="fade-up">
+            <span className="team-showcase__label">ĐỘI NGŨ PHÁT TRIỂN</span>
+            <h2 className="team-showcase__title">
+              Năng lực <span className="team-showcase__title-highlight">Thực thi</span>
+            </h2>
+            <p className="team-showcase__desc">
+              Dự án được thực hiện bởi đội ngũ sinh viên từ Khoa Công nghệ Thông tin — Trường Đại học Nguyễn Tất Thành, với chuyên môn sâu rộng về Khoa học Dữ liệu và Kỹ thuật Phần mềm.
+            </p>
+          </div>
 
-        {/* Member Cards Grid (Rectangular Photo Header - Image Top, Text Below) */}
-        <div className="team-showcase__cards" data-aos="fade-up" data-aos-delay="100">
-          {teamMembers.map((member, index) => (
-            <div
-              className={`team-card team-card--${member.themeColor}`}
-              key={index}
-              data-aos="fade-up"
-              data-aos-delay={150 + index * 80}
-            >
-              {/* Top Rounded Rectangular Image Box */}
-              <div className="team-card__image-box">
-                <span className="team-card__circuit-line" aria-hidden="true"></span>
-                {/* Floating Top Left Glass Badge Icon */}
-                <div className="team-card__top-icon">
-                  <i className={member.topIcon}></i>
+          {/* Member Cards Grid */}
+          <div className="team-showcase__cards" data-aos="fade-up" data-aos-delay="100">
+            {teamMembers.map((member, index) => (
+              <div
+                className="team-card"
+                key={index}
+                data-aos="fade-up"
+                data-aos-delay={150 + index * 80}
+              >
+                <div className="team-card__image-box">
+                  <img
+                    src={member.avatar}
+                    alt={member.name}
+                    className="team-card__avatar-img"
+                  />
                 </div>
-                <span className="team-card__member-code">{member.memberCode}</span>
-
-                {/* Rectangular Photo Avatar */}
-                <img
-                  src={member.avatar}
-                  alt={member.name}
-                  className="team-card__rect-avatar-img"
-                />
-
-                {/* Role Pill Badge anchored at base of image */}
-                <div className="team-card__role-pill">
-                  <span>{member.roleTag}</span>
+                <div className="team-card__body">
+                  <div className="team-card__role">{member.roleTag}</div>
+                  <h3 className="team-card__name">{member.name}</h3>
+                  <div className="team-card__divider"></div>
+                  <p className="team-card__task">{member.task}</p>
                 </div>
               </div>
-
-              {/* Text Content Below Image */}
-              <div className="team-card__body">
-                {/* Member Name */}
-                <h3 className="team-card__name">{member.name}</h3>
-
-                {/* Symmetrical Underline Accent */}
-                <div className="team-card__name-accent"></div>
-
-                {/* Task description */}
-                <p className="team-card__task">{member.task}</p>
-
-                {/* Bottom Skill Capsule Badge */}
-                <div className="team-card__skill-pill">
-                  <i className={member.skillIcon}></i>
-                  <span>{member.major}</span>
-                </div>
-              </div>
-            </div>
-          ))}
+            ))}
+          </div>
         </div>
-      </div>
-    </section>
+      </section>
 
-    {/* BOTTOM: 3D Carousel Phone Showcase (Separate 100vh fullpage slide) */}
-    <section className="app-showcase-slide fullpage-slide">
-      <div
-        className="team-showcase__carousel-area"
-        data-aos="fade-up"
-        data-aos-delay="300"
-        onMouseEnter={() => setIsCarouselPaused(true)}
-        onMouseLeave={() => setIsCarouselPaused(false)}
-      >
+      {/* BOTTOM: 3D Carousel Phone Showcase (Separate 100vh fullpage slide) */}
+      <section className="app-showcase-slide fullpage-slide">
+        <div
+          className="team-showcase__carousel-area"
+          data-aos="fade-up"
+          data-aos-delay="300"
+          onMouseEnter={() => setIsCarouselPaused(true)}
+          onMouseLeave={() => setIsCarouselPaused(false)}
+        >
+          <div className="app-showcase__header" data-aos="fade-up">
+             <h2 className="app-showcase__title">Hệ Sinh Thái Sản Phẩm</h2>
+             <p className="app-showcase__desc">Ứng dụng di động toàn diện, tích hợp công nghệ AI để hỗ trợ quản lý canh tác thông minh và hiệu quả.</p>
+          </div>
           <div 
             className="carousel-3d"
             onTouchStart={onTouchStart}

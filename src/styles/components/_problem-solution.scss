@@ -1,6 +1,10 @@
 @use "../abstracts/variables" as *;
 @use "../abstracts/mixins" as *;
 
+// ==========================================
+// PROBLEM SOLUTION SECTION
+// ==========================================
+
 .problem-solution__container {
   display: flex;
   flex-direction: column;
@@ -8,14 +12,10 @@
   width: 100%;
   max-width: 1200px;
   margin-inline: auto;
-  padding-top: 8.5rem; // Clears the fixed navbar
-  padding-bottom: 1.5rem;
+  padding-top: 8rem;
+  padding-bottom: 2rem;
   padding-inline: 1.5rem;
   box-sizing: border-box;
-
-  @media (max-height: 820px) {
-    padding-top: 7rem;
-  }
 
   @media (max-width: $tablet) {
     padding-top: 6rem;
@@ -34,84 +34,42 @@
   }
 
   @media (min-width: #{$tablet + 1px}) {
-    grid-template-columns: 5.2fr 4.8fr;
-    gap: 4rem;
+    grid-template-columns: 1fr 1fr;
+    gap: 5rem;
   }
 }
 
 // ==========================================
-// IMAGE/DASHBOARD SIDE (Left)
+// IMAGE SIDE (Left)
 // ==========================================
+
 .problem-solution__image-side {
   display: flex;
   justify-content: center;
   align-items: center;
   position: relative;
   width: 100%;
-
-  @media (max-width: $tablet) {
-    margin-bottom: 1.5rem;
-  }
 }
 
 .problem-solution__image-wrapper {
   position: relative;
-  width: 95%;
-  max-width: 540px;
-  background: rgba(255, 255, 255, 0.85);
-  backdrop-filter: blur(12px);
-  -webkit-backdrop-filter: blur(12px);
-  border: 1px solid rgba(255, 255, 255, 0.4);
-  border-radius: 18px;
+  width: 100%;
+  max-width: 500px;
+  border-radius: $radius-lg;
   box-shadow: $shadow-lg;
-  overflow: visible; // Allow widgets to float outside!
-  padding: 0.5rem 0.5rem 0.5rem 0.5rem;
   transition: transform 0.4s ease, box-shadow 0.4s ease;
 
   &:hover {
     transform: translateY(-5px);
-    box-shadow: 0 30px 60px rgba(27, 51, 35, 0.12);
+    box-shadow: $shadow-xl;
   }
-
-  @media (max-width: $tablet) {
-    width: 90%;
-  }
-}
-
-.problem-solution__window-header {
-  display: flex;
-  align-items: center;
-  gap: 6px;
-  padding: 0.5rem 0.8rem;
-  border-bottom: 1px solid rgba(0, 0, 0, 0.05);
-
-  .dot {
-    width: 10px;
-    height: 10px;
-    border-radius: 50%;
-    display: inline-block;
-
-    &--red { background-color: #ff5f56; }
-    &--yellow { background-color: #ffbd2e; }
-    &--green { background-color: #27c93f; }
-  }
-}
-
-.problem-solution__window-title {
-  margin-left: auto;
-  margin-right: auto;
-  font-size: 0.75rem;
-  font-weight: 600;
-  color: $text-light;
-  font-family: monospace;
 }
 
 .problem-solution__image-container {
   position: relative;
-  border-radius: 12px;
+  border-radius: $radius-lg;
   overflow: hidden;
-  border: 1px solid rgba(0, 0, 0, 0.05);
-  background-color: #f7faf7;
+  background-color: $white;
 }
 
 .problem-solution__img {
@@ -119,37 +77,34 @@
   height: auto;
   display: block;
   object-fit: cover;
-  transition: transform 0.8s ease;
+  transition: transform 0.6s ease;
 
   .problem-solution__image-wrapper:hover & {
-    transform: scale(1.03);
+    transform: scale(1.02);
   }
 }
 
 // Floating Dashboard Widgets
 .problem-solution__widget {
   position: absolute;
-  background: rgba(255, 255, 255, 0.94);
-  backdrop-filter: blur(8px);
-  -webkit-backdrop-filter: blur(8px);
-  border: 1px solid rgba(255, 255, 255, 0.8);
-  border-radius: 14px;
-  padding: 0.5rem 0.85rem;
+  background: $white;
+  border: 1px solid rgba(0, 0, 0, 0.05);
+  border-radius: $radius-md;
+  padding: 0.75rem 1rem;
   display: flex;
   align-items: center;
-  gap: 0.65rem;
-  box-shadow: 0 10px 20px rgba(0, 0, 0, 0.06);
+  gap: 0.85rem;
+  box-shadow: $shadow-md;
   z-index: 5;
-  transition: all 0.3s ease;
 
   i {
     font-size: 1.25rem;
     display: flex;
     align-items: center;
     justify-content: center;
-    width: 32px;
-    height: 32px;
-    border-radius: 8px;
+    width: 36px;
+    height: 36px;
+    border-radius: 10px;
   }
 
   div {
@@ -158,21 +113,20 @@
     text-align: left;
 
     strong {
-      font-size: 0.8rem;
+      font-size: 0.85rem;
       color: $text-dark;
       font-weight: 700;
     }
 
     span {
-      font-size: 0.65rem;
+      font-size: 0.7rem;
       color: $text-light;
     }
   }
 
   &--sensors {
-    top: 25px;
-    left: -35px;
-    animation: problemWidgetFloat 6s ease-in-out infinite;
+    top: 30px;
+    left: -40px;
 
     i {
       background: rgba(#e67e22, 0.1);
@@ -181,10 +135,8 @@
   }
 
   &--ai {
-    bottom: 25px;
-    right: -35px;
-    animation: problemWidgetFloat 6s ease-in-out infinite;
-    animation-delay: 3s;
+    bottom: 30px;
+    right: -40px;
 
     i {
       background: rgba($primary-color, 0.1);
@@ -193,17 +145,17 @@
   }
 
   @media (max-width: $tablet) {
-    padding: 0.4rem 0.65rem;
+    padding: 0.5rem 0.75rem;
     
     i {
-      width: 26px;
-      height: 26px;
-      font-size: 1rem;
+      width: 32px;
+      height: 32px;
+      font-size: 1.1rem;
     }
 
     div {
-      strong { font-size: 0.75rem; }
-      span { font-size: 0.6rem; }
+      strong { font-size: 0.8rem; }
+      span { font-size: 0.65rem; }
     }
   }
 
@@ -220,6 +172,7 @@
 // ==========================================
 // CONTENT SIDE (Right)
 // ==========================================
+
 .problem-solution__content-side {
   display: flex;
   flex-direction: column;
@@ -227,21 +180,12 @@
 
 .problem-solution__tag {
   align-self: flex-start;
-  background: rgba($primary-color, 0.08);
-  border: 1px solid rgba($primary-color, 0.15);
   color: $primary-color-dark;
-  padding: 0.4rem 1rem;
-  border-radius: 99px;
-  font-size: 0.8rem;
-  font-weight: 600;
-  display: inline-flex;
-  align-items: center;
-  gap: 0.5rem;
+  font-size: 0.85rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 1px;
   margin-bottom: 1rem;
-
-  i {
-    font-size: 0.95rem;
-  }
 
   @media (max-width: $tablet) {
     align-self: center;
@@ -249,25 +193,14 @@
 }
 
 .problem-solution__title {
-  font-size: 2.25rem;
+  font-size: clamp(2rem, 3.5vw, 2.75rem);
   font-weight: 800;
-  line-height: 1.25;
+  line-height: 1.2;
   color: $text-dark;
-  margin-bottom: 1.25rem;
-
-  .highlight {
-    background: linear-gradient(to right, $primary-color-dark, #0284c7);
-    -webkit-background-clip: text;
-    -webkit-text-fill-color: transparent;
-  }
+  margin-bottom: 2rem;
 
   @media (max-width: $tablet) {
-    font-size: 1.8rem;
     text-align: center;
-  }
-
-  @media (max-width: $mobile) {
-    font-size: 1.5rem;
   }
 }
 
@@ -275,10 +208,6 @@
   display: flex;
   flex-direction: column;
   gap: 1.25rem;
-
-  @media (max-height: 820px) {
-    gap: 0.85rem;
-  }
 }
 
 .problem-solution__card {
@@ -286,48 +215,31 @@
   gap: 1.25rem;
   align-items: flex-start;
   padding: 1.25rem;
-  border-radius: 16px;
+  border-radius: $radius-md;
+  background: $white;
+  border: 1px solid rgba(0, 0, 0, 0.05);
+  box-shadow: $shadow-sm;
   transition: all 0.3s ease;
   text-align: left;
 
   &:hover {
-    transform: translateX(6px);
-    box-shadow: 0 10px 25px rgba(0, 0, 0, 0.04);
+    transform: translateX(5px);
+    box-shadow: $shadow-md;
+    border-color: rgba($primary-color, 0.2);
   }
 
   &--problem {
-    background: rgba(#e74c3c, 0.04);
-    border: 1px solid rgba(#e74c3c, 0.1);
-
     .problem-solution__card-icon {
       background: rgba(#e74c3c, 0.1);
       color: #c0392b;
     }
-
-    &:hover {
-      background: rgba(#e74c3c, 0.06);
-      border-color: rgba(#e74c3c, 0.25);
-    }
   }
 
   &--solution {
-    background: rgba($primary-color, 0.04);
-    border: 1px solid rgba($primary-color, 0.1);
-
     .problem-solution__card-icon {
       background: rgba($primary-color, 0.1);
       color: $primary-color-dark;
     }
-
-    &:hover {
-      background: rgba($primary-color, 0.06);
-      border-color: rgba($primary-color, 0.25);
-    }
-  }
-
-  @media (max-height: 820px) {
-    padding: 0.9rem 1.1rem;
-    border-radius: 12px;
   }
 
   @media (max-width: $mobile) {
@@ -337,34 +249,33 @@
 }
 
 .problem-solution__card-icon {
-  width: 44px;
-  height: 44px;
+  width: 48px;
+  height: 48px;
   border-radius: 12px;
   display: flex;
   align-items: center;
   justify-content: center;
   flex-shrink: 0;
-  font-size: 1.35rem;
+  font-size: 1.5rem;
   transition: all 0.3s ease;
 
-  @media (max-height: 820px) {
-    width: 38px;
-    height: 38px;
-    font-size: 1.15rem;
-    border-radius: 10px;
+  @media (max-width: $mobile) {
+    width: 40px;
+    height: 40px;
+    font-size: 1.2rem;
   }
 }
 
 .problem-solution__card-body {
   h3 {
-    font-size: 0.95rem;
+    font-size: 1.05rem;
     font-weight: 700;
     color: $text-dark;
     margin-bottom: 0.4rem;
   }
 
   p {
-    font-size: 0.85rem;
+    font-size: 0.95rem;
     line-height: 1.6;
     color: $text-light;
     margin: 0;
@@ -383,24 +294,12 @@
     color: $primary-color-dark;
   }
 
-  @media (max-height: 820px) {
+  @media (max-width: $mobile) {
     h3 {
-      font-size: 0.9rem;
-      margin-bottom: 0.25rem;
+      font-size: 0.95rem;
     }
     p {
-      font-size: 0.8rem;
-      line-height: 1.45;
+      font-size: 0.85rem;
     }
-  }
-}
-
-// Animations
-@keyframes problemWidgetFloat {
-  0%, 100% {
-    transform: translateY(0);
-  }
-  50% {
-    transform: translateY(-6px);
   }
 }

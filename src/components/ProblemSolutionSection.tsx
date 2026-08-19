@@ -9,12 +9,6 @@ export default function ProblemSolutionSection({ image, imageAlt }: ProblemSolut
       <div className="problem-solution__grid">
         <div className="problem-solution__image-side" data-aos="fade-right">
           <div className="problem-solution__image-wrapper">
-            <div className="problem-solution__window-header">
-              <span className="dot dot--red"></span>
-              <span className="dot dot--yellow"></span>
-              <span className="dot dot--green"></span>
-              <span className="problem-solution__window-title">EaAgri System Diagram</span>
-            </div>
             <div className="problem-solution__image-container">
               <img src={image} alt={imageAlt} className="problem-solution__img" />
               <div className="problem-solution__image-overlay"></div>
@@ -39,17 +33,17 @@ export default function ProblemSolutionSection({ image, imageAlt }: ProblemSolut
 
         <div className="problem-solution__content-side" data-aos="fade-left">
           <span className="problem-solution__tag">
-            <i className="ri-lightbulb-line"></i> Tầm Nhìn & Sứ Mệnh
+            Tầm Nhìn & Sứ Mệnh
           </span>
           <h2 className="problem-solution__title">
-            Vấn Đề & <span className="highlight">Giải Pháp</span>
+            Vấn Đề & Giải Pháp
           </h2>
 
           <div className="problem-solution__cards">
             {/* The Problem Card */}
             <div className="problem-solution__card problem-solution__card--problem">
               <div className="problem-solution__card-icon">
-                <i className="ri-error-warning-line"></i>
+                <i className="ri-error-warning-fill"></i>
               </div>
               <div className="problem-solution__card-body">
                 <h3>"Tứ Giác Rủi Ro" Trong Nông Nghiệp</h3>
@@ -62,7 +56,7 @@ export default function ProblemSolutionSection({ image, imageAlt }: ProblemSolut
             {/* The Solution Card */}
             <div className="problem-solution__card problem-solution__card--solution">
               <div className="problem-solution__card-icon">
-                <i className="ri-checkbox-circle-line"></i>
+                <i className="ri-checkbox-circle-fill"></i>
               </div>
               <div className="problem-solution__card-body">
                 <h3>Số Hóa Với "Data-Driven Farming"</h3>
