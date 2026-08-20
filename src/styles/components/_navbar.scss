@@ -20,6 +20,22 @@ nav.navbar-container {
   pointer-events: none; // Allow clicks to pass through transparent gap
 }
 
+// Keep content unobstructed while reading: scrolling down tucks the navigation
+// above the viewport; scrolling up or moving the pointer to the top reveals it.
+nav.navbar-container.is-hidden {
+  translate: 0 calc(-100% - 2.5rem);
+  opacity: 0;
+
+  .nav__logo,
+  .nav__right-capsule {
+    pointer-events: none;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  nav.navbar-container { transition-duration: 0.01ms; }
+}
+
 .nav__logo {
   display: flex;
   align-items: center;

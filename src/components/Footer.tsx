@@ -1,6 +1,6 @@
 import { useNavigate } from "react-router-dom";
 
-const Footer = () => {
+export default function Footer() {
   const navigate = useNavigate();
 
   return (
@@ -11,20 +11,36 @@ const Footer = () => {
       <div className="section__container footer__container">
         {/* Brand Column */}
         <div className="footer__brand-col" data-aos="fade-up">
-          <div className="footer__logo-box" onClick={() => navigate("/")}>
-            <img
-              src="/logo_navbar.png"
-              alt="EaAgri Logo"
-              className="footer__logo-img"
-            />
+          <div className="footer__logo-box" onClick={() => navigate("/")} title="EaAgri - Về trang chủ">
+            <div className="footer__logo-icon-wrap">
+              <img
+                src="/logo2.png"
+                alt="EaAgri Durian AI Mascot"
+                className="footer__logo-icon"
+              />
+              <span className="footer__logo-pulse" />
+            </div>
+            <div className="footer__logo-text-group">
+              <div className="footer__logo-brand">
+                Ea<span>Agri</span>
+              </div>
+              <span className="footer__logo-sub">Trợ lý nông nghiệp thông minh</span>
+            </div>
           </div>
+
           <p className="footer__description">
-            Hệ sinh thái nông nghiệp thông minh ứng dụng công nghệ AI, IoT và dữ liệu thời gian thực giúp nâng cao năng suất và chất lượng nông sản Việt Nam.
+            Hệ sinh thái nông nghiệp thông minh ứng dụng công nghệ <strong>AI</strong>, <strong>IoT</strong> và dữ liệu thời gian thực giúp hóa giải rủi ro, tối ưu hóa chi phí và nâng cao chất lượng sầu riêng Việt Nam.
           </p>
-          {/* Quick contact badge */}
-          <div className="footer__contact-badge">
-            <i className="ri-mail-send-line"></i>
-            <span>contact@eaagri.id.vn</span>
+
+          <div className="footer__contact-list">
+            <a href="mailto:contact@eaagri.id.vn" className="footer__contact-chip" title="Gửi email liên hệ">
+              <i className="ri-mail-send-line"></i>
+              <span>contact@eaagri.id.vn</span>
+            </a>
+            <div className="footer__contact-chip footer__contact-chip--location">
+              <i className="ri-map-pin-2-line"></i>
+              <span>Đắk Lắk & TP. Hồ Chí Minh</span>
+            </div>
           </div>
         </div>
 
@@ -34,17 +50,31 @@ const Footer = () => {
           <ul className="footer__links">
             <li>
               <a href="#" onClick={(e) => { e.preventDefault(); navigate("/"); }}>
-                <i className="ri-arrow-right-s-line"></i> Trang chủ
+                <i className="ri-home-4-line"></i> <span>Trang chủ</span>
               </a>
             </li>
             <li>
               <a href="#" onClick={(e) => { e.preventDefault(); navigate("/architecture"); }}>
-                <i className="ri-arrow-right-s-line"></i> Kiến trúc hệ thống
+                <i className="ri-node-tree"></i> <span>Kiến trúc hệ thống</span>
               </a>
             </li>
             <li>
               <a href="#" onClick={(e) => { e.preventDefault(); navigate("/news"); }}>
-                <i className="ri-arrow-right-s-line"></i> Tin tức & Sự kiện
+                <i className="ri-newspaper-line"></i> <span>Tin tức & Sự kiện</span>
+              </a>
+            </li>
+            <li>
+              <a
+                href="#awards"
+                onClick={(e) => {
+                  e.preventDefault();
+                  navigate("/");
+                  setTimeout(() => {
+                    document.querySelector('.awards-section__container')?.scrollIntoView({ behavior: 'smooth' });
+                  }, 100);
+                }}
+              >
+                <i className="ri-trophy-line"></i> <span>Danh hiệu & Giải thưởng</span>
               </a>
             </li>
           </ul>
@@ -54,44 +84,57 @@ const Footer = () => {
         <div className="footer__social-col" data-aos="fade-up" data-aos-delay="200">
           <h4 className="footer__title">Kết Nối</h4>
           <p className="footer__social-desc">
-            Theo dõi hành trình phát triển và cập nhật các tính năng mới nhất từ EaAgri.
+            Theo dõi hành trình phát triển và kết nối cùng đội ngũ kỹ sư sáng lập EaAgri.
           </p>
           <div className="footer__social-cards">
             <a
               href="https://www.facebook.com/profile.php?id=61577351045350"
               target="_blank"
               rel="noopener noreferrer"
-              className="footer__social-card"
-              title="Facebook"
+              className="footer__social-card footer__social-card--fb"
+              title="Fanpage Facebook chính thức"
             >
-              <i className="ri-facebook-circle-fill"></i>
-              <span>Facebook</span>
+              <div className="footer__social-icon">
+                <i className="ri-facebook-circle-fill"></i>
+              </div>
+              <div className="footer__social-text">
+                <strong>Facebook</strong>
+                <span>@EaAgri.Official</span>
+              </div>
+              <i className="ri-arrow-right-up-line footer__social-arrow"></i>
             </a>
+
             <a
               href="https://github.com/TuansHuynh/EaAgri"
               target="_blank"
               rel="noopener noreferrer"
-              className="footer__social-card"
-              title="GitHub"
+              className="footer__social-card footer__social-card--gh"
+              title="Mã nguồn & Dự án trên GitHub"
             >
-              <i className="ri-github-fill"></i>
-              <span>GitHub</span>
+              <div className="footer__social-icon">
+                <i className="ri-github-fill"></i>
+              </div>
+              <div className="footer__social-text">
+                <strong>GitHub</strong>
+                <span>Open Source Repos</span>
+              </div>
+              <i className="ri-arrow-right-up-line footer__social-arrow"></i>
             </a>
           </div>
         </div>
 
-        {/* Download & Newsletter Column */}
+        {/* Download & Mobile Apps Column */}
         <div className="footer__download-col" data-aos="fade-up" data-aos-delay="300">
           <h4 className="footer__title">Tải Ứng Dụng</h4>
           <p className="footer__download-desc">
-            Quản lý và giám sát vườn sầu riêng của bạn mọi lúc, mọi nơi trực tiếp trên thiết bị di động.
+            Quản lý và giám sát vườn sầu riêng của bạn mọi lúc, mọi nơi trực tiếp trên smartphone.
           </p>
           
           <div className="footer__download-row">
-            <a href="##" className="footer__download-btn" aria-label="App Store">
+            <a href="#" className="footer__download-btn" aria-label="App Store">
               <img
                 src="/assets/apple.png"
-                alt="App Store"
+                alt="Tải trên App Store"
               />
             </a>
             <a 
@@ -103,9 +146,14 @@ const Footer = () => {
             >
               <img
                 src="/assets/google.png"
-                alt="Google Play"
+                alt="Tải trên Google Play"
               />
             </a>
+          </div>
+
+          <div className="footer__status-badge">
+            <span className="footer__status-dot" />
+            <span>Mạng lưới IoT & AI hoạt động 24/7</span>
           </div>
         </div>
       </div>
@@ -113,18 +161,18 @@ const Footer = () => {
       {/* Footer Bottom Bar */}
       <div className="footer__bar">
         <div className="footer__bar-content">
-          <span className="footer__copyright">
-            Copyright © 2026 Ea Agri Team. All rights reserved.
-          </span>
+          <div className="footer__copyright">
+            <span>© 2026 <strong>EaAgri Team</strong>. Nông Nghiệp Số Vì Nông Dân Việt.</span>
+          </div>
           <div className="footer__bar-links">
             <a href="#">Điều khoản dịch vụ</a>
             <span className="footer__bar-divider"></span>
             <a href="#">Chính sách bảo mật</a>
+            <span className="footer__bar-divider"></span>
+            <a href="#">Quy chuẩn VietGAP</a>
           </div>
         </div>
       </div>
     </footer>
   );
-};
-
-export default Footer;
+}
