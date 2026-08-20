@@ -472,9 +472,11 @@ export default function ProblemSolutionSection() {
                   {MATRIX_DATA.map((item, idx) => (
                     <div
                       key={item.id}
-                      className="problem-solution__card problem-solution__card--problem"
+                      className={`problem-solution__card problem-solution__card--problem ${
+                        item.id === activeItemId ? "problem-solution__card--active" : ""
+                      }`}
                       style={{ animationDelay: `${idx * 0.08}s` }}
-                      onClick={() => setActiveItemId(item.id)}
+                      onClick={() => setActiveItemId(item.id === activeItemId ? "overview" : item.id)}
                     >
                       <div className="problem-solution__card-icon">
                         <i className={item.riskIcon}></i>
@@ -509,9 +511,11 @@ export default function ProblemSolutionSection() {
                   {MATRIX_DATA.map((item, idx) => (
                     <div
                       key={item.id}
-                      className="problem-solution__card problem-solution__card--solution"
+                      className={`problem-solution__card problem-solution__card--solution ${
+                        item.id === activeItemId ? "problem-solution__card--active" : ""
+                      }`}
                       style={{ animationDelay: `${idx * 0.08}s` }}
-                      onClick={() => setActiveItemId(item.id)}
+                      onClick={() => setActiveItemId(item.id === activeItemId ? "overview" : item.id)}
                     >
                       <div className="problem-solution__card-icon">
                         <i className={item.solutionIcon}></i>
