@@ -1,10 +1,6 @@
 import { useState, useEffect } from "react";
 import { createPortal } from "react-dom";
 
-interface ProblemSolutionSectionProps {
-  image?: string;
-  imageAlt?: string;
-}
 
 type ViewMode = "comparison" | "problem" | "solution";
 
@@ -172,10 +168,7 @@ const MATRIX_DATA: RiskSolutionPair[] = [
   },
 ];
 
-export default function ProblemSolutionSection({
-  image = "/assets/mohinhtongquan",
-  imageAlt = "Sơ đồ hệ thống EaAgri",
-}: ProblemSolutionSectionProps) {
+export default function ProblemSolutionSection() {
   const [activeMode, setActiveMode] = useState<ViewMode>("comparison");
   // Default to overview
   const [activeItemId, setActiveItemId] = useState<string>("overview");
