@@ -25,10 +25,7 @@ export default function HomePage() {
       </div>
 
       <div className="section-bg--gradient-teal fullpage-slide">
-        <ProblemSolutionSection
-          image="/ẢNh 1.png"
-          imageAlt="Vườn sầu riêng thông minh kết nối cảm biến IoT và ứng dụng Ea Agri"
-        />
+        <ProblemSolutionSection />
       </div>
 
       <div className="section-bg--gradient-warm fullpage-slide">
