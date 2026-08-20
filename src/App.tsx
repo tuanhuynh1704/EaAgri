@@ -10,7 +10,7 @@ import { AuthProvider } from "./context/AuthContext";
 
 function App() {
   const { pathname } = useLocation();
-  const isAuthPage = pathname === "/login";
+  const isAuthPage = pathname === "/login" || pathname === "/register";
 
   useEffect(() => {
     if ('scrollRestoration' in window.history) {

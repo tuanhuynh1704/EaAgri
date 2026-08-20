@@ -485,6 +485,195 @@
   .auth-page__toggle { margin-top: 1.2rem; }
 }
 
+// ==========================================
+// REGISTER PAGE SPECIFIC STYLES
+// ==========================================
+.auth-page--register {
+  padding-top: 5rem;
+  padding-bottom: 3rem;
+}
+
+.auth-page__card-wrapper--register {
+  width: min(1080px, 100%);
+}
+
+.auth-page__card--register {
+  max-width: 520px;
+  padding: clamp(2rem, 3vw, 3rem) clamp(1.75rem, 3.5vw, 2.5rem);
+}
+
+.auth-page__row-2 {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 0.85rem;
+
+  @media (max-width: 540px) {
+    grid-template-columns: 1fr;
+    gap: 1.15rem;
+  }
+}
+
+.auth-page__pwd-toggle {
+  position: absolute;
+  right: 0.75rem;
+  background: none;
+  border: none;
+  color: #94a3b8;
+  cursor: pointer;
+  padding: 0.25rem;
+  font-size: 1.1rem;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: color 0.2s ease;
+  z-index: 6;
+
+  &:hover {
+    color: $primary-color-dark;
+  }
+}
+
+.auth-page__roles-grid {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 0.5rem;
+
+  @media (max-width: 440px) {
+    grid-template-columns: 1fr;
+  }
+}
+
+.auth-page__role-btn {
+  display: flex;
+  align-items: center;
+  gap: 0.45rem;
+  padding: 0.55rem 0.7rem;
+  border-radius: 10px;
+  background: rgba(255, 255, 255, 0.6);
+  border: 1.5px solid rgba(20, 132, 93, 0.15);
+  color: #475569;
+  font-size: 0.78rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.25s ease;
+  text-align: left;
+
+  i {
+    font-size: 0.95rem;
+    color: $primary-color-dark;
+    transition: transform 0.25s ease;
+  }
+
+  &:hover {
+    background: rgba(255, 255, 255, 0.95);
+    border-color: rgba(20, 132, 93, 0.35);
+    color: $text-dark;
+  }
+
+  &--active {
+    background: #ffffff;
+    border-color: $primary-color;
+    color: $primary-color-dark;
+    box-shadow: 0 4px 12px rgba(22, 132, 82, 0.15);
+
+    i {
+      transform: scale(1.15);
+    }
+  }
+}
+
+.auth-page__checkbox-group {
+  margin-top: 0.2rem;
+}
+
+.auth-page__checkbox-label {
+  display: flex;
+  align-items: flex-start;
+  gap: 0.6rem;
+  font-size: 0.8rem;
+  color: #64748b;
+  line-height: 1.45;
+  cursor: pointer;
+
+  input[type="checkbox"] {
+    margin-top: 0.15rem;
+    accent-color: $primary-color;
+    width: 15px;
+    height: 15px;
+    cursor: pointer;
+    flex-shrink: 0;
+  }
+
+  a {
+    color: $primary-color-dark;
+    font-weight: 600;
+    text-decoration: underline;
+
+    &:hover {
+      color: $primary-color;
+    }
+  }
+}
+
+.auth-page__perks-list {
+  margin-top: 1.5rem;
+  display: flex;
+  flex-direction: column;
+  gap: 0.65rem;
+  position: relative;
+  z-index: 1;
+}
+
+.auth-page__perk-item {
+  display: flex;
+  align-items: center;
+  gap: 0.55rem;
+  font-size: 0.82rem;
+  color: rgba(231, 246, 239, 0.85);
+
+  i {
+    font-size: 1rem;
+    color: #67e0b5;
+    flex-shrink: 0;
+  }
+}
+
+.auth-page__success-box {
+  text-align: center;
+  padding: 1.5rem 0.5rem;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 1rem;
+
+  .auth-page__success-icon {
+    width: 60px;
+    height: 60px;
+    border-radius: 50%;
+    background: linear-gradient(135deg, #1b5e20, #0c916e);
+    color: #ffffff;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 2rem;
+    box-shadow: 0 10px 25px rgba(22, 132, 82, 0.35);
+  }
+
+  h3 {
+    font-size: 1.25rem;
+    font-weight: 800;
+    color: $text-dark;
+    margin: 0;
+  }
+
+  p {
+    font-size: 0.88rem;
+    color: #64748b;
+    margin: 0;
+    line-height: 1.5;
+  }
+}
+
 @media (prefers-reduced-motion: reduce) {
   .auth-leaf, .auth-leaf-img { animation: none; }
 }

@@ -367,18 +367,18 @@
   }
 }
 
-// Quick feature thumbnails strip under the photo (Vườn 3D, Sơ Đồ, 01-04)
+// Quick feature thumbnails strip under the photo (00 Overview + 01 to 04)
 .problem-solution__thumb-strip {
   display: grid;
-  grid-template-columns: 1.15fr 1.05fr repeat(4, 1fr);
+  grid-template-columns: 1.35fr repeat(4, 1fr);
   gap: 0.35rem;
   margin-top: 0.6rem;
 
   @media (max-width: $mobile) {
-    grid-template-columns: repeat(6, 1fr);
+    grid-template-columns: repeat(5, 1fr);
 
-    .problem-solution__thumb-item span {
-      font-size: 0.65rem;
+    .problem-solution__thumb-item:first-child span {
+      display: none;
     }
   }
 }
@@ -844,6 +844,13 @@
       background: #ffffff;
       border-color: rgba(239, 68, 68, 0.3);
     }
+
+    &.problem-solution__card--active {
+      background: #ffffff;
+      border-color: #dc2626;
+      box-shadow: 0 4px 18px rgba(220, 38, 38, 0.16);
+      transform: translateX(4px);
+    }
   }
 
   &--solution {
@@ -858,6 +865,13 @@
     &:hover {
       background: #ffffff;
       border-color: rgba($primary-color, 0.3);
+    }
+
+    &.problem-solution__card--active {
+      background: #ffffff;
+      border-color: $primary-color;
+      box-shadow: 0 4px 18px rgba(46, 125, 50, 0.16);
+      transform: translateX(4px);
     }
   }
 }

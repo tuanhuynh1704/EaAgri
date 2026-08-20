@@ -9,6 +9,7 @@ interface AlertState {
 }
 
 export default function Login() {
+  const [showPassword, setShowPassword] = useState(false);
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [isLoading, setIsLoading] = useState(false);
@@ -174,7 +175,7 @@ export default function Login() {
               <div className="auth-page__input-wrapper">
                 <i className="ri-lock-line"></i>
                 <input
-                  type="password"
+                  type={showPassword ? "text" : "password"}
                   id="password"
                   placeholder="Tối thiểu 6 ký tự..."
                   className="auth-page__input"
@@ -182,6 +183,15 @@ export default function Login() {
                   onChange={(e) => setPassword(e.target.value)}
                   required
                 />
+                <button
+                  type="button"
+                  className="auth-page__pwd-toggle"
+                  onClick={() => setShowPassword(!showPassword)}
+                  tabIndex={-1}
+                  aria-label="Ẩn hiện mật khẩu"
+                >
+                  <i className={showPassword ? "ri-eye-off-line" : "ri-eye-line"}></i>
+                </button>
               </div>
             </div>
 
@@ -204,7 +214,10 @@ export default function Login() {
           </form>
 
           <div className="auth-page__toggle">
-            <span><i className="ri-shield-keyhole-line"></i> Tài khoản được cấp bởi quản trị viên Ea Agri</span>
+            <span>Chưa có tài khoản? </span>
+            <button type="button" onClick={() => navigate("/register")}>
+              Đăng ký tài khoản ngay
+            </button>
           </div>
 
         </div>
