@@ -96,13 +96,13 @@ const teamMembers: TeamMember[] = [
     name: "HUỲNH ANH TUẤN",
     roleTag: "Product & Communication",
     task: "Nội dung, truyền thông và vận hành.",
-    major: "Kỹ thuật phần mềm",
+    major: "Khoa học dữ liệu",
     id: "2200005725",
     avatar: "/Tuấn.jpg",
     themeColor: "orange",
     topIcon: "ri-megaphone-line",
     roleIcon: "ri-user-fill",
-    skillIcon: "ri-stack-fill",
+    skillIcon: "ri-database-2-fill",
     decorIcon1: "ri-leaf-fill",
     decorIcon2: "ri-leaf-line",
     memberCode: "EA-04",
@@ -240,10 +240,25 @@ const TeamSection = () => {
             </div>
           ))}
         </div>
+
+        <aside className="team-advisors" data-aos="fade-up" data-aos-delay="180" aria-label="Cố vấn chuyên môn">
+          <div className="team-advisors__intro">
+            <span className="team-advisors__icon"><i className="ri-graduation-cap-line" /></span>
+            <div>
+              <small>ACADEMIC SUPPORT</small>
+              <strong>Cố vấn chuyên môn</strong>
+            </div>
+          </div>
+          <div className="team-advisors__list">
+            <span><i className="ri-user-star-line" /> ThS. Nguyễn Huỳnh Thông</span>
+            <span><i className="ri-user-star-line" /> ThS. Phạm Đình Tài</span>
+            <span><i className="ri-user-star-line" /> TS. Hoàng Thịnh Nhân</span>
+          </div>
+        </aside>
       </div>
     </section>
 
-    {/* BOTTOM: 3D Carousel Phone Showcase (Separate 100vh fullpage slide) */}
+    {/* BOTTOM: 3D Carousel Phone Showcase in the natural page flow */}
     <section className="app-showcase-slide fullpage-slide">
       <div
         className="team-showcase__carousel-area"
