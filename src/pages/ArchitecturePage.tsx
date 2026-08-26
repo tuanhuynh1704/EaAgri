@@ -5,6 +5,37 @@ import FeatureGrid from "../components/FeatureGrid";
 export default function ArchitecturePage() {
     return (
         <div className="section-bg--gradient-soft" style={{ paddingTop: '90px' }}>
+            <section className="architecture-tech-hero section__container" data-aos="fade-up">
+                <div className="architecture-tech-hero__copy">
+                    <span className="architecture-tech-hero__eyebrow">
+                        <i className="ri-radar-line"></i>
+                        DIGITAL FARMING SYSTEM
+                    </span>
+                    <h1>Công nghệ vận hành ngay tại khu vườn</h1>
+                    <p>
+                        Cảm biến IoT, AI và dữ liệu thời gian thực phối hợp trong một hệ thống
+                        thống nhất, giúp nhà nông theo dõi và ra quyết định chính xác hơn.
+                    </p>
+                    <div className="architecture-tech-hero__signals" aria-label="Các năng lực chính">
+                        <span><i className="ri-wifi-line"></i> IoT 24/7</span>
+                        <span><i className="ri-brain-line"></i> AI phân tích</span>
+                        <span><i className="ri-drop-line"></i> Tưới thông minh</span>
+                    </div>
+                </div>
+
+                <div className="architecture-tech-hero__visual">
+                    <span className="architecture-tech-hero__glow" aria-hidden="true"></span>
+                    <img
+                        src="/Cây 2.png"
+                        alt="Mô hình cây sầu riêng ứng dụng IoT và AI của Ea Agri"
+                    />
+                    <span className="architecture-tech-hero__status">
+                        <i className="ri-checkbox-circle-fill"></i>
+                        Hệ thống đang trực tuyến
+                    </span>
+                </div>
+            </section>
+
             <VideoSection
                 tag="EAAGRI HYBRID SYSTEM"
                 title="Kiến Trúc Hệ Thống"

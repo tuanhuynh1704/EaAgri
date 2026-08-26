@@ -96,11 +96,13 @@
   .hero-badge { margin-bottom: .8rem; padding: .35rem .75rem; }
   .hero-title { margin-bottom: 1rem; }
   .hero-title .text-ea-agri { font-size: clamp(2.65rem, 14vw, 3.25rem); letter-spacing: -2px; }
-  .hero-title .text-sub { font-size: clamp(1.45rem, 7vw, 1.8rem); }
+  .hero-title .text-sub { font-size: clamp(1.35rem, 6.6vw, 1.72rem); }
+  .hero-title .text-sub--accent { gap: .48rem; }
+  .hero-title .text-sub--accent small { min-height: 1.35rem; padding: .15rem .38rem; font-size: .43rem; }
   .hero-description { margin-bottom: 1.2rem; font-size: .9rem; line-height: 1.65; }
   .hero__visual .image-wrapper-container { width: min(88vw, 350px); }
   .hero-download-links { gap: .55rem; }
-  .hero-download-links .download-btn { flex: 1; max-width: 165px; padding: .48rem .65rem; gap: .45rem; }
+  .hero-download-links .download-btn { flex: 1; min-width: 0; min-height: 54px; max-width: 165px; padding: .48rem .65rem; gap: .45rem; }
   .hero-download-links .download-btn__icon { font-size: 1.55rem; }
   .hero-download-links .download-btn__small { font-size: .48rem; }
   .hero-download-links .download-btn__store { font-size: .72rem; }

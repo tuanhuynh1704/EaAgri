@@ -1,0 +1,502 @@
+// ==========================================
+// FLOATING MASCOT — Interactive Durian Buddy
+// ==========================================
+
+.floating-mascot {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 80px;
+  height: 80px;
+  z-index: 9998;
+  cursor: grab;
+  pointer-events: auto;
+  will-change: transform;
+  user-select: none;
+  -webkit-user-select: none;
+  touch-action: none;
+  --mascot-visual-scale: 1;
+
+  // Entry animation
+  opacity: 0;
+  visibility: hidden;
+  transition: opacity 0.5s ease, visibility 0.5s ease;
+
+  &--visible {
+    opacity: 1;
+    visibility: visible;
+  }
+
+  &--dragging {
+    cursor: grabbing;
+
+    .floating-mascot__img {
+      --mascot-visual-scale: 0.94;
+      transform: scale(1.15);
+      filter: drop-shadow(0 12px 28px rgba(76, 175, 80, 0.45));
+    }
+
+    .floating-mascot__glow {
+      transform: scale(1.6);
+      opacity: 0.6;
+    }
+
+    .floating-mascot__shadow {
+      transform: scale(0.5) translateX(-50%);
+      opacity: 0.15;
+    }
+  }
+
+  &--mouse-near {
+    .floating-mascot__img {
+      filter: drop-shadow(0 8px 20px rgba(76, 175, 80, 0.35));
+    }
+
+    .floating-mascot__glow {
+      opacity: 0.45;
+      transform: scale(1.35);
+    }
+  }
+
+  &--clicked {
+    .floating-mascot__img {
+      --mascot-visual-scale: 1.02;
+      animation: mascotBounceClick 0.6s cubic-bezier(0.34, 1.56, 0.64, 1);
+    }
+  }
+
+  // Lật hướng khi di chuyển sang trái
+  &--facing-left {
+    .floating-mascot__img {
+      transform: translate(var(--eye-x, 0), var(--eye-y, 0)) scaleX(-1);
+    }
+  }
+
+  // Khi đang di chuyển (roaming)
+  &--roaming {
+    .floating-mascot__img {
+      --mascot-visual-scale: 1;
+      animation: mascotRoamBob 0.8s ease-in-out infinite;
+    }
+
+    .floating-mascot__shadow {
+      animation: shadowBounce 0.8s ease-in-out infinite;
+    }
+  }
+
+  // Facing left + roaming combo
+  &--facing-left#{&}--roaming {
+    .floating-mascot__img {
+      animation: mascotRoamBobFlipped 0.8s ease-in-out infinite;
+    }
+  }
+}
+
+// === MOOD ANIMATIONS ===
+
+.floating-mascot--idle .floating-mascot__img {
+  --mascot-visual-scale: 1;
+  animation: mascotBreathing 3s ease-in-out infinite;
+}
+
+.floating-mascot--wave .floating-mascot__img {
+  --mascot-visual-scale: 0.98;
+  animation: mascotWave 1.2s ease-in-out infinite;
+}
+
+.floating-mascot--bounce .floating-mascot__img {
+  --mascot-visual-scale: 0.98;
+  animation: mascotBounce 0.8s cubic-bezier(0.34, 1.56, 0.64, 1) infinite;
+}
+
+.floating-mascot--spin .floating-mascot__img {
+  --mascot-visual-scale: 0.9;
+  animation: mascotSpin 2s linear infinite;
+}
+
+.floating-mascot--wiggle .floating-mascot__img {
+  --mascot-visual-scale: 0.96;
+  animation: mascotWiggle 0.6s ease-in-out infinite;
+}
+
+.floating-mascot--sleep .floating-mascot__img {
+  --mascot-visual-scale: 0.91;
+  animation: mascotSleeping 2.4s ease-in-out infinite;
+}
+
+// Clicked animation overrides mood
+.floating-mascot--clicked .floating-mascot__img {
+  --mascot-visual-scale: 1.02;
+  animation: mascotBounceClick 0.6s cubic-bezier(0.34, 1.56, 0.64, 1) !important;
+}
+
+// === MASCOT IMAGE ===
+
+.floating-mascot__img {
+  position: relative;
+  display: block;
+  width: 100%;
+  height: 100%;
+  max-width: none;
+  aspect-ratio: 1 / 1;
+  object-fit: contain;
+  object-position: center;
+  scale: var(--mascot-visual-scale, 1);
+  overflow: hidden;
+  pointer-events: none;
+  z-index: 2;
+  filter: drop-shadow(0 6px 16px rgba(76, 175, 80, 0.25));
+  transition: transform 0.3s cubic-bezier(0.34, 1.56, 0.64, 1), scale 0.25s ease, filter 0.3s ease;
+  transform-origin: center bottom;
+
+  // "Nhìn theo" chuột bằng translate nhẹ
+  transform: translate(var(--eye-x, 0), var(--eye-y, 0));
+}
+
+// === MOTION TRAIL (vệt sáng khi di chuyển) ===
+
+.floating-mascot__trail {
+  position: absolute;
+  inset: 5px;
+  border-radius: 50%;
+  z-index: 0;
+  pointer-events: none;
+  background: radial-gradient(
+    circle,
+    rgba(129, 199, 132, 0.3) 0%,
+    rgba(76, 175, 80, 0.1) 40%,
+    transparent 70%
+  );
+  filter: blur(8px);
+  animation: trailPulse 0.6s ease-in-out infinite alternate;
+}
+
+@keyframes trailPulse {
+  0% {
+    opacity: 0.5;
+    transform: scale(1.1) translateX(8px);
+  }
+  100% {
+    opacity: 0.2;
+    transform: scale(1.4) translateX(-4px);
+  }
+}
+
+// === AMBIENT GLOW ===
+
+.floating-mascot__glow {
+  position: absolute;
+  inset: -18px;
+  border-radius: 50%;
+  background: radial-gradient(
+    circle,
+    rgba(129, 199, 132, 0.35) 0%,
+    rgba(76, 175, 80, 0.15) 45%,
+    transparent 70%
+  );
+  z-index: 0;
+  opacity: 0.3;
+  transform: scale(1.15);
+  transition: all 0.4s ease;
+  pointer-events: none;
+  animation: glowPulse 4s ease-in-out infinite;
+}
+
+// === GROUND SHADOW ===
+
+.floating-mascot__shadow {
+  position: absolute;
+  bottom: -8px;
+  left: 50%;
+  transform: translateX(-50%) scale(1);
+  width: 55%;
+  height: 10px;
+  border-radius: 50%;
+  background: radial-gradient(ellipse, rgba(0, 0, 0, 0.15) 0%, transparent 70%);
+  z-index: 1;
+  pointer-events: none;
+  transition: all 0.4s ease;
+  animation: shadowPulse 3s ease-in-out infinite;
+}
+
+// === PARTICLE BURST (on click) ===
+
+.floating-mascot__particles {
+  position: absolute;
+  inset: 0;
+  z-index: 5;
+  pointer-events: none;
+}
+
+.floating-mascot__particle {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  background: linear-gradient(135deg, #FFD700, #4CAF50);
+  animation: particleBurst 0.7s cubic-bezier(0.25, 0.46, 0.45, 0.94) forwards;
+  animation-delay: var(--delay);
+  box-shadow: 0 0 6px rgba(255, 215, 0, 0.7);
+
+  &:nth-child(odd) {
+    background: linear-gradient(135deg, #4CAF50, #81C784);
+    width: 6px;
+    height: 6px;
+  }
+
+  &:nth-child(3n) {
+    background: linear-gradient(135deg, #FFC107, #FF9800);
+    width: 5px;
+    height: 5px;
+    border-radius: 2px;
+  }
+}
+
+// === SPEECH TOOLTIP ===
+
+.floating-mascot__tooltip {
+  position: absolute;
+  bottom: calc(100% + 14px);
+  left: 50%;
+  transform: translateX(-50%);
+  white-space: nowrap;
+  padding: 0.5rem 0.85rem;
+  background: rgba(255, 255, 255, 0.96);
+  backdrop-filter: blur(16px);
+  -webkit-backdrop-filter: blur(16px);
+  border: 1px solid rgba(76, 175, 80, 0.2);
+  border-radius: 14px;
+  box-shadow:
+    0 8px 24px rgba(46, 125, 50, 0.12),
+    0 2px 6px rgba(0, 0, 0, 0.04);
+  z-index: 10;
+  animation: tooltipPopIn 0.35s cubic-bezier(0.34, 1.56, 0.64, 1);
+  pointer-events: none;
+
+  span {
+    font-size: 0.82rem;
+    font-weight: 600;
+    color: #1b5e20;
+    letter-spacing: -0.01em;
+  }
+}
+
+.floating-mascot__tooltip-arrow {
+  position: absolute;
+  bottom: -6px;
+  left: 50%;
+  transform: translateX(-50%) rotate(45deg);
+  width: 12px;
+  height: 12px;
+  background: rgba(255, 255, 255, 0.96);
+  border-right: 1px solid rgba(76, 175, 80, 0.2);
+  border-bottom: 1px solid rgba(76, 175, 80, 0.2);
+}
+
+// ==========================================
+// KEYFRAME ANIMATIONS
+// ==========================================
+
+@keyframes mascotBreathing {
+  0%, 100% {
+    transform: translate(var(--eye-x, 0), var(--eye-y, 0)) scale(1);
+  }
+  50% {
+    transform: translate(var(--eye-x, 0), var(--eye-y, 0)) scale(1.06);
+  }
+}
+
+@keyframes mascotWave {
+  0%, 100% {
+    transform: translate(var(--eye-x, 0), var(--eye-y, 0)) rotate(0deg);
+  }
+  25% {
+    transform: translate(var(--eye-x, 0), var(--eye-y, 0)) rotate(14deg);
+  }
+  75% {
+    transform: translate(var(--eye-x, 0), var(--eye-y, 0)) rotate(-14deg);
+  }
+}
+
+@keyframes mascotBounce {
+  0%, 100% {
+    transform: translate(var(--eye-x, 0), var(--eye-y, 0)) translateY(0) scale(1, 1);
+  }
+  30% {
+    transform: translate(var(--eye-x, 0), var(--eye-y, 0)) translateY(-18px) scale(0.95, 1.08);
+  }
+  50% {
+    transform: translate(var(--eye-x, 0), var(--eye-y, 0)) translateY(0) scale(1.08, 0.92);
+  }
+  70% {
+    transform: translate(var(--eye-x, 0), var(--eye-y, 0)) translateY(-8px) scale(0.98, 1.04);
+  }
+}
+
+@keyframes mascotSpin {
+  from {
+    transform: translate(var(--eye-x, 0), var(--eye-y, 0)) rotate(0deg);
+  }
+  to {
+    transform: translate(var(--eye-x, 0), var(--eye-y, 0)) rotate(360deg);
+  }
+}
+
+@keyframes mascotWiggle {
+  0%, 100% {
+    transform: translate(var(--eye-x, 0), var(--eye-y, 0)) rotate(0deg) translateX(0);
+  }
+  20% {
+    transform: translate(var(--eye-x, 0), var(--eye-y, 0)) rotate(-5deg) translateX(-4px);
+  }
+  40% {
+    transform: translate(var(--eye-x, 0), var(--eye-y, 0)) rotate(5deg) translateX(4px);
+  }
+  60% {
+    transform: translate(var(--eye-x, 0), var(--eye-y, 0)) rotate(-3deg) translateX(-2px);
+  }
+  80% {
+    transform: translate(var(--eye-x, 0), var(--eye-y, 0)) rotate(3deg) translateX(2px);
+  }
+}
+
+@keyframes mascotSleeping {
+  0%, 100% { transform: translate(var(--eye-x, 0), var(--eye-y, 0)) rotate(-1deg); }
+  50% { transform: translate(var(--eye-x, 0), calc(var(--eye-y, 0) + 2px)) rotate(1deg); }
+}
+
+@keyframes mascotBounceClick {
+  0% {
+    transform: scale(1);
+  }
+  20% {
+    transform: scale(0.85) translateY(4px);
+  }
+  50% {
+    transform: scale(1.25) translateY(-22px);
+  }
+  70% {
+    transform: scale(1) translateY(0);
+  }
+  85% {
+    transform: scale(1.08) translateY(-6px);
+  }
+  100% {
+    transform: scale(1);
+  }
+}
+
+// Hiệu ứng "bay" khi roaming — nghiêng nhẹ + nhún lên xuống
+@keyframes mascotRoamBob {
+  0%, 100% {
+    transform: translate(var(--eye-x, 0), var(--eye-y, 0)) translateY(0) rotate(0deg);
+  }
+  25% {
+    transform: translate(var(--eye-x, 0), var(--eye-y, 0)) translateY(-8px) rotate(3deg);
+  }
+  75% {
+    transform: translate(var(--eye-x, 0), var(--eye-y, 0)) translateY(-4px) rotate(-2deg);
+  }
+}
+
+// Phiên bản lật (facing left) của roam bob
+@keyframes mascotRoamBobFlipped {
+  0%, 100% {
+    transform: translate(var(--eye-x, 0), var(--eye-y, 0)) scaleX(-1) translateY(0) rotate(0deg);
+  }
+  25% {
+    transform: translate(var(--eye-x, 0), var(--eye-y, 0)) scaleX(-1) translateY(-8px) rotate(-3deg);
+  }
+  75% {
+    transform: translate(var(--eye-x, 0), var(--eye-y, 0)) scaleX(-1) translateY(-4px) rotate(2deg);
+  }
+}
+
+// Shadow nhún theo khi roaming
+@keyframes shadowBounce {
+  0%, 100% {
+    transform: translateX(-50%) scaleX(1);
+    opacity: 0.15;
+  }
+  25% {
+    transform: translateX(-50%) scaleX(0.7);
+    opacity: 0.08;
+  }
+  75% {
+    transform: translateX(-50%) scaleX(0.85);
+    opacity: 0.12;
+  }
+}
+
+@keyframes glowPulse {
+  0%, 100% {
+    opacity: 0.25;
+    transform: scale(1.15);
+  }
+  50% {
+    opacity: 0.45;
+    transform: scale(1.3);
+  }
+}
+
+@keyframes shadowPulse {
+  0%, 100% {
+    transform: translateX(-50%) scaleX(1);
+    opacity: 0.15;
+  }
+  50% {
+    transform: translateX(-50%) scaleX(0.85);
+    opacity: 0.1;
+  }
+}
+
+@keyframes particleBurst {
+  0% {
+    transform: translate(-50%, -50%) rotate(var(--angle)) translateX(0) scale(1);
+    opacity: 1;
+  }
+  100% {
+    transform: translate(-50%, -50%) rotate(var(--angle)) translateX(55px) scale(0);
+    opacity: 0;
+  }
+}
+
+@keyframes tooltipPopIn {
+  0% {
+    opacity: 0;
+    transform: translateX(-50%) translateY(8px) scale(0.85);
+  }
+  100% {
+    opacity: 1;
+    transform: translateX(-50%) translateY(0) scale(1);
+  }
+}
+
+// ==========================================
+// RESPONSIVE & REDUCED MOTION
+// ==========================================
+
+@media (max-width: 768px) {
+  .floating-mascot {
+    width: 60px;
+    height: 60px;
+  }
+
+  .floating-mascot__tooltip {
+    display: none; // Ẩn tooltip trên mobile cho gọn
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .floating-mascot__img,
+  .floating-mascot__glow,
+  .floating-mascot__shadow {
+    animation: none !important;
+  }
+
+  .floating-mascot {
+    transition: none;
+  }
+}

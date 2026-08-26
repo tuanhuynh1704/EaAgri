@@ -6,6 +6,7 @@ import { Outlet, useLocation } from "react-router-dom";
 import Navbar from "./components/Navbar";
 import Footer from "./components/Footer";
 import FloatingContact from "./components/FloatingContact";
+import FloatingMascot from "./components/FloatingMascot";
 import { AuthProvider } from "./context/AuthContext";
 
 function App() {
@@ -35,6 +36,7 @@ function App() {
       <Outlet />
       {!isAuthPage && <Footer />}
       {!isAuthPage && <FloatingContact />}
+      {!isAuthPage && <FloatingMascot />}
     </AuthProvider>
   );
 }

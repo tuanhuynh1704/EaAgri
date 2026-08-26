@@ -1,12 +1,14 @@
 import { useEffect } from "react";
 import Hero from "../components/Hero";
 import TeamSection from "../components/TeamSection";
-// import AIChat from "../components/AIChat";
 import AwardsSection from "../components/AwardsSection";
 import ProblemSolutionSection from "../components/ProblemSolutionSection";
 import VideoGallerySection from "../components/VideoGallerySection";
 import ResultSection from "../components/ResultSection";
 import RoadmapSection from "../components/RoadmapSection";
+import SplashIntro from "../components/SplashIntro";
+import DurianScannerSection from "../components/DurianScannerSection";
+import LogoMarqueeSection from "../components/LogoMarqueeSection";
 
 export default function HomePage() {
   useEffect(() => {
@@ -17,7 +19,10 @@ export default function HomePage() {
 
   return (
     <>
+      <SplashIntro />
       <Hero />
+      <LogoMarqueeSection />
+      <DurianScannerSection />
       <TeamSection />
 
       <div className="section-bg--gradient-soft fullpage-slide">

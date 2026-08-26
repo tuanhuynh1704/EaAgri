@@ -173,8 +173,8 @@ const MATRIX_DATA: RiskSolutionPair[] = [
 ];
 
 export default function ProblemSolutionSection({
-  image = "/assets/mohinhtongquan",
-  imageAlt = "Sơ đồ hệ thống EaAgri",
+  image: _image = "/assets/mohinhtongquan",
+  imageAlt: _imageAlt = "Sơ đồ hệ thống EaAgri",
 }: ProblemSolutionSectionProps) {
   const [activeMode, setActiveMode] = useState<ViewMode>("comparison");
   // Default to overview

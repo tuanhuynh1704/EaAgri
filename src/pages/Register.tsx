@@ -8,24 +8,12 @@ interface AlertState {
   message: string;
 }
 
-const USER_ROLES = [
-  { id: "farmer", label: "Chủ vườn / Nông dân", icon: "ri-plant-line" },
-  { id: "expert", label: "Kỹ sư / Chuyên gia", icon: "ri-microscope-line" },
-  { id: "coop", label: "Doanh nghiệp / HTX", icon: "ri-building-line" },
-  { id: "guest", label: "Khách quan tâm", icon: "ri-user-smile-line" },
-];
-
 export default function Register() {
   const [fullName, setFullName] = useState("");
   const [email, setEmail] = useState("");
-  const [phone, setPhone] = useState("");
   const [password, setPassword] = useState("");
-  const [confirmPassword, setConfirmPassword] = useState("");
-  const [userRole, setUserRole] = useState("farmer");
-  const [agreeTerms, setAgreeTerms] = useState(true);
 
   const [showPassword, setShowPassword] = useState(false);
-  const [showConfirmPassword, setShowConfirmPassword] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
   const [alert, setAlert] = useState<AlertState>({ type: null, message: "" });
   const [isRegisteredSuccess, setIsRegisteredSuccess] = useState(false);
@@ -90,16 +78,6 @@ export default function Register() {
       return;
     }
 
-    if (password !== confirmPassword) {
-      setAlert({ type: "error", message: "Mật khẩu xác nhận không trùng khớp." });
-      return;
-    }
-
-    if (!agreeTerms) {
-      setAlert({ type: "error", message: "Vui lòng đồng ý với Điều khoản dịch vụ của EaAgri." });
-      return;
-    }
-
     setIsLoading(true);
 
     try {
@@ -109,8 +87,6 @@ export default function Register() {
         options: {
           data: {
             full_name: fullName.trim(),
-            phone: phone.trim(),
-            user_role: userRole,
             role: "user",
           },
         },
@@ -130,7 +106,7 @@ export default function Register() {
         setAlert({
           type: "success",
           message:
-            "Đăng ký tài khoản thành công! Vui lòng kiểm tra email để xác thực (hoặc đăng nhập ngay nếu không cần xác thực).",
+            "Đăng ký tài khoản thành công! Bạn có thể đăng nhập ngay bây giờ.",
         });
       }
     } catch (err: any) {
@@ -251,7 +227,7 @@ export default function Register() {
                 <i className="ri-check-line"></i>
               </div>
               <h3>Chào mừng bạn đến với EaAgri!</h3>
-              <p>Tài khoản của bạn đã được khởi tạo thành công trên hệ sinh thái.</p>
+              <p>Tài khoản của bạn đã được tạo thành công trên hệ thống.</p>
               <button
                 type="button"
                 className="auth-page__submit"
@@ -280,145 +256,47 @@ export default function Register() {
                 </div>
               </div>
 
-              {/* Email & Phone Row */}
-              <div className="auth-page__row-2">
-                {/* Email */}
-                <div className="auth-page__group">
-                  <label htmlFor="email">Email</label>
-                  <div className="auth-page__input-wrapper">
-                    <i className="ri-mail-line"></i>
-                    <input
-                      type="email"
-                      id="email"
-                      placeholder="email@example.com"
-                      className="auth-page__input"
-                      value={email}
-                      onChange={(e) => setEmail(e.target.value)}
-                      required
-                    />
-                  </div>
-                </div>
-
-                {/* Phone */}
-                <div className="auth-page__group">
-                  <label htmlFor="phone">Số điện thoại (tùy chọn)</label>
-                  <div className="auth-page__input-wrapper">
-                    <i className="ri-phone-line"></i>
-                    <input
-                      type="tel"
-                      id="phone"
-                      placeholder="09xx xxx xxx"
-                      className="auth-page__input"
-                      value={phone}
-                      onChange={(e) => setPhone(e.target.value)}
-                    />
-                  </div>
-                </div>
-              </div>
-
-              {/* Role Selection Pills */}
+              {/* Email */}
               <div className="auth-page__group">
-                <label>Bạn là ai?</label>
-                <div className="auth-page__roles-grid">
-                  {USER_ROLES.map((role) => {
-                    const isSelected = userRole === role.id;
-                    return (
-                      <button
-                        type="button"
-                        key={role.id}
-                        className={`auth-page__role-btn ${
-                          isSelected ? "auth-page__role-btn--active" : ""
-                        }`}
-                        onClick={() => setUserRole(role.id)}
-                      >
-                        <i className={role.icon}></i>
-                        <span>{role.label}</span>
-                      </button>
-                    );
-                  })}
-                </div>
-              </div>
-
-              {/* Password & Confirm Password Row */}
-              <div className="auth-page__row-2">
-                {/* Password */}
-                <div className="auth-page__group">
-                  <label htmlFor="password">Mật khẩu</label>
-                  <div className="auth-page__input-wrapper">
-                    <i className="ri-lock-2-line"></i>
-                    <input
-                      type={showPassword ? "text" : "password"}
-                      id="password"
-                      placeholder="Tối thiểu 6 ký tự..."
-                      className="auth-page__input"
-                      value={password}
-                      onChange={(e) => setPassword(e.target.value)}
-                      required
-                    />
-                    <button
-                      type="button"
-                      className="auth-page__pwd-toggle"
-                      onClick={() => setShowPassword(!showPassword)}
-                      tabIndex={-1}
-                      aria-label="Ẩn hiện mật khẩu"
-                    >
-                      <i className={showPassword ? "ri-eye-off-line" : "ri-eye-line"}></i>
-                    </button>
-                  </div>
-                </div>
-
-                {/* Confirm Password */}
-                <div className="auth-page__group">
-                  <label htmlFor="confirmPassword">Xác nhận mật khẩu</label>
-                  <div className="auth-page__input-wrapper">
-                    <i className="ri-shield-keyhole-line"></i>
-                    <input
-                      type={showConfirmPassword ? "text" : "password"}
-                      id="confirmPassword"
-                      placeholder="Nhập lại mật khẩu..."
-                      className="auth-page__input"
-                      value={confirmPassword}
-                      onChange={(e) => setConfirmPassword(e.target.value)}
-                      required
-                    />
-                    <button
-                      type="button"
-                      className="auth-page__pwd-toggle"
-                      onClick={() => setShowConfirmPassword(!showConfirmPassword)}
-                      tabIndex={-1}
-                      aria-label="Ẩn hiện xác nhận mật khẩu"
-                    >
-                      <i
-                        className={
-                          showConfirmPassword ? "ri-eye-off-line" : "ri-eye-line"
-                        }
-                      ></i>
-                    </button>
-                  </div>
-                </div>
-              </div>
-
-              {/* Terms Agreement Checkbox */}
-              <div className="auth-page__checkbox-group">
-                <label className="auth-page__checkbox-label">
+                <label htmlFor="email">Email / Gmail</label>
+                <div className="auth-page__input-wrapper">
+                  <i className="ri-mail-line"></i>
                   <input
-                    type="checkbox"
-                    checked={agreeTerms}
-                    onChange={(e) => setAgreeTerms(e.target.checked)}
+                    type="email"
+                    id="email"
+                    placeholder="email@example.com"
+                    className="auth-page__input"
+                    value={email}
+                    onChange={(e) => setEmail(e.target.value)}
                     required
                   />
-                  <span>
-                    Tôi đồng ý với{" "}
-                    <a href="#" onClick={(e) => e.preventDefault()}>
-                      Điều khoản dịch vụ
-                    </a>{" "}
-                    và{" "}
-                    <a href="#" onClick={(e) => e.preventDefault()}>
-                      Chính sách bảo mật
-                    </a>{" "}
-                    của EaAgri.
-                  </span>
-                </label>
+                </div>
+              </div>
+
+              {/* Password */}
+              <div className="auth-page__group">
+                <label htmlFor="password">Mật khẩu</label>
+                <div className="auth-page__input-wrapper">
+                  <i className="ri-lock-2-line"></i>
+                  <input
+                    type={showPassword ? "text" : "password"}
+                    id="password"
+                    placeholder="Tối thiểu 6 ký tự..."
+                    className="auth-page__input"
+                    value={password}
+                    onChange={(e) => setPassword(e.target.value)}
+                    required
+                  />
+                  <button
+                    type="button"
+                    className="auth-page__pwd-toggle"
+                    onClick={() => setShowPassword(!showPassword)}
+                    tabIndex={-1}
+                    aria-label="Ẩn hiện mật khẩu"
+                  >
+                    <i className={showPassword ? "ri-eye-off-line" : "ri-eye-line"}></i>
+                  </button>
+                </div>
               </div>
 
               {/* Submit Button */}
