@@ -1,6 +1,10 @@
 import { useState, useEffect } from "react";
 import { createPortal } from "react-dom";
 
+interface ProblemSolutionSectionProps {
+  image?: string;
+  imageAlt?: string;
+}
 
 type ViewMode = "comparison" | "problem" | "solution";
 
