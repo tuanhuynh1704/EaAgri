@@ -184,9 +184,9 @@ const TeamSection = () => {
           <h2 className="team-showcase__title">
             Đội Ngũ <span className="team-showcase__title-highlight">Thực Hiện<i className="ri-cpu-line team-title-tech-icon"></i><span className="team-title-underline"></span></span>
           </h2>
-          {/* <p className="team-showcase__desc">
+          <p className="team-showcase__desc">
             Dự án được thực hiện bởi sinh viên <span className="team-desc-highlight">Khoa Công nghệ Thông tin</span> — <span className="team-desc-highlight">Trường Đại học Nguyễn Tất Thành</span>.
-          </p> */}
+          </p>
         </div>
 
         {/* Member Cards Grid (Rectangular Photo Header - Image Top, Text Below) */}
