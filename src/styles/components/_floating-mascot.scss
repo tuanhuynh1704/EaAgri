@@ -17,14 +17,32 @@
   touch-action: none;
   --mascot-visual-scale: 1;
 
-  // Entry animation
-  opacity: 0;
-  visibility: hidden;
-  transition: opacity 0.5s ease, visibility 0.5s ease;
+  // Lifecycle States
+  opacity: 1;
+  visibility: visible;
+  transform-origin: center center;
 
-  &--visible {
+  &--running_in,
+  &--running_out {
     opacity: 1;
     visibility: visible;
+    cursor: pointer;
+
+    .floating-mascot__img {
+      animation: mascotRunningRush 0.4s ease-in-out infinite alternate;
+      filter: drop-shadow(0 8px 18px rgba(16, 185, 129, 0.4));
+    }
+  }
+
+  &--active {
+    opacity: 1;
+    visibility: visible;
+  }
+
+  &--hidden {
+    opacity: 0;
+    visibility: hidden;
+    pointer-events: none;
   }
 
   &--dragging {
@@ -262,24 +280,53 @@
   left: 50%;
   transform: translateX(-50%);
   white-space: nowrap;
-  padding: 0.5rem 0.85rem;
+  padding: 0.45rem 0.75rem;
   background: rgba(255, 255, 255, 0.96);
   backdrop-filter: blur(16px);
   -webkit-backdrop-filter: blur(16px);
-  border: 1px solid rgba(76, 175, 80, 0.2);
-  border-radius: 14px;
+  border: 1px solid rgba(76, 175, 80, 0.24);
+  border-radius: 16px;
   box-shadow:
-    0 8px 24px rgba(46, 125, 50, 0.12),
+    0 8px 24px rgba(46, 125, 50, 0.14),
     0 2px 6px rgba(0, 0, 0, 0.04);
   z-index: 10;
   animation: tooltipPopIn 0.35s cubic-bezier(0.34, 1.56, 0.64, 1);
-  pointer-events: none;
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  pointer-events: auto;
 
   span {
     font-size: 0.82rem;
     font-weight: 600;
     color: #1b5e20;
     letter-spacing: -0.01em;
+  }
+
+  &-chat-btn {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.25rem;
+    padding: 0.2rem 0.55rem;
+    border-radius: 999px;
+    background: linear-gradient(135deg, #10b981, #059669);
+    color: #ffffff;
+    font-size: 0.7rem;
+    font-weight: 750;
+    border: none;
+    cursor: pointer;
+    box-shadow: 0 2px 6px rgba(16, 185, 129, 0.3);
+    transition: all 0.2s cubic-bezier(0.16, 1, 0.3, 1);
+
+    i {
+      font-size: 0.8rem;
+    }
+
+    &:hover {
+      background: linear-gradient(135deg, #059669, #047857);
+      transform: scale(1.08);
+      box-shadow: 0 4px 10px rgba(16, 185, 129, 0.4);
+    }
   }
 }
 
@@ -471,6 +518,31 @@
   100% {
     opacity: 1;
     transform: translateX(-50%) translateY(0) scale(1);
+  }
+}
+
+@keyframes mascotRunningRush {
+  0% {
+    transform: translateY(0) rotate(-6deg) scale(1.05);
+  }
+  100% {
+    transform: translateY(-8px) rotate(6deg) scale(1.08);
+  }
+}
+
+@keyframes mascotMagicDisappear {
+  0% {
+    opacity: 1;
+    transform: scale(1) rotate(0deg);
+  }
+  35% {
+    transform: scale(1.15) rotate(15deg);
+    filter: drop-shadow(0 0 20px #10b981) brightness(1.4);
+  }
+  100% {
+    opacity: 0;
+    transform: scale(0) rotate(180deg);
+    filter: drop-shadow(0 0 30px #34d399) brightness(2);
   }
 }
 

@@ -93,10 +93,29 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
 
   const signOut = async () => {
     setLoading(true);
-    await supabase.auth.signOut();
-    setUser(null);
-    setProfile(null);
-    setLoading(false);
+    try {
+      await supabase.auth.signOut();
+    } catch (err) {
+      console.warn("AuthContext: Supabase signOut returned error, forcing local session clear:", err);
+    } finally {
+      try {
+        Object.keys(localStorage).forEach((key) => {
+          if (key.startsWith("sb-") || key.includes("supabase.auth.token")) {
+            localStorage.removeItem(key);
+          }
+        });
+        Object.keys(sessionStorage).forEach((key) => {
+          if (key.startsWith("sb-") || key.includes("supabase.auth.token")) {
+            sessionStorage.removeItem(key);
+          }
+        });
+      } catch (_) {}
+
+      setUser(null);
+      setProfile(null);
+      setAuthError(null);
+      setLoading(false);
+    }
   };
 
   return (

@@ -1,13 +1,18 @@
 @use "../abstracts/variables" as *;
 @use "../abstracts/mixins" as *;
 
+// ==========================================
+// SEAMLESS TRANSPARENT NAVBAR (HERO TOP)
+// + FLOATING GLASS CAPSULE ON SCROLL
+// ==========================================
+
 nav.navbar-container {
   position: fixed;
   top: 1.5rem;
   left: 0;
   right: 0;
   margin-inline: auto;
-  width: calc(100% - 3rem);
+  width: calc(100% - 3.5rem);
   max-width: 1200px;
   display: flex;
   align-items: center;
@@ -16,14 +21,18 @@ nav.navbar-container {
   border: none;
   box-shadow: none;
   z-index: 1000;
-  transition: all 0.3s ease;
+  transition: all 0.35s cubic-bezier(0.16, 1, 0.3, 1);
   pointer-events: none; // Allow clicks to pass through transparent gap
+
+  @media (max-width: $mobile) {
+    top: 0.85rem;
+    width: calc(100% - 1.5rem);
+  }
 }
 
-// Keep content unobstructed while reading: scrolling down tucks the navigation
-// above the viewport; scrolling up or moving the pointer to the top reveals it.
+// Hide on deep scroll down, reveal on scroll up
 nav.navbar-container.is-hidden {
-  translate: 0 calc(-100% - 2.5rem);
+  transform: translateY(calc(-100% - 2.5rem));
   opacity: 0;
 
   .nav__logo,
@@ -33,337 +42,502 @@ nav.navbar-container.is-hidden {
 }
 
 @media (prefers-reduced-motion: reduce) {
-  nav.navbar-container { transition-duration: 0.01ms; }
+  nav.navbar-container {
+    transition-duration: 0.01ms;
+  }
 }
+
+// ==========================================
+// BRAND LOGO (TRANSPARENT AT TOP)
+// ==========================================
 
 .nav__logo {
   display: flex;
   align-items: center;
   cursor: pointer;
-  pointer-events: auto; // Restore clicks
+  pointer-events: auto;
   background: transparent;
-  backdrop-filter: none;
-  -webkit-backdrop-filter: none;
   border: 1px solid transparent;
-  border-radius: 99px;
-  padding: 0.4rem 0.6rem;
+  border-radius: 999px;
+  padding: 0.2rem 0.4rem;
   box-shadow: none;
-  transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
-  
+  transition: all 0.35s cubic-bezier(0.16, 1, 0.3, 1);
+
   .nav__logo-img {
-    height: 75px; // Prominent transparent logo on Page 1!
+    height: 64px;
     width: auto;
     object-fit: contain;
-    transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
-    filter: drop-shadow(0 4px 15px rgba(0, 0, 0, 0.05));
-    
+    transition: transform 0.3s ease, filter 0.3s ease;
+    filter: drop-shadow(0 4px 12px rgba(0, 0, 0, 0.06));
+
     @media (max-width: $mobile) {
-      height: 48px;
+      height: 44px;
     }
   }
-  
-  &:hover .nav__logo-img {
-    transform: scale(1.04) translateY(-2px);
+
+  &:hover {
+    .nav__logo-img {
+      transform: scale(1.04) translateY(-1px);
+      filter: drop-shadow(0 6px 16px rgba(16, 185, 129, 0.18));
+    }
   }
 }
 
-// When scrolled down to Page 2+ -> Add white solid capsule background to both Logo & Menu!
-.navbar-container.is-scrolled {
-  .nav__logo {
-    background: rgba(255, 255, 255, 0.5);
-    backdrop-filter: blur(16px);
-    -webkit-backdrop-filter: blur(16px);
-    border: 1px solid rgba(255, 255, 255, 0.5);
-    padding: 0.4rem 1.4rem 0.4rem 1.2rem;
-    box-shadow: 
-      0 12px 35px rgba(27, 51, 35, 0.07),
-      0 1px 4px rgba(27, 51, 35, 0.02);
+// ==========================================
+// RIGHT MENU & ACTIONS (TRANSPARENT AT TOP)
+// ==========================================
 
-    .nav__logo-img {
-      height: 52px;
-      
-      @media (max-width: $mobile) {
-        height: 40px;
-      }
+.nav__right-capsule {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.65rem;
+  background: transparent;
+  border: 1px solid transparent;
+  border-radius: 999px;
+  padding: 0.2rem 0.3rem;
+  box-shadow: none;
+  transition: all 0.35s cubic-bezier(0.16, 1, 0.3, 1);
+  pointer-events: auto;
+
+  @media (max-width: $mobile) {
+    gap: 0.35rem;
+    padding: 0;
+  }
+}
+
+// Menu Nav Items
+.nav__menu {
+  display: flex;
+  align-items: center;
+  gap: 0.35rem;
+
+  @media (max-width: $mobile) {
+    gap: 0.2rem;
+  }
+}
+
+.nav__link {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.45rem;
+  min-height: 40px;
+  padding: 0.42rem 1rem;
+  border-radius: 999px;
+  font-size: 0.92rem;
+  font-weight: 700;
+  color: #173827;
+  text-decoration: none;
+  position: relative;
+  transition: all 0.25s cubic-bezier(0.16, 1, 0.3, 1);
+  border: 1px solid transparent;
+  background: transparent;
+
+  .nav__link-icon {
+    font-size: 1.1rem;
+    color: #486e58;
+    transition: transform 0.25s ease, color 0.25s ease;
+  }
+
+  &:hover {
+    color: #047857;
+    background: rgba(255, 255, 255, 0.68);
+    backdrop-filter: blur(10px);
+    -webkit-backdrop-filter: blur(10px);
+    border-color: rgba(16, 185, 129, 0.2);
+    box-shadow: 0 4px 14px rgba(16, 110, 76, 0.06);
+
+    .nav__link-icon {
+      color: #059669;
+      transform: scale(1.12);
+    }
+  }
+
+  // Active State: Soft translucent glowing pill
+  &.active {
+    color: #047857;
+    font-weight: 750;
+    background: rgba(255, 255, 255, 0.85);
+    backdrop-filter: blur(12px);
+    -webkit-backdrop-filter: blur(12px);
+    border-color: rgba(16, 185, 129, 0.28);
+    box-shadow: 
+      0 4px 14px rgba(16, 110, 76, 0.08),
+      inset 0 1px 0 rgba(255, 255, 255, 0.9);
+
+    .nav__link-icon {
+      color: #059669;
+    }
+  }
+
+  @media (max-width: $mobile) {
+    min-height: 36px;
+    padding: 0.35rem 0.6rem;
+
+    .nav__link-text {
+      display: none;
+    }
+
+    .nav__link-icon {
+      font-size: 1.25rem;
+    }
+  }
+}
+
+// ==========================================
+// USER MENU & PROFILE DROPDOWN
+// ==========================================
+
+.nav__user-menu-wrapper {
+  position: relative;
+  display: inline-flex;
+  align-items: center;
+}
+
+.nav__user-pill {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+  min-height: 40px;
+  padding: 0.28rem 0.85rem 0.28rem 0.35rem;
+  border-radius: 999px;
+  background: rgba(255, 255, 255, 0.85);
+  backdrop-filter: blur(14px);
+  -webkit-backdrop-filter: blur(14px);
+  border: 1px solid rgba(16, 185, 129, 0.28);
+  box-shadow: 0 2px 8px rgba(16, 110, 76, 0.08);
+  cursor: pointer;
+  transition: all 0.25s cubic-bezier(0.16, 1, 0.3, 1);
+
+  &:hover,
+  &.is-active {
+    background: #ffffff;
+    border-color: #10b981;
+    box-shadow: 0 4px 16px rgba(16, 185, 129, 0.2);
+    transform: translateY(-1px);
+  }
+
+  .nav__user-avatar {
+    width: 32px;
+    height: 32px;
+    border-radius: 50%;
+    background: linear-gradient(135deg, #10b981, #059669);
+    color: #ffffff;
+    font-size: 0.9rem;
+    font-weight: 850;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    box-shadow: 0 2px 6px rgba(16, 185, 129, 0.35);
+  }
+
+  .nav__user-name {
+    font-size: 0.88rem;
+    font-weight: 750;
+    color: #133a27;
+    max-width: 110px;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+
+    @media (max-width: $mobile) {
+      display: none;
+    }
+  }
+
+  .nav__user-role-tag {
+    font-size: 0.68rem;
+    font-weight: 800;
+    padding: 0.12rem 0.45rem;
+    border-radius: 999px;
+    background: rgba(245, 158, 11, 0.15);
+    color: #d97706;
+    border: 1px solid rgba(245, 158, 11, 0.3);
+
+    @media (max-width: $mobile) {
+      display: none;
+    }
+  }
+
+  .nav__user-chevron {
+    font-size: 1.1rem;
+    color: #526f5f;
+    transition: transform 0.25s ease;
+
+    &.is-rotated {
+      transform: rotate(180deg);
+    }
+  }
+}
+
+// Dropdown Box
+.nav__user-dropdown {
+  position: absolute;
+  top: calc(100% + 10px);
+  right: 0;
+  width: 240px;
+  background: rgba(255, 255, 255, 0.96);
+  backdrop-filter: blur(20px);
+  -webkit-backdrop-filter: blur(20px);
+  border: 1px solid rgba(16, 185, 129, 0.22);
+  border-radius: 20px;
+  box-shadow:
+    0 16px 40px rgba(18, 65, 45, 0.16),
+    0 2px 8px rgba(0, 0, 0, 0.04);
+  padding: 0.9rem;
+  z-index: 1000;
+  animation: dropdownPopIn 0.25s cubic-bezier(0.16, 1, 0.3, 1);
+
+  &-header {
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+    padding: 0.3rem 0.4rem 0.6rem;
+  }
+
+  &-avatar {
+    width: 40px;
+    height: 40px;
+    border-radius: 50%;
+    background: linear-gradient(135deg, #10b981, #059669);
+    color: #ffffff;
+    font-size: 1.1rem;
+    font-weight: 850;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    box-shadow: 0 4px 10px rgba(16, 185, 129, 0.3);
+    flex-shrink: 0;
+  }
+
+  &-info {
+    display: flex;
+    flex-direction: column;
+    overflow: hidden;
+
+    .user-title {
+      font-size: 0.92rem;
+      font-weight: 800;
+      color: #133a27;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+
+    .user-email {
+      font-size: 0.74rem;
+      color: #638271;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      margin-bottom: 0.3rem;
+    }
+
+    .admin-pill,
+    .member-pill {
+      display: inline-flex;
+      align-items: center;
+      gap: 0.25rem;
+      font-size: 0.66rem;
+      font-weight: 800;
+      padding: 0.1rem 0.5rem;
+      border-radius: 999px;
+      width: fit-content;
+    }
+
+    .admin-pill {
+      background: rgba(245, 158, 11, 0.12);
+      color: #d97706;
+      border: 1px solid rgba(245, 158, 11, 0.25);
+    }
+
+    .member-pill {
+      background: rgba(16, 185, 129, 0.12);
+      color: #059669;
+      border: 1px solid rgba(16, 185, 129, 0.25);
+    }
+  }
+
+  &-divider {
+    height: 1px;
+    background: rgba(16, 185, 129, 0.14);
+    margin: 0.45rem 0;
+  }
+
+  &-links {
+    display: flex;
+    flex-direction: column;
+    gap: 0.25rem;
+  }
+
+  &-item {
+    display: flex;
+    align-items: center;
+    gap: 0.65rem;
+    width: 100%;
+    padding: 0.55rem 0.8rem;
+    border-radius: 12px;
+    background: transparent;
+    border: none;
+    color: #1f4e34;
+    font-size: 0.84rem;
+    font-weight: 750;
+    cursor: pointer;
+    text-align: left;
+    transition: all 0.2s ease;
+
+    i {
+      font-size: 1.05rem;
+      color: #10b981;
     }
 
     &:hover {
-      background: rgba(255, 255, 255, 0.6);
-      box-shadow: 0 16px 40px rgba(27, 51, 35, 0.11);
-      border-color: rgba($primary-color, 0.15);
+      background: rgba(16, 185, 129, 0.1);
+      color: #047857;
+      transform: translateX(2px);
+    }
 
-      .nav__logo-img {
-        transform: scale(1.04) translateY(-1px);
+    &--logout {
+      color: #ef4444;
+
+      i {
+        color: #ef4444;
+      }
+
+      &:hover {
+        background: rgba(239, 68, 68, 0.1);
+        color: #dc2626;
+
+        i {
+          color: #dc2626;
+        }
+      }
+    }
+  }
+}
+
+@keyframes dropdownPopIn {
+  0% {
+    opacity: 0;
+    transform: translateY(-8px) scale(0.96);
+  }
+  100% {
+    opacity: 1;
+    transform: translateY(0) scale(1);
+  }
+}
+
+// Action Buttons
+.nav__actions {
+  display: flex;
+  align-items: center;
+  gap: 0.45rem;
+  margin-left: 0.15rem;
+
+  .btn {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 0.45rem;
+    min-height: 40px;
+    padding: 0.42rem 1.25rem;
+    border-radius: 999px;
+    font-size: 0.9rem;
+    font-weight: 750;
+    border: none;
+    cursor: pointer;
+    text-decoration: none;
+    transition: all 0.25s cubic-bezier(0.16, 1, 0.3, 1);
+
+    i {
+      font-size: 1.05rem;
+    }
+
+    // Login Button: Premium Emerald Pill
+    &--login {
+      background: linear-gradient(135deg, #10b981 0%, #059669 100%);
+      color: #ffffff;
+      border: 1px solid rgba(255, 255, 255, 0.35);
+      box-shadow: 0 4px 16px rgba(5, 150, 105, 0.3);
+
+      &:hover {
+        background: linear-gradient(135deg, #059669 0%, #047857 100%);
+        transform: translateY(-1px);
+        box-shadow: 0 6px 20px rgba(5, 150, 105, 0.42);
+        border-color: rgba(255, 255, 255, 0.6);
+      }
+
+      @media (max-width: $mobile) {
+        min-height: 36px;
+        padding: 0.35rem 0.85rem;
+
+        span {
+          display: none;
+        }
+
+        i {
+          font-size: 1.2rem;
+        }
+      }
+    }
+  }
+}
+
+// ==========================================
+// WHEN SCROLLED DOWN OR ON INNER PAGES:
+// AUTOMATIC GLASS CAPSULE FOR PERFECT CONTRAST
+// ==========================================
+
+.navbar-container.is-scrolled,
+.navbar-container.is-inner-page {
+  top: 1.15rem;
+
+  .nav__logo {
+    background: rgba(255, 255, 255, 0.92);
+    backdrop-filter: blur(18px);
+    -webkit-backdrop-filter: blur(18px);
+    border: 1px solid rgba(255, 255, 255, 0.88);
+    padding: 0.28rem 1.1rem 0.28rem 0.9rem;
+    box-shadow:
+      0 10px 30px rgba(18, 60, 42, 0.08),
+      inset 0 1px 0 rgba(255, 255, 255, 0.95);
+
+    .nav__logo-img {
+      height: 44px;
+
+      @media (max-width: $mobile) {
+        height: 36px;
       }
     }
   }
 
   .nav__right-capsule {
-    background: transparent;
-    backdrop-filter: none;
-    -webkit-backdrop-filter: none;
-    border-color: transparent;
-    padding: 0;
-    gap: 0.8rem;
-    box-shadow: none;
+    background: rgba(255, 255, 255, 0.92);
+    backdrop-filter: blur(18px);
+    -webkit-backdrop-filter: blur(18px);
+    border: 1px solid rgba(255, 255, 255, 0.88);
+    padding: 0.3rem 0.38rem 0.3rem 0.45rem;
+    gap: 0.35rem;
+    box-shadow:
+      0 10px 30px rgba(18, 60, 42, 0.08),
+      inset 0 1px 0 rgba(255, 255, 255, 0.95);
 
-    &:hover {
-      background: transparent;
-      box-shadow: none;
-      border-color: transparent;
-    }
+    .nav__link {
+      min-height: 38px;
+      padding: 0.36rem 0.85rem;
+      color: #3b5344;
 
-    .nav__menu {
-      min-height: 58px;
-      padding: 0.45rem 0.65rem;
-      background: rgba(255, 255, 255, 0.5);
-      backdrop-filter: blur(16px);
-      -webkit-backdrop-filter: blur(16px);
-      border: 1px solid rgba(255, 255, 255, 0.5);
-      border-radius: 20px;
-      box-shadow:
-        0 12px 32px rgba(27, 51, 35, 0.075),
-        inset 0 1px 0 rgba(255, 255, 255, 0.85);
-    }
-
-    .nav__actions {
-      min-height: 58px;
-      padding: 0.45rem;
-      background: rgba(255, 255, 255, 0.5);
-      backdrop-filter: blur(16px);
-      -webkit-backdrop-filter: blur(16px);
-      border: 1px solid rgba(255, 255, 255, 0.5);
-      border-radius: 20px;
-      box-shadow:
-        0 12px 32px rgba(27, 51, 35, 0.075),
-        inset 0 1px 0 rgba(255, 255, 255, 0.85);
-
-      .btn--login,
-      .btn--logout {
-        min-height: 48px;
-      }
-    }
-
-    @media (max-width: $mobile) {
-      padding: 0;
-      gap: 0.75rem;
-
-      .nav__menu,
-      .nav__actions {
-        min-height: 48px;
-        padding: 0.25rem;
-        border-radius: 16px;
-      }
-    }
-  }
-}
-
-// Architecture, News and all inner routes always start with the compact
-// navigation treatment; only the homepage hero uses the transparent variant.
-.navbar-container.is-inner-page {
-  top: 1.15rem;
-
-  .nav__logo,
-  .nav__menu,
-  .nav__actions {
-    border-color: rgba(20, 91, 66, 0.08);
-  }
-
-  .nav__logo {
-    padding-inline: 1rem 1.2rem;
-
-    .nav__logo-img { height: 48px; }
-  }
-}
-
-.nav__right-capsule {
-  display: flex;
-  align-items: center;
-  gap: 1.25rem;
-  background: transparent;
-  backdrop-filter: none;
-  -webkit-backdrop-filter: none;
-  border: 1px solid transparent;
-  border-radius: 99px;
-  padding: 0.4rem 0.6rem;
-  box-shadow: none;
-  transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
-  pointer-events: auto; // Restore clicks
-
-  @media (max-width: $mobile) {
-    padding: 0.4rem 0.6rem;
-    gap: 0.75rem;
-  }
-}
-
-.nav__menu {
-  display: flex;
-  align-items: center;
-  gap: 0.35rem;
-  
-  @media (max-width: $tablet) {
-    gap: 0.75rem;
-  }
-}
-
-.nav__link {
-  display: flex;
-  align-items: center;
-  gap: 0.45rem;
-  min-height: 42px;
-  font-size: 0.92rem;
-  font-weight: 700;
-  color: #1b3323;
-  padding: 0.35rem 0.65rem 0.45rem;
-  border-radius: 14px;
-  position: relative;
-  transition: color 0.3s ease;
-  
-  .nav__link-icon {
-    display: inline-flex;
-    align-items: center;
-    justify-content: center;
-    width: 28px;
-    height: 28px;
-    border-radius: 9px;
-    font-size: 1rem;
-    color: #58705f;
-    background: rgba(46, 125, 50, 0.06);
-    transition: all 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
-    
-    @media (max-width: $mobile) {
-      font-size: 1.25rem;
-    }
-  }
-  
-  &:hover {
-    color: $primary-color-dark;
-    background: rgba(46, 125, 50, 0.055);
-    
-    .nav__link-icon {
-      color: $primary-color-dark;
-      background: rgba(46, 125, 50, 0.11);
-      transform: translateY(-1px);
-    }
-  }
-  
-  &.active {
-    color: $primary-color-dark;
-    
-    .nav__link-icon {
-      color: $primary-color-dark;
-      background: rgba(46, 125, 50, 0.12);
-    }
-    
-    &::after {
-      content: '';
-      position: absolute;
-      bottom: 0;
-      left: 0.7rem;
-      right: 0.7rem;
-      height: 2.5px;
-      background: $primary-color;
-      border-radius: 99px;
-      animation: expandLine 0.3s ease forwards;
-    }
-  }
-
-  @media (max-width: $mobile) {
-    .nav__link-text {
-      display: none;
-    }
-    padding: 0.5rem;
-  }
-}
-
-@keyframes expandLine {
-  from {
-    transform: scaleX(0);
-  }
-  to {
-    transform: scaleX(1);
-  }
-}
-
-.nav__actions {
-  display: flex;
-  align-items: center;
-  gap: 0.75rem;
-  
-  .nav__admin-btns {
-    display: flex;
-    gap: 0.5rem;
-    
-    @media (max-width: $laptop) {
-      display: none;
-    }
-  }
-  
-  .nav__user-greeting {
-    font-size: 0.85rem;
-    color: $text-dark;
-    font-weight: 600;
-  }
-  
-  .btn {
-    min-height: 42px;
-    padding: 0.5rem 1.15rem;
-    gap: 0.45rem;
-    font-size: 0.92rem;
-    font-weight: 750;
-    box-shadow: none;
-    
-    &--login {
-      background: linear-gradient(135deg, #079653, #008349);
-      color: $white;
-      border: none;
-      border-radius: 14px;
-
-      span:first-child {
-        display: inline-flex;
-        align-items: center;
-        justify-content: center;
-        font-size: 1.05rem;
-      }
-      
       &:hover {
-        background: #00703f;
-        transform: translateY(-1px);
-        box-shadow: 0 7px 16px rgba(#008f51, 0.2);
+        background: rgba(16, 185, 129, 0.09);
       }
 
-      @media (max-width: $mobile) {
-        padding: 0.5rem 0.85rem;
-        
-        span:last-child {
-          display: none;
-        }
+      &.active {
+        background: linear-gradient(135deg, rgba(236, 253, 245, 0.95), rgba(209, 250, 229, 0.8));
       }
     }
-    
-    &--logout {
-      background: #e53935;
-      color: $white;
-      
-      &:hover {
-        background: #c62828;
-      }
-    }
-    
-    &--admin {
-      background: #ef6c00;
-      color: $white;
-      
-      &:hover {
-        background: #e65100;
-      }
-    }
-  }
-}
 
-@media (max-width: $mobile) {
-  nav.navbar-container {
-    top: 1rem;
-    width: calc(100% - 2rem);
+    .btn--login {
+      min-height: 38px;
+      padding: 0.36rem 1.15rem;
+    }
   }
 }

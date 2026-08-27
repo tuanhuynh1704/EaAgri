@@ -8,7 +8,9 @@ const Navbar = () => {
   const { user, profile, signOut } = useAuth();
   const [isScrolled, setIsScrolled] = useState(false);
   const [isHidden, setIsHidden] = useState(false);
+  const [isUserMenuOpen, setIsUserMenuOpen] = useState(false);
   const lastScrollY = useRef(0);
+  const userMenuRef = useRef<HTMLDivElement>(null);
   const isHomePage = pathname === "/";
   const useCapsuleStyle = !isHomePage || isScrolled;
 
@@ -42,7 +44,19 @@ const Navbar = () => {
   useEffect(() => {
     setIsHidden(false);
     lastScrollY.current = window.scrollY;
+    setIsUserMenuOpen(false); // Close user menu on route navigation
   }, [pathname]);
+
+  // Click outside to close user menu
+  useEffect(() => {
+    const handleClickOutside = (event: MouseEvent) => {
+      if (userMenuRef.current && !userMenuRef.current.contains(event.target as Node)) {
+        setIsUserMenuOpen(false);
+      }
+    };
+    document.addEventListener("mousedown", handleClickOutside);
+    return () => document.removeEventListener("mousedown", handleClickOutside);
+  }, []);
 
   const handleNew = () => {
     navigate("/news");
@@ -55,6 +69,20 @@ const Navbar = () => {
   const handleHome = () => {
     navigate("/");
   };
+
+  const handleSignOut = async () => {
+    setIsUserMenuOpen(false);
+    try {
+      await signOut();
+      navigate("/");
+    } catch (err) {
+      console.error("Sign out error:", err);
+    }
+  };
+
+  const displayName = profile?.full_name || user?.email?.split("@")[0] || "Thành viên";
+  const initialChar = displayName.trim().charAt(0).toUpperCase() || "U";
+  const isAdmin = profile?.role === "SA";
 
   return (
     <nav
@@ -80,9 +108,7 @@ const Navbar = () => {
               handleHome();
             }}
           >
-            <span className="nav__link-icon">
-              <i className="ri-home-5-line"></i>
-            </span>
+            <i className="ri-home-5-line nav__link-icon"></i>
             <span className="nav__link-text">Trang chủ</span>
           </a>
 
@@ -94,9 +120,7 @@ const Navbar = () => {
               navigate("/architecture");
             }}
           >
-            <span className="nav__link-icon">
-              <i className="ri-layout-grid-line"></i>
-            </span>
+            <i className="ri-layout-grid-line nav__link-icon"></i>
             <span className="nav__link-text">Kiến trúc</span>
           </a>
 
@@ -108,43 +132,111 @@ const Navbar = () => {
               handleNew();
             }}
           >
-            <span className="nav__link-icon">
-              <i className="ri-article-line"></i>
-            </span>
+            <i className="ri-article-line nav__link-icon"></i>
             <span className="nav__link-text">Tin tức</span>
           </a>
         </div>
 
         <div className="nav__actions">
           {user ? (
-            <>
-              {profile?.role === "SA" && (
-                <div className="nav__admin-btns">
-                  <button className="btn btn--admin" onClick={() => navigate("/admin/news")}>
-                    Quản lý bài
-                  </button>
-                  <button className="btn btn--admin" onClick={() => navigate("/admin/accounts")}>
-                    Tài khoản
+            <div className="nav__user-menu-wrapper" ref={userMenuRef}>
+              <button
+                type="button"
+                className={`nav__user-pill ${isUserMenuOpen ? "is-active" : ""}`}
+                onClick={() => setIsUserMenuOpen((prev) => !prev)}
+                aria-expanded={isUserMenuOpen}
+                title="Tài khoản của bạn"
+              >
+                <div className="nav__user-avatar">
+                  {initialChar}
+                </div>
+                <span className="nav__user-name">{displayName}</span>
+                {isAdmin && <span className="nav__user-role-tag">Admin</span>}
+                <i className={`ri-arrow-down-s-line nav__user-chevron ${isUserMenuOpen ? "is-rotated" : ""}`} />
+              </button>
+
+              {/* User Glassmorphism Dropdown */}
+              {isUserMenuOpen && (
+                <div className="nav__user-dropdown">
+                  <div className="nav__user-dropdown-header">
+                    <div className="nav__user-dropdown-avatar">
+                      {initialChar}
+                    </div>
+                    <div className="nav__user-dropdown-info">
+                      <strong className="user-title">{displayName}</strong>
+                      <small className="user-email">{user.email}</small>
+                      {isAdmin ? (
+                        <span className="admin-pill">
+                          <i className="ri-shield-star-fill" /> Quản Trị Viên
+                        </span>
+                      ) : (
+                        <span className="member-pill">
+                          <i className="ri-user-smile-fill" /> Thành Viên
+                        </span>
+                      )}
+                    </div>
+                  </div>
+
+                  <div className="nav__user-dropdown-divider" />
+
+                  <div className="nav__user-dropdown-links">
+                    {isAdmin && (
+                      <>
+                        <button
+                          type="button"
+                          className="nav__user-dropdown-item"
+                          onClick={() => {
+                            setIsUserMenuOpen(false);
+                            navigate("/admin/news");
+                          }}
+                        >
+                          <i className="ri-file-list-3-line" />
+                          <span>Quản lý bài viết</span>
+                        </button>
+
+                        <button
+                          type="button"
+                          className="nav__user-dropdown-item"
+                          onClick={() => {
+                            setIsUserMenuOpen(false);
+                            navigate("/admin/accounts");
+                          }}
+                        >
+                          <i className="ri-group-line" />
+                          <span>Quản lý tài khoản</span>
+                        </button>
+
+                        <button
+                          type="button"
+                          className="nav__user-dropdown-item"
+                          onClick={() => {
+                            setIsUserMenuOpen(false);
+                            navigate("/news/create");
+                          }}
+                        >
+                          <i className="ri-edit-box-line" />
+                          <span>Đăng bài mới</span>
+                        </button>
+                      </>
+                    )}
+                  </div>
+
+                  <div className="nav__user-dropdown-divider" />
+
+                  <button
+                    type="button"
+                    className="nav__user-dropdown-item nav__user-dropdown-item--logout"
+                    onClick={handleSignOut}
+                  >
+                    <i className="ri-logout-box-r-line" />
+                    <span>Đăng xuất</span>
                   </button>
                 </div>
               )}
-              
-              <div className="nav__user-greeting">
-                {profile?.full_name || user.email?.split("@")[0]}
-              </div>
-
-              <button className="btn btn--logout" onClick={signOut}>
-                <span>
-                  <i className="ri-logout-box-r-line"></i>
-                </span>
-                <span>Đăng xuất</span>
-              </button>
-            </>
+            </div>
           ) : (
             <button className="btn btn--login" onClick={handleLogin}>
-              <span>
-                <i className="ri-user-line"></i>
-              </span>
+              <i className="ri-user-line"></i>
               <span>Đăng nhập</span>
             </button>
           )}
