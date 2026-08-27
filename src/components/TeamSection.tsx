@@ -232,10 +232,10 @@ const TeamSection = () => {
                 <p className="team-card__task">{member.task}</p>
 
                 {/* Bottom Skill Capsule Badge */}
-                {/* <div className="team-card__skill-pill">
+                <div className="team-card__skill-pill">
                   <i className={member.skillIcon}></i>
                   <span>{member.major}</span>
-                </div> */}
+                </div>
               </div>
             </div>
           ))}
