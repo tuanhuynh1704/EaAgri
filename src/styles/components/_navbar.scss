@@ -183,31 +183,255 @@ nav.navbar-container.is-hidden {
   }
 }
 
-// Actions (Login / Logout / Admin)
+// ==========================================
+// USER MENU & PROFILE DROPDOWN
+// ==========================================
+
+.nav__user-menu-wrapper {
+  position: relative;
+  display: inline-flex;
+  align-items: center;
+}
+
+.nav__user-pill {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+  min-height: 40px;
+  padding: 0.28rem 0.85rem 0.28rem 0.35rem;
+  border-radius: 999px;
+  background: rgba(255, 255, 255, 0.85);
+  backdrop-filter: blur(14px);
+  -webkit-backdrop-filter: blur(14px);
+  border: 1px solid rgba(16, 185, 129, 0.28);
+  box-shadow: 0 2px 8px rgba(16, 110, 76, 0.08);
+  cursor: pointer;
+  transition: all 0.25s cubic-bezier(0.16, 1, 0.3, 1);
+
+  &:hover,
+  &.is-active {
+    background: #ffffff;
+    border-color: #10b981;
+    box-shadow: 0 4px 16px rgba(16, 185, 129, 0.2);
+    transform: translateY(-1px);
+  }
+
+  .nav__user-avatar {
+    width: 32px;
+    height: 32px;
+    border-radius: 50%;
+    background: linear-gradient(135deg, #10b981, #059669);
+    color: #ffffff;
+    font-size: 0.9rem;
+    font-weight: 850;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    box-shadow: 0 2px 6px rgba(16, 185, 129, 0.35);
+  }
+
+  .nav__user-name {
+    font-size: 0.88rem;
+    font-weight: 750;
+    color: #133a27;
+    max-width: 110px;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+
+    @media (max-width: $mobile) {
+      display: none;
+    }
+  }
+
+  .nav__user-role-tag {
+    font-size: 0.68rem;
+    font-weight: 800;
+    padding: 0.12rem 0.45rem;
+    border-radius: 999px;
+    background: rgba(245, 158, 11, 0.15);
+    color: #d97706;
+    border: 1px solid rgba(245, 158, 11, 0.3);
+
+    @media (max-width: $mobile) {
+      display: none;
+    }
+  }
+
+  .nav__user-chevron {
+    font-size: 1.1rem;
+    color: #526f5f;
+    transition: transform 0.25s ease;
+
+    &.is-rotated {
+      transform: rotate(180deg);
+    }
+  }
+}
+
+// Dropdown Box
+.nav__user-dropdown {
+  position: absolute;
+  top: calc(100% + 10px);
+  right: 0;
+  width: 240px;
+  background: rgba(255, 255, 255, 0.96);
+  backdrop-filter: blur(20px);
+  -webkit-backdrop-filter: blur(20px);
+  border: 1px solid rgba(16, 185, 129, 0.22);
+  border-radius: 20px;
+  box-shadow:
+    0 16px 40px rgba(18, 65, 45, 0.16),
+    0 2px 8px rgba(0, 0, 0, 0.04);
+  padding: 0.9rem;
+  z-index: 1000;
+  animation: dropdownPopIn 0.25s cubic-bezier(0.16, 1, 0.3, 1);
+
+  &-header {
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+    padding: 0.3rem 0.4rem 0.6rem;
+  }
+
+  &-avatar {
+    width: 40px;
+    height: 40px;
+    border-radius: 50%;
+    background: linear-gradient(135deg, #10b981, #059669);
+    color: #ffffff;
+    font-size: 1.1rem;
+    font-weight: 850;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    box-shadow: 0 4px 10px rgba(16, 185, 129, 0.3);
+    flex-shrink: 0;
+  }
+
+  &-info {
+    display: flex;
+    flex-direction: column;
+    overflow: hidden;
+
+    .user-title {
+      font-size: 0.92rem;
+      font-weight: 800;
+      color: #133a27;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+
+    .user-email {
+      font-size: 0.74rem;
+      color: #638271;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      margin-bottom: 0.3rem;
+    }
+
+    .admin-pill,
+    .member-pill {
+      display: inline-flex;
+      align-items: center;
+      gap: 0.25rem;
+      font-size: 0.66rem;
+      font-weight: 800;
+      padding: 0.1rem 0.5rem;
+      border-radius: 999px;
+      width: fit-content;
+    }
+
+    .admin-pill {
+      background: rgba(245, 158, 11, 0.12);
+      color: #d97706;
+      border: 1px solid rgba(245, 158, 11, 0.25);
+    }
+
+    .member-pill {
+      background: rgba(16, 185, 129, 0.12);
+      color: #059669;
+      border: 1px solid rgba(16, 185, 129, 0.25);
+    }
+  }
+
+  &-divider {
+    height: 1px;
+    background: rgba(16, 185, 129, 0.14);
+    margin: 0.45rem 0;
+  }
+
+  &-links {
+    display: flex;
+    flex-direction: column;
+    gap: 0.25rem;
+  }
+
+  &-item {
+    display: flex;
+    align-items: center;
+    gap: 0.65rem;
+    width: 100%;
+    padding: 0.55rem 0.8rem;
+    border-radius: 12px;
+    background: transparent;
+    border: none;
+    color: #1f4e34;
+    font-size: 0.84rem;
+    font-weight: 750;
+    cursor: pointer;
+    text-align: left;
+    transition: all 0.2s ease;
+
+    i {
+      font-size: 1.05rem;
+      color: #10b981;
+    }
+
+    &:hover {
+      background: rgba(16, 185, 129, 0.1);
+      color: #047857;
+      transform: translateX(2px);
+    }
+
+    &--logout {
+      color: #ef4444;
+
+      i {
+        color: #ef4444;
+      }
+
+      &:hover {
+        background: rgba(239, 68, 68, 0.1);
+        color: #dc2626;
+
+        i {
+          color: #dc2626;
+        }
+      }
+    }
+  }
+}
+
+@keyframes dropdownPopIn {
+  0% {
+    opacity: 0;
+    transform: translateY(-8px) scale(0.96);
+  }
+  100% {
+    opacity: 1;
+    transform: translateY(0) scale(1);
+  }
+}
+
+// Action Buttons
 .nav__actions {
   display: flex;
   align-items: center;
   gap: 0.45rem;
   margin-left: 0.15rem;
-
-  .nav__admin-btns {
-    display: flex;
-    gap: 0.35rem;
-
-    @media (max-width: $laptop) {
-      display: none;
-    }
-  }
-
-  .nav__user-greeting {
-    font-size: 0.84rem;
-    font-weight: 700;
-    color: #163827;
-    padding: 0.3rem 0.75rem;
-    background: rgba(255, 255, 255, 0.75);
-    backdrop-filter: blur(10px);
-    border-radius: 999px;
-  }
 
   .btn {
     display: inline-flex;
@@ -253,28 +477,6 @@ nav.navbar-container.is-hidden {
         i {
           font-size: 1.2rem;
         }
-      }
-    }
-
-    &--logout {
-      background: #ef4444;
-      color: #ffffff;
-
-      &:hover {
-        background: #dc2626;
-        transform: translateY(-1px);
-        box-shadow: 0 4px 14px rgba(239, 68, 68, 0.3);
-      }
-    }
-
-    &--admin {
-      background: #f59e0b;
-      color: #ffffff;
-      font-size: 0.8rem;
-      padding: 0.32rem 0.75rem;
-
-      &:hover {
-        background: #d97706;
       }
     }
   }
