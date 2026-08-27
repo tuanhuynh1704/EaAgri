@@ -1,4 +1,4 @@
-import { useMemo, useState, type CSSProperties, type MouseEvent } from "react";
+import { useMemo, useState, useEffect, type CSSProperties, type MouseEvent } from "react";
 
 interface Hotspot {
   id: string;
@@ -10,8 +10,23 @@ interface Hotspot {
   top: string;
 }
 
+const ROTATING_HIGHLIGHTS = [
+  { text: "thông minh", tag: "AI • IoT • DATA" },
+  { text: "tích hợp AI & IoT", tag: "REALTIME SENSOR" },
+  { text: "chuẩn dữ liệu số", tag: "BIG DATA INSIGHT" },
+  { text: "bền vững Tây Nguyên", tag: "GREEN AGRI 2026" },
+];
+
 const Hero = () => {
   const [activeHotspot, setActiveHotspot] = useState<string | null>(null);
+  const [highlightIndex, setHighlightIndex] = useState(0);
+
+  useEffect(() => {
+    const timer = setInterval(() => {
+      setHighlightIndex((prev) => (prev + 1) % ROTATING_HIGHLIGHTS.length);
+    }, 3200);
+    return () => clearInterval(timer);
+  }, []);
 
   const fallingLeaves = useMemo(() => (
     Array.from({ length: 16 }, (_, index) => {
@@ -326,24 +341,39 @@ const Hero = () => {
 
         {/* RIGHT COLUMN: Heading, Subtext, App links, Key Stats & Social Proof */}
         <div className="hero__content" data-aos="fade-up">
-          {/* Green Pill Badge */}
+          {/* Green Pill Badge with Live Radar Pulse */}
           <div className="hero-badge" data-aos="fade-right" data-aos-delay="100">
+            <span className="hero-badge__pulse-wrap" aria-hidden="true">
+              <span className="hero-badge__pulse-sonar" />
+              <span className="hero-badge__pulse-dot" />
+            </span>
             <span className="hero-badge__icon"><i className="ri-leaf-fill"></i></span>
             <span className="hero-badge__text">NỀN TẢNG NÔNG NGHIỆP SỐ</span>
+            <span className="hero-badge__live-chip">LIVE AI</span>
           </div>
 
           <h1 className="hero-title">
-            <span className="text-ea-agri">Ea Agri</span>
+            <span className="text-ea-agri" data-text="Ea Agri">
+              Ea Agri
+              <span className="text-ea-agri__light-beam" aria-hidden="true" />
+            </span>
             <span className="text-sub text-gray">Hệ sinh thái nông nghiệp</span>
             <span className="text-sub text-sub--accent">
-              <span>thông minh</span>
-              <small>AI • IoT • DATA</small>
+              <span className="rotating-word-box">
+                <span key={highlightIndex} className="rotating-word-item">
+                  {ROTATING_HIGHLIGHTS[highlightIndex].text}
+                </span>
+              </span>
+              <small key={`tag-${highlightIndex}`} className="tech-chip-animated">
+                <i className="ri-flashlight-fill" /> {ROTATING_HIGHLIGHTS[highlightIndex].tag}
+              </small>
             </span>
           </h1>
 
           <p className="hero-description">
-            Giải pháp tối ưu hóa chuỗi giá trị sầu riêng tại Tây Nguyên.
-            Tích hợp AI đa phương thức, IoT, dữ liệu lớn và mô hình kinh tế chia sẻ.
+            <span className="hero-description__energy-bar" aria-hidden="true" />
+            Giải pháp tối ưu hóa chuỗi giá trị <strong className="hero-highlight">sầu riêng tại Tây Nguyên</strong>.
+            Tích hợp <strong className="hero-highlight">AI đa phương thức</strong>, <strong className="hero-highlight">IoT</strong>, <strong className="hero-highlight">dữ liệu lớn</strong> và mô hình kinh tế chia sẻ.
           </p>
 
           <div className="hero-download-links">

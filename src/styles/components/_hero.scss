@@ -1229,26 +1229,63 @@
 .hero-badge {
   display: inline-flex;
   align-items: center;
-  gap: 0.5rem;
-  padding: 0.48rem 1rem;
-  background: linear-gradient(90deg, rgba(236, 253, 245, 0.92), rgba(240, 253, 250, 0.72));
-  border: 1px solid rgba(16, 185, 129, 0.2);
+  gap: 0.55rem;
+  padding: 0.42rem 0.95rem 0.42rem 0.65rem;
+  background: linear-gradient(90deg, rgba(236, 253, 245, 0.95), rgba(240, 253, 250, 0.85));
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+  border: 1px solid rgba(16, 185, 129, 0.28);
   border-radius: 99px;
   margin-bottom: 1.15rem;
-  box-shadow: 0 8px 22px rgba(16, 110, 76, 0.06);
+  box-shadow: 
+    0 8px 22px rgba(16, 110, 76, 0.08),
+    inset 0 1px 0 rgba(255, 255, 255, 0.9);
   transition: transform 0.3s ease, box-shadow 0.3s ease, border-color 0.3s ease;
 
   &:hover {
-    transform: translateY(-2px) scale(1.015);
-    border-color: rgba(16, 185, 129, 0.38);
-    box-shadow: 0 12px 28px rgba(16, 110, 76, 0.12);
+    transform: translateY(-2px) scale(1.02);
+    border-color: rgba(16, 185, 129, 0.48);
+    box-shadow: 0 12px 28px rgba(16, 110, 76, 0.14);
+
+    .hero-badge__pulse-sonar {
+      animation-duration: 1.2s;
+    }
+  }
+
+  // Live Radar Pulse Indicator
+  &__pulse-wrap {
+    position: relative;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 14px;
+    height: 14px;
+    margin-right: -0.15rem;
+  }
+
+  &__pulse-sonar {
+    position: absolute;
+    width: 100%;
+    height: 100%;
+    border-radius: 50%;
+    background: rgba(16, 185, 129, 0.55);
+    animation: heroSonarPing 2s cubic-bezier(0, 0, 0.2, 1) infinite;
+  }
+
+  &__pulse-dot {
+    position: relative;
+    width: 7px;
+    height: 7px;
+    border-radius: 50%;
+    background: #10b981;
+    box-shadow: 0 0 8px rgba(16, 185, 129, 0.8);
   }
   
   &__icon {
     display: flex;
     align-items: center;
     color: #059669;
-    font-size: 0.9rem;
+    font-size: 0.88rem;
   }
   
   &__text {
@@ -1257,12 +1294,37 @@
     color: #047857;
     letter-spacing: 0.08em;
   }
+
+  &__live-chip {
+    display: inline-flex;
+    align-items: center;
+    padding: 0.12rem 0.42rem;
+    border-radius: 999px;
+    background: linear-gradient(135deg, #10b981, #059669);
+    color: #ffffff;
+    font-size: 0.56rem;
+    font-weight: 850;
+    letter-spacing: 0.06em;
+    box-shadow: 0 2px 6px rgba(16, 185, 129, 0.35);
+    margin-left: 0.15rem;
+  }
+}
+
+@keyframes heroSonarPing {
+  0% {
+    transform: scale(0.8);
+    opacity: 0.9;
+  }
+  80%, 100% {
+    transform: scale(2.4);
+    opacity: 0;
+  }
 }
 
 .hero-title {
   display: flex;
   flex-direction: column;
-  margin-bottom: 1.5rem;
+  margin-bottom: 1.35rem;
   font-family: 'Inter', sans-serif;
   text-align: left;
   
@@ -1271,24 +1333,50 @@
   }
 
   .text-ea-agri {
+    position: relative;
+    display: inline-block;
     font-size: clamp(3.35rem, 4.7vw, 4.85rem);
     font-weight: 820;
     letter-spacing: -3.4px;
-    background: linear-gradient(110deg, #176f40 0%, #159064 47%, #087c85 100%);
+    background: linear-gradient(
+      110deg,
+      #176f40 0%,
+      #159064 25%,
+      #2ae299 50%,
+      #159064 75%,
+      #087c85 100%
+    );
+    background-size: 240% 100%;
     -webkit-background-clip: text;
     -webkit-text-fill-color: transparent;
     background-clip: text;
     line-height: 1.06;
     padding: 0 0.04em 0.12em;
-    margin: 0 -0.04em 0.62rem;
+    margin: 0 -0.04em 0.55rem;
     overflow: visible;
-    filter: drop-shadow(0 6px 14px rgba(8, 124, 133, 0.1));
-    background-size: 180% 100%;
-    background-position: var(--hero-pointer-x, 45%) center;
-    transition: background-position 0.25s ease, filter 0.3s ease;
+    filter: drop-shadow(0 6px 16px rgba(8, 124, 133, 0.12));
+    animation: textShimmerSweep 7s ease-in-out infinite alternate;
+    transition: filter 0.3s ease;
 
     &:hover {
-      filter: drop-shadow(0 10px 20px rgba(8, 124, 133, 0.18));
+      filter: drop-shadow(0 10px 24px rgba(8, 124, 133, 0.24));
+      animation-duration: 3.5s;
+    }
+
+    // Sweeping Optical Light Beam
+    &__light-beam {
+      position: absolute;
+      inset: 0;
+      pointer-events: none;
+      background: linear-gradient(
+        105deg,
+        transparent 35%,
+        rgba(255, 255, 255, 0.45) 50%,
+        transparent 65%
+      );
+      mix-blend-mode: overlay;
+      transform: translateX(-100%);
+      animation: sweepLightBeam 6s ease-in-out infinite;
     }
     
     @media (max-width: $mobile) {
@@ -1297,83 +1385,237 @@
   }
   
   .text-sub {
-    font-size: clamp(1.5rem, 2vw, 2rem);
+    font-size: clamp(1.45rem, 1.9vw, 1.95rem);
     font-weight: 735;
     color: #183426;
-    line-height: 1.12;
+    line-height: 1.14;
     letter-spacing: -0.75px;
 
     &--accent {
       display: inline-flex;
       align-items: center;
-      gap: 0.8rem;
-      margin-top: 0.16rem;
+      gap: 0.75rem;
+      margin-top: 0.22rem;
       color: #087e69;
       position: relative;
       width: fit-content;
+      flex-wrap: wrap;
 
-      > span {
+      .rotating-word-box {
         position: relative;
+        display: inline-flex;
+        align-items: center;
+        min-height: 2.4rem;
+        perspective: 600px;
+      }
+
+      .rotating-word-item {
+        display: inline-block;
+        position: relative;
+        background: linear-gradient(120deg, #0d845e, #0a8790);
+        -webkit-background-clip: text;
+        -webkit-text-fill-color: transparent;
+        background-clip: text;
+        animation: rotateWordEnter 0.52s cubic-bezier(0.16, 1, 0.3, 1) both;
 
         &::after {
           content: '';
           position: absolute;
           left: 0;
-          bottom: -0.42rem;
-          width: 72%;
-          height: 2px;
+          bottom: -0.28rem;
+          width: 100%;
+          height: 2.5px;
           border-radius: 999px;
-          background: linear-gradient(90deg, #12a56b, #0a8790, transparent);
+          background: linear-gradient(90deg, #12a56b, #0a8790, #34d399, transparent);
+          background-size: 200% 100%;
+          animation: accentUnderlineFlow 4s linear infinite;
         }
       }
 
-      small {
+      .tech-chip-animated {
         display: inline-flex;
         align-items: center;
+        gap: 0.35rem;
         min-height: 1.65rem;
-        padding: 0.22rem 0.55rem;
-        border: 1px solid rgba(9, 135, 112, 0.14);
+        padding: 0.25rem 0.65rem;
+        border: 1px solid rgba(9, 135, 112, 0.2);
         border-radius: 999px;
-        background: rgba(239, 253, 248, 0.78);
-        color: #4a7d6c;
-        font-size: 0.52rem;
+        background: linear-gradient(135deg, rgba(239, 253, 248, 0.95), rgba(220, 252, 231, 0.75));
+        backdrop-filter: blur(8px);
+        -webkit-backdrop-filter: blur(8px);
+        color: #0f766e;
+        font-size: 0.54rem;
         font-weight: 850;
         letter-spacing: 0.12em;
         white-space: nowrap;
+        box-shadow: 0 2px 10px rgba(13, 143, 109, 0.08);
+        animation: chipFadeIn 0.45s ease-out both;
+
+        i {
+          color: #10b981;
+          font-size: 0.68rem;
+          animation: iconGlowPulse 2s ease-in-out infinite;
+        }
       }
 
       @media (max-width: $laptop) {
         margin-inline: auto;
+        justify-content: center;
       }
-
     }
     
     @media (max-width: $mobile) {
-      font-size: 1.65rem;
+      font-size: 1.55rem;
     }
+  }
+}
+
+@keyframes textShimmerSweep {
+  0% {
+    background-position: 0% 50%;
+  }
+  100% {
+    background-position: 100% 50%;
+  }
+}
+
+@keyframes sweepLightBeam {
+  0%, 70% {
+    transform: translateX(-120%);
+    opacity: 0;
+  }
+  75% {
+    opacity: 0.65;
+  }
+  90% {
+    transform: translateX(120%);
+    opacity: 0.65;
+  }
+  91%, 100% {
+    opacity: 0;
+  }
+}
+
+@keyframes rotateWordEnter {
+  0% {
+    opacity: 0;
+    transform: translateY(14px) rotateX(-24deg);
+    filter: blur(3px);
+  }
+  100% {
+    opacity: 1;
+    transform: translateY(0) rotateX(0deg);
+    filter: blur(0);
+  }
+}
+
+@keyframes accentUnderlineFlow {
+  0% {
+    background-position: 0% 50%;
+  }
+  100% {
+    background-position: 200% 50%;
+  }
+}
+
+@keyframes chipFadeIn {
+  from {
+    opacity: 0;
+    transform: scale(0.92);
+  }
+  to {
+    opacity: 1;
+    transform: scale(1);
+  }
+}
+
+@keyframes iconGlowPulse {
+  0%, 100% {
+    opacity: 0.75;
+    transform: scale(1);
+  }
+  50% {
+    opacity: 1;
+    transform: scale(1.25);
+    filter: drop-shadow(0 0 4px #10b981);
   }
 }
 
 .hero-description {
   position: relative;
   font-size: 0.98rem;
-  line-height: 1.82;
+  line-height: 1.84;
   color: #536b5c;
   margin-bottom: 1.65rem;
-  max-width: 520px;
+  max-width: 530px;
   text-align: left;
-  padding-left: 1rem;
-  border-left: 2px solid rgba(13, 143, 109, 0.32);
+  padding-left: 1.15rem;
+  border-left: 2px solid rgba(13, 143, 109, 0.22);
+  
+  // Animated flowing energy beam on left border
+  &__energy-bar {
+    position: absolute;
+    left: -2px;
+    top: 0;
+    width: 2.5px;
+    height: 42%;
+    border-radius: 999px;
+    background: linear-gradient(180deg, transparent, #10b981 40%, #34d399 70%, transparent);
+    box-shadow: 0 0 10px rgba(16, 185, 129, 0.65);
+    animation: energyBeamFlow 3.4s ease-in-out infinite;
+    pointer-events: none;
+  }
+
+  .hero-highlight {
+    display: inline-block;
+    color: #14532d;
+    font-weight: 700;
+    padding: 0.05rem 0.38rem;
+    margin: 0 0.1rem;
+    border-radius: 6px;
+    background: rgba(16, 185, 129, 0.09);
+    border: 1px solid rgba(16, 185, 129, 0.18);
+    transition: all 0.25s cubic-bezier(0.16, 1, 0.3, 1);
+
+    &:hover {
+      background: rgba(16, 185, 129, 0.18);
+      color: #064e3b;
+      border-color: rgba(16, 185, 129, 0.4);
+      box-shadow: 0 4px 12px rgba(16, 185, 129, 0.16);
+      transform: translateY(-1px);
+    }
+  }
   
   @media (max-width: $laptop) {
     text-align: center;
     margin-inline: auto;
     padding-left: 0;
     border-left: 0;
+
+    &__energy-bar {
+      display: none;
+    }
   }
   
   @media (max-width: $mobile) {
     font-size: 0.92rem;
+  }
+}
+
+@keyframes energyBeamFlow {
+  0% {
+    top: 0%;
+    opacity: 0;
+  }
+  20% {
+    opacity: 1;
+  }
+  80% {
+    opacity: 1;
+  }
+  100% {
+    top: 60%;
+    opacity: 0;
   }
 }
 

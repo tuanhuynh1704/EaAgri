@@ -80,9 +80,7 @@ const Navbar = () => {
               handleHome();
             }}
           >
-            <span className="nav__link-icon">
-              <i className="ri-home-5-line"></i>
-            </span>
+            <i className="ri-home-5-line nav__link-icon"></i>
             <span className="nav__link-text">Trang chủ</span>
           </a>
 
@@ -94,9 +92,7 @@ const Navbar = () => {
               navigate("/architecture");
             }}
           >
-            <span className="nav__link-icon">
-              <i className="ri-layout-grid-line"></i>
-            </span>
+            <i className="ri-layout-grid-line nav__link-icon"></i>
             <span className="nav__link-text">Kiến trúc</span>
           </a>
 
@@ -108,9 +104,7 @@ const Navbar = () => {
               handleNew();
             }}
           >
-            <span className="nav__link-icon">
-              <i className="ri-article-line"></i>
-            </span>
+            <i className="ri-article-line nav__link-icon"></i>
             <span className="nav__link-text">Tin tức</span>
           </a>
         </div>
@@ -134,17 +128,13 @@ const Navbar = () => {
               </div>
 
               <button className="btn btn--logout" onClick={signOut}>
-                <span>
-                  <i className="ri-logout-box-r-line"></i>
-                </span>
+                <i className="ri-logout-box-r-line"></i>
                 <span>Đăng xuất</span>
               </button>
             </>
           ) : (
             <button className="btn btn--login" onClick={handleLogin}>
-              <span>
-                <i className="ri-user-line"></i>
-              </span>
+              <i className="ri-user-line"></i>
               <span>Đăng nhập</span>
             </button>
           )}
