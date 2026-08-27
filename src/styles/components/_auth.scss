@@ -188,9 +188,11 @@
   align-items: center;
   width: 100%;
 
-  i {
+  > i {
     position: absolute;
     left: 1.1rem;
+    top: 50%;
+    transform: translateY(-50%);
     color: #94a3b8;
     font-size: 1.15rem;
     z-index: 5;
@@ -199,22 +201,30 @@
   }
 
   // Dynamic focus color on wrapper icon
-  &:focus-within i {
+  &:focus-within > i {
     color: $primary-color-light;
   }
 }
 
 .auth-page__input {
   width: 100%;
-  padding: 0.85rem 1rem 0.85rem 2.8rem;
-  border: 1px solid rgba($primary-color, 0.15);
+  height: 48px;
+  padding: 0 2.8rem 0 2.8rem;
+  border: 1.5px solid rgba($primary-color, 0.18);
   border-radius: 12px;
   font-size: 0.92rem;
   color: $text-dark;
-  background: rgba(255, 255, 255, 0.95);
+  background: rgba(255, 255, 255, 0.85);
+  backdrop-filter: blur(8px);
   transition: all 0.3s cubic-bezier(0.165, 0.84, 0.44, 1);
   outline: none;
   font-family: inherit;
+  box-sizing: border-box;
+
+  &:hover {
+    background: rgba(255, 255, 255, 0.95);
+    border-color: rgba($primary-color, 0.35);
+  }
 
   &:focus {
     border-color: $primary-color-light;
@@ -257,25 +267,39 @@
 }
 
 .auth-page__toggle {
-  margin-top: 2rem;
+  margin-top: 1.85rem;
   text-align: center;
-  font-size: 0.9rem;
+  font-size: 0.92rem;
   color: #64748b;
   font-weight: 500;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.35rem;
+  flex-wrap: wrap;
 
-  button {
+  button,
+  a,
+  .auth-page__toggle-link {
     background: none;
     border: none;
-    color: $primary-color-light;
-    font-weight: 750;
+    color: #168452; // Vibrant prominent emerald green
+    font-weight: 800;
     cursor: pointer;
-    padding: 0 0.25rem;
-    transition: color 0.3s ease;
-    text-decoration: none;
+    padding: 0.15rem 0.45rem;
+    border-radius: 6px;
+    transition: all 0.25s ease;
+    text-decoration: underline;
+    text-underline-offset: 3px;
+    display: inline-flex;
+    align-items: center;
+    gap: 0.25rem;
 
     &:hover {
-      color: $primary-color-dark;
+      color: #0b683e;
+      background: rgba(22, 132, 82, 0.12);
       text-decoration: underline;
+      transform: translateY(-1px);
     }
   }
 }
@@ -494,12 +518,11 @@
 }
 
 .auth-page__card-wrapper--register {
-  width: min(1080px, 100%);
+  width: min(1040px, 100%);
 }
 
 .auth-page__card--register {
-  max-width: 520px;
-  padding: clamp(2rem, 3vw, 3rem) clamp(1.75rem, 3.5vw, 2.5rem);
+  max-width: 460px;
 }
 
 .auth-page__row-2 {
@@ -515,21 +538,34 @@
 
 .auth-page__pwd-toggle {
   position: absolute;
-  right: 0.75rem;
+  right: 0.85rem;
+  top: 50%;
+  transform: translateY(-50%);
   background: none;
   border: none;
   color: #94a3b8;
   cursor: pointer;
-  padding: 0.25rem;
-  font-size: 1.1rem;
+  padding: 0.35rem;
   display: flex;
   align-items: center;
   justify-content: center;
-  transition: color 0.2s ease;
+  border-radius: 8px;
   z-index: 6;
+  transition: all 0.2s ease;
+
+  i {
+    position: static !important;
+    transform: none !important;
+    left: auto !important;
+    top: auto !important;
+    font-size: 1.25rem !important;
+    color: inherit !important;
+    pointer-events: auto !important;
+  }
 
   &:hover {
     color: $primary-color-dark;
+    background: rgba($primary-color, 0.08);
   }
 }
 

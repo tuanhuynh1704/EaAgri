@@ -1,0 +1,739 @@
+@use "../abstracts/variables" as *;
+
+.durian-scanner-section {
+  position: relative;
+  overflow: hidden;
+  padding: clamp(3.8rem, 5.5vw, 5.8rem) 0;
+  background:
+    radial-gradient(circle at 80% 30%, rgba(52, 211, 153, 0.12), transparent 45%),
+    radial-gradient(circle at 20% 70%, rgba(14, 165, 233, 0.08), transparent 40%),
+    linear-gradient(160deg, #f8fffb 0%, #f0faf4 50%, #f0fdf9 100%);
+
+  // Subtle tech dot matrix grid
+  &::before {
+    content: "";
+    position: absolute;
+    inset: 0;
+    pointer-events: none;
+    opacity: 0.35;
+    background-image: radial-gradient(rgba(16, 185, 129, 0.25) 1px, transparent 1px);
+    background-size: 28px 28px;
+    mask-image: linear-gradient(180deg, transparent, #000 15%, #000 85%, transparent);
+  }
+
+  &__inner {
+    position: relative;
+    z-index: 2;
+    display: grid;
+    grid-template-columns: minmax(300px, 0.78fr) minmax(500px, 1.22fr);
+    align-items: center;
+    gap: clamp(2.2rem, 4vw, 4rem);
+  }
+}
+
+.scanner-bg-aura {
+  position: absolute;
+  border-radius: 50%;
+  filter: blur(90px);
+  pointer-events: none;
+  z-index: 1;
+
+  &--1 {
+    width: 450px;
+    height: 450px;
+    background: radial-gradient(circle, rgba(16, 185, 129, 0.18), transparent 70%);
+    top: 10%;
+    right: 5%;
+  }
+
+  &--2 {
+    width: 350px;
+    height: 350px;
+    background: radial-gradient(circle, rgba(14, 165, 233, 0.15), transparent 70%);
+    bottom: 10%;
+    left: 5%;
+  }
+}
+
+// ==========================================
+// LEFT COLUMN: COPY & STEP CARDS
+// ==========================================
+
+.durian-scanner-copy {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+
+  .scanner-eyebrow {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.5rem;
+    padding: 0.4rem 1.1rem;
+    background: rgba(16, 185, 129, 0.08);
+    border: 1px solid rgba(16, 185, 129, 0.2);
+    border-radius: 99px;
+    margin-bottom: 1rem;
+
+    &__icon {
+      color: #059669;
+      font-size: 0.95rem;
+    }
+
+    &__text {
+      font-size: 0.72rem;
+      font-weight: 800;
+      color: #047857;
+      letter-spacing: 0.08em;
+    }
+  }
+
+  .scanner-title {
+    margin: 0 0 0.95rem;
+    color: #0f2e1d;
+    font-size: clamp(2.15rem, 3.35vw, 3.25rem);
+    line-height: 1.05;
+    letter-spacing: -0.04em;
+    font-family: 'Inter', sans-serif;
+    font-weight: 850;
+
+    .text-gradient {
+      background: linear-gradient(110deg, #059669 0%, #0d9488 60%, #0284c7 100%);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background-clip: text;
+    }
+  }
+
+  .scanner-desc {
+    margin: 0 0 1.4rem;
+    color: #4b6354;
+    font-size: 0.94rem;
+    line-height: 1.68;
+    max-width: 540px;
+  }
+
+  // Feature Step Cards
+  .scanner-feature-cards {
+    display: flex;
+    flex-direction: column;
+    gap: 0.65rem;
+    width: 100%;
+    max-width: 520px;
+
+    .feature-step-card {
+      display: flex;
+      align-items: flex-start;
+      gap: 0.85rem;
+      padding: 0.72rem 1rem;
+      background: rgba(255, 255, 255, 0.75);
+      backdrop-filter: blur(10px);
+      border: 1px solid rgba(255, 255, 255, 0.85);
+      border-left: 3px solid #cbd5e1;
+      border-radius: 16px;
+      box-shadow: 0 4px 15px rgba(6, 78, 59, 0.03);
+      transition: all 0.3s cubic-bezier(0.2, 0.8, 0.2, 1);
+
+      .step-badge {
+        display: grid;
+        place-items: center;
+        width: 31px;
+        height: 31px;
+        border-radius: 10px;
+        background: #f1f5f9;
+        color: #64748b;
+        font-size: 0.78rem;
+        font-weight: 800;
+        flex-shrink: 0;
+        transition: all 0.3s ease;
+      }
+
+      .step-info {
+        h4 {
+          margin: 0 0 0.25rem;
+          font-size: 0.88rem;
+          font-weight: 750;
+          color: #1e293b;
+          transition: color 0.3s ease;
+        }
+
+        p {
+          margin: 0;
+          font-size: 0.75rem;
+          color: #64748b;
+          line-height: 1.45;
+        }
+      }
+
+      &.is-active, &:hover {
+        background: rgba(255, 255, 255, 0.95);
+        border-color: rgba(52, 211, 153, 0.4);
+        border-left-color: #10b981;
+        transform: translateX(6px);
+        box-shadow: 0 10px 25px rgba(16, 185, 129, 0.1);
+
+        .step-badge {
+          background: #dcfce7;
+          color: #15803d;
+          box-shadow: 0 0 12px rgba(16, 185, 129, 0.25);
+        }
+
+        .step-info h4 {
+          color: #047857;
+        }
+      }
+    }
+  }
+}
+
+// ==========================================
+// RIGHT COLUMN: LUXURY GLASSMORPHIC TERMINAL
+// ==========================================
+
+.durian-scanner-console-wrapper {
+  position: relative;
+  width: 100%;
+}
+
+.durian-scanner-console {
+  position: relative;
+  overflow: hidden;
+  padding: 0.95rem;
+  border-radius: 24px;
+  background: rgba(255, 255, 255, 0.88);
+  backdrop-filter: blur(20px);
+  -webkit-backdrop-filter: blur(20px);
+  border: 1.5px solid rgba(255, 255, 255, 0.95);
+  box-shadow:
+    0 25px 60px rgba(6, 78, 59, 0.09),
+    0 2px 8px rgba(0, 0, 0, 0.02);
+
+  // Top Bar & Mode Tabs
+  &__topbar {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 1rem;
+    padding: 0.3rem 0.45rem 0.8rem;
+    border-bottom: 1px solid rgba(226, 232, 240, 0.8);
+    margin-bottom: 0.75rem;
+
+    .terminal-status {
+      display: inline-flex;
+      align-items: center;
+      gap: 0.5rem;
+      font-size: 0.72rem;
+      font-weight: 800;
+      color: #047857;
+      letter-spacing: 0.06em;
+
+      .status-indicator {
+        width: 8px;
+        height: 8px;
+        border-radius: 50%;
+        background: #10b981;
+        box-shadow: 0 0 10px #10b981;
+        animation: liveDotBlink 1.6s infinite;
+      }
+    }
+
+    .terminal-modes {
+      display: flex;
+      gap: 0.35rem;
+      background: #f1f5f9;
+      padding: 3px;
+      border-radius: 12px;
+
+      .mode-tab {
+        display: inline-flex;
+        align-items: center;
+        gap: 0.4rem;
+        padding: 0.35rem 0.85rem;
+        border: none;
+        border-radius: 9px;
+        background: transparent;
+        color: #64748b;
+        font-size: 0.75rem;
+        font-weight: 700;
+        cursor: pointer;
+        transition: all 0.22s ease;
+
+        i {
+          font-size: 0.85rem;
+        }
+
+        &.is-active, &:hover {
+          background: #ffffff;
+          color: #047857;
+          box-shadow: 0 2px 8px rgba(0, 0, 0, 0.06);
+        }
+      }
+    }
+  }
+}
+
+// Interactive Scan Canvas Stage
+.durian-scan-stage {
+  --scan-x: 50%;
+  --scan-y: 50%;
+  --fruit-rotate-x: 0deg;
+  --fruit-rotate-y: 0deg;
+  position: relative;
+  overflow: hidden;
+  height: clamp(290px, 32vw, 330px);
+  border-radius: 18px;
+  background: radial-gradient(circle at 50% 50%, rgba(240, 253, 244, 0.95) 0%, rgba(226, 248, 238, 0.85) 60%, rgba(214, 243, 233, 0.7) 100%);
+  border: 1px solid rgba(52, 211, 153, 0.28);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: crosshair;
+  touch-action: none;
+  perspective: 1000px;
+  user-select: none;
+
+  // Tech Grid Background
+  &__grid {
+    position: absolute;
+    inset: 0;
+    z-index: 1;
+    pointer-events: none;
+    opacity: 0.45;
+    background-image:
+      linear-gradient(rgba(16, 185, 129, 0.18) 1px, transparent 1px),
+      linear-gradient(90deg, rgba(16, 185, 129, 0.18) 1px, transparent 1px);
+    background-size: 24px 24px;
+  }
+
+  // Holographic Rings
+  &__rings {
+    position: absolute;
+    inset: 0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    pointer-events: none;
+    z-index: 1;
+
+    .ring {
+      position: absolute;
+      border-radius: 50%;
+      border: 1px dashed rgba(16, 185, 129, 0.25);
+      animation: radarRingPulse 6s linear infinite;
+
+      &--1 { width: 230px; height: 230px; }
+      &--2 { width: 300px; height: 300px; border-color: rgba(14, 165, 233, 0.18); animation-delay: -2s; }
+    }
+  }
+
+  // Central 3D Durian Image
+  .durian-scan-subject {
+    max-width: 250px;
+    max-height: 250px;
+    object-fit: contain;
+    position: relative;
+    z-index: 2;
+    filter: drop-shadow(0 20px 25px rgba(6, 78, 59, 0.18));
+    transform: rotateX(var(--fruit-rotate-x)) rotateY(var(--fruit-rotate-y)) scale(1.02);
+    transition: transform 0.14s ease-out;
+    pointer-events: none;
+  }
+
+  // Reticle Laser Target Cursor
+  .durian-scan-reticle {
+    position: absolute;
+    left: var(--scan-x);
+    top: var(--scan-y);
+    z-index: 6;
+    width: 90px;
+    height: 90px;
+    border: 1.5px solid rgba(16, 185, 129, 0.95);
+    border-radius: 50%;
+    box-shadow:
+      0 0 0 6px rgba(16, 185, 129, 0.08),
+      0 0 24px rgba(16, 185, 129, 0.5),
+      inset 0 0 18px rgba(16, 185, 129, 0.15);
+    transform: translate(-50%, -50%);
+    pointer-events: none;
+
+    .reticle-core {
+      position: absolute;
+      left: 50%;
+      top: 50%;
+      width: 6px;
+      height: 6px;
+      border-radius: 50%;
+      background: #10b981;
+      box-shadow: 0 0 8px #10b981;
+      transform: translate(-50%, -50%);
+    }
+
+    &::before, &::after {
+      content: "";
+      position: absolute;
+      background: #10b981;
+    }
+    &::before { left: -10px; top: 50%; width: 18px; height: 1.5px; transform: translateY(-50%); }
+    &::after { right: -10px; top: 50%; width: 18px; height: 1.5px; transform: translateY(-50%); }
+
+    .reticle-label {
+      position: absolute;
+      top: -28px;
+      left: 50%;
+      transform: translateX(-50%);
+      white-space: nowrap;
+      padding: 3px 8px;
+      border-radius: 6px;
+      background: rgba(15, 23, 42, 0.88);
+      color: #34d399;
+      font-size: 10px;
+      font-weight: 700;
+      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+    }
+  }
+
+  // Laser Scan Line
+  .durian-scan-laser {
+    position: absolute;
+    left: 4%;
+    right: 4%;
+    top: 6%;
+    z-index: 4;
+    height: 2px;
+    opacity: 0;
+    background: linear-gradient(90deg, transparent, rgba(52, 211, 153, 0.9), #ffffff, rgba(14, 165, 233, 0.9), transparent);
+    box-shadow: 0 0 14px rgba(16, 185, 129, 0.8);
+    pointer-events: none;
+  }
+
+  &.is-scanning .durian-scan-laser {
+    opacity: 1;
+    animation: scannerLaserMotion 2.4s ease-in-out infinite alternate;
+  }
+
+  // Live HUD Pins on Fruit
+  .fruit-ai-pins {
+    position: absolute;
+    inset: 0;
+    pointer-events: none;
+    z-index: 4;
+
+    .fruit-pin {
+      position: absolute;
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      padding: 4px 10px;
+      border-radius: 999px;
+      background: rgba(255, 255, 255, 0.92);
+      border: 1px solid rgba(52, 211, 153, 0.5);
+      box-shadow: 0 4px 12px rgba(6, 78, 59, 0.12);
+      backdrop-filter: blur(8px);
+      font-size: 10px;
+      font-weight: 700;
+      color: #065f46;
+
+      &__dot {
+        width: 6px;
+        height: 6px;
+        border-radius: 50%;
+        background: #10b981;
+        box-shadow: 0 0 6px #10b981;
+      }
+
+      &--stem { top: 12%; left: 16%; }
+      &--brix { top: 46%; right: 10%; }
+      &--spikes { bottom: 16%; left: 18%; }
+    }
+  }
+
+  // Interactive Hint Pill
+  .durian-scan-hint {
+    position: absolute;
+    bottom: 12px;
+    left: 50%;
+    transform: translateX(-50%);
+    z-index: 6;
+    display: inline-flex;
+    align-items: center;
+    gap: 0.45rem;
+    padding: 0.45rem 1rem;
+    border: 1px solid rgba(255, 255, 255, 0.9);
+    border-radius: 999px;
+    background: rgba(255, 255, 255, 0.88);
+    backdrop-filter: blur(12px);
+    color: #047857;
+    font-size: 0.72rem;
+    font-weight: 750;
+    box-shadow: 0 6px 18px rgba(6, 78, 59, 0.08);
+    white-space: nowrap;
+    pointer-events: none;
+
+    i {
+      color: #059669;
+    }
+  }
+}
+
+// Progress Bar
+.durian-scan-progress-bar {
+  padding: 0.72rem 0.35rem 0.4rem;
+
+  .progress-info {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-bottom: 0.5rem;
+
+    .progress-label {
+      display: inline-flex;
+      align-items: center;
+      gap: 0.4rem;
+      font-size: 0.75rem;
+      font-weight: 700;
+      color: #64748b;
+
+      i {
+        color: #10b981;
+      }
+    }
+
+    .progress-percent {
+      font-size: 0.85rem;
+      font-weight: 800;
+      color: #047857;
+    }
+  }
+
+  .progress-track {
+    overflow: hidden;
+    height: 7px;
+    border-radius: 999px;
+    background: #e2e8f0;
+
+    .progress-fill {
+      position: relative;
+      height: 100%;
+      border-radius: inherit;
+      background: linear-gradient(90deg, #10b981, #06b6d4);
+      transition: width 0.15s linear;
+
+      .progress-glow {
+        position: absolute;
+        right: 0;
+        top: 0;
+        bottom: 0;
+        width: 12px;
+        background: #ffffff;
+        filter: blur(2px);
+      }
+    }
+  }
+}
+
+// Diagnostic Results Grid
+.durian-scan-results-grid {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr) repeat(2, 1fr) auto;
+  gap: 0.45rem;
+  margin-top: 0.4rem;
+  max-height: 0;
+  opacity: 0;
+  transform: translateY(10px);
+  overflow: hidden;
+  transition: all 0.45s cubic-bezier(0.2, 0.8, 0.2, 1);
+
+  &.is-visible {
+    max-height: 220px;
+    opacity: 1;
+    transform: none;
+    padding-top: 0.4rem;
+  }
+
+  .result-metric-card {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    padding: 0.58rem 0.7rem;
+    border: 1px solid rgba(226, 232, 240, 0.9);
+    border-radius: 14px;
+    background: #f8fafc;
+    transition: all 0.25s ease;
+
+    &:hover {
+      background: #ffffff;
+      border-color: rgba(52, 211, 153, 0.4);
+      box-shadow: 0 6px 16px rgba(16, 185, 129, 0.08);
+    }
+
+    .metric-icon {
+      width: 32px;
+      height: 32px;
+      border-radius: 10px;
+      background: #dcfce7;
+      color: #15803d;
+      display: grid;
+      place-items: center;
+      font-size: 1.1rem;
+      flex-shrink: 0;
+
+      &--amber { background: #fef3c7; color: #b45309; }
+      &--cyan { background: #e0f2fe; color: #0284c7; }
+      &--teal { background: #ccfbf1; color: #0f766e; }
+    }
+
+    .metric-text {
+      display: flex;
+      flex-direction: column;
+      min-width: 0;
+
+      .metric-lbl {
+        font-size: 0.65rem;
+        font-weight: 700;
+        color: #94a3b8;
+        text-transform: uppercase;
+        letter-spacing: 0.03em;
+      }
+
+      .metric-val {
+        font-size: 0.85rem;
+        font-weight: 800;
+        color: #0f172a;
+        margin-top: 1px;
+        white-space: nowrap;
+
+        &.text-emerald { color: #047857; }
+        &.text-amber { color: #b45309; }
+        &.text-cyan { color: #0284c7; }
+        &.text-teal { color: #0f766e; }
+      }
+    }
+  }
+
+  .result-actions {
+    display: flex;
+    align-items: center;
+
+    .btn-rescan {
+      display: inline-flex;
+      align-items: center;
+      gap: 0.45rem;
+      height: 100%;
+      min-height: 48px;
+      padding: 0 1.1rem;
+      border: 1px solid rgba(16, 185, 129, 0.3);
+      border-radius: 14px;
+      background: #dcfce7;
+      color: #15803d;
+      font-size: 0.82rem;
+      font-weight: 800;
+      cursor: pointer;
+      white-space: nowrap;
+      transition: all 0.25s ease;
+
+      i {
+        font-size: 1rem;
+      }
+
+      &:hover {
+        background: #bbf7d0;
+        box-shadow: 0 4px 14px rgba(16, 185, 129, 0.2);
+        transform: translateY(-1px);
+      }
+    }
+  }
+}
+
+@keyframes scannerLaserMotion {
+  from { top: 6%; }
+  to { top: 92%; }
+}
+
+// ==========================================
+// RESPONSIVE ADJUSTMENTS
+// ==========================================
+
+@media (max-width: $laptop) {
+  .durian-scanner-section__inner {
+    grid-template-columns: 1fr;
+    gap: 3rem;
+  }
+
+  .durian-scanner-copy {
+    text-align: center;
+    align-items: center;
+
+    .scanner-desc {
+      margin-inline: auto;
+    }
+
+    .scanner-feature-cards {
+      margin-inline: auto;
+    }
+  }
+
+  .durian-scanner-console-wrapper {
+    max-width: 720px;
+    margin-inline: auto;
+  }
+}
+
+@media (max-width: $mobile) {
+  .durian-scanner-section {
+    padding: 3.5rem 0;
+  }
+
+  .durian-scanner-console {
+    padding: 0.85rem;
+    border-radius: 20px;
+
+    &__topbar {
+      flex-direction: column;
+      align-items: flex-start;
+      gap: 0.6rem;
+
+      .terminal-modes {
+        width: 100%;
+        justify-content: space-between;
+
+        .mode-tab {
+          padding: 0.3rem 0.55rem;
+          font-size: 0.7rem;
+        }
+      }
+    }
+  }
+
+  .durian-scan-stage {
+    height: 300px;
+
+    .durian-scan-subject {
+      max-width: 220px;
+      max-height: 220px;
+    }
+
+    .fruit-ai-pins .fruit-pin {
+      padding: 3px 7px;
+      font-size: 9px;
+    }
+  }
+
+  .durian-scan-results-grid {
+    grid-template-columns: 1fr;
+
+    &.is-visible {
+      max-height: 480px;
+    }
+
+    .result-actions .btn-rescan {
+      width: 100%;
+      justify-content: center;
+    }
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .durian-scan-laser,
+  .durian-scan-reticle {
+    animation: none !important;
+  }
+}

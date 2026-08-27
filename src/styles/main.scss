@@ -7,10 +7,13 @@
 @use "./base/global";
 
 @use "./components/navbar";
+@use "./components/splash-intro";
 @use "./components/hero";
+@use "./components/durian-scanner";
 @use "./components/team";
 @use "./components/story";
 @use "./components/awards";
+@use "./components/logo-marquee";
 @use "./components/problem-solution";
 @use "./components/video-gallery";
 @use "./components/video";
@@ -27,4 +30,5 @@
 @use "./components/floating-contact";
 @use "./components/ai-chat";
 @use "./components/quill-custom";
+@use "./components/floating-mascot";
 @use "./base/mobile";

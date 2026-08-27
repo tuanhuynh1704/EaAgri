@@ -12,6 +12,7 @@
   "dependencies": {
     "@supabase/ssr": "^0.12.0",
     "@supabase/supabase-js": "^2.108.2",
+    "@types/three": "^0.185.4",
     "aos": "^2.3.4",
     "dotenv": "^17.4.2",
     "react": "^19.2.0",
@@ -20,7 +21,8 @@
     "react-quill-new": "^3.8.3",
     "react-router-dom": "^7.17.0",
     "remixicon": "^4.9.1",
-    "scrollreveal": "^4.0.9"
+    "scrollreveal": "^4.0.9",
+    "three": "^0.185.1"
   },
   "devDependencies": {
     "@eslint/js": "^9.39.1",

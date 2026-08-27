@@ -1,6 +1,157 @@
 @use "../abstracts/variables" as *;
 @use "../abstracts/mixins" as *;
 
+.architecture-tech-hero {
+  display: grid;
+  grid-template-columns: minmax(310px, 0.72fr) minmax(520px, 1.28fr);
+  align-items: center;
+  gap: clamp(2rem, 5vw, 5.5rem);
+  padding-top: clamp(2.5rem, 5vw, 5rem);
+  padding-bottom: clamp(3rem, 6vw, 6rem);
+
+  &__copy {
+    position: relative;
+    z-index: 2;
+  }
+
+  &__eyebrow {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.5rem;
+    margin-bottom: 1.15rem;
+    padding: 0.48rem 0.9rem;
+    border: 1px solid rgba(22, 145, 105, 0.2);
+    border-radius: 999px;
+    background: rgba(236, 253, 245, 0.76);
+    color: #08765c;
+    font-size: 0.73rem;
+    font-weight: 800;
+    letter-spacing: 0.11em;
+  }
+
+  h1 {
+    max-width: 560px;
+    margin: 0 0 1.2rem;
+    color: #153925;
+    font-size: clamp(2.2rem, 4vw, 4.1rem);
+    line-height: 1.02;
+    letter-spacing: -0.055em;
+  }
+
+  p {
+    max-width: 590px;
+    margin: 0;
+    color: #5e7466;
+    font-size: clamp(0.96rem, 1.25vw, 1.1rem);
+    line-height: 1.75;
+  }
+
+  &__signals {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.65rem;
+    margin-top: 1.7rem;
+
+    span {
+      display: inline-flex;
+      align-items: center;
+      gap: 0.42rem;
+      padding: 0.52rem 0.75rem;
+      border: 1px solid rgba(14, 116, 89, 0.12);
+      border-radius: 11px;
+      background: rgba(255, 255, 255, 0.74);
+      color: #28624b;
+      font-size: 0.78rem;
+      font-weight: 750;
+      box-shadow: 0 8px 24px rgba(24, 84, 60, 0.06);
+    }
+  }
+
+  &__visual {
+    position: relative;
+    overflow: hidden;
+    min-width: 0;
+    border: 1px solid rgba(92, 224, 211, 0.38);
+    border-radius: 30px;
+    background: #073d43;
+    box-shadow: 0 32px 70px rgba(14, 69, 67, 0.18);
+    isolation: isolate;
+
+    &::after {
+      content: "";
+      position: absolute;
+      inset: 0;
+      z-index: 2;
+      pointer-events: none;
+      border-radius: inherit;
+      box-shadow: inset 0 0 0 1px rgba(255, 255, 255, 0.2);
+      background: linear-gradient(135deg, rgba(255,255,255,0.1), transparent 34%, rgba(21, 128, 117, 0.08));
+    }
+
+    img {
+      display: block;
+      width: 100%;
+      aspect-ratio: 16 / 9;
+      object-fit: cover;
+      transition: transform 0.8s cubic-bezier(0.2, 0.8, 0.2, 1);
+    }
+
+    &:hover img { transform: scale(1.025); }
+  }
+
+  &__glow {
+    position: absolute;
+    inset: 12% 16%;
+    z-index: -1;
+    border-radius: 50%;
+    background: rgba(55, 234, 192, 0.34);
+    filter: blur(55px);
+  }
+
+  &__status {
+    position: absolute;
+    right: 1.15rem;
+    bottom: 1.15rem;
+    z-index: 3;
+    display: inline-flex;
+    align-items: center;
+    gap: 0.45rem;
+    padding: 0.55rem 0.78rem;
+    border: 1px solid rgba(255,255,255,0.25);
+    border-radius: 999px;
+    background: rgba(5, 46, 44, 0.76);
+    backdrop-filter: blur(12px);
+    color: #d9fff2;
+    font-size: 0.74rem;
+    font-weight: 750;
+
+    i { color: #45e6a8; }
+  }
+}
+
+@media (max-width: $laptop) {
+  .architecture-tech-hero {
+    grid-template-columns: 1fr;
+    gap: 2rem;
+    text-align: center;
+
+    &__copy, h1, p { margin-inline: auto; }
+    &__signals { justify-content: center; }
+    &__visual { width: min(100%, 900px); margin-inline: auto; }
+  }
+}
+
+@media (max-width: $mobile) {
+  .architecture-tech-hero {
+    padding-inline: 1rem;
+    padding-top: 1.5rem;
+
+    &__visual { border-radius: 20px; }
+    &__visual img { aspect-ratio: 4 / 3; object-position: center; }
+    &__status { right: 0.7rem; bottom: 0.7rem; font-size: 0.64rem; }
+  }
+}
+
 .video__section {
   text-align: center;
   position: relative;
