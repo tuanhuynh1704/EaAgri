@@ -731,6 +731,38 @@
   }
 }
 
+// Đồng bộ tỷ lệ với phần logo trên viewport 2K/4K hoặc khi trình duyệt
+// đang zoom-out. Chỉ phóng khối nội dung, nền section vẫn phủ đủ màn hình.
+@media (min-width: 2400px) and (max-width: 3199px) {
+  .durian-scanner-section {
+    min-height: 760px;
+  }
+
+  .durian-scanner-section__inner {
+    zoom: 1.35;
+  }
+}
+
+@media (min-width: 3200px) and (max-width: 4799px) {
+  .durian-scanner-section {
+    min-height: 1080px;
+  }
+
+  .durian-scanner-section__inner {
+    zoom: 2;
+  }
+}
+
+@media (min-width: 4800px) {
+  .durian-scanner-section {
+    min-height: 1380px;
+  }
+
+  .durian-scanner-section__inner {
+    zoom: 2.5;
+  }
+}
+
 @media (prefers-reduced-motion: reduce) {
   .durian-scan-laser,
   .durian-scan-reticle {
