@@ -27,6 +27,7 @@
     margin: 0;
     color: #667c72;
     font-size: clamp(0.9rem, 1.2vw, 1.02rem);
+    line-height: 1.55;
   }
 }
 
@@ -141,7 +142,12 @@
       font-size: 2.65vw;
     }
 
-    p { font-size: 1.05vw; }
+    p {
+      max-width: 64vw;
+      margin-inline: auto;
+      font-size: 1.05vw;
+      line-height: 1.55;
+    }
   }
 
   .logo-marquee__eyebrow {
