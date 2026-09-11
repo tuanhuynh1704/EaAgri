@@ -14,7 +14,7 @@ export default function Footer() {
           <div className="footer__logo-box" onClick={() => navigate("/")} title="EaAgri - Về trang chủ">
             <div className="footer__logo-icon-wrap">
               <img
-                src="/logo2.png"
+                src="/logo_v1.jpg"
                 alt="EaAgri Durian AI Mascot"
                 className="footer__logo-icon"
               />

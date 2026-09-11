@@ -92,7 +92,7 @@ const Navbar = () => {
     >
       <div className="nav__logo" onClick={handleHome}>
         <img
-          src="/logo_navbar.png"
+          src="/logo_banner.jpg"
           alt="EaAgri Logo"
           className="nav__logo-img"
         />
