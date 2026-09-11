@@ -10,6 +10,7 @@ import AccountManagement from "../pages/AccountManagement";
 import ManageNews from "../pages/ManageNews";
 
 import ArchitecturePage from "../pages/ArchitecturePage";
+import PrivacyPolicy from "../pages/PrivacyPolicy";
 
 export const router = createBrowserRouter([
   {
@@ -18,6 +19,9 @@ export const router = createBrowserRouter([
     children: [
       { path: "/", element: <HomePage /> },
       { path: "/architecture", element: <ArchitecturePage /> },
+      { path: "/privacy", element: <PrivacyPolicy /> },
+      { path: "/privacy-policy", element: <PrivacyPolicy /> },
+      { path: "/chinh-sach-bao-mat", element: <PrivacyPolicy /> },
       { path: "/news", element: <NewsList /> },
       { path: "/news/:id", element: <NewsDetail /> },
       { path: "/news/create", element: <UploadNews /> },

@@ -167,7 +167,15 @@ export default function Footer() {
           <div className="footer__bar-links">
             <a href="#">Điều khoản dịch vụ</a>
             <span className="footer__bar-divider"></span>
-            <a href="#">Chính sách bảo mật</a>
+            <a
+              href="/privacy"
+              onClick={(e) => {
+                e.preventDefault();
+                navigate("/privacy");
+              }}
+            >
+              Chính sách bảo mật
+            </a>
             <span className="footer__bar-divider"></span>
             <a href="#">Quy chuẩn VietGAP</a>
           </div>
