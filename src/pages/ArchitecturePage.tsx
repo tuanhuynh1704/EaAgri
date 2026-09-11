@@ -1,11 +1,35 @@
 import { useEffect } from "react";
+import { useSEO } from "../hooks/useSEO";
 import VideoSection from "../components/VideoSection";
 import StoryFeatureSection from "../components/StoryFeatureSection";
 import FeatureGrid from "../components/FeatureGrid";
 
 export default function ArchitecturePage() {
+    useSEO({
+        title: "Kiến Trúc Hệ Thống Nông Nghiệp Thông Minh IoT & AI",
+        description:
+            "Khám phá kiến trúc công nghệ Hybrid của EaAgri: Mạng lưới cảm biến độ ẩm đất đa tầng, bộ não kép AI Vision YOLOv9 và Gemini reasoning, hệ thống RAG và dự báo giá LSTM.",
+        keywords:
+            "Kiến trúc EaAgri, IoT nông nghiệp, AI Dual-Brain, YOLOv9 VietGAP, tưới tự động 3 lớp, LSTM dự báo giá",
+        canonicalUrl: "https://www.eaagri.vn/architecture",
+        structuredData: {
+            "@context": "https://schema.org",
+            "@type": "TechArticle",
+            "headline": "Kiến Trúc Hệ Thống Nông Nghiệp Thông Minh EaAgri (IoT & AI)",
+            "description": "Mô hình Hybrid kết hợp cảm biến IoT thời gian thực, AI thị giác máy tính và hệ thống RAG tri thức chuẩn hóa VietGAP.",
+            "url": "https://www.eaagri.vn/architecture",
+            "author": {
+                "@type": "Organization",
+                "name": "EaAgri Team"
+            },
+            "publisher": {
+                "@type": "Organization",
+                "name": "EaAgri"
+            }
+        }
+    });
+
     useEffect(() => {
-        document.title = "Kiến Trúc Hệ Thống IoT & AI | EaAgri";
         window.scrollTo(0, 0);
     }, []);
 

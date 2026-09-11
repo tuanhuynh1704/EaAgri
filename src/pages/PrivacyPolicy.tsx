@@ -1,8 +1,23 @@
 import { useEffect } from "react";
+import { useSEO } from "../hooks/useSEO";
 
 export default function PrivacyPolicy() {
+  useSEO({
+    title: "Chính Sách Bảo Mật Dữ Liệu",
+    description:
+      "Chính sách bảo mật và an toàn dữ liệu cá nhân, nhật ký canh tác và cảm biến IoT tại Hệ sinh thái Nông nghiệp Thông minh EaAgri.",
+    keywords: "chính sách bảo mật EaAgri, an toàn dữ liệu nông nghiệp, bảo mật IoT",
+    canonicalUrl: "https://www.eaagri.vn/privacy-policy",
+    structuredData: {
+      "@context": "https://schema.org",
+      "@type": "WebPage",
+      "name": "Chính Sách Bảo Mật Dữ Liệu | EaAgri",
+      "url": "https://www.eaagri.vn/privacy-policy",
+      "description": "Chính sách bảo mật thông tin và an toàn dữ liệu người dùng tại EaAgri."
+    }
+  });
+
   useEffect(() => {
-    document.title = "Chính sách bảo mật | EaAgri - Nông nghiệp Thông Minh";
     window.scrollTo(0, 0);
   }, []);
 

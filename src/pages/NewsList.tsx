@@ -1,5 +1,6 @@
 import { useEffect, useState } from "react";
 import { Link } from "react-router-dom";
+import { useSEO } from "../hooks/useSEO";
 import { supabase } from "../utils/supabase/client";
 import { useAuth } from "../context/AuthContext";
 import { cleanContent } from "../utils/cleanContent";
@@ -22,6 +23,22 @@ const stripHtml = (html: string) => {
 };
 
 export default function NewsList() {
+  useSEO({
+    title: "Bản Tin & Kiến Thức Nông Nghiệp Thông Minh",
+    description:
+      "Cập nhật tin tức thị trường giá sầu riêng, kỹ thuật canh tác VietGAP, cảnh báo sâu bệnh và dự báo thời tiết nông nghiệp mới nhất từ EaAgri.",
+    keywords:
+      "tin tức nông nghiệp, giá sầu riêng hôm nay, kỹ thuật sầu riêng VietGAP, cảnh báo sâu bệnh Đắk Lắk, bản tin EaAgri",
+    canonicalUrl: "https://www.eaagri.vn/news",
+    structuredData: {
+      "@context": "https://schema.org",
+      "@type": "CollectionPage",
+      "name": "Bản Tin & Kiến Thức Nông Nghiệp EaAgri",
+      "description": "Kho dữ liệu tin tức, giá cả thị trường và cẩm nang kỹ thuật canh tác nông nghiệp số.",
+      "url": "https://www.eaagri.vn/news"
+    }
+  });
+
   const [news, setNews] = useState<NewsItem[]>([]);
   const [loading, setLoading] = useState(true);
   const [selectedCategory, setSelectedCategory] = useState("Tất cả");
@@ -41,7 +58,6 @@ export default function NewsList() {
 
   // Fetch articles from Supabase on mount
   useEffect(() => {
-    document.title = "Tin Tức & Bản Tin Nông Nghiệp | EaAgri";
     window.scrollTo(0, 0);
     const fetchNews = async () => {
       setLoading(true);

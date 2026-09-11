@@ -1,5 +1,6 @@
 import { useEffect, useState } from "react";
 import { useParams, useNavigate, Link } from "react-router-dom";
+import { useSEO } from "../hooks/useSEO";
 import { supabase } from "../utils/supabase/client";
 import { useAuth } from "../context/AuthContext";
 import "react-quill-new/dist/quill.snow.css";
@@ -27,6 +28,52 @@ export default function NewsDetail() {
 
   const isSA = profile?.role === "SA";
 
+  const { url: imageUrl } = article ? parseImageUrlAndPosition(article.image_url) : { url: null };
+  const articleSnippet = article
+    ? (new DOMParser().parseFromString(cleanContent(article.content), "text/html").body.textContent || "")
+        .replace(/\s+/g, " ")
+        .trim()
+        .slice(0, 160)
+    : "";
+
+  useSEO({
+    title: article ? article.title : "Chi Tiết Bản Tin",
+    description: articleSnippet || "Xem chi tiết bài viết và kiến thức nông nghiệp từ EaAgri.",
+    keywords: article ? `${article.category}, ${article.title}, EaAgri tin tức` : undefined,
+    ogTitle: article ? article.title : undefined,
+    ogDescription: articleSnippet || undefined,
+    ogImage: imageUrl || undefined,
+    ogType: "article",
+    canonicalUrl: id ? `https://www.eaagri.vn/news/${id}` : undefined,
+    structuredData: article
+      ? {
+          "@context": "https://schema.org",
+          "@type": "NewsArticle",
+          "headline": article.title,
+          "description": articleSnippet,
+          "image": imageUrl ? [imageUrl] : ["https://www.eaagri.vn/logo_v1.jpg"],
+          "datePublished": article.created_at,
+          "dateModified": article.created_at,
+          "author": {
+            "@type": "Person",
+            "name": article.author || "EaAgri Editor"
+          },
+          "publisher": {
+            "@type": "Organization",
+            "name": "EaAgri",
+            "logo": {
+              "@type": "ImageObject",
+              "url": "https://www.eaagri.vn/logo_v1.jpg"
+            }
+          },
+          "mainEntityOfPage": {
+            "@type": "WebPage",
+            "@id": `https://www.eaagri.vn/news/${id}`
+          }
+        }
+      : undefined
+  });
+
   useEffect(() => {
     const fetchArticle = async () => {
       if (!id) return;
@@ -47,7 +94,6 @@ export default function NewsDetail() {
           setError("Không tìm thấy bài viết này.");
         } else {
           setArticle(data as NewsItem);
-          document.title = `${data.title} | EaAgri News`;
           window.scrollTo(0, 0);
         }
       } catch (err: any) {
