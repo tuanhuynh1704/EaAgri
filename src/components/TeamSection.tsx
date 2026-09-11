@@ -34,8 +34,8 @@ interface TeamMember {
   name: string;
   roleTag: string;
   task: string;
-  major: string;
-  id: string;
+  // major: string;
+  // id: string;
   avatar: string;
   themeColor: "green" | "blue" | "purple" | "orange";
   topIcon: string;
@@ -49,10 +49,10 @@ interface TeamMember {
 const teamMembers: TeamMember[] = [
   {
     name: "PHAN ĐĂNG HUY",
-    roleTag: "Founder & Project Leader",
-    task: "Nhà sáng lập - Điều phối dự án, phát triển sản phẩm và kiểm thử.",
-    major: "Khoa học dữ liệu",
-    id: "2311559215",
+    roleTag: "FOUNDER & CEO",
+    task: "Chiến lược sản phẩm - Điều phối - Gọi vốn",
+    // major: "Khoa học dữ liệu",
+    // id: "2311559215",
     avatar: "/huy.jpg",
     themeColor: "green",
     topIcon: "ri-shield-star-line",
@@ -64,10 +64,9 @@ const teamMembers: TeamMember[] = [
   },
   {
     name: "NGUYỄN ANH GIẢNG",
-    roleTag: "AI & Data Engineer",
-    task: "AI, dữ liệu và phát triển giải pháp.",
-    major: "Khoa học dữ liệu",
-    id: "2311558913",
+    roleTag: "CTO / AI & DATA LEAD",
+    task: "AI & dữ liệu - Kiến trúc kỹ thuật - Phát triển giải pháp",
+    // id: "2311558913",
     avatar: "/Giảng.jpg",
     themeColor: "blue",
     topIcon: "ri-brain-line",
@@ -79,10 +78,10 @@ const teamMembers: TeamMember[] = [
   },
   {
     name: "ĐẶNG VĂN CHUNG",
-    roleTag: "Technical Engineer",
-    task: "Hỗ trợ kỹ thuật và khảo sát.",
-    major: "Khoa học dữ liệu",
-    id: "2311559253",
+    roleTag: "FIELD OPERATION LEAD",
+    task: "Khảo sát vườn - Hỗ trợ kỹ thuật - Triển khai Pilot",
+    // major: "Khoa học dữ liệu",
+    // id: "2311559253",
     avatar: "/chung.jpg",
     themeColor: "purple",
     topIcon: "ri-code-s-slash-line",
@@ -94,10 +93,10 @@ const teamMembers: TeamMember[] = [
   },
   {
     name: "HUỲNH ANH TUẤN",
-    roleTag: "Product & Communication",
-    task: "Nội dung, truyền thông và vận hành.",
-    major: "Khoa học dữ liệu",
-    id: "2200005725",
+    roleTag: "GROWTH & OPERATIONS LEAD",
+    task: "Truyền thông - Onboarding người dùng - Vận hành.",
+    // major: "Khoa học dữ liệu",
+    // id: "2200005725",
     avatar: "/Tuấn.jpg",
     themeColor: "orange",
     topIcon: "ri-megaphone-line",
@@ -175,73 +174,73 @@ const TeamSection = () => {
     <>
       <section id="section-team" className="team-showcase fullpage-slide">
         <div className="team-showcase__container">
-        {/* TOP: Team Info Header */}
-        <div className="team-showcase__header" data-aos="fade-up">
-          <span className="team-showcase__label">
-            <span className="team-showcase__status-dot"></span>
-            EAAGRI / CORE TEAM
-          </span>
-          <h2 className="team-showcase__title">
-            Đội Ngũ <span className="team-showcase__title-highlight">Thực Hiện<i className="ri-cpu-line team-title-tech-icon"></i><span className="team-title-underline"></span></span>
-          </h2>
-          <p className="team-showcase__desc">
-            Dự án được thực hiện bởi sinh viên <span className="team-desc-highlight">Khoa Công nghệ Thông tin</span> — <span className="team-desc-highlight">Trường Đại học Nguyễn Tất Thành</span>.
-          </p>
-        </div>
+          {/* TOP: Team Info Header */}
+          <div className="team-showcase__header" data-aos="fade-up">
+            <span className="team-showcase__label">
+              <span className="team-showcase__status-dot"></span>
+              EAAGRI / CORE TEAM
+            </span>
+            <h2 className="team-showcase__title">
+              Đội Ngũ <span className="team-showcase__title-highlight">Vận Hành<i className="ri-cpu-line team-title-tech-icon"></i><span className="team-title-underline"></span></span>
+            </h2>
+            <p className="team-showcase__desc">
+              Dự án được thực hiện bởi sinh viên <span className="team-desc-highlight">Khoa Công nghệ Thông tin</span> — <span className="team-desc-highlight">Trường Đại học Nguyễn Tất Thành</span>.
+            </p>
+          </div>
 
-        {/* Member Cards Grid (Rectangular Photo Header - Image Top, Text Below) */}
-        <div className="team-showcase__cards" data-aos="fade-up" data-aos-delay="100">
-          {teamMembers.map((member, index) => (
-            <div
-              className={`team-card team-card--${member.themeColor}`}
-              key={index}
-              data-aos="fade-up"
-              data-aos-delay={150 + index * 80}
-            >
-              {/* Top Rounded Rectangular Image Box */}
-              <div className="team-card__image-box">
-                <span className="team-card__circuit-line" aria-hidden="true"></span>
-                {/* Floating Top Left Glass Badge Icon */}
-                <div className="team-card__top-icon">
-                  <i className={member.topIcon}></i>
+          {/* Member Cards Grid (Rectangular Photo Header - Image Top, Text Below) */}
+          <div className="team-showcase__cards" data-aos="fade-up" data-aos-delay="100">
+            {teamMembers.map((member, index) => (
+              <div
+                className={`team-card team-card--${member.themeColor}`}
+                key={index}
+                data-aos="fade-up"
+                data-aos-delay={150 + index * 80}
+              >
+                {/* Top Rounded Rectangular Image Box */}
+                <div className="team-card__image-box">
+                  <span className="team-card__circuit-line" aria-hidden="true"></span>
+                  {/* Floating Top Left Glass Badge Icon */}
+                  <div className="team-card__top-icon">
+                    <i className={member.topIcon}></i>
+                  </div>
+                  <span className="team-card__member-code">{member.memberCode}</span>
+
+                  {/* Rectangular Photo Avatar */}
+                  <img
+                    src={member.avatar}
+                    alt={member.name}
+                    className="team-card__rect-avatar-img"
+                  />
+
+                  {/* Role Pill Badge anchored at base of image */}
+                  <div className="team-card__role-pill">
+                    <span>{member.roleTag}</span>
+                  </div>
                 </div>
-                <span className="team-card__member-code">{member.memberCode}</span>
 
-                {/* Rectangular Photo Avatar */}
-                <img
-                  src={member.avatar}
-                  alt={member.name}
-                  className="team-card__rect-avatar-img"
-                />
+                {/* Text Content Below Image */}
+                <div className="team-card__body">
+                  {/* Member Name */}
+                  <h3 className="team-card__name">{member.name}</h3>
 
-                {/* Role Pill Badge anchored at base of image */}
-                <div className="team-card__role-pill">
-                  <span>{member.roleTag}</span>
+                  {/* Symmetrical Underline Accent */}
+                  <div className="team-card__name-accent"></div>
+
+                  {/* Task description */}
+                  <p className="team-card__task">{member.task}</p>
+
+                  {/* Bottom Skill Capsule Badge */}
+                  <div className="team-card__skill-pill">
+                    <i className={member.skillIcon}></i>
+                    {/* <span>{member.major}</span> */}
+                  </div>
                 </div>
               </div>
+            ))}
+          </div>
 
-              {/* Text Content Below Image */}
-              <div className="team-card__body">
-                {/* Member Name */}
-                <h3 className="team-card__name">{member.name}</h3>
-
-                {/* Symmetrical Underline Accent */}
-                <div className="team-card__name-accent"></div>
-
-                {/* Task description */}
-                <p className="team-card__task">{member.task}</p>
-
-                {/* Bottom Skill Capsule Badge */}
-                <div className="team-card__skill-pill">
-                  <i className={member.skillIcon}></i>
-                  <span>{member.major}</span>
-                </div>
-              </div>
-            </div>
-          ))}
-        </div>
-
-        <aside className="team-advisors" data-aos="fade-up" data-aos-delay="180" aria-label="Cố vấn chuyên môn">
+          {/* <aside className="team-advisors" data-aos="fade-up" data-aos-delay="180" aria-label="Cố vấn chuyên môn">
           <div className="team-advisors__intro">
             <span className="team-advisors__icon"><i className="ri-graduation-cap-line" /></span>
             <div>
@@ -254,20 +253,20 @@ const TeamSection = () => {
             <span><i className="ri-user-star-line" /> ThS. Phạm Đình Tài</span>
             <span><i className="ri-user-star-line" /> TS. Hoàng Thịnh Nhân</span>
           </div>
-        </aside>
-      </div>
-    </section>
+        </aside> */}
+        </div>
+      </section>
 
-    {/* BOTTOM: 3D Carousel Phone Showcase in the natural page flow */}
-    <section className="app-showcase-slide fullpage-slide">
-      <div
-        className="team-showcase__carousel-area"
-        data-aos="fade-up"
-        data-aos-delay="300"
-        onMouseEnter={() => setIsCarouselPaused(true)}
-        onMouseLeave={() => setIsCarouselPaused(false)}
-      >
-          <div 
+      {/* BOTTOM: 3D Carousel Phone Showcase in the natural page flow */}
+      <section className="app-showcase-slide fullpage-slide">
+        <div
+          className="team-showcase__carousel-area"
+          data-aos="fade-up"
+          data-aos-delay="300"
+          onMouseEnter={() => setIsCarouselPaused(true)}
+          onMouseLeave={() => setIsCarouselPaused(false)}
+        >
+          <div
             className="carousel-3d"
             onTouchStart={onTouchStart}
             onTouchMove={onTouchMove}
@@ -286,8 +285,8 @@ const TeamSection = () => {
               if (i === 4) positionClass = "far-right";
 
               return (
-                <div 
-                  key={imgIndex} 
+                <div
+                  key={imgIndex}
                   className={`phone-mockup ${positionClass}`}
                   onClick={() => setCurrentIndex(imgIndex)}
                   style={{ cursor: 'pointer' }}
