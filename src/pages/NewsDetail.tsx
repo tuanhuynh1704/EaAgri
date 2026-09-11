@@ -47,6 +47,8 @@ export default function NewsDetail() {
           setError("Không tìm thấy bài viết này.");
         } else {
           setArticle(data as NewsItem);
+          document.title = `${data.title} | EaAgri News`;
+          window.scrollTo(0, 0);
         }
       } catch (err: any) {
         console.error("Error fetching article:", err);

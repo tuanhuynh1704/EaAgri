@@ -1,8 +1,14 @@
+import { useEffect } from "react";
 import VideoSection from "../components/VideoSection";
 import StoryFeatureSection from "../components/StoryFeatureSection";
 import FeatureGrid from "../components/FeatureGrid";
 
 export default function ArchitecturePage() {
+    useEffect(() => {
+        document.title = "Kiến Trúc Hệ Thống IoT & AI | EaAgri";
+        window.scrollTo(0, 0);
+    }, []);
+
     return (
         <div className="section-bg--gradient-soft" style={{ paddingTop: '90px' }}>
             <section className="architecture-tech-hero section__container" data-aos="fade-up">

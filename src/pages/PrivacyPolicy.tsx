@@ -2,6 +2,7 @@ import { useEffect } from "react";
 
 export default function PrivacyPolicy() {
   useEffect(() => {
+    document.title = "Chính sách bảo mật | EaAgri - Nông nghiệp Thông Minh";
     window.scrollTo(0, 0);
   }, []);
 

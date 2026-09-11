@@ -9,25 +9,25 @@
     <image:image>
       <image:loc>https://www.eaagri.vn/logo_v1.jpg</image:loc>
       <image:title>Logo EaAgri - Nông nghiệp Thông Minh</image:title>
-      <image:caption>Logo chính thức của Hệ sinh thái Nông nghiệp Thông minh EaAgri</image:caption>
+      <image:caption>Hệ sinh thái Nông nghiệp Thông minh EaAgri tích hợp AI và IoT</image:caption>
     </image:image>
+  </url>
+  <url>
+    <loc>https://www.eaagri.vn/architecture</loc>
+    <lastmod>2026-09-11</lastmod>
+    <changefreq>weekly</changefreq>
+    <priority>0.8</priority>
+  </url>
+  <url>
+    <loc>https://www.eaagri.vn/news</loc>
+    <lastmod>2026-09-11</lastmod>
+    <changefreq>daily</changefreq>
+    <priority>0.8</priority>
   </url>
   <url>
     <loc>https://www.eaagri.vn/privacy-policy</loc>
     <lastmod>2026-09-11</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.5</priority>
-  </url>
-  <url>
-    <loc>https://www.eaagri.vn/kien-truc</loc>
-    <lastmod>2026-09-11</lastmod>
-    <changefreq>weekly</changefreq>
-    <priority>0.8</priority>
-  </url>
-  <url>
-    <loc>https://www.eaagri.vn/tin-tuc</loc>
-    <lastmod>2026-09-11</lastmod>
-    <changefreq>daily</changefreq>
-    <priority>0.8</priority>
   </url>
 </urlset>

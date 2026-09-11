@@ -41,6 +41,8 @@ export default function NewsList() {
 
   // Fetch articles from Supabase on mount
   useEffect(() => {
+    document.title = "Tin Tức & Bản Tin Nông Nghiệp | EaAgri";
+    window.scrollTo(0, 0);
     const fetchNews = async () => {
       setLoading(true);
       try {
