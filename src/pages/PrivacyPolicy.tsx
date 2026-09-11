@@ -12,29 +12,29 @@ export default function PrivacyPolicy() {
         <section className="privacy-page__hero" data-aos="fade-up">
           <div className="privacy-page__hero-left">
             <span className="privacy-page__eyebrow">
-              NỀN TẢNG INTELLIGENTPACK / AI + IOT
+              HỆ SINH THÁI NÔNG NGHIỆP THÔNG MINH EAAGRI / AI + IOT
             </span>
             <h1 className="privacy-page__title">
-              Chính sách bảo<br />mật của<br />IntelligentPack
+              Chính sách bảo<br />mật của<br />EaAgri
             </h1>
             <p className="privacy-page__desc">
-              Chính sách bảo mật này giải thích cách IntelligentPack thu thập, sử dụng và bảo vệ dữ liệu cho nền tảng giám sát bưu kiện dựa trên IoT và trí tuệ nhân tạo của mình.
+              Chính sách bảo mật này giải thích cách EaAgri thu thập, sử dụng và bảo vệ dữ liệu cho hệ sinh thái trợ lý nông nghiệp thông minh dựa trên nền tảng IoT và trí tuệ nhân tạo của chúng tôi.
             </p>
           </div>
 
           <div className="privacy-page__hero-right">
             <div className="privacy-page__badge-matrix">
               <div className="privacy-page__badge-item">
-                ĐO LƯỜNG TỪ XA IOT
+                CẢM BIẾN IOT NÔNG NGHIỆP
               </div>
               <div className="privacy-page__badge-item">
-                GIÁM SÁT QR
+                TRUY XUẤT NGUỒN GỐC QR
               </div>
               <div className="privacy-page__badge-item">
                 CẢNH BÁO THỜI GIAN THỰC
               </div>
               <div className="privacy-page__badge-item">
-                PHÂN TÍCH AI
+                TRỢ LÝ NÔNG NGHIỆP AI
               </div>
             </div>
           </div>
@@ -48,11 +48,11 @@ export default function PrivacyPolicy() {
               THÔNG TIN CHÚNG TÔI THU THẬP
             </h2>
             <ul className="privacy-page__list">
-              <li className="privacy-page__list-item">Địa chỉ email</li>
-              <li className="privacy-page__list-item">Thông tin tài khoản người dùng</li>
-              <li className="privacy-page__list-item">Dữ liệu đo từ xa của thiết bị IntelligentPack</li>
-              <li className="privacy-page__list-item">Thông tin gói hàng QR</li>
-              <li className="privacy-page__list-item">Phân tích sử dụng</li>
+              <li className="privacy-page__list-item">Địa chỉ email và số điện thoại liên lạc</li>
+              <li className="privacy-page__list-item">Thông tin tài khoản nông hộ / người dùng</li>
+              <li className="privacy-page__list-item">Dữ liệu đo từ xa của cảm biến IoT EaAgri (độ ẩm, nhiệt độ, pH đất)</li>
+              <li className="privacy-page__list-item">Thông tin mùa vụ, nhật ký canh tác và mã QR truy xuất</li>
+              <li className="privacy-page__list-item">Dữ liệu tương tác và phân tích sử dụng ứng dụng</li>
             </ul>
           </div>
 
@@ -62,11 +62,11 @@ export default function PrivacyPolicy() {
               CÁCH CHÚNG TÔI SỬ DỤNG THÔNG TIN
             </h2>
             <ul className="privacy-page__list">
-              <li className="privacy-page__list-item">Xác thực</li>
-              <li className="privacy-page__list-item">Giám sát gói hàng</li>
-              <li className="privacy-page__list-item">Cảnh báo thời gian thực</li>
-              <li className="privacy-page__list-item">phân tích dựa trên trí tuệ nhân tạo</li>
-              <li className="privacy-page__list-item">Hỗ trợ khách hàng</li>
+              <li className="privacy-page__list-item">Xác thực và bảo vệ tài khoản người dùng</li>
+              <li className="privacy-page__list-item">Giám sát điều kiện môi trường và sức khỏe cây trồng</li>
+              <li className="privacy-page__list-item">Gửi thông báo và cảnh báo sâu bệnh thời gian thực</li>
+              <li className="privacy-page__list-item">Phân tích chẩn đoán và đề xuất canh tác tối ưu bằng AI</li>
+              <li className="privacy-page__list-item">Hỗ trợ kỹ thuật và chăm sóc khách hàng/nhà nông</li>
             </ul>
           </div>
 
@@ -76,9 +76,9 @@ export default function PrivacyPolicy() {
               BẢO MẬT DỮ LIỆU
             </h2>
             <ul className="privacy-page__list">
-              <li className="privacy-page__list-item">Lưu trữ đám mây an toàn</li>
-              <li className="privacy-page__list-item">Giao tiếp được mã hóa</li>
-              <li className="privacy-page__list-item">Kiểm soát truy cập</li>
+              <li className="privacy-page__list-item">Lưu trữ đám mây bảo mật và độ sẵn sàng cao</li>
+              <li className="privacy-page__list-item">Giao tiếp truyền dẫn được mã hóa chuẩn SSL/TLS</li>
+              <li className="privacy-page__list-item">Kiểm soát và phân quyền truy cập dữ liệu nghiêm ngặt</li>
             </ul>
           </div>
 
@@ -88,9 +88,9 @@ export default function PrivacyPolicy() {
               QUYỀN CỦA NGƯỜI DÙNG
             </h2>
             <ul className="privacy-page__list">
-              <li className="privacy-page__list-item">Truy cập dữ liệu cá nhân</li>
-              <li className="privacy-page__list-item">Yêu cầu chỉnh sửa</li>
-              <li className="privacy-page__list-item">Yêu cầu xóa</li>
+              <li className="privacy-page__list-item">Truy cập và xem dữ liệu cá nhân & dữ liệu canh tác</li>
+              <li className="privacy-page__list-item">Yêu cầu cập nhật hoặc chỉnh sửa thông tin nông hộ</li>
+              <li className="privacy-page__list-item">Yêu cầu xóa tài khoản và dữ liệu liên quan</li>
             </ul>
           </div>
 
@@ -100,9 +100,10 @@ export default function PrivacyPolicy() {
               DỊCH VỤ CỦA BÊN THỨ BA
             </h2>
             <ul className="privacy-page__list">
-              <li className="privacy-page__list-item">Supabase</li>
-              <li className="privacy-page__list-item">Gửi lại email</li>
-              <li className="privacy-page__list-item">OpenAI (Phân tích AI)</li>
+              <li className="privacy-page__list-item">Supabase (Hạ tầng lưu trữ cơ sở dữ liệu & xác thực)</li>
+              <li className="privacy-page__list-item">Dịch vụ gửi email thông báo và xác nhận bảo mật</li>
+              <li className="privacy-page__list-item">Google Gemini / AI Models (Mô hình Trợ lý Nông nghiệp thông minh)</li>
+              <li className="privacy-page__list-item">Dịch vụ dữ liệu thời tiết và khí tượng chuyên sâu</li>
             </ul>
           </div>
         </div>
