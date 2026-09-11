@@ -1,0 +1,17 @@
+{
+  "name": "Ea Agri - Nông nghiệp Thông Minh",
+  "short_name": "EaAgri",
+  "description": "Hệ sinh thái nông nghiệp thông minh ứng dụng AI & IoT phục vụ bà con nông dân.",
+  "start_url": "/",
+  "display": "standalone",
+  "background_color": "#ffffff",
+  "theme_color": "#2e7d32",
+  "icons": [
+    {
+      "src": "/logo_v1.jpg",
+      "sizes": "192x192 512x512",
+      "type": "image/jpeg",
+      "purpose": "any maskable"
+    }
+  ]
+}
