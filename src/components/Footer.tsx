@@ -33,7 +33,7 @@ export default function Footer() {
           </p>
 
           <div className="footer__contact-list">
-            <a href="mailto:eaagri@eaagri.id.vn" className="footer__contact-chip" title="Gửi email liên hệ">
+            <a href="mailto:eaagri@eaagri.vn" className="footer__contact-chip" title="Gửi email liên hệ">
               <i className="ri-mail-send-line"></i>
               <span>eaagri@eaagri.id.vn</span>
             </a>

@@ -51,14 +51,18 @@
 
   .navbar-container.is-scrolled .nav__logo,
   .navbar-container.is-inner-page .nav__logo {
-    min-height: 50px;
-    padding: .3rem .55rem;
-    border-radius: 16px;
+    min-height: 48px;
+    padding: .25rem .7rem;
+    border-radius: 999px;
 
-    .nav__logo-img { width: 72px; height: auto; }
+    .nav__logo-img { width: auto; height: 38px; max-width: 130px; }
   }
 
-  .nav__logo .nav__logo-img { width: 76px; height: auto; }
+  .nav__logo {
+    padding: .2rem .35rem;
+
+    .nav__logo-img { width: auto; height: 50px; max-width: 145px; }
+  }
   .nav__right-capsule { margin-left: auto; gap: .35rem !important; }
 
   .navbar-container.is-scrolled .nav__right-capsule {
