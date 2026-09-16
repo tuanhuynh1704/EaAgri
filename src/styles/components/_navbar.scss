@@ -64,14 +64,18 @@ nav.navbar-container.is-hidden {
   transition: all 0.35s cubic-bezier(0.16, 1, 0.3, 1);
 
   .nav__logo-img {
-    height: 64px;
+    height: 110px;
     width: auto;
     object-fit: contain;
     transition: transform 0.3s ease, filter 0.3s ease;
-    filter: drop-shadow(0 4px 12px rgba(0, 0, 0, 0.06));
+    filter: drop-shadow(0 4px 14px rgba(0, 0, 0, 0.08));
+
+    @media (max-width: $tablet) {
+      height: 90px;
+    }
 
     @media (max-width: $mobile) {
-      height: 50px;
+      height: 54px;
     }
   }
 
@@ -496,16 +500,20 @@ nav.navbar-container.is-hidden {
     backdrop-filter: blur(18px);
     -webkit-backdrop-filter: blur(18px);
     border: 1px solid rgba(255, 255, 255, 0.88);
-    padding: 0.28rem 1.1rem 0.28rem 0.9rem;
+    padding: 0.32rem 1.4rem 0.32rem 1.1rem;
     box-shadow:
       0 10px 30px rgba(18, 60, 42, 0.08),
       inset 0 1px 0 rgba(255, 255, 255, 0.95);
 
     .nav__logo-img {
-      height: 44px;
+      height: 64px;
+
+      @media (max-width: $tablet) {
+        height: 52px;
+      }
 
       @media (max-width: $mobile) {
-        height: 38px;
+        height: 42px;
       }
     }
   }
