@@ -394,3 +394,412 @@
   from { transform: rotate(0deg); }
   to { transform: rotate(360deg); }
 }
+
+// ==========================================
+// COOPERATION CONTACT MODAL
+// ==========================================
+.coop-modal__backdrop {
+  position: fixed;
+  inset: 0;
+  z-index: 9999;
+  background: rgba(8, 24, 18, 0.65);
+  backdrop-filter: blur(8px);
+  -webkit-backdrop-filter: blur(8px);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 1rem;
+  animation: coopFadeIn 0.25s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+.coop-modal__dialog {
+  background: #ffffff;
+  border: 1px solid rgba(16, 185, 129, 0.2);
+  border-radius: 24px;
+  width: 100%;
+  max-width: 620px;
+  max-height: 90vh;
+  display: flex;
+  flex-direction: column;
+  box-shadow: 
+    0 25px 50px -12px rgba(6, 78, 59, 0.25),
+    0 0 0 1px rgba(16, 185, 129, 0.08);
+  animation: coopScaleUp 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+  overflow: hidden;
+}
+
+.coop-modal__header {
+  position: relative;
+  padding: 1.75rem 2rem 1.25rem;
+  background: linear-gradient(135deg, rgba(236, 253, 245, 0.9), rgba(240, 253, 250, 0.7));
+  border-bottom: 1px solid rgba(16, 185, 129, 0.15);
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 1rem;
+
+  @media (max-width: $mobile) {
+    padding: 1.25rem 1.25rem 1rem;
+  }
+}
+
+.coop-modal__header-content {
+  flex: 1;
+}
+
+.coop-modal__badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.35rem;
+  font-size: 0.72rem;
+  font-weight: 800;
+  letter-spacing: 0.8px;
+  text-transform: uppercase;
+  color: #047857;
+  background: rgba(16, 185, 129, 0.15);
+  border: 1px solid rgba(16, 185, 129, 0.3);
+  padding: 0.2rem 0.6rem;
+  border-radius: 999px;
+  margin-bottom: 0.5rem;
+
+  i {
+    font-size: 0.85rem;
+    color: #10b981;
+  }
+}
+
+.coop-modal__title {
+  font-size: 1.45rem;
+  font-weight: 850;
+  color: #064e3b;
+  margin: 0 0 0.35rem;
+  line-height: 1.2;
+
+  @media (max-width: $mobile) {
+    font-size: 1.25rem;
+  }
+}
+
+.coop-modal__desc {
+  font-size: 0.85rem;
+  color: #335345;
+  margin: 0;
+  line-height: 1.45;
+}
+
+.coop-modal__close-btn {
+  background: rgba(255, 255, 255, 0.85);
+  border: 1px solid rgba(0, 0, 0, 0.08);
+  color: #4b5563;
+  width: 36px;
+  height: 36px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 1.25rem;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  flex-shrink: 0;
+
+  &:hover {
+    background: #fee2e2;
+    color: #ef4444;
+    border-color: #fca5a5;
+    transform: rotate(90deg);
+  }
+}
+
+.coop-modal__body {
+  padding: 1.75rem 2rem 2rem;
+  overflow-y: auto;
+  flex: 1;
+
+  @media (max-width: $mobile) {
+    padding: 1.25rem;
+  }
+}
+
+.coop-modal__form {
+  display: flex;
+  flex-direction: column;
+  gap: 1.15rem;
+}
+
+.coop-modal__alert {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  padding: 0.75rem 1rem;
+  border-radius: 12px;
+  font-size: 0.85rem;
+  font-weight: 600;
+
+  &--error {
+    background: #fef2f2;
+    border: 1px solid #fecaca;
+    color: #b91c1c;
+
+    i {
+      font-size: 1.1rem;
+    }
+  }
+}
+
+.coop-modal__row {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 1rem;
+
+  @media (max-width: 600px) {
+    grid-template-columns: 1fr;
+    gap: 1.15rem;
+  }
+}
+
+.coop-modal__field {
+  display: flex;
+  flex-direction: column;
+  gap: 0.4rem;
+
+  label {
+    font-size: 0.82rem;
+    font-weight: 700;
+    color: #1e293b;
+    display: flex;
+    align-items: center;
+    gap: 0.25rem;
+  }
+}
+
+.coop-modal__req {
+  color: #ef4444;
+  font-weight: 800;
+}
+
+.coop-modal__input-wrap {
+  position: relative;
+  display: flex;
+  align-items: center;
+
+  > i {
+    position: absolute;
+    left: 0.9rem;
+    font-size: 1.05rem;
+    color: #94a3b8;
+    pointer-events: none;
+    transition: color 0.2s ease;
+  }
+
+  input,
+  select,
+  textarea {
+    width: 100%;
+    padding: 0.72rem 0.9rem 0.72rem 2.55rem;
+    background: #f8fafc;
+    border: 1.5px solid #e2e8f0;
+    border-radius: 12px;
+    font-size: 0.88rem;
+    color: #0f172a;
+    outline: none;
+    font-family: inherit;
+    transition: all 0.2s cubic-bezier(0.16, 1, 0.3, 1);
+
+    &::placeholder {
+      color: #94a3b8;
+    }
+
+    &:focus {
+      background: #ffffff;
+      border-color: #10b981;
+      box-shadow: 0 0 0 4px rgba(16, 185, 129, 0.12);
+
+      + i,
+      ~ i {
+        color: #10b981;
+      }
+    }
+  }
+
+  select {
+    cursor: pointer;
+    appearance: none;
+    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' fill='none' viewBox='0 0 24 24' stroke='%2364748b'%3E%3Cpath stroke-linecap='round' stroke-linejoin='round' stroke-width='2' d='M19 9l-7 7-7-7'%3E%3C/path%3E%3C/svg%3E");
+    background-repeat: no-repeat;
+    background-position: right 0.85rem center;
+    background-size: 1rem;
+    padding-right: 2.3rem;
+  }
+
+  &--textarea {
+    align-items: flex-start;
+
+    textarea {
+      padding: 0.75rem 0.9rem;
+      resize: vertical;
+      min-height: 80px;
+    }
+  }
+
+  &:focus-within > i {
+    color: #10b981;
+  }
+}
+
+.coop-modal__footer {
+  margin-top: 0.5rem;
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+}
+
+.coop-modal__submit-btn {
+  width: 100%;
+  padding: 0.85rem 1.5rem;
+  border-radius: 14px;
+  font-size: 0.95rem;
+  font-weight: 750;
+  background: linear-gradient(135deg, #10b981, #059669);
+  color: #ffffff;
+  border: none;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.5rem;
+  box-shadow: 0 6px 18px rgba(16, 185, 129, 0.28);
+  transition: all 0.25s cubic-bezier(0.16, 1, 0.3, 1);
+
+  &:hover:not(:disabled) {
+    transform: translateY(-2px);
+    box-shadow: 0 8px 22px rgba(16, 185, 129, 0.36);
+    background: linear-gradient(135deg, #059669, #047857);
+  }
+
+  &:disabled {
+    opacity: 0.7;
+    cursor: not-allowed;
+    transform: none;
+  }
+}
+
+.coop-modal__spinner {
+  animation: spin 1s linear infinite;
+}
+
+.coop-modal__direct-contact {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-wrap: wrap;
+  gap: 0.5rem;
+  font-size: 0.82rem;
+  color: #64748b;
+}
+
+.coop-modal__contact-link {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.3rem;
+  color: #059669;
+  font-weight: 700;
+  text-decoration: none;
+  transition: color 0.2s ease;
+
+  &:hover {
+    color: #047857;
+    text-decoration: underline;
+  }
+}
+
+// SUCCESS VIEW
+.coop-modal__success-view {
+  text-align: center;
+  padding: 1.5rem 1rem;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  animation: coopScaleUp 0.35s cubic-bezier(0.16, 1, 0.3, 1);
+
+  .coop-modal__success-icon {
+    width: 68px;
+    height: 68px;
+    border-radius: 50%;
+    background: #ecfdf5;
+    color: #10b981;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 2.5rem;
+    margin-bottom: 1.25rem;
+    box-shadow: 0 8px 24px rgba(16, 185, 129, 0.2);
+  }
+
+  h4 {
+    font-size: 1.35rem;
+    font-weight: 850;
+    color: #064e3b;
+    margin: 0 0 0.75rem;
+  }
+
+  p {
+    font-size: 0.9rem;
+    line-height: 1.6;
+    color: #334155;
+    max-width: 440px;
+    margin: 0 0 1.75rem;
+
+    strong {
+      color: #047857;
+    }
+  }
+}
+
+.coop-modal__success-actions {
+  display: flex;
+  gap: 0.85rem;
+  flex-wrap: wrap;
+  justify-content: center;
+  width: 100%;
+}
+
+.coop-modal__btn-done {
+  padding: 0.75rem 1.6rem;
+  border-radius: 12px;
+  font-weight: 700;
+}
+
+.coop-modal__btn-social {
+  padding: 0.75rem 1.4rem;
+  border-radius: 12px;
+  font-weight: 700;
+  background: #1877f2;
+  color: #ffffff;
+  display: inline-flex;
+  align-items: center;
+  gap: 0.45rem;
+  text-decoration: none;
+  transition: all 0.2s ease;
+
+  &:hover {
+    background: #166fe5;
+    transform: translateY(-1px);
+    box-shadow: 0 4px 14px rgba(24, 119, 242, 0.3);
+  }
+}
+
+@keyframes coopFadeIn {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}
+
+@keyframes coopScaleUp {
+  from {
+    opacity: 0;
+    transform: scale(0.94) translateY(12px);
+  }
+  to {
+    opacity: 1;
+    transform: scale(1) translateY(0);
+  }
+}
