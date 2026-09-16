@@ -105,7 +105,7 @@ export default function Login() {
       {/* Full-screen Background Banner Image */}
       <div className="auth-page__bg" style={{ backgroundImage: "url('/Banner 3.png')" }}></div>
       <div className="auth-page__overlay"></div>
-      
+
       {/* Animated Falling Leaves across the entire viewport */}
       <div className="auth-page__leaves" aria-hidden="true">
         {fallingLeaves.map((leaf) => (
@@ -130,7 +130,7 @@ export default function Login() {
           <div className="auth-page__online"><i /> Hệ thống đang hoạt động ổn định</div>
         </aside>
         <div className="auth-page__card" data-aos="zoom-in">
-          
+
 
 
           {/* Toggle Title */}
@@ -151,7 +151,7 @@ export default function Login() {
 
           {/* Authentication Form */}
           <form onSubmit={handleSubmit} className="auth-page__form">
-            
+
             {/* Email */}
             <div className="auth-page__group">
               <label htmlFor="email">Email</label>
@@ -196,9 +196,9 @@ export default function Login() {
             </div>
 
             {/* Submit Button */}
-            <button 
-              type="submit" 
-              className="auth-page__submit" 
+            <button
+              type="submit"
+              className="auth-page__submit"
               disabled={isLoading}
             >
               {isLoading ? (
