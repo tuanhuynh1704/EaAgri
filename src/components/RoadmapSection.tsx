@@ -101,6 +101,7 @@ export default function RoadmapSection() {
           organization: formData.organization.trim() || null,
           cooperation_type: formData.cooperationType,
           message: formData.message.trim() || null,
+          status: "pending",
           created_at: new Date().toISOString()
         }
       ]);

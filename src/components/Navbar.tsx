@@ -187,6 +187,18 @@ const Navbar = () => {
                           className="nav__user-dropdown-item"
                           onClick={() => {
                             setIsUserMenuOpen(false);
+                            navigate("/admin/cooperation");
+                          }}
+                        >
+                          <i className="ri-shake-hands-line" />
+                          <span>Quản lý hợp tác</span>
+                        </button>
+
+                        <button
+                          type="button"
+                          className="nav__user-dropdown-item"
+                          onClick={() => {
+                            setIsUserMenuOpen(false);
                             navigate("/admin/news");
                           }}
                         >

@@ -8,6 +8,7 @@ import Login from "../pages/Login";
 import Register from "../pages/Register";
 import AccountManagement from "../pages/AccountManagement";
 import ManageNews from "../pages/ManageNews";
+import ManageCooperation from "../pages/ManageCooperation";
 
 import ArchitecturePage from "../pages/ArchitecturePage";
 import PrivacyPolicy from "../pages/PrivacyPolicy";
@@ -28,7 +29,8 @@ export const router = createBrowserRouter([
       { path: "/login", element: <Login /> },
       { path: "/register", element: <Register /> },
       { path: "/admin/accounts", element: <AccountManagement /> },
-      { path: "/admin/news", element: <ManageNews /> }
+      { path: "/admin/news", element: <ManageNews /> },
+      { path: "/admin/cooperation", element: <ManageCooperation /> },
     ]
   },
 ]);
