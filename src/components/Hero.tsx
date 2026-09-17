@@ -1,5 +1,6 @@
 import { useMemo, useState, useEffect, type CSSProperties, type MouseEvent } from "react";
 import EaAgriDurian from "./eaagri-3d/EaAgriDurian";
+import { triggerAppStoreNotice } from "./AppStoreNoticeModal";
 
 const ROTATING_HIGHLIGHTS = [
   { text: "thông minh", tag: "AI • IoT • DATA" },
@@ -231,7 +232,15 @@ const Hero = () => {
           </p>
 
           <div className="hero-download-links">
-            <a href="#" className="download-btn">
+            <a
+              href="#app-store"
+              className="download-btn"
+              onClick={(e) => {
+                e.preventDefault();
+                triggerAppStoreNotice();
+              }}
+              title="Tải về trên App Store (iOS)"
+            >
               <span className="download-btn__icon apple-store-icon">
                 <i className="ri-apple-fill"></i>
               </span>
