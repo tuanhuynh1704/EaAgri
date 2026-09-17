@@ -64,18 +64,18 @@ nav.navbar-container.is-hidden {
   transition: all 0.35s cubic-bezier(0.16, 1, 0.3, 1);
 
   .nav__logo-img {
-    height: 110px;
+    height: 180px;
     width: auto;
     object-fit: contain;
     transition: transform 0.3s ease, filter 0.3s ease;
     filter: drop-shadow(0 4px 14px rgba(0, 0, 0, 0.08));
 
     @media (max-width: $tablet) {
-      height: 90px;
+      height: 145px;
     }
 
     @media (max-width: $mobile) {
-      height: 54px;
+      height: 95px;
     }
   }
 
@@ -496,31 +496,37 @@ nav.navbar-container.is-hidden {
   top: 1.15rem;
 
   .nav__logo {
-    background: rgba(255, 255, 255, 0.92);
+    background: rgba(255, 255, 255, 0.94);
     backdrop-filter: blur(18px);
     -webkit-backdrop-filter: blur(18px);
     border: 1px solid rgba(255, 255, 255, 0.88);
-    padding: 0.28rem 0.85rem;
-    min-height: 46px;
+    padding: 0.35rem 1.4rem;
+    min-height: 52px;
     display: inline-flex;
     align-items: center;
     justify-content: center;
     border-radius: 999px;
+    overflow: hidden;
     box-shadow:
       0 10px 30px rgba(18, 60, 42, 0.08),
       inset 0 1px 0 rgba(255, 255, 255, 0.95);
 
     .nav__logo-img {
-      height: 36px;
+      height: 72px;
       width: auto;
+      max-width: none;
       object-fit: contain;
+      transform: scale(1.48);
+      transform-origin: center;
 
       @media (max-width: $tablet) {
-        height: 32px;
+        height: 60px;
+        transform: scale(1.35);
       }
 
       @media (max-width: $mobile) {
-        height: 28px;
+        height: 48px;
+        transform: scale(1.28);
       }
     }
   }

@@ -51,17 +51,18 @@
 
   .navbar-container.is-scrolled .nav__logo,
   .navbar-container.is-inner-page .nav__logo {
-    min-height: 40px;
-    padding: .2rem .6rem;
+    min-height: 48px;
+    padding: .22rem .9rem;
     border-radius: 999px;
+    overflow: hidden;
 
-    .nav__logo-img { width: auto; height: 28px; max-width: 110px; }
+    .nav__logo-img { width: auto; height: 48px; max-width: none; transform: scale(1.28); }
   }
 
   .nav__logo {
     padding: .2rem .35rem;
 
-    .nav__logo-img { width: auto; height: 50px; max-width: 145px; }
+    .nav__logo-img { width: auto; height: 95px; max-width: none; }
   }
   .nav__right-capsule { margin-left: auto; gap: .35rem !important; }
 
