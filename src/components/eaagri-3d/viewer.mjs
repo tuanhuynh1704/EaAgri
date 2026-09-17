@@ -25,6 +25,14 @@ const glyph = {
   irrigation: "≈",
   assistant: "✧",
 };
+const HOTSPOT_OFFSETS = Object.freeze({
+  assistant: new T.Vector3(0.46, 0.48, 0.05), // Dời nút trợ lý lên phía trên bên phải, hoàn toàn không che mặt nông dân
+  overview: new T.Vector3(0, 0.42, 0),        // Dời lên cao phía trên tán lá đỉnh
+  weather: new T.Vector3(0.34, 0.32, 0),      // Dời chếch lên phía ngoài trạm thời tiết
+  soil: new T.Vector3(-0.4, 0.22, 0),         // Dời ra phía ngoài bên trái cảm biến đất
+  disease: new T.Vector3(0, 0.32, 0),         // Dời lên cao phía trên trái sầu riêng
+  irrigation: new T.Vector3(0.36, -0.05, 0),  // Dời sang phía ngoài máy bơm nước
+});
 const active = new WeakMap();
 const node = (tag, cls, text) => {
   const e = document.createElement(tag);
@@ -271,7 +279,7 @@ export function createEaAgriScene(container, options = {}) {
       data.source === "live"
         ? "Dữ liệu do website cung cấp"
         : data.source === "demo"
-          ? "DỮ LIỆU MINH HOẠ"
+          ? ""
           : "CHƯA KẾT NỐI DỮ LIỆU";
     cardValues.get("overview").value.textContent = data.treeName || "Sầu riêng";
     cardValues.get("overview").sub.textContent =
@@ -337,21 +345,22 @@ export function createEaAgriScene(container, options = {}) {
   const resizeObserver = new ResizeObserver(resize);
   resizeObserver.observe(root);
   function updateCamera() {
-    // Fit a 7.4m wide, 7m tall bounding envelope in any host container.
+    // Generous bounding envelope so foliage and ground are never clipped.
     const vFov = (camera.fov * Math.PI) / 180,
       hFov = 2 * Math.atan(Math.tan(vFov / 2) * camera.aspect);
     const dist =
-      Math.max(3.7 / Math.tan(hFov / 2), 3.65 / Math.tan(vFov / 2)) / zoom;
+      Math.max(4.2 / Math.tan(hFov / 2), 4.1 / Math.tan(vFov / 2)) / zoom;
     focusPoint.lerp(targetFocusPoint, 0.14);
     camera.position.set(
       focusPoint.x,
-      focusPoint.y + dist * 0.205,
+      focusPoint.y + dist * 0.19,
       focusPoint.z + dist,
     );
     camera.lookAt(focusPoint);
     camera.updateMatrixWorld();
   }
   const worldPosition = new T.Vector3();
+  const offsetVector = new T.Vector3();
   function updatePins() {
     if (!model) return;
     model.updateMatrixWorld(true);
@@ -366,6 +375,10 @@ export function createEaAgriScene(container, options = {}) {
         return;
       }
       anchor.getWorldPosition(worldPosition);
+      if (HOTSPOT_OFFSETS[id]) {
+        offsetVector.copy(HOTSPOT_OFFSETS[id]).applyEuler(pivot.rotation);
+        worldPosition.add(offsetVector);
+      }
       worldPosition.project(camera);
       pin.hidden =
         worldPosition.z > 1 ||

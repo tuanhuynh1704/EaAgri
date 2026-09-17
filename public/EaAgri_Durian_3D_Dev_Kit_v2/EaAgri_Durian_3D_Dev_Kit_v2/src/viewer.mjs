@@ -271,7 +271,7 @@ export function createEaAgriScene(container, options = {}) {
       data.source === "live"
         ? "Dữ liệu do website cung cấp"
         : data.source === "demo"
-          ? "DỮ LIỆU MINH HOẠ"
+          ? ""
           : "CHƯA KẾT NỐI DỮ LIỆU";
     cardValues.get("overview").value.textContent = data.treeName || "Sầu riêng";
     cardValues.get("overview").sub.textContent =

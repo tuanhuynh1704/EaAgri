@@ -7,7 +7,7 @@
   isolation: isolate;
   font-family: inherit;
   color: #16483e;
-  overflow: hidden;
+  overflow: visible;
   container-type: inline-size;
 }
 .ea3d * {
@@ -82,11 +82,13 @@
   font: 600 19px/1 system-ui;
   transition:
     background 0.2s,
-    box-shadow 0.2s;
+    box-shadow 0.2s,
+    transform 0.2s;
 }
 .ea3d-pin:hover,
 .ea3d-pin[aria-pressed="true"] {
   background: #074f42;
+  transform: translate(-50%, -50%) scale(1.1);
   box-shadow:
     0 0 0 8px #63dab447,
     0 4px 18px #063b3033;
@@ -99,7 +101,7 @@
   position: absolute;
   inset: 0;
   pointer-events: none;
-  z-index: 2;
+  z-index: 4;
 }
 .ea3d-card {
   position: absolute;
@@ -107,80 +109,90 @@
   flex-direction: column;
   gap: 5px;
   text-align: left;
-  width: 150px;
-  max-width: 27%;
-  padding: 12px;
-  border: 1px solid #74d3c977;
-  border-radius: 12px;
-  background: linear-gradient(140deg, #124554ed, #12565ce8);
+  width: 172px;
+  padding: 12px 14px;
+  border: 1px solid rgba(116, 220, 201, 0.42);
+  border-radius: 14px;
+  background: linear-gradient(135deg, rgba(14, 52, 60, 0.88), rgba(15, 68, 72, 0.82));
   color: #eefff9;
-  box-shadow: 0 10px 28px #12453222;
+  box-shadow: 0 12px 30px rgba(10, 40, 30, 0.28), 0 0 14px rgba(60, 200, 150, 0.12);
   pointer-events: auto;
   cursor: pointer;
   font-family: inherit;
-  backdrop-filter: blur(10px);
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+  transition:
+    transform 0.26s cubic-bezier(0.34, 1.56, 0.64, 1),
+    border-color 0.26s ease,
+    box-shadow 0.26s ease,
+    background 0.26s ease;
 }
 .ea3d-card:hover {
   border-color: #8affda;
-  background: #124953;
+  background: rgba(18, 73, 83, 0.94);
+  transform: translateY(-4px) scale(1.03);
+  box-shadow: 0 16px 36px rgba(10, 40, 30, 0.38), 0 0 20px rgba(80, 230, 180, 0.25);
 }
 .ea3d-card.is-selected {
   border-color: #a8ffe0;
   box-shadow:
-    0 0 0 3px #68dcb555,
-    0 14px 32px #12453244;
+    0 0 0 3px rgba(104, 220, 181, 0.4),
+    0 16px 36px rgba(18, 69, 50, 0.4);
   transform: translateY(-3px) rotate(0deg);
 }
 .ea3d-card-overview {
-  left: 0;
-  top: 11%;
-  transform: rotate(-3deg);
+  left: -48px;
+  top: 6%;
+  transform: rotate(-2.5deg);
 }
 .ea3d-card-soil {
-  left: 0;
-  top: 58%;
-  transform: rotate(-2deg);
+  left: -52px;
+  top: 62%;
+  transform: rotate(-1.5deg);
 }
 .ea3d-card-weather {
-  right: 0;
-  top: 12%;
-  transform: rotate(3deg);
+  right: -48px;
+  top: 7%;
+  transform: rotate(2.5deg);
 }
 .ea3d-card-disease {
-  right: 0;
-  top: 59%;
-  transform: rotate(2deg);
+  right: -52px;
+  top: 62%;
+  transform: rotate(1.5deg);
 }
 .ea3d-card-title {
   font-size: 12px;
   font-weight: 600;
-  color: #aaf3cf;
+  color: #87e9c5;
+  letter-spacing: 0.02em;
 }
 .ea3d-card-value {
-  font-size: 22px;
-  font-weight: 650;
+  font-size: 20px;
+  font-weight: 700;
   line-height: 1.15;
   letter-spacing: -0.02em;
+  color: #ffffff;
 }
 .ea3d-card-sub {
   font-size: 12px;
-  line-height: 1.4;
+  line-height: 1.38;
   color: #bfdad2;
   overflow-wrap: anywhere;
 }
 .ea3d-toolbar {
   position: absolute;
   z-index: 5;
-  bottom: 29px;
+  bottom: 22px;
   left: 50%;
   transform: translateX(-50%);
   display: flex;
   gap: 4px;
-  padding: 5px;
-  border: 1px solid #247b6630;
+  padding: 4px 6px;
+  border: 1px solid rgba(36, 123, 102, 0.22);
   border-radius: 40px;
-  background: #ffffffdc;
-  box-shadow: 0 6px 20px #174c3b0d;
+  background: rgba(255, 255, 255, 0.88);
+  box-shadow: 0 6px 20px rgba(23, 76, 59, 0.1);
+  backdrop-filter: blur(8px);
 }
 .ea3d-button {
   width: 36px;
@@ -193,20 +205,22 @@
   font: 500 21px/1 system-ui;
   display: grid;
   place-items: center;
+  transition: background 0.18s ease;
 }
 .ea3d-button:hover {
   background: #dff3e9;
 }
 .ea3d-hint {
   position: absolute;
-  bottom: 10px;
+  bottom: 4px;
   left: 50%;
   transform: translateX(-50%);
-  font-size: 12px;
+  font-size: 11.5px;
   white-space: nowrap;
-  color: #537d6e;
+  color: #436d5e;
   z-index: 4;
   pointer-events: none;
+  opacity: 0.9;
 }
 .ea3d-source {
   position: absolute;
@@ -226,10 +240,10 @@
   transform: translateX(-50%);
   padding: 16px 36px 16px 18px;
   z-index: 6;
-  border: 1px solid #7ab99f55;
+  border: 1px solid rgba(122, 185, 159, 0.45);
   border-radius: 15px;
-  background: #fffffff2;
-  box-shadow: 0 10px 45px #153e2729;
+  background: rgba(255, 255, 255, 0.94);
+  box-shadow: 0 10px 45px rgba(21, 62, 39, 0.18);
   backdrop-filter: blur(12px);
 }
 .ea3d-details h3 {
@@ -257,46 +271,70 @@
   cursor: pointer;
   border-radius: 50%;
 }
-@container (max-width:500px) {
+@container (max-width:580px) {
   .ea3d-card {
-    width: 124px;
-    padding: 9px;
-    max-width: 31%;
+    width: 142px;
+    padding: 10px 11px;
     gap: 4px;
   }
+  .ea3d-card-overview {
+    left: -12px;
+    top: 5%;
+  }
+  .ea3d-card-weather {
+    right: -12px;
+    top: 6%;
+  }
+  .ea3d-card-soil {
+    left: -12px;
+    top: 60%;
+  }
+  .ea3d-card-disease {
+    right: -12px;
+    top: 60%;
+  }
   .ea3d-card-value {
-    font-size: 18px;
+    font-size: 17px;
   }
   .ea3d-card-title,
   .ea3d-card-sub {
-    font-size: 12px;
-  }
-  .ea3d-card-disease {
-    top: 62%;
-  }
-  .ea3d-card-soil {
-    top: 61%;
+    font-size: 11.5px;
   }
   .ea3d-pin {
     width: 34px;
     height: 34px;
   }
-  .ea3d-source {
-    font-size: 12px;
-    left: 8px;
-  }
 }
-@container (max-width:360px) {
-  .ea3d-card-disease,
-  .ea3d-card-soil {
-    display: none;
-  }
+@container (max-width:440px) {
   .ea3d-card {
-    max-width: 37%;
+    width: 126px;
+    padding: 8px 10px;
+  }
+  .ea3d-card-overview {
+    left: 2px;
+    top: 4%;
+  }
+  .ea3d-card-weather {
+    right: 2px;
+    top: 4%;
+  }
+  .ea3d-card-soil {
+    left: 2px;
+    top: 64%;
+  }
+  .ea3d-card-disease {
+    right: 2px;
+    top: 64%;
+  }
+  .ea3d-card-value {
+    font-size: 15px;
+  }
+  .ea3d-card-title,
+  .ea3d-card-sub {
+    font-size: 11px;
   }
   .ea3d-hint {
-    font-size: 12px;
-    letter-spacing: -0.01em;
+    font-size: 11px;
   }
 }
 @media (prefers-reduced-motion: reduce) {
