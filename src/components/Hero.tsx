@@ -1,14 +1,5 @@
 import { useMemo, useState, useEffect, type CSSProperties, type MouseEvent } from "react";
-
-interface Hotspot {
-  id: string;
-  label: string;
-  icon: string;
-  category: string;
-  metric: string;
-  left: string;
-  top: string;
-}
+import EaAgriDurian from "./eaagri-3d/EaAgriDurian";
 
 const ROTATING_HIGHLIGHTS = [
   { text: "thông minh", tag: "AI • IoT • DATA" },
@@ -18,7 +9,6 @@ const ROTATING_HIGHLIGHTS = [
 ];
 
 const Hero = () => {
-  const [activeHotspot, setActiveHotspot] = useState<string | null>(null);
   const [highlightIndex, setHighlightIndex] = useState(0);
 
   useEffect(() => {
@@ -66,91 +56,11 @@ const Hero = () => {
     }))
   ), []);
 
-  const hotspots: Hotspot[] = [
-    {
-      id: "map",
-      label: "Bản đồ số vườn",
-      icon: "ri-map-pin-2-fill",
-      category: "Bản Đồ Số Lô Vườn",
-      metric: "Lô A2 • 120 cây đang nuôi trái (64% diện tích)",
-      left: "24%",
-      top: "39%",
-    },
-    {
-      id: "chart",
-      label: "Dữ liệu thời gian thực",
-      icon: "ri-line-chart-fill",
-      category: "Cảm Biến Đất & Khí Hậu",
-      metric: "Độ ẩm 68% • Nhiệt độ 28°C • pH 6.2 (Tối ưu)",
-      left: "24%",
-      top: "53%",
-    },
-    {
-      id: "weather",
-      label: "Dự báo thời tiết",
-      icon: "ri-sun-cloudy-fill",
-      category: "Trạm Quan Trắc Vi Khí Hậu",
-      metric: "28°C • Nắng 12.5k Lux • Độ ẩm 70%",
-      left: "87%",
-      top: "39%",
-    },
-    {
-      id: "growth",
-      label: "Mô hình tăng trưởng",
-      icon: "ri-plant-fill",
-      category: "Chỉ Số Sinh Học AI",
-      metric: "Tăng trưởng: +15% • Sạch bệnh 100%",
-      left: "74%",
-      top: "55%",
-    },
-    {
-      id: "durian",
-      label: "Quả sầu riêng",
-      icon: "ri-award-fill",
-      category: "Sầu Riêng Ri6 Thượng Hạng",
-      metric: "Chuẩn Loại 1 • Brix 18.5° • Cơm sáp hạt lép",
-      left: "51%",
-      top: "40%",
-    },
-    {
-      id: "pump",
-      label: "Trạm máy bơm IoT",
-      icon: "ri-water-flash-fill",
-      category: "Tưới Tiêu Tự Động",
-      metric: "Van tưới nhỏ giọt • Đang cấp ẩm tự động",
-      left: "64%",
-      top: "66%",
-    },
-  ];
-
   const scrollToNextSection = () => {
     const nextSection = document.getElementById('section-team');
     if (nextSection) {
       nextSection.scrollIntoView({ behavior: 'smooth' });
     }
-  };
-
-  const handleVisualPointerMove = (event: MouseEvent<HTMLDivElement>) => {
-    const bounds = event.currentTarget.getBoundingClientRect();
-    const x = (event.clientX - bounds.left) / bounds.width - 0.5;
-    const y = (event.clientY - bounds.top) / bounds.height - 0.5;
-    event.currentTarget.style.setProperty("--parallax-x", `${x * 14}px`);
-    event.currentTarget.style.setProperty("--parallax-y", `${y * 10}px`);
-    event.currentTarget.style.setProperty("--parallax-node-x", `${x * -7}px`);
-    event.currentTarget.style.setProperty("--parallax-node-y", `${y * -5}px`);
-    event.currentTarget.style.setProperty("--visual-tilt-x", `${y * -3.2}deg`);
-    event.currentTarget.style.setProperty("--visual-tilt-y", `${x * 4.2}deg`);
-    event.currentTarget.style.setProperty("--visual-light-x", `${(x + 0.5) * 100}%`);
-    event.currentTarget.style.setProperty("--visual-light-y", `${(y + 0.5) * 100}%`);
-  };
-
-  const resetVisualParallax = (event: MouseEvent<HTMLDivElement>) => {
-    event.currentTarget.style.setProperty("--parallax-x", "0px");
-    event.currentTarget.style.setProperty("--parallax-y", "0px");
-    event.currentTarget.style.setProperty("--parallax-node-x", "0px");
-    event.currentTarget.style.setProperty("--parallax-node-y", "0px");
-    event.currentTarget.style.setProperty("--visual-tilt-x", "0deg");
-    event.currentTarget.style.setProperty("--visual-tilt-y", "0deg");
   };
 
   const handleHeroPointerMove = (event: MouseEvent<HTMLElement>) => {
@@ -255,85 +165,29 @@ const Hero = () => {
       </div>
 
       <div className="hero-grid-layout section__container">
-        {/* LEFT COLUMN: Grand 3D Tree Visual with Interactive Beacons */}
+        {/* LEFT COLUMN: Grand 3D Tree Visual with Interactive 3D Model */}
         <div
           className="hero__visual"
           data-aos="zoom-in"
           data-aos-delay="100"
-          onMouseMove={handleVisualPointerMove}
-          onMouseLeave={resetVisualParallax}
         >
-          <div className="image-wrapper-container">
+          <div className="image-wrapper-container hero-3d-wrapper">
             <span className="hero-visual-depth-glow" aria-hidden="true"></span>
             
-            {/* The main tree and farmer image (Enlarged) */}
-            <img
-              src="/Cây 1.png"
-              alt="Hệ sinh thái sầu riêng thông minh Ea Agri"
-              className="main-hero-image"
+            {/* The 3D Tree, IoT devices and Farmer interactive model */}
+            <EaAgriDurian
+              assetBaseUrl="/eaagri-3d/assets/"
+              posterUrl="/Cây 1.png"
+              quality="auto"
+              showCards={true}
+              showHotspots={true}
+              showFarmer={true}
             />
 
             {/* Glowing Sunlight Sparkles & Pollen Bokeh */}
             <div className="hero-sparkles-layer" aria-hidden="true">
               {sunSparkles.map((sp) => (
                 <span className="sun-sparkle" style={sp.style} key={sp.id}></span>
-              ))}
-            </div>
-
-            {/* Wifi Telemetry Pulse Waves from Farmer's Tablet */}
-            <div className="farmer-tablet-wifi-aura" aria-hidden="true">
-              <span className="wifi-center-dot"></span>
-              <span className="wifi-ring wifi-ring--1"></span>
-              <span className="wifi-ring wifi-ring--2"></span>
-              <span className="wifi-ring wifi-ring--3"></span>
-            </div>
-
-            {/* Wireless Telemetry Pulse from Solar Sensor Pole */}
-            <div className="solar-sensor-telemetry-aura" aria-hidden="true">
-              <span className="sensor-center-dot"></span>
-              <span className="telemetry-ring telemetry-ring--1"></span>
-              <span className="telemetry-ring telemetry-ring--2"></span>
-            </div>
-
-            {/* Animated Circuit Data Flow Nodes */}
-            <div className="iot-data-layer" aria-hidden="true">
-              {[0, 1, 2, 3, 4].map((node) => (
-                <span className={`iot-data-node iot-data-node--${node + 1}`} key={node}></span>
-              ))}
-            </div>
-
-            {/* Interactive Screen & IoT Hotspots with Live Tooltips */}
-            <div className="hero-interactive-hotspots">
-              {hotspots.map((hs) => (
-                <div
-                  key={hs.id}
-                  className={`hero-hotspot-pin ${activeHotspot === hs.id ? "is-active" : ""}`}
-                  style={{ left: hs.left, top: hs.top }}
-                  onMouseEnter={() => setActiveHotspot(hs.id)}
-                  onMouseLeave={() => setActiveHotspot(null)}
-                  onClick={() => setActiveHotspot(activeHotspot === hs.id ? null : hs.id)}
-                >
-                  <button
-                    type="button"
-                    className="hotspot-trigger-beacon"
-                    aria-label={hs.label}
-                  >
-                    <span className="beacon-outer-radar"></span>
-                    <span className="beacon-inner-pulse"></span>
-                    <span className="beacon-dot">
-                      <i className={hs.icon}></i>
-                    </span>
-                  </button>
-
-                  {/* High-Tech Frosted Live Tooltip Popover */}
-                  <div className="hotspot-tooltip-popover">
-                    <div className="tooltip-header">
-                      <i className={hs.icon}></i>
-                      <span className="tooltip-cat">{hs.category}</span>
-                    </div>
-                    <div className="tooltip-metric">{hs.metric}</div>
-                  </div>
-                </div>
               ))}
             </div>
           </div>
