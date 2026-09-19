@@ -77,6 +77,7 @@
 
   .nav__menu { gap: 0; }
   .nav__link { min-height: 42px; padding: .35rem; }
+  .nav__link .nav__link-text { display: none; }
   .nav__link .nav__link-icon { width: 30px; height: 30px; font-size: 1.05rem; }
   .nav__link.active::after { left: .35rem; right: .35rem; bottom: 1px; }
   .nav__actions { gap: .25rem; }
@@ -87,7 +88,8 @@
     min-height: 100svh;
     height: auto;
     padding: 6.1rem 1rem 2.5rem;
-    overflow: hidden;
+    overflow-x: clip;
+    overflow-y: visible;
   }
 
   .hero-grid-layout {
@@ -105,7 +107,7 @@
   .hero-title .text-sub--accent { gap: .48rem; }
   .hero-title .text-sub--accent small { min-height: 1.35rem; padding: .15rem .38rem; font-size: .43rem; }
   .hero-description { margin-bottom: 1.2rem; font-size: .9rem; line-height: 1.65; }
-  .hero__visual .image-wrapper-container { width: min(88vw, 350px); }
+  .hero__visual .image-wrapper-container { width: min(90vw, 350px); height: clamp(320px, 85vw, 380px); }
   .hero-download-links { gap: .55rem; }
   .hero-download-links .download-btn { flex: 1; min-width: 0; min-height: 54px; max-width: 165px; padding: .48rem .65rem; gap: .45rem; }
   .hero-download-links .download-btn__icon { font-size: 1.55rem; }

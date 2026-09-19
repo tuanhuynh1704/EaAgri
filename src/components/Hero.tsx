@@ -82,15 +82,16 @@ const Hero = () => {
       const dx = centerX - event.clientX;
       const dy = centerY - event.clientY;
       const distance = Math.hypot(dx, dy);
-      const radius = 190;
+      const radius = 130;
 
       if (distance < radius) {
         const force = (radius - distance) / radius;
+        const smoothForce = force * force; // Soft quadratic falloff for natural breeze physics
         const safeDistance = Math.max(distance, 1);
-        leaf.style.setProperty("--leaf-repel-x", `${(dx / safeDistance) * force * 108}px`);
-        leaf.style.setProperty("--leaf-repel-y", `${(dy / safeDistance) * force * 78}px`);
-        leaf.style.setProperty("--leaf-repel-rotate", `${(dx >= 0 ? 1 : -1) * force * 96}deg`);
-        leaf.style.setProperty("--leaf-repel-scale", `${1 + force * 0.32}`);
+        leaf.style.setProperty("--leaf-repel-x", `${(dx / safeDistance) * smoothForce * 26}px`);
+        leaf.style.setProperty("--leaf-repel-y", `${(dy / safeDistance) * smoothForce * 16}px`);
+        leaf.style.setProperty("--leaf-repel-rotate", `${(dx >= 0 ? 1 : -1) * smoothForce * 14}deg`);
+        leaf.style.setProperty("--leaf-repel-scale", `${1 + smoothForce * 0.03}`);
         leaf.classList.add("is-repelled");
       } else {
         leaf.style.setProperty("--leaf-repel-x", "0px");
@@ -137,14 +138,6 @@ const Hero = () => {
           <span className="wind-seed wind-seed--3"></span>
         </div>
 
-        {/* A distant flock crosses the open sky occasionally */}
-        <div className="hero-bird-sky" aria-hidden="true">
-          {[1, 2, 3, 4, 5].map((bird) => (
-            <span className={`bird-flight bird-flight--${bird}`} key={bird}>
-              <i className="sky-bird"><b></b><em></em></i>
-            </span>
-          ))}
-        </div>
         
         {/* Dynamic Sunlight Illumination & Rays Effect */}
         <div className="hero-sun-illumination">

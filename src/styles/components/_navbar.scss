@@ -64,7 +64,7 @@ nav.navbar-container.is-hidden {
   transition: all 0.35s cubic-bezier(0.16, 1, 0.3, 1);
 
   .nav__logo-img {
-    height: 180px;
+    height: 130px;
     width: auto;
     object-fit: contain;
     transition: transform 0.3s ease, filter 0.3s ease;
@@ -164,7 +164,7 @@ nav.navbar-container.is-hidden {
     backdrop-filter: blur(12px);
     -webkit-backdrop-filter: blur(12px);
     border-color: rgba(16, 185, 129, 0.28);
-    box-shadow: 
+    box-shadow:
       0 4px 14px rgba(16, 110, 76, 0.08),
       inset 0 1px 0 rgba(255, 255, 255, 0.9);
 
@@ -424,6 +424,7 @@ nav.navbar-container.is-hidden {
     opacity: 0;
     transform: translateY(-8px) scale(0.96);
   }
+
   100% {
     opacity: 1;
     transform: translateY(0) scale(1);

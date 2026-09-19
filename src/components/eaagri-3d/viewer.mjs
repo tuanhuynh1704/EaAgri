@@ -217,6 +217,11 @@ export function createEaAgriScene(container, options = {}) {
   details.setAttribute("aria-live", "polite");
   const close = button("×", "Đóng thông tin", () => {
     details.hidden = true;
+    targetFocusPoint.set(0, 1.9, 0);
+    zoom = 1;
+    cards.querySelectorAll(".ea3d-card").forEach((card) => card.classList.remove("is-selected"));
+    pins.forEach((el) => el.setAttribute("aria-pressed", "false"));
+    requestRender();
     pins.get(selected)?.focus();
   });
   close.className = "ea3d-close";
@@ -312,8 +317,10 @@ export function createEaAgriScene(container, options = {}) {
       );
     const anchor = model?.getObjectByName(`Hotspot_${id}`);
     if (anchor) {
-      anchor.getWorldPosition(targetFocusPoint);
-      zoom = 1.25;
+      const anchorPos = new T.Vector3();
+      anchor.getWorldPosition(anchorPos);
+      targetFocusPoint.set(anchorPos.x * 0.15, 1.9 + (anchorPos.y - 1.9) * 0.12, 0);
+      zoom = 1.05;
       requestRender();
     }
     pins.forEach((el, key) =>
@@ -349,7 +356,7 @@ export function createEaAgriScene(container, options = {}) {
     const vFov = (camera.fov * Math.PI) / 180,
       hFov = 2 * Math.atan(Math.tan(vFov / 2) * camera.aspect);
     const dist =
-      Math.max(4.2 / Math.tan(hFov / 2), 4.1 / Math.tan(vFov / 2)) / zoom;
+      Math.max(5.8 / Math.tan(hFov / 2), 5.4 / Math.tan(vFov / 2)) / zoom;
     focusPoint.lerp(targetFocusPoint, 0.14);
     camera.position.set(
       focusPoint.x,

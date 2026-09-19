@@ -13,10 +13,10 @@ const DEFAULT_TITLE_LINES = [
   "NÔNG NGHIỆP THÔNG MINH EA AGRI"
 ];
 
-const TYPE_DURATION = 2400;
-const TYPE_DELAY = 350;
-const HOLD_AFTER_TYPED = 1200;
-const MAX_SPLASH = 6800;
+const TYPE_DURATION = 1100;
+const TYPE_DELAY = 120;
+const HOLD_AFTER_TYPED = 500;
+const MAX_SPLASH = 2800;
 const SPLASH_SEEN_KEY = "eaagri_homepage_splash_seen_v1";
 
 const vertexShader = `
@@ -121,24 +121,23 @@ const fragmentShader = `
     float radialDist = length(worldPos.xy);
     float horizonGlow = smoothstep(1.8, 0.0, radialDist);
     
-    // Deep Forest & Eco-Stars Palette
-    vec3 dawnLightCenter = vec3(1.15, 1.25, 1.0);
-    vec3 deepForest = vec3(0.04, 0.18, 0.14);
-    vec3 emeraldBio = vec3(0.2, 0.9, 0.55);
-    vec3 goldenPollen = vec3(1.0, 0.85, 0.35);
-    vec3 cyanMist = vec3(0.35, 0.75, 0.98);
+    // Light Eco Theme: Emerald Bio, Mint, Golden Amber Pollen, Forest Teal
+    vec3 leafDeep = vec3(0.04, 0.42, 0.25);
+    vec3 emeraldBio = vec3(0.06, 0.72, 0.42);
+    vec3 goldenPollen = vec3(0.95, 0.68, 0.12);
+    vec3 mintAqua = vec3(0.08, 0.65, 0.55);
 
     float resonance = sin(time * 2.0) * 0.5 + 0.5;
     float colorPhase1 = sin(tunnelProgress * 3.14159 + time * 0.5) * 0.5 + 0.5;
     float colorPhase2 = cos(radialDist * 2.5 - time * 0.6) * 0.5 + 0.5;
     float colorPhase3 = sin(radialDist * 3.0 + time * 0.8) * 0.5 + 0.5;
 
-    vec3 baseColor = mix(deepForest, emeraldBio, colorPhase1 * 0.8);
-    baseColor = mix(baseColor, cyanMist, colorPhase2 * 0.5);
-    baseColor = mix(baseColor, goldenPollen, colorPhase3 * 0.35 * resonance);
+    vec3 baseColor = mix(leafDeep, emeraldBio, colorPhase1 * 0.85);
+    baseColor = mix(baseColor, mintAqua, colorPhase2 * 0.45);
+    baseColor = mix(baseColor, goldenPollen, colorPhase3 * 0.4 * resonance);
     
-    vec3 finalColor = mix(baseColor, dawnLightCenter, horizonGlow * 0.8);
-    finalColor += vec3(0.2, 0.3, 0.25) * vMouseInfluence * uHoverIntensity;
+    vec3 finalColor = mix(baseColor, emeraldBio, horizonGlow * 0.4);
+    finalColor += vec3(0.05, 0.2, 0.1) * vMouseInfluence * uHoverIntensity;
     return finalColor;
   }
 
@@ -148,19 +147,19 @@ const fragmentShader = `
     if (dist > 0.5) discard;
     float roundMask = 1.0 - smoothstep(0.24, 0.5, dist);
     if (roundMask <= 0.001) discard;
-    float coreGlow = exp(-dist * dist * 11.0);
-    float softEdge = pow(roundMask, 1.35) * (0.62 + coreGlow * 0.38);
+    float coreGlow = exp(-dist * dist * 9.0);
+    float softEdge = pow(roundMask, 1.25) * (0.65 + coreGlow * 0.35);
     float depthFade = smoothstep(22.0, 2.0, vDepth);
-    depthFade = pow(depthFade, 2.0);
+    depthFade = pow(depthFade, 1.8);
 
-    float alpha = 0.5 + vDistanceFromCenter * 0.45;
-    alpha = mix(alpha, 0.85, vMouseInfluence * 0.4);
+    float alpha = 0.55 + vDistanceFromCenter * 0.4;
+    alpha = mix(alpha, 0.88, vMouseInfluence * 0.4);
     alpha *= depthFade;
     alpha *= softEdge;
 
     vec3 wormholeColor = getWormholeColor(vWorldPosition, vTunnelProgress, uTime);
-    float intensity = 1.7 + vDistanceFromCenter * 0.7 + vMouseInfluence * 0.4;
-    wormholeColor = mix(wormholeColor, vec3(1.0), coreGlow * 0.25);
+    float intensity = 1.1 + vDistanceFromCenter * 0.35 + vMouseInfluence * 0.3;
+    wormholeColor = mix(wormholeColor, vec3(0.05, 0.3, 0.18), coreGlow * 0.15);
     wormholeColor *= intensity;
     gl_FragColor = vec4(wormholeColor, alpha);
   }
@@ -232,9 +231,9 @@ export default function SplashIntro({
     let speedMult = 1;
 
     try {
-      renderer = new THREE.WebGLRenderer({ canvas, antialias: true, alpha: false });
-      // Deep dark forest night background
-      renderer.setClearColor(0x02110c, 1);
+      renderer = new THREE.WebGLRenderer({ canvas, antialias: true, alpha: true });
+      // Soft pearlescent eco-white clear color
+      renderer.setClearColor(0xf6fbf7, 1);
       renderer.setPixelRatio(Math.min(window.devicePixelRatio, isMobile ? 1.5 : 2));
       renderer.setSize(window.innerWidth, window.innerHeight, false);
 
@@ -276,7 +275,7 @@ export default function SplashIntro({
         fragmentShader,
         transparent: true,
         depthWrite: false,
-        blending: THREE.AdditiveBlending,
+        blending: THREE.NormalBlending,
       });
 
       points = new THREE.Points(geometry, material);
@@ -366,7 +365,7 @@ export default function SplashIntro({
         warpOut: () => {
           warping = true;
           if (clock) warpStart = clock.getElapsedTime();
-          return new Promise<void>((resolve) => setTimeout(resolve, 1300));
+          return new Promise<void>((resolve) => setTimeout(resolve, 750));
         },
         dispose: () => {
           disposed = true;
@@ -418,7 +417,7 @@ export default function SplashIntro({
       );
       setShouldRender(false);
       if (onComplete) onComplete();
-    }, 1250);
+    }, 850);
   }, [onComplete]);
 
   // Typing Effect

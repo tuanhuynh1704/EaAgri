@@ -1,4 +1,4 @@
-const logos = [
+const baseLogos = [
   { src: "/Logo/NTTU.jpg", alt: "Nguyễn Tất Thành University" },
   { src: "/Logo/FIT.png", alt: "FIT" },
   { src: "/Logo/NIIC.jpg", alt: "NIIC" },
@@ -8,11 +8,14 @@ const logos = [
   { src: "/Logo/KNX.png", alt: "KNX" },
 ];
 
-function LogoGroup({ hidden = false }: { hidden?: boolean }) {
+// Nhân bản danh sách 3 lần trong mỗi nhóm để đảm bảo chiều dài vượt xa mọi kích thước màn hình (iPad, máy tính bảng, màn hình siêu rộng)
+const marqueeItems = [...baseLogos, ...baseLogos, ...baseLogos];
+
+function LogoGroup({ groupKey, hidden = false }: { groupKey: string; hidden?: boolean }) {
   return (
     <div className="logo-marquee__group" aria-hidden={hidden || undefined}>
-      {logos.map((logo) => (
-        <div className="logo-marquee__item" key={`${hidden ? "copy-" : ""}${logo.src}`}>
+      {marqueeItems.map((logo, index) => (
+        <div className="logo-marquee__item" key={`${groupKey}-${logo.src}-${index}`}>
           <span className="logo-marquee__media">
             <img src={logo.src} alt={hidden ? "" : logo.alt} loading="lazy" />
           </span>
@@ -35,8 +38,8 @@ export default function LogoMarqueeSection() {
 
       <div className="logo-marquee__viewport">
         <div className="logo-marquee__track">
-          <LogoGroup />
-          <LogoGroup hidden />
+          <LogoGroup groupKey="grp1" />
+          <LogoGroup groupKey="grp2" hidden />
         </div>
       </div>
     </section>

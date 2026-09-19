@@ -80,7 +80,7 @@ export default function EaAgriDurian({
       style={{
         width: '100%',
         height: '100%',
-        minHeight: '480px',
+        minHeight: '380px',
         position: 'relative',
         ...style,
       }}
