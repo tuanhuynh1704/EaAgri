@@ -67,7 +67,14 @@ const Navbar = () => {
   };
 
   const handleHome = () => {
-    navigate("/");
+    if (pathname === "/") {
+      window.scrollTo({ top: 0, behavior: "smooth" });
+    } else {
+      navigate("/");
+      setTimeout(() => {
+        window.scrollTo({ top: 0, behavior: "smooth" });
+      }, 50);
+    }
   };
 
   const handleSignOut = async () => {
@@ -90,7 +97,7 @@ const Navbar = () => {
       data-aos="fade-down"
       onFocusCapture={() => setIsHidden(false)}
     >
-      <div className="nav__logo" onClick={handleHome}>
+      <div className="nav__logo" onClick={handleHome} title="EaAgri - Về đầu trang">
         <img
           src="/logo_banner.jpg"
           alt="EaAgri Logo"

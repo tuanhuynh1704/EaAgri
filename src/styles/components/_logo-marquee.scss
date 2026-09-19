@@ -51,16 +51,29 @@
   overflow: hidden;
   width: 100%;
   padding: 0.4rem 0 1rem;
-  mask-image: linear-gradient(90deg, transparent 0%, #000 8%, #000 92%, transparent 100%);
+  -webkit-mask-image: linear-gradient(90deg, transparent 0%, #000 7%, #000 93%, transparent 100%);
+  mask-image: linear-gradient(90deg, transparent 0%, #000 7%, #000 93%, transparent 100%);
+  touch-action: pan-y;
+  user-select: none;
+  -webkit-user-select: none;
 
-  &:hover .logo-marquee__track { animation-play-state: paused; }
+  // Chỉ tạm dừng khi di chuột trên thiết bị có chuột (desktop). Tránh iPad/iPhone bị dừng vĩnh viễn khi chạm màn hình (sticky hover)
+  @media (hover: hover) and (pointer: fine) {
+    &:hover .logo-marquee__track {
+      animation-play-state: paused;
+    }
+  }
 }
 
 .logo-marquee__track {
   display: flex;
   width: max-content;
   will-change: transform;
-  animation: logoMarqueeMove 30s linear infinite;
+  transform: translate3d(0, 0, 0);
+  -webkit-transform: translate3d(0, 0, 0);
+  backface-visibility: hidden;
+  -webkit-backface-visibility: hidden;
+  animation: logoMarqueeMove 85s linear infinite;
 }
 
 .logo-marquee__group {
@@ -68,6 +81,7 @@
   align-items: center;
   gap: clamp(1rem, 2vw, 2rem);
   padding-right: clamp(1rem, 2vw, 2rem);
+  flex-shrink: 0;
 }
 
 .logo-marquee__item {
@@ -101,27 +115,57 @@
     object-fit: contain;
     filter: saturate(0.78) opacity(0.76);
     transition: filter 0.3s ease, transform 0.3s ease;
+    pointer-events: none;
+    -webkit-user-drag: none;
+    user-select: none;
   }
 }
 
-.logo-marquee__item {
-  &:hover {
-    transform: translateY(-6px) scale(1.025);
-    border-color: rgba(21, 153, 98, 0.3);
-    box-shadow: 0 17px 38px rgba(22, 99, 67, 0.14);
+@media (hover: hover) and (pointer: fine) {
+  .logo-marquee__item {
+    &:hover {
+      transform: translateY(-6px) scale(1.025);
+      border-color: rgba(21, 153, 98, 0.3);
+      box-shadow: 0 17px 38px rgba(22, 99, 67, 0.14);
 
-    .logo-marquee__media img { filter: saturate(1) opacity(1); transform: scale(1.04); }
+      .logo-marquee__media img {
+        filter: saturate(1) opacity(1);
+        transform: scale(1.04);
+      }
+    }
   }
 }
 
 @keyframes logoMarqueeMove {
-  to { transform: translateX(-50%); }
+  0% {
+    transform: translate3d(0, 0, 0);
+  }
+  100% {
+    transform: translate3d(-50%, 0, 0);
+  }
+}
+
+// Tablet / iPad (768px - 1024px)
+@media (max-width: 1024px) {
+  .logo-marquee {
+    min-height: 300px;
+    padding: 2.6rem 0 3.2rem;
+  }
+  .logo-marquee__item {
+    width: 156px;
+    height: 84px;
+    border-radius: 18px;
+    padding: 0.85rem 1.15rem;
+  }
+  .logo-marquee__track {
+    animation-duration: 65s;
+  }
 }
 
 @media (max-width: 700px) {
-  .logo-marquee { min-height: 290px; padding: 2.5rem 0 3rem; }
-  .logo-marquee__item { width: 138px; height: 78px; border-radius: 16px; }
-  .logo-marquee__track { animation-duration: 24s; }
+  .logo-marquee { min-height: 280px; padding: 2.2rem 0 2.8rem; }
+  .logo-marquee__item { width: 138px; height: 76px; border-radius: 16px; padding: 0.75rem 1rem; }
+  .logo-marquee__track { animation-duration: 55s; }
 }
 
 // 2K/4K và trường hợp trình duyệt đang zoom-out: các giới hạn px/rem
@@ -173,6 +217,9 @@
   }
 }
 
+// Không pause khi có reduced-motion (tránh trường hợp iPad bật Tiết kiệm pin hoặc Giảm chuyển động làm đứng hình logo bị cắt xén), mà cho chạy chậm nhẹ nhàng
 @media (prefers-reduced-motion: reduce) {
-  .logo-marquee__track { animation-play-state: paused; }
+  .logo-marquee__track {
+    animation-duration: 100s;
+  }
 }

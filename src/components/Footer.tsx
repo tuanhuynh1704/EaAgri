@@ -1,7 +1,20 @@
-import { useNavigate } from "react-router-dom";
+import { useNavigate, useLocation } from "react-router-dom";
+import { triggerAppStoreNotice } from "./AppStoreNoticeModal";
 
 export default function Footer() {
   const navigate = useNavigate();
+  const { pathname } = useLocation();
+
+  const handleFooterHome = () => {
+    if (pathname === "/") {
+      window.scrollTo({ top: 0, behavior: "smooth" });
+    } else {
+      navigate("/");
+      setTimeout(() => {
+        window.scrollTo({ top: 0, behavior: "smooth" });
+      }, 50);
+    }
+  };
 
   return (
     <footer className="footer">
@@ -11,7 +24,7 @@ export default function Footer() {
       <div className="section__container footer__container">
         {/* Brand Column */}
         <div className="footer__brand-col" data-aos="fade-up">
-          <div className="footer__logo-box" onClick={() => navigate("/")} title="EaAgri - Về trang chủ">
+          <div className="footer__logo-box" onClick={handleFooterHome} title="EaAgri - Về đầu trang">
             <div className="footer__logo-icon-wrap">
               <img
                 src="/logo_v1.jpg"
@@ -131,7 +144,16 @@ export default function Footer() {
           </p>
           
           <div className="footer__download-row">
-            <a href="#" className="footer__download-btn" aria-label="App Store">
+            <a
+              href="#app-store"
+              className="footer__download-btn"
+              onClick={(e) => {
+                e.preventDefault();
+                triggerAppStoreNotice();
+              }}
+              aria-label="App Store (iOS)"
+              title="Tải trên App Store (iOS)"
+            >
               <img
                 src="/assets/apple.png"
                 alt="Tải trên App Store"

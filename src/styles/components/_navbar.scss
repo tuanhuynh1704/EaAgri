@@ -64,18 +64,18 @@ nav.navbar-container.is-hidden {
   transition: all 0.35s cubic-bezier(0.16, 1, 0.3, 1);
 
   .nav__logo-img {
-    height: 110px;
+    height: 130px;
     width: auto;
     object-fit: contain;
     transition: transform 0.3s ease, filter 0.3s ease;
     filter: drop-shadow(0 4px 14px rgba(0, 0, 0, 0.08));
 
     @media (max-width: $tablet) {
-      height: 90px;
+      height: 145px;
     }
 
     @media (max-width: $mobile) {
-      height: 54px;
+      height: 95px;
     }
   }
 
@@ -164,7 +164,7 @@ nav.navbar-container.is-hidden {
     backdrop-filter: blur(12px);
     -webkit-backdrop-filter: blur(12px);
     border-color: rgba(16, 185, 129, 0.28);
-    box-shadow: 
+    box-shadow:
       0 4px 14px rgba(16, 110, 76, 0.08),
       inset 0 1px 0 rgba(255, 255, 255, 0.9);
 
@@ -424,6 +424,7 @@ nav.navbar-container.is-hidden {
     opacity: 0;
     transform: translateY(-8px) scale(0.96);
   }
+
   100% {
     opacity: 1;
     transform: translateY(0) scale(1);
@@ -496,24 +497,37 @@ nav.navbar-container.is-hidden {
   top: 1.15rem;
 
   .nav__logo {
-    background: rgba(255, 255, 255, 0.92);
+    background: rgba(255, 255, 255, 0.94);
     backdrop-filter: blur(18px);
     -webkit-backdrop-filter: blur(18px);
     border: 1px solid rgba(255, 255, 255, 0.88);
-    padding: 0.32rem 1.4rem 0.32rem 1.1rem;
+    padding: 0.35rem 1.4rem;
+    min-height: 52px;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: 999px;
+    overflow: hidden;
     box-shadow:
       0 10px 30px rgba(18, 60, 42, 0.08),
       inset 0 1px 0 rgba(255, 255, 255, 0.95);
 
     .nav__logo-img {
-      height: 64px;
+      height: 72px;
+      width: auto;
+      max-width: none;
+      object-fit: contain;
+      transform: scale(1.48);
+      transform-origin: center;
 
       @media (max-width: $tablet) {
-        height: 52px;
+        height: 60px;
+        transform: scale(1.35);
       }
 
       @media (max-width: $mobile) {
-        height: 42px;
+        height: 48px;
+        transform: scale(1.28);
       }
     }
   }
