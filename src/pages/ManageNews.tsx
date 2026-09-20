@@ -4,6 +4,7 @@ import { Link,
  } from "react-router-dom";
 import { supabase } from "../utils/supabase/client";
 import { useAuth } from "../context/AuthContext";
+import { useSEO } from "../hooks/useSEO";
 import ReactQuill from "react-quill-new";
 import "react-quill-new/dist/quill.snow.css";
 import { cleanContent } from "../utils/cleanContent";
@@ -26,6 +27,11 @@ interface AlertState {
 }
 
 export default function ManageNews() {
+  useSEO({
+    title: "Quản Lý Bản Tin",
+    noindex: true,
+  });
+
   const { user, profile, loading: authLoading } = useAuth();
   // const navigate = useNavigate();
 

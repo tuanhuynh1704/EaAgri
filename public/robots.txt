@@ -2,5 +2,9 @@ User-agent: *
 Allow: /
 Allow: /logo_v1.jpg
 Allow: /assets/
+Disallow: /admin/
+Disallow: /tintuc/create
+Disallow: /login
+Disallow: /register
 
 Sitemap: https://www.eaagri.vn/sitemap.xml

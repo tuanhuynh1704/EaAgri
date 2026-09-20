@@ -1,6 +1,7 @@
 import React, { useState, useEffect, useMemo } from "react";
 import { useNavigate, useLocation } from "react-router-dom";
 import { useAuth } from "../context/AuthContext";
+import { useSEO } from "../hooks/useSEO";
 import { supabase } from "../utils/supabase/client";
 
 interface AlertState {
@@ -9,6 +10,12 @@ interface AlertState {
 }
 
 export default function Login() {
+  useSEO({
+    title: "Đăng Nhập Tài Khoản",
+    description: "Đăng nhập vào Hệ thống Nông nghiệp Thông minh EaAgri.",
+    noindex: true,
+  });
+
   const [showPassword, setShowPassword] = useState(false);
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");

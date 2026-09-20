@@ -1,6 +1,7 @@
 import { useEffect, useState } from "react";
 import { Link } from "react-router-dom";
 import { useAuth } from "../context/AuthContext";
+import { useSEO } from "../hooks/useSEO";
 import { supabase } from "../utils/supabase/client";
 
 interface Profile {
@@ -17,6 +18,11 @@ interface AlertState {
 }
 
 export default function AccountManagement() {
+  useSEO({
+    title: "Quản Lý Tài Khoản",
+    noindex: true,
+  });
+
   const { user, profile: currentUserProfile, loading: authLoading } = useAuth();
   const [profiles, setProfiles] = useState<Profile[]>([]);
   const [loading, setLoading] = useState(true);

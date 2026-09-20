@@ -10,6 +10,7 @@ export interface SEOProps {
   ogUrl?: string;
   ogType?: string;
   canonicalUrl?: string;
+  noindex?: boolean;
   structuredData?: Record<string, any> | Array<Record<string, any>>;
 }
 
@@ -51,6 +52,7 @@ export function useSEO({
   ogUrl,
   ogType = "website",
   canonicalUrl,
+  noindex = false,
   structuredData,
 }: SEOProps) {
   useEffect(() => {
@@ -66,7 +68,11 @@ export function useSEO({
     // 2. Standard Meta
     updateMetaTag("name", "description", finalDescription);
     updateMetaTag("name", "keywords", finalKeywords);
-    updateMetaTag("name", "robots", "index, follow, max-image-preview:large, max-snippet:-1, max-video-preview:-1");
+    updateMetaTag(
+      "name",
+      "robots",
+      noindex ? "noindex, nofollow" : "index, follow, max-image-preview:large, max-snippet:-1, max-video-preview:-1"
+    );
 
     // 3. Open Graph
     updateMetaTag("property", "og:title", ogTitle || finalTitle);
@@ -117,6 +123,7 @@ export function useSEO({
     ogUrl,
     ogType,
     canonicalUrl,
+    noindex,
     structuredData,
   ]);
 }

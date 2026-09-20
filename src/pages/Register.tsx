@@ -1,6 +1,7 @@
 import React, { useState, useEffect, useMemo } from "react";
 import { useNavigate, useLocation, Link } from "react-router-dom";
 import { useAuth } from "../context/AuthContext";
+import { useSEO } from "../hooks/useSEO";
 import { supabase } from "../utils/supabase/client";
 
 interface AlertState {
@@ -9,6 +10,12 @@ interface AlertState {
 }
 
 export default function Register() {
+  useSEO({
+    title: "Đăng Ký Tài Khoản",
+    description: "Tạo tài khoản thành viên Hệ thống Nông nghiệp Thông minh EaAgri.",
+    noindex: true,
+  });
+
   const [fullName, setFullName] = useState("");
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");

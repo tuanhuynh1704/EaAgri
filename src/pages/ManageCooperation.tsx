@@ -2,6 +2,7 @@ import { useEffect, useState, useMemo } from "react";
 import { Link } from "react-router-dom";
 import { supabase } from "../utils/supabase/client";
 import { useAuth } from "../context/AuthContext";
+import { useSEO } from "../hooks/useSEO";
 
 export interface CooperationItem {
   id: string;
@@ -59,6 +60,11 @@ const STATUS_CONFIG: Record<
 };
 
 export default function ManageCooperation() {
+  useSEO({
+    title: "Quản Lý Đăng Ký Hợp Tác",
+    noindex: true,
+  });
+
   const { user, profile, loading: authLoading } = useAuth();
 
   const [items, setItems] = useState<CooperationItem[]>([]);
