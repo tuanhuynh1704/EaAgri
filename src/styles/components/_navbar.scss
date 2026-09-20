@@ -8,7 +8,7 @@
 
 nav.navbar-container {
   position: fixed;
-  top: 1.5rem;
+  top: 0.5rem;
   left: 0;
   right: 0;
   margin-inline: auto;
@@ -25,7 +25,7 @@ nav.navbar-container {
   pointer-events: none; // Allow clicks to pass through transparent gap
 
   @media (max-width: $mobile) {
-    top: 0.85rem;
+    top: 0.45rem;
     width: calc(100% - 1.5rem);
   }
 }
@@ -64,18 +64,18 @@ nav.navbar-container.is-hidden {
   transition: all 0.35s cubic-bezier(0.16, 1, 0.3, 1);
 
   .nav__logo-img {
-    height: 130px;
+    height: clamp(125px, 9.5vw, 150px);
     width: auto;
     object-fit: contain;
     transition: transform 0.3s ease, filter 0.3s ease;
     filter: drop-shadow(0 4px 14px rgba(0, 0, 0, 0.08));
 
     @media (max-width: $tablet) {
-      height: 145px;
+      height: 120px;
     }
 
     @media (max-width: $mobile) {
-      height: 95px;
+      height: 85px;
     }
   }
 
@@ -494,59 +494,66 @@ nav.navbar-container.is-hidden {
 
 .navbar-container.is-scrolled,
 .navbar-container.is-inner-page {
-  top: 1.15rem;
+  top: 0.5rem;
 
   .nav__logo {
     background: rgba(255, 255, 255, 0.94);
-    backdrop-filter: blur(18px);
-    -webkit-backdrop-filter: blur(18px);
+    backdrop-filter: blur(16px);
+    -webkit-backdrop-filter: blur(16px);
     border: 1px solid rgba(255, 255, 255, 0.88);
-    padding: 0.35rem 1.4rem;
-    min-height: 52px;
+    padding: 0.22rem 1.05rem;
+    min-height: 46px;
     display: inline-flex;
     align-items: center;
     justify-content: center;
     border-radius: 999px;
     overflow: hidden;
     box-shadow:
-      0 10px 30px rgba(18, 60, 42, 0.08),
+      0 6px 20px rgba(18, 60, 42, 0.08),
       inset 0 1px 0 rgba(255, 255, 255, 0.95);
 
     .nav__logo-img {
-      height: 72px;
+      height: 62px;
       width: auto;
       max-width: none;
       object-fit: contain;
-      transform: scale(1.48);
+      transform: scale(1.42);
       transform-origin: center;
 
       @media (max-width: $tablet) {
-        height: 60px;
+        height: 52px;
         transform: scale(1.35);
       }
 
       @media (max-width: $mobile) {
-        height: 48px;
-        transform: scale(1.28);
+        height: 42px;
+        transform: scale(1.25);
       }
     }
   }
 
   .nav__right-capsule {
     background: rgba(255, 255, 255, 0.92);
-    backdrop-filter: blur(18px);
-    -webkit-backdrop-filter: blur(18px);
+    backdrop-filter: blur(16px);
+    -webkit-backdrop-filter: blur(16px);
     border: 1px solid rgba(255, 255, 255, 0.88);
-    padding: 0.3rem 0.38rem 0.3rem 0.45rem;
-    gap: 0.35rem;
+    padding: 0.22rem 0.32rem 0.22rem 0.38rem;
+    gap: 0.3rem;
+    min-height: 46px;
     box-shadow:
-      0 10px 30px rgba(18, 60, 42, 0.08),
+      0 6px 20px rgba(18, 60, 42, 0.08),
       inset 0 1px 0 rgba(255, 255, 255, 0.95);
 
     .nav__link {
-      min-height: 38px;
-      padding: 0.36rem 0.85rem;
+      min-height: 34px;
+      padding: 0.25rem 0.75rem;
+      font-size: 0.86rem;
       color: #3b5344;
+      gap: 0.35rem;
+
+      .nav__link-icon {
+        font-size: 0.95rem;
+      }
 
       &:hover {
         background: rgba(16, 185, 129, 0.09);
@@ -558,8 +565,25 @@ nav.navbar-container.is-hidden {
     }
 
     .btn--login {
-      min-height: 38px;
-      padding: 0.36rem 1.15rem;
+      min-height: 34px;
+      padding: 0.25rem 1rem;
+      font-size: 0.84rem;
+      gap: 0.35rem;
+    }
+
+    .nav__user-pill {
+      min-height: 34px;
+      padding: 0.2rem 0.6rem 0.2rem 0.25rem;
+
+      .nav__user-avatar {
+        width: 28px;
+        height: 28px;
+        font-size: 0.78rem;
+      }
+
+      .nav__user-name {
+        font-size: 0.82rem;
+      }
     }
   }
 }

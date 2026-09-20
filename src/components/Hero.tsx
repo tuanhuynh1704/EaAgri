@@ -3,10 +3,10 @@ import EaAgriDurian from "./eaagri-3d/EaAgriDurian";
 import { triggerAppStoreNotice } from "./AppStoreNoticeModal";
 
 const ROTATING_HIGHLIGHTS = [
-  { text: "thông minh", tag: "AI • IoT • DATA" },
-  { text: "tích hợp AI & IoT", tag: "REALTIME SENSOR" },
-  { text: "chuẩn dữ liệu số", tag: "BIG DATA INSIGHT" },
-  { text: "bền vững Tây Nguyên", tag: "GREEN AGRI 2026" },
+  { text: "thông minh", tag: "AI • IOT" },
+  { text: "sạch sâu bệnh", tag: "YOLOv9 DETECT" },
+  { text: "chuẩn VietGAP", tag: "VIETGAP 2026" },
+  { text: "tối ưu năng suất", tag: "HIGH YIELD" },
 ];
 
 const Hero = () => {
@@ -196,7 +196,7 @@ const Hero = () => {
               <span className="hero-badge__pulse-dot" />
             </span>
             <span className="hero-badge__icon"><i className="ri-leaf-fill"></i></span>
-            <span className="hero-badge__text">NỀN TẢNG NÔNG NGHIỆP SỐ</span>
+            <span className="hero-badge__text">TRỢ LÝ CÂY SẦU RIÊNG</span>
             <span className="hero-badge__live-chip">LIVE AI</span>
           </div>
 
@@ -205,7 +205,7 @@ const Hero = () => {
               Ea Agri
               <span className="text-ea-agri__light-beam" aria-hidden="true" />
             </span>
-            <span className="text-sub text-gray">Hệ sinh thái nông nghiệp</span>
+            <span className="text-sub text-gray">Trợ lý cây sầu riêng</span>
             <span className="text-sub text-sub--accent">
               <span className="rotating-word-box">
                 <span key={highlightIndex} className="rotating-word-item">
@@ -220,8 +220,7 @@ const Hero = () => {
 
           <p className="hero-description">
             <span className="hero-description__energy-bar" aria-hidden="true" />
-            Giải pháp tối ưu hóa chuỗi giá trị <strong className="hero-highlight">sầu riêng tại Tây Nguyên</strong>.
-            Tích hợp <strong className="hero-highlight">AI đa phương thức</strong>, <strong className="hero-highlight">IoT</strong>, <strong className="hero-highlight">dữ liệu lớn</strong> và mô hình kinh tế chia sẻ.
+            Ứng dụng AI & IoT theo dõi sức khỏe, chẩn đoán sâu bệnh và tối ưu năng suất cho <strong className="hero-highlight">cây sầu riêng</strong>.
           </p>
 
           <div className="hero-download-links">
