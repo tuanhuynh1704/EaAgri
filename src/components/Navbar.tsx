@@ -59,7 +59,7 @@ const Navbar = () => {
   }, []);
 
   const handleNew = () => {
-    navigate("/news");
+    navigate("/tintuc");
   };
 
   const handleLogin = () => {
@@ -132,8 +132,8 @@ const Navbar = () => {
           </a>
 
           <a
-            href="/news"
-            className={`nav__link ${pathname.startsWith("/news") ? "active" : ""}`}
+            href="/tintuc"
+            className={`nav__link ${pathname.startsWith("/tintuc") ? "active" : ""}`}
             onClick={(e) => {
               e.preventDefault();
               handleNew();
@@ -206,7 +206,7 @@ const Navbar = () => {
                           className="nav__user-dropdown-item"
                           onClick={() => {
                             setIsUserMenuOpen(false);
-                            navigate("/admin/news");
+                            navigate("//admintintuc");
                           }}
                         >
                           <i className="ri-file-list-3-line" />
@@ -230,7 +230,7 @@ const Navbar = () => {
                           className="nav__user-dropdown-item"
                           onClick={() => {
                             setIsUserMenuOpen(false);
-                            navigate("/news/create");
+                            navigate("/tintuc/create");
                           }}
                         >
                           <i className="ri-edit-box-line" />

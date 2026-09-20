@@ -44,7 +44,7 @@ export default function NewsDetail() {
     ogDescription: articleSnippet || undefined,
     ogImage: imageUrl || undefined,
     ogType: "article",
-    canonicalUrl: id ? `https://www.eaagri.vn/news/${id}` : undefined,
+    canonicalUrl: id ? `https://www.eaagri.vn/tintuc/${id}` : undefined,
     structuredData: article
       ? {
           "@context": "https://schema.org",
@@ -68,7 +68,7 @@ export default function NewsDetail() {
           },
           "mainEntityOfPage": {
             "@type": "WebPage",
-            "@id": `https://www.eaagri.vn/news/${id}`
+            "@id": `https://www.eaagri.vn/tintuc/${id}`
           }
         }
       : undefined
@@ -128,7 +128,7 @@ export default function NewsDetail() {
       if (deleteError) throw deleteError;
 
       alert("Xóa bài viết thành công!");
-      navigate("/news");
+      navigate("/tintuc");
     } catch (err: any) {
       console.error("Error deleting article:", err);
       alert("Đã xảy ra lỗi khi xóa bài viết: " + (err.message || "Lỗi không xác định"));
@@ -166,7 +166,7 @@ export default function NewsDetail() {
           <i className="ri-error-warning-line error-icon"></i>
           <h2>Đã xảy ra lỗi</h2>
           <p>{error || "Không tìm thấy bài viết."}</p>
-          <Link to="/news" className="btn btn-secondary">
+          <Link to="/tintuc" className="btn btn-secondary">
             <i className="ri-arrow-left-line"></i> Quay lại Bản Tin
           </Link>
         </div>
@@ -180,7 +180,7 @@ export default function NewsDetail() {
         
         {/* Navigation Breadcrumb / Back button */}
         <div className="news-detail__actions">
-          <Link to="/news" className="news-detail__back-link">
+          <Link to="/tintuc" className="news-detail__back-link">
             <i className="ri-arrow-left-line"></i>
             <span>Quay lại Bản Tin</span>
           </Link>

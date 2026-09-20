@@ -491,7 +491,7 @@ export default function ManageNews() {
                       {/* Title */}
                       <td>
                         <div className="manage-news__item-title">
-                          <Link to={`/news/${item.id}`} className="title-link">
+                          <Link to={`/tintuc/${item.id}`} className="title-link">
                             {cleanContent(item.title)}
                           </Link>
                         </div>

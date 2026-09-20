@@ -29,13 +29,13 @@ export default function NewsList() {
       "Cập nhật tin tức thị trường giá sầu riêng, kỹ thuật canh tác VietGAP, cảnh báo sâu bệnh và dự báo thời tiết nông nghiệp mới nhất từ EaAgri.",
     keywords:
       "tin tức nông nghiệp, giá sầu riêng hôm nay, kỹ thuật sầu riêng VietGAP, cảnh báo sâu bệnh Đắk Lắk, bản tin EaAgri",
-    canonicalUrl: "https://www.eaagri.vn/news",
+    canonicalUrl: "https://www.eaagri.vn/tintuc",
     structuredData: {
       "@context": "https://schema.org",
       "@type": "CollectionPage",
       "name": "Bản Tin & Kiến Thức Nông Nghiệp EaAgri",
       "description": "Kho dữ liệu tin tức, giá cả thị trường và cẩm nang kỹ thuật canh tác nông nghiệp số.",
-      "url": "https://www.eaagri.vn/news"
+      "url": "https://www.eaagri.vn/tintuc"
     }
   });
 
@@ -212,7 +212,7 @@ export default function NewsList() {
                 data-aos-delay={index * 50}
               >
                 {/* Card Image */}
-                <Link to={`/news/${item.id}`} className="news-list__card-image-wrapper">
+                <Link to={`/tintuc/${item.id}`} className="news-list__card-image-wrapper">
                   {item.image_url ? (
                     <img 
                       src={parseImageUrlAndPosition(item.image_url).url!} 
@@ -241,7 +241,7 @@ export default function NewsList() {
                   </div>
 
                   {/* Title */}
-                  <Link to={`/news/${item.id}`} style={{ textDecoration: "none" }}>
+                  <Link to={`/tintuc/${item.id}`} style={{ textDecoration: "none" }}>
                     <h2 className="news-list__card-title">{cleanContent(item.title)}</h2>
                   </Link>
 
@@ -251,7 +251,7 @@ export default function NewsList() {
                   {/* Card Footer Actions */}
                   <div className="news-list__card-footer">
                     <Link
-                      to={`/news/${item.id}`}
+                      to={`/tintuc/${item.id}`}
                       className="news-list__read-more"
                     >
                       <span>Xem tiếp</span>

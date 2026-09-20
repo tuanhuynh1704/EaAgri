@@ -382,7 +382,7 @@ export default function ManageCooperation() {
             <i className="ri-arrow-left-line" /> Quay lại Trang Chủ
           </Link>
           <div className="coop-admin__quick-nav">
-            <Link to="/admin/news" className="coop-admin__nav-pill">
+            <Link to="/admin/tintuc" className="coop-admin__nav-pill">
               <i className="ri-file-list-3-line" /> Bài Viết
             </Link>
             <Link to="/admin/accounts" className="coop-admin__nav-pill">
