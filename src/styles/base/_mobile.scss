@@ -116,25 +116,278 @@
   .scroll-down-hint, .features-bar-section { display: none; }
   .hero-leaf:nth-child(n+9), .iot-data-node:nth-child(n+4) { display: none; }
 
-  // Team cards: one clean column with consistent photo crop.
+  // Team Showcase on Mobile: Horizontal Swipe / Scroll Snap with 3D Flip Card
   .team-showcase {
     height: auto;
     min-height: 0;
-    padding: 6rem .75rem 2.5rem;
+    padding: 5.5rem 0 2rem;
+    overflow: hidden;
+  }
+
+  .team-showcase__container {
+    height: auto;
+    gap: 1.15rem;
+    padding: 0;
+    width: 100%;
+    max-width: 100%;
     overflow: visible;
   }
 
-  .team-showcase__container { height: auto; gap: 1.4rem; }
-  .team-showcase__header { padding-inline: .4rem; }
+  .team-showcase__header {
+    padding-inline: 1rem;
+    margin-bottom: 0.2rem;
+  }
+
   .team-showcase__label { font-size: .58rem; letter-spacing: 1.3px; }
   .team-showcase__title { font-size: clamp(1.8rem, 9vw, 2.25rem); letter-spacing: -1px; }
   .team-title-tech-icon { display: none; }
   .team-showcase__desc { font-size: .84rem; line-height: 1.55; }
-  .team-showcase__cards { grid-template-columns: 1fr; max-width: 430px; gap: 1.1rem; }
-  .team-card { border-radius: 20px; }
-  .team-card__image-box { height: clamp(275px, 78vw, 320px); }
-  .team-card__body { padding: 1rem .9rem; }
-  .team-card__task { min-height: 0; margin-bottom: .9rem; }
+
+  // 1. Horizontal swipe across members with peek effect
+  .team-showcase__cards {
+    display: flex !important;
+    flex-direction: row !important;
+    flex-wrap: nowrap !important;
+    overflow-x: auto !important;
+    overflow-y: hidden !important;
+    -webkit-overflow-scrolling: touch;
+    scroll-snap-type: x mandatory;
+    scroll-behavior: smooth;
+    gap: 14px;
+    width: 100%;
+    max-width: 100%;
+    padding: 0.5rem calc((100vw - clamp(230px, 68vw, 260px)) / 2) 0.8rem;
+    margin: 0;
+    scrollbar-width: none;
+    &::-webkit-scrollbar {
+      display: none;
+    }
+  }
+
+  // 2. Thu nhỏ khung 1 thành viên lại
+  .team-card {
+    flex: 0 0 clamp(230px, 68vw, 260px) !important;
+    width: clamp(230px, 68vw, 260px) !important;
+    height: clamp(330px, 48vh, 375px) !important;
+    scroll-snap-align: center;
+    scroll-snap-stop: always;
+    border-radius: 22px;
+    background: transparent !important;
+    border: none !important;
+    box-shadow: none !important;
+    cursor: pointer;
+    user-select: none;
+    -webkit-tap-highlight-color: transparent;
+    padding: 0;
+  }
+
+  .team-card__flipper {
+    width: 100%;
+    height: 100%;
+    border-radius: 22px;
+  }
+
+  .team-card__front {
+    border-radius: 22px;
+    overflow: hidden;
+    box-shadow: 0 12px 30px rgba(0, 0, 0, 0.16), 0 4px 10px rgba(0, 0, 0, 0.08);
+    border: 1px solid rgba(255, 255, 255, 0.18);
+  }
+
+  .team-card__image-box {
+    width: 100% !important;
+    height: 100% !important;
+    border-radius: 22px;
+    padding-bottom: 2.3rem;
+  }
+
+  .team-card__rect-avatar-img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    object-position: center 26%;
+  }
+
+  // Flip cue badge on photo front
+  .team-card__flip-hint {
+    display: inline-flex !important;
+    position: absolute;
+    bottom: 0.55rem;
+    left: 50%;
+    transform: translateX(-50%);
+    align-items: center;
+    gap: 0.35rem;
+    font-size: 0.62rem;
+    font-weight: 600;
+    color: rgba(255, 255, 255, 0.95);
+    background: rgba(10, 30, 24, 0.65);
+    backdrop-filter: blur(10px);
+    -webkit-backdrop-filter: blur(10px);
+    padding: 0.28rem 0.75rem;
+    border-radius: 99px;
+    border: 1px solid rgba(255, 255, 255, 0.25);
+    z-index: 5;
+    letter-spacing: 0.2px;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.25);
+    pointer-events: none;
+    white-space: nowrap;
+
+    i {
+      font-size: 0.75rem;
+      animation: flipHintSpin 3s ease-in-out infinite;
+    }
+  }
+
+  @keyframes flipHintSpin {
+    0%, 70% { transform: rotate(0deg); }
+    85% { transform: rotate(180deg); }
+    100% { transform: rotate(180deg); }
+  }
+
+  // 3. Bỏ thông tin bên dưới, bật lật ra mặt sau che ảnh lại
+  .team-card__body {
+    display: none !important;
+  }
+
+  .team-card__back {
+    display: flex !important;
+  }
+
+  // Mobile Navigation Dots & Swipe Hint
+  .team-showcase__mobile-nav {
+    display: flex !important;
+    flex-direction: column;
+    align-items: center;
+    gap: 0.45rem;
+    width: 100%;
+    padding-top: 0.2rem;
+  }
+
+  .team-showcase__pagination {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 0.45rem;
+  }
+
+  .team-showcase__dot {
+    width: 8px;
+    height: 8px;
+    border-radius: 99px;
+    border: none;
+    padding: 0;
+    background: rgba(20, 88, 60, 0.25);
+    cursor: pointer;
+    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+
+    &.is-active {
+      width: 26px;
+      background: #14583c;
+      box-shadow: 0 0 10px rgba(20, 88, 60, 0.4);
+    }
+  }
+
+  .team-showcase__swipe-hint {
+    display: flex;
+    align-items: center;
+    gap: 0.3rem;
+    font-size: 0.72rem;
+    font-weight: 500;
+    color: rgba(20, 88, 60, 0.6);
+    letter-spacing: 0.2px;
+
+    i {
+      font-size: 0.85rem;
+    }
+  }
+
+  // Expert & Advisory Showcase Mobile
+  .team-expert-showcase {
+    padding-inline: 0.85rem;
+    gap: 0.85rem;
+    margin-top: 0.35rem;
+  }
+
+  .expert-card {
+    flex-direction: column;
+    align-items: center;
+    text-align: center;
+    padding: 1.35rem 1rem;
+    gap: 1rem;
+    border-radius: 20px;
+
+    &::before {
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 4px;
+    }
+  }
+
+  .expert-card__avatar-wrapper {
+    width: 112px;
+    height: 136px;
+    border-radius: 16px;
+  }
+
+  .expert-card__content {
+    align-items: center;
+    text-align: center;
+  }
+
+  .expert-card__tags {
+    justify-content: center;
+  }
+
+  .expert-card__name {
+    font-size: 1.2rem;
+  }
+
+  .expert-card__position {
+    font-size: 0.82rem;
+    justify-content: center;
+    text-align: center;
+  }
+
+  .expert-card__desc {
+    font-size: 0.78rem;
+    text-align: center;
+    margin-bottom: 0.85rem;
+  }
+
+  .expert-card__contact-row {
+    justify-content: center;
+    width: 100%;
+    flex-direction: column;
+    gap: 0.5rem;
+  }
+
+  .expert-contact-chip {
+    width: 100%;
+    justify-content: center;
+    font-size: 0.74rem;
+    padding: 0.45rem 0.75rem;
+  }
+
+  .academic-advisors {
+    flex-direction: column;
+    align-items: stretch;
+    padding: 1rem;
+    gap: 0.85rem;
+    border-radius: 16px;
+  }
+
+  .academic-advisors__list {
+    display: grid;
+    grid-template-columns: 1fr;
+    gap: 0.4rem;
+
+    span {
+      justify-content: center;
+      border-radius: 10px;
+      padding: 0.45rem 0.6rem;
+    }
+  }
 
   // Product screenshots: center phone only, swipe-friendly controls.
   .team-showcase__carousel-area {
@@ -298,8 +551,6 @@
   .nav__actions .btn { padding-inline: .5rem; }
 
   .hero-download-links .download-btn { padding-inline: .45rem; }
-  .team-showcase { padding-inline: .55rem; }
-  .team-card__image-box { height: 280px; }
   .phone-mockup,
   .phone-mockup__fixed-wrapper { width: 205px !important; }
   .carousel-3d { height: 455px; }

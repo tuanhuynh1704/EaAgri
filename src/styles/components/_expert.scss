@@ -1,0 +1,492 @@
+@use "../abstracts/variables" as *;
+
+.expert-section {
+  position: relative;
+  overflow: hidden;
+  padding: clamp(4rem, 6vw, 6rem) 0;
+  background:
+    radial-gradient(circle at 80% 30%, rgba(52, 211, 153, 0.12), transparent 45%),
+    radial-gradient(circle at 20% 70%, rgba(14, 165, 233, 0.08), transparent 40%),
+    linear-gradient(160deg, #f8fffb 0%, #f0faf4 50%, #f0fdf9 100%);
+
+  // Subtle tech dot matrix grid
+  &::before {
+    content: "";
+    position: absolute;
+    inset: 0;
+    pointer-events: none;
+    opacity: 0.35;
+    background-image: radial-gradient(rgba(16, 185, 129, 0.25) 1px, transparent 1px);
+    background-size: 28px 28px;
+    mask-image: linear-gradient(180deg, transparent, #000 15%, #000 85%, transparent);
+  }
+
+  &__inner {
+    position: relative;
+    z-index: 2;
+    display: grid;
+    grid-template-columns: minmax(320px, 0.95fr) minmax(380px, 1.05fr);
+    align-items: center;
+    gap: clamp(2.5rem, 5vw, 5rem);
+  }
+}
+
+.expert-bg-aura {
+  position: absolute;
+  border-radius: 50%;
+  filter: blur(90px);
+  pointer-events: none;
+  z-index: 1;
+
+  &--1 {
+    width: 450px;
+    height: 450px;
+    background: radial-gradient(circle, rgba(16, 185, 129, 0.18), transparent 70%);
+    top: 10%;
+    right: 5%;
+  }
+
+  &--2 {
+    width: 350px;
+    height: 350px;
+    background: radial-gradient(circle, rgba(14, 165, 233, 0.15), transparent 70%);
+    bottom: 10%;
+    left: 5%;
+  }
+}
+
+// ==========================================
+// LEFT COLUMN: CONCISE BIO & SUMMARY
+// ==========================================
+
+.expert-section-copy {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+
+  .expert-eyebrow {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.5rem;
+    padding: 0.4rem 1.1rem;
+    background: rgba(16, 185, 129, 0.08);
+    border: 1px solid rgba(16, 185, 129, 0.2);
+    border-radius: 99px;
+    margin-bottom: 0.9rem;
+
+    &__icon {
+      color: #059669;
+      font-size: 0.95rem;
+    }
+
+    &__text {
+      font-size: 0.72rem;
+      font-weight: 800;
+      color: #047857;
+      letter-spacing: 0.08em;
+    }
+  }
+
+  .expert-title {
+    margin: 0 0 1.25rem;
+    color: #0f2e1d;
+    font-size: clamp(2.2rem, 3.4vw, 3.25rem);
+    line-height: 1.1;
+    letter-spacing: -0.03em;
+    font-weight: 850;
+
+    .text-gradient {
+      background: linear-gradient(110deg, #059669 0%, #0d9488 60%, #0284c7 100%);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+    }
+  }
+}
+
+// Concise Summary Card
+.expert-summary-card {
+  width: 100%;
+  max-width: 540px;
+  padding: 1.5rem 1.6rem;
+  border-radius: 20px;
+  background: rgba(255, 255, 255, 0.94);
+  border: 1.5px solid rgba(16, 185, 129, 0.18);
+  box-shadow:
+    0 12px 32px rgba(10, 75, 48, 0.06),
+    0 2px 8px rgba(0, 0, 0, 0.02);
+  margin-bottom: 1.35rem;
+  position: relative;
+  overflow: hidden;
+
+  &::before {
+    content: "";
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 4.5px;
+    height: 100%;
+    background: linear-gradient(180deg, #10b981 0%, #0284c7 100%);
+  }
+
+  &__header {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 0.45rem;
+    margin-bottom: 0.85rem;
+  }
+}
+
+.expert-summary-tag {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.35rem;
+  padding: 0.28rem 0.75rem;
+  border-radius: 99px;
+  background: rgba(16, 185, 129, 0.1);
+  border: 1px solid rgba(16, 185, 129, 0.25);
+  color: #047857;
+  font-size: 0.72rem;
+  font-weight: 800;
+  letter-spacing: 0.5px;
+
+  .tag-flag {
+    font-size: 0.9rem;
+  }
+}
+
+.expert-summary-name {
+  margin: 0;
+  font-size: 1.45rem;
+  font-weight: 850;
+  color: #0d3826;
+  letter-spacing: 0.2px;
+  line-height: 1.2;
+}
+
+.expert-summary-position {
+  display: inline-flex;
+  align-items: flex-start;
+  gap: 0.5rem;
+  font-size: 0.88rem;
+  color: #2b5543;
+  line-height: 1.5;
+  margin: 0 0 0.85rem;
+
+  i {
+    color: #10b981;
+    font-size: 1.05rem;
+    flex-shrink: 0;
+    margin-top: 2px;
+  }
+
+  strong {
+    color: #0a3020;
+    font-weight: 750;
+  }
+}
+
+.expert-summary-desc {
+  margin: 0;
+  font-size: 0.84rem;
+  color: #556e62;
+  line-height: 1.6;
+  padding-top: 0.75rem;
+  border-top: 1px dashed rgba(16, 185, 129, 0.2);
+}
+
+// Quick Contact Buttons Row
+.expert-contact-row {
+  display: flex;
+  align-items: center;
+  gap: 0.85rem;
+  flex-wrap: wrap;
+
+  .expert-contact-btn {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.45rem;
+    padding: 0.55rem 1.15rem;
+    border-radius: 99px;
+    font-size: 0.82rem;
+    font-weight: 700;
+    text-decoration: none;
+    transition: all 0.25s ease;
+
+    &--email {
+      background: #ffffff;
+      color: #065f46;
+      border: 1.5px solid rgba(16, 185, 129, 0.25);
+      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.04);
+
+      i {
+        color: #059669;
+        font-size: 0.95rem;
+      }
+
+      &:hover {
+        background: #065f46;
+        color: #ffffff;
+        border-color: #065f46;
+        box-shadow: 0 6px 18px rgba(6, 95, 70, 0.25);
+        i { color: #ffffff; }
+      }
+    }
+
+    &--phone {
+      background: linear-gradient(135deg, #059669 0%, #047857 100%);
+      color: #ffffff;
+      border: 1.5px solid #059669;
+      box-shadow: 0 4px 14px rgba(5, 150, 105, 0.25);
+
+      i {
+        color: #ffffff;
+        font-size: 0.95rem;
+      }
+
+      &:hover {
+        background: #065f46;
+        border-color: #065f46;
+        box-shadow: 0 6px 20px rgba(6, 95, 70, 0.35);
+        transform: translateY(-2px);
+      }
+    }
+  }
+}
+
+// ==========================================
+// RIGHT COLUMN: BIG STANDALONE PHOTO (NO BOX)
+// ==========================================
+
+.expert-visual-showcase {
+  position: relative;
+  width: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.expert-big-card {
+  position: relative;
+  width: min(440px, 34vw, calc(72vh * 959 / 1280));
+  aspect-ratio: 959 / 1280;
+  height: auto;
+  border-radius: 28px;
+  overflow: hidden;
+  box-shadow:
+    0 28px 70px rgba(10, 65, 42, 0.22),
+    0 12px 28px rgba(0, 0, 0, 0.1);
+  border: 4px solid rgba(255, 255, 255, 0.95);
+  background: #19221d;
+  transition: transform 0.4s cubic-bezier(0.25, 0.46, 0.45, 0.94);
+
+  &:hover {
+    transform: translateY(-4px);
+    box-shadow:
+      0 34px 80px rgba(10, 65, 42, 0.28),
+      0 14px 32px rgba(0, 0, 0, 0.12);
+  }
+}
+
+.expert-big-img {
+  width: 100%;
+  height: 100%;
+  object-fit: contain;
+  display: block;
+}
+
+// Glowing aura behind/inside
+.expert-img-aura {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  background: radial-gradient(circle at 50% 20%, transparent 60%, rgba(5, 30, 20, 0.4) 100%);
+}
+
+// Floating Badge on the big card
+.expert-floating-tag {
+  position: absolute;
+  z-index: 5;
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+  padding: 0.5rem 1.05rem;
+  border-radius: 99px;
+  background: rgba(8, 30, 21, 0.82);
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+  border: 1.5px solid rgba(255, 255, 255, 0.28);
+  color: #ffffff;
+  font-size: 0.78rem;
+  font-weight: 750;
+  letter-spacing: 0.3px;
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.28);
+  max-width: calc(100% - 2.5rem);
+  white-space: nowrap;
+  animation: tagFloat 4s ease-in-out infinite alternate;
+
+  .tag-flag {
+    font-size: 1rem;
+  }
+
+  i {
+    color: #34d399;
+    font-size: 0.92rem;
+  }
+
+  &--top {
+    top: 1.35rem;
+    right: 1.35rem;
+  }
+}
+
+@keyframes tagFloat {
+  0% { transform: translateY(0); }
+  100% { transform: translateY(-4px); }
+}
+
+// Caption Overlay at Bottom of Card
+.expert-big-card__caption {
+  position: absolute;
+  bottom: 0;
+  inset-inline: 0;
+  padding: 1.25rem 1.35rem 1rem;
+  background: linear-gradient(180deg, transparent 0%, rgba(4, 25, 16, 0.45) 35%, rgba(2, 16, 10, 0.86) 100%);
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  text-align: left;
+  z-index: 4;
+
+  .caption-name {
+    font-size: 1.2rem;
+    font-weight: 850;
+    color: #ffffff;
+    letter-spacing: 0.3px;
+    margin: 0 0 0.25rem;
+    line-height: 1.2;
+    text-shadow: 0 2px 8px rgba(0, 0, 0, 0.4);
+  }
+
+  .caption-role {
+    margin: 0;
+    font-size: 0.76rem;
+    color: #a7f3d0;
+    line-height: 1.4;
+    display: inline-flex;
+    align-items: center;
+    gap: 0.4rem;
+    letter-spacing: 0.2px;
+
+    i {
+      color: #34d399;
+      font-size: 0.88rem;
+    }
+  }
+}
+
+// ==========================================
+// RESPONSIVE MEDIA QUERIES
+// ==========================================
+
+@media (max-width: 1024px) {
+  .expert-section__inner {
+    grid-template-columns: 1fr;
+    gap: 2.8rem;
+  }
+
+  .expert-section-copy {
+    align-items: center;
+    text-align: center;
+  }
+
+  .expert-summary-card {
+    max-width: 600px;
+    text-align: left;
+  }
+
+  .expert-contact-row {
+    justify-content: center;
+  }
+
+  .expert-big-card {
+    width: min(390px, 78vw, calc(56vh * 959 / 1280));
+    aspect-ratio: 959 / 1280;
+    height: auto;
+  }
+}
+
+@media (max-width: 768px) {
+  .expert-section {
+    padding: 4.5rem 0 2.5rem;
+  }
+
+  .expert-section__inner {
+    padding-inline: 1rem;
+    gap: 2rem;
+  }
+
+  .expert-title {
+    font-size: clamp(1.85rem, 8.5vw, 2.3rem);
+    text-align: center;
+  }
+
+  .expert-summary-card {
+    padding: 1.25rem 1.15rem;
+    border-radius: 18px;
+  }
+
+  .expert-summary-name {
+    font-size: 1.25rem;
+  }
+
+  .expert-summary-position {
+    font-size: 0.82rem;
+  }
+
+  .expert-summary-desc {
+    font-size: 0.78rem;
+  }
+
+  .expert-contact-row {
+    width: 100%;
+    flex-direction: column;
+    gap: 0.55rem;
+
+    .expert-contact-btn {
+      width: 100%;
+      justify-content: center;
+      padding: 0.55rem 1rem;
+      font-size: 0.78rem;
+    }
+  }
+
+  .expert-big-card {
+    width: min(340px, 90vw, calc(52vh * 959 / 1280));
+    aspect-ratio: 959 / 1280;
+    height: auto;
+    border-radius: 22px;
+  }
+
+  .expert-floating-tag {
+    padding: 0.38rem 0.8rem;
+    font-size: 0.7rem;
+
+    &--top {
+      top: 0.85rem;
+      right: 0.85rem;
+    }
+  }
+
+  .expert-big-card__caption {
+    padding: 1rem 1.1rem 0.85rem;
+
+    .caption-name {
+      font-size: 1.05rem;
+    }
+
+    .caption-role {
+      font-size: 0.7rem;
+    }
+  }
+}

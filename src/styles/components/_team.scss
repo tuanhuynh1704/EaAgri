@@ -295,6 +295,8 @@
   transition: all 0.35s cubic-bezier(0.25, 0.46, 0.45, 0.94);
   min-width: 0;
   height: 100%;
+  perspective: 1200px;
+  -webkit-perspective: 1200px;
 
   &:hover {
     transform: translateY(-7px);
@@ -302,6 +304,163 @@
       0 18px 40px rgba(0, 0, 0, 0.08),
       0 30px 60px rgba(0, 0, 0, 0.04);
   }
+}
+
+// 3D Card Flipper
+.team-card__flipper {
+  position: relative;
+  width: 100%;
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+  transition: transform 0.65s cubic-bezier(0.34, 1.25, 0.64, 1);
+  transform-style: preserve-3d;
+  -webkit-transform-style: preserve-3d;
+}
+
+.team-card.is-flipped .team-card__flipper {
+  transform: rotateY(180deg);
+}
+
+.team-card__front {
+  position: relative;
+  width: 100%;
+  height: 100%;
+  backface-visibility: hidden;
+  -webkit-backface-visibility: hidden;
+  transform: rotateY(0deg);
+}
+
+.team-card__flip-hint {
+  display: none; // Hidden on desktop
+}
+
+// Back face (Hidden on desktop, active on mobile)
+.team-card__back {
+  display: none; // Hidden on desktop
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  backface-visibility: hidden;
+  -webkit-backface-visibility: hidden;
+  transform: rotateY(180deg);
+  border-radius: 22px;
+  overflow: hidden;
+  box-shadow: 0 16px 36px rgba(0, 0, 0, 0.28), 0 4px 12px rgba(0, 0, 0, 0.12);
+  flex-direction: column;
+  justify-content: space-between;
+  padding: 1.15rem 1rem 1rem;
+  z-index: 5;
+  background: #111714;
+  border: 1px solid rgba(255, 255, 255, 0.12);
+}
+
+.team-card__back-top {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  width: 100%;
+  position: relative;
+  z-index: 2;
+
+  .team-card__top-icon {
+    position: static;
+    width: 34px;
+    height: 34px;
+    font-size: 1rem;
+  }
+
+  .team-card__member-code {
+    position: static;
+    font-size: 0.65rem;
+  }
+}
+
+.team-card__back-main {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  text-align: center;
+  padding: 0.4rem 0.2rem;
+  flex-grow: 1;
+  justify-content: center;
+  position: relative;
+  z-index: 2;
+}
+
+.team-card__back-role {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  padding: 0.3rem 0.75rem;
+  border-radius: 99px;
+  font-size: 0.65rem;
+  font-weight: 700;
+  letter-spacing: 0.3px;
+  border: 1px solid rgba(255, 255, 255, 0.2);
+  background: rgba(0, 0, 0, 0.45);
+  color: #ffffff;
+  margin-bottom: 0.55rem;
+  backdrop-filter: blur(8px);
+}
+
+.team-card__back-name {
+  font-size: 0.98rem;
+  font-weight: 800;
+  color: #ffffff !important;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  margin: 0 0 0.4rem;
+  line-height: 1.25;
+  text-shadow: 0 2px 8px rgba(0, 0, 0, 0.4);
+}
+
+.team-card__back-task {
+  font-size: 0.78rem;
+  color: rgba(235, 245, 240, 0.88);
+  line-height: 1.48;
+  font-weight: 500;
+  margin: 0 0 0.85rem;
+  padding: 0.5rem 0.6rem;
+  border-radius: 12px;
+  background: rgba(255, 255, 255, 0.05);
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  backdrop-filter: blur(6px);
+  width: 100%;
+}
+
+.team-card__back-bottom {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 100%;
+  position: relative;
+  z-index: 2;
+}
+
+.team-card__back-return-pill {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.4rem;
+  font-size: 0.68rem;
+  font-weight: 600;
+  color: rgba(255, 255, 255, 0.85);
+  padding: 0.35rem 0.85rem;
+  border-radius: 99px;
+  background: rgba(255, 255, 255, 0.12);
+  border: 1px solid rgba(255, 255, 255, 0.18);
+  backdrop-filter: blur(10px);
+  transition: all 0.2s ease;
+
+  i {
+    font-size: 0.8rem;
+  }
+}
+
+.team-showcase__mobile-nav {
+  display: none; // Hidden on desktop
 }
 
 // Top Rounded Rectangular Image Header
@@ -470,6 +629,22 @@
       color: #2e7d32;
     }
   }
+
+  .team-card__back {
+    background: radial-gradient(circle at 50% 10%, rgba(37, 138, 76, 0.35) 0%, #111a15 65%, #0a110d 100%);
+    border: 1.5px solid rgba(46, 204, 113, 0.4);
+    box-shadow: 0 16px 36px rgba(13, 64, 40, 0.35), 0 4px 12px rgba(0, 0, 0, 0.18);
+  }
+  .team-card__back-role {
+    border-color: rgba(79, 210, 160, 0.45);
+    background: rgba(14, 56, 38, 0.7);
+    color: #bbf7d0;
+  }
+  .team-card__back-return-pill {
+    background: rgba(46, 204, 113, 0.18);
+    border-color: rgba(46, 204, 113, 0.35);
+    color: #e8fbf2;
+  }
 }
 
 // Card 2: Blue Theme (Nguyễn Anh Giảng)
@@ -500,6 +675,22 @@
     i {
       color: #1976d2;
     }
+  }
+
+  .team-card__back {
+    background: radial-gradient(circle at 50% 10%, rgba(22, 141, 179, 0.35) 0%, #111822 65%, #0b1017 100%);
+    border: 1.5px solid rgba(52, 152, 219, 0.4);
+    box-shadow: 0 16px 36px rgba(12, 53, 79, 0.35), 0 4px 12px rgba(0, 0, 0, 0.18);
+  }
+  .team-card__back-role {
+    border-color: rgba(56, 189, 248, 0.45);
+    background: rgba(14, 44, 68, 0.7);
+    color: #bae6fd;
+  }
+  .team-card__back-return-pill {
+    background: rgba(56, 189, 248, 0.18);
+    border-color: rgba(56, 189, 248, 0.35);
+    color: #f0f9ff;
   }
 }
 
@@ -532,6 +723,22 @@
       color: #7b1fa2;
     }
   }
+
+  .team-card__back {
+    background: radial-gradient(circle at 50% 10%, rgba(102, 115, 200, 0.35) 0%, #171524 65%, #0f0e19 100%);
+    border: 1.5px solid rgba(139, 92, 246, 0.4);
+    box-shadow: 0 16px 36px rgba(45, 30, 80, 0.35), 0 4px 12px rgba(0, 0, 0, 0.18);
+  }
+  .team-card__back-role {
+    border-color: rgba(167, 139, 250, 0.45);
+    background: rgba(43, 29, 74, 0.7);
+    color: #e9d5ff;
+  }
+  .team-card__back-return-pill {
+    background: rgba(167, 139, 250, 0.18);
+    border-color: rgba(167, 139, 250, 0.35);
+    color: #faf5ff;
+  }
 }
 
 // Card 4: Orange Theme (Huỳnh Anh Tuấn)
@@ -562,6 +769,22 @@
     i {
       color: #e65100;
     }
+  }
+
+  .team-card__back {
+    background: radial-gradient(circle at 50% 10%, rgba(189, 138, 45, 0.35) 0%, #201912 65%, #15100a 100%);
+    border: 1.5px solid rgba(245, 158, 11, 0.4);
+    box-shadow: 0 16px 36px rgba(78, 52, 15, 0.35), 0 4px 12px rgba(0, 0, 0, 0.18);
+  }
+  .team-card__back-role {
+    border-color: rgba(251, 191, 36, 0.45);
+    background: rgba(66, 44, 15, 0.7);
+    color: #fef08a;
+  }
+  .team-card__back-return-pill {
+    background: rgba(245, 158, 11, 0.18);
+    border-color: rgba(245, 158, 11, 0.35);
+    color: #fffbeb;
   }
 }
 
@@ -609,104 +832,302 @@
     linear-gradient(180deg, #fff 0%, #f8fcfa 100%);
 }
 
-.team-advisors {
+// ============================================
+// EXPERT & ADVISORY SHOWCASE
+// ============================================
+.team-expert-showcase {
   width: 100%;
   max-width: 1240px;
+  display: flex;
+  flex-direction: column;
+  gap: 1.25rem;
+  margin-top: 0.5rem;
+  position: relative;
+  z-index: 4;
+}
+
+// Main Featured Expert Card: ThS. Liang Guei Jia
+.expert-card {
+  width: 100%;
+  display: flex;
+  align-items: center;
+  gap: 2rem;
+  padding: 1.6rem 2.2rem;
+  border-radius: 24px;
+  background: linear-gradient(135deg, rgba(255, 255, 255, 0.98) 0%, rgba(240, 252, 246, 0.94) 100%);
+  border: 1.5px solid rgba(22, 139, 104, 0.2);
+  box-shadow:
+    0 16px 40px rgba(18, 92, 68, 0.08),
+    0 4px 12px rgba(0, 0, 0, 0.03);
+  position: relative;
+  overflow: hidden;
+  transition: all 0.35s cubic-bezier(0.25, 0.46, 0.45, 0.94);
+
+  &::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 6px;
+    height: 100%;
+    background: linear-gradient(180deg, #1ca66a 0%, #0a8c91 100%);
+  }
+
+  &:hover {
+    transform: translateY(-3px);
+    box-shadow:
+      0 22px 50px rgba(18, 92, 68, 0.12),
+      0 6px 18px rgba(0, 0, 0, 0.05);
+    border-color: rgba(22, 139, 104, 0.35);
+  }
+}
+
+.expert-card__avatar-col {
+  flex-shrink: 0;
+}
+
+.expert-card__avatar-wrapper {
+  position: relative;
+  width: 132px;
+  height: 160px;
+  border-radius: 18px;
+  overflow: hidden;
+  box-shadow: 0 10px 24px rgba(0, 0, 0, 0.14);
+  border: 2px solid rgba(255, 255, 255, 0.95);
+  background: #1e2622;
+}
+
+.expert-card__avatar-img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  object-position: center 18%;
+  transition: transform 0.4s ease;
+
+  &:hover {
+    transform: scale(1.05);
+  }
+}
+
+.expert-card__badge-flag {
+  position: absolute;
+  bottom: 0.5rem;
+  left: 50%;
+  transform: translateX(-50%);
+  display: inline-flex;
+  align-items: center;
+  gap: 0.25rem;
+  padding: 0.22rem 0.6rem;
+  border-radius: 99px;
+  background: rgba(10, 32, 25, 0.82);
+  backdrop-filter: blur(6px);
+  color: #ffffff;
+  font-size: 0.65rem;
+  font-weight: 750;
+  letter-spacing: 0.5px;
+  border: 1px solid rgba(255, 255, 255, 0.25);
+  white-space: nowrap;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.25);
+}
+
+.expert-card__content {
+  flex-grow: 1;
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  text-align: left;
+}
+
+.expert-card__tags {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  margin-bottom: 0.45rem;
+  flex-wrap: wrap;
+}
+
+.expert-tag {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.35rem;
+  padding: 0.25rem 0.65rem;
+  border-radius: 99px;
+  font-size: 0.68rem;
+  font-weight: 750;
+  letter-spacing: 0.3px;
+  text-transform: uppercase;
+
+  &--global {
+    background: linear-gradient(90deg, #e8f5e9, #e0f2f1);
+    color: #1b5e20;
+    border: 1px solid rgba(46, 125, 50, 0.25);
+
+    i {
+      color: #2e7d32;
+    }
+  }
+
+  &--org {
+    background: linear-gradient(90deg, #e3f2fd, #e0f7fa);
+    color: #0d47a1;
+    border: 1px solid rgba(25, 118, 210, 0.25);
+
+    i {
+      color: #1976d2;
+    }
+  }
+}
+
+.expert-card__name {
+  font-size: 1.35rem;
+  font-weight: 850;
+  color: #14583c;
+  letter-spacing: 0.2px;
+  margin: 0 0 0.35rem;
+  line-height: 1.2;
+}
+
+.expert-card__position {
+  display: inline-flex;
+  align-items: flex-start;
+  gap: 0.45rem;
+  font-size: 0.88rem;
+  color: #264e3f;
+  line-height: 1.45;
+  margin: 0 0 0.55rem;
+
+  i {
+    color: #168b68;
+    font-size: 1rem;
+    flex-shrink: 0;
+    margin-top: 2px;
+  }
+
+  strong {
+    color: #0c3e29;
+    font-weight: 750;
+  }
+}
+
+.expert-card__desc {
+  font-size: 0.82rem;
+  color: #556c62;
+  line-height: 1.5;
+  margin: 0 0 0.95rem;
+  max-width: 880px;
+}
+
+.expert-card__contact-row {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  flex-wrap: wrap;
+}
+
+.expert-contact-chip {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.45rem;
+  padding: 0.4rem 0.85rem;
+  border-radius: 99px;
+  font-size: 0.76rem;
+  font-weight: 650;
+  color: #14583c;
+  background: #ffffff;
+  border: 1px solid rgba(20, 88, 60, 0.2);
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.04);
+  text-decoration: none;
+  transition: all 0.25s ease;
+
+  i {
+    color: #168b68;
+    font-size: 0.88rem;
+  }
+
+  &:hover {
+    background: #14583c;
+    color: #ffffff;
+    border-color: #14583c;
+    box-shadow: 0 4px 14px rgba(20, 88, 60, 0.2);
+
+    i {
+      color: #ffffff;
+    }
+  }
+}
+
+// Academic Advisors Strip
+.academic-advisors {
+  width: 100%;
   display: flex;
   align-items: center;
   justify-content: space-between;
   gap: 1.25rem;
-  padding: 0.85rem 1rem;
-  border: 1px solid rgba(18, 132, 91, 0.14);
+  padding: 0.85rem 1.25rem;
   border-radius: 18px;
-  background: linear-gradient(110deg, rgba(240, 250, 246, 0.92), rgba(243, 250, 251, 0.76));
-  box-shadow: 0 12px 30px rgba(20, 83, 65, 0.06);
+  background: rgba(255, 255, 255, 0.85);
+  border: 1px solid rgba(18, 132, 91, 0.14);
+  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.03);
 }
 
-.team-advisors__intro,
-.team-advisors__list,
-.team-advisors__list span {
+.academic-advisors__intro {
   display: flex;
   align-items: center;
-}
-
-.team-advisors__intro {
-  gap: 0.7rem;
+  gap: 0.75rem;
   flex-shrink: 0;
+
+  div {
+    display: flex;
+    flex-direction: column;
+  }
+
+  small {
+    color: #648176;
+    font: 700 0.58rem/1.2 monospace;
+    letter-spacing: 1.2px;
+  }
+
+  strong {
+    margin-top: 0.15rem;
+    color: #174c3a;
+    font-size: 0.84rem;
+  }
 }
 
-.team-advisors__icon {
+.academic-advisors__icon {
   display: grid;
   place-items: center;
-  width: 40px;
-  height: 40px;
-  border-radius: 12px;
+  width: 36px;
+  height: 36px;
+  border-radius: 10px;
   color: #087f63;
-  background: #fff;
-  box-shadow: 0 5px 15px rgba(15, 100, 72, 0.09);
-  font-size: 1.15rem;
+  background: #ffffff;
+  box-shadow: 0 3px 10px rgba(15, 100, 72, 0.1);
+  font-size: 1.1rem;
 }
 
-.team-advisors__intro div {
+.academic-advisors__list {
   display: flex;
-  flex-direction: column;
-}
-
-.team-advisors__intro small {
-  color: #648176;
-  font: 700 0.58rem/1.2 monospace;
-  letter-spacing: 1px;
-}
-
-.team-advisors__intro strong {
-  margin-top: 0.15rem;
-  color: #174c3a;
-  font-size: 0.88rem;
-}
-
-.team-advisors__list {
+  align-items: center;
   justify-content: flex-end;
   gap: 0.55rem;
   flex-wrap: wrap;
-}
 
-.team-advisors__list span {
-  gap: 0.35rem;
-  padding: 0.45rem 0.65rem;
-  border-radius: 99px;
-  color: #356456;
-  background: rgba(255, 255, 255, .78);
-  font-size: 0.7rem;
-  font-weight: 650;
-}
+  span {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.35rem;
+    padding: 0.35rem 0.65rem;
+    border-radius: 99px;
+    color: #2b594b;
+    background: rgba(240, 250, 246, 0.85);
+    border: 1px solid rgba(18, 132, 91, 0.12);
+    font-size: 0.72rem;
+    font-weight: 650;
 
-.team-advisors__list i {
-  color: #15946c;
-}
-
-@media (max-width: 900px) {
-  .team-advisors {
-    flex-direction: column;
-    align-items: stretch;
-  }
-
-  .team-advisors__list {
-    justify-content: flex-start;
-  }
-}
-
-@media (max-width: 600px) {
-  .team-advisors {
-    padding: 0.85rem;
-  }
-
-  .team-advisors__list {
-    display: grid;
-    grid-template-columns: 1fr;
-  }
-
-  .team-advisors__list span {
-    border-radius: 10px;
+    i {
+      color: #168b68;
+    }
   }
 }
 
@@ -979,29 +1400,6 @@
 
   .team-showcase__title {
     font-size: 2rem;
-  }
-
-  .team-showcase__cards {
-    grid-template-columns: 1fr;
-    max-width: 400px;
-    gap: 1.15rem;
-  }
-
-  .team-card {
-    height: auto;
-  }
-
-  .team-card__image-box {
-    height: clamp(275px, 78vw, 320px);
-  }
-
-  .team-card__rect-avatar-img {
-    padding-top: 0;
-    object-position: center 32%;
-  }
-
-  .team-card__body {
-    padding-bottom: 1rem;
   }
 
   .team-showcase__desc {

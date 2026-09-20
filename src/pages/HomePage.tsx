@@ -8,7 +8,7 @@ import VideoGallerySection from "../components/VideoGallerySection";
 import ResultSection from "../components/ResultSection";
 import RoadmapSection from "../components/RoadmapSection";
 import SplashIntro from "../components/SplashIntro";
-import DurianScannerSection from "../components/DurianScannerSection";
+import ExpertSection from "../components/ExpertSection";
 import LogoMarqueeSection from "../components/LogoMarqueeSection";
 
 export default function HomePage() {
@@ -76,7 +76,7 @@ export default function HomePage() {
       <SplashIntro />
       <Hero />
       <LogoMarqueeSection />
-      <DurianScannerSection />
+      <ExpertSection />
       <TeamSection />
 
       <div className="section-bg--gradient-soft fullpage-slide">

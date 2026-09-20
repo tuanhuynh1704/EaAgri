@@ -1,4 +1,4 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef } from "react";
 
 const appScreenshots = [
   "/assets/main screen.jpg",
@@ -114,6 +114,61 @@ const TeamSection = () => {
   const [touchEnd, setTouchEnd] = useState<number | null>(null);
   const [isCarouselPaused, setIsCarouselPaused] = useState(false);
 
+  // Mobile Team Cards: Flip & Swipe state
+  const [flippedCards, setFlippedCards] = useState<{ [key: number]: boolean }>({});
+  const [activeCardIndex, setActiveCardIndex] = useState(0);
+  const cardsContainerRef = useRef<HTMLDivElement>(null);
+  const touchStartXRef = useRef<number>(0);
+  const touchStartYRef = useRef<number>(0);
+  const isSwipingRef = useRef<boolean>(false);
+
+  const handleCardsTouchStart = (e: React.TouchEvent) => {
+    touchStartXRef.current = e.touches[0].clientX;
+    touchStartYRef.current = e.touches[0].clientY;
+    isSwipingRef.current = false;
+  };
+
+  const handleCardsTouchMove = (e: React.TouchEvent) => {
+    const deltaX = Math.abs(e.touches[0].clientX - touchStartXRef.current);
+    const deltaY = Math.abs(e.touches[0].clientY - touchStartYRef.current);
+    if (deltaX > 8 || deltaY > 8) {
+      isSwipingRef.current = true;
+    }
+  };
+
+  const handleCardsScroll = () => {
+    const container = cardsContainerRef.current;
+    if (!container) return;
+    const scrollLeft = container.scrollLeft;
+    const firstCard = container.firstElementChild as HTMLElement | null;
+    const cardWidth = firstCard ? firstCard.offsetWidth : 250;
+    const gap = 14;
+    const index = Math.round(scrollLeft / (cardWidth + gap));
+    setActiveCardIndex(Math.max(0, Math.min(teamMembers.length - 1, index)));
+  };
+
+  const handleCardClick = (index: number) => {
+    if (isSwipingRef.current) return;
+    setFlippedCards((prev) => ({
+      ...prev,
+      [index]: !prev[index],
+    }));
+  };
+
+  const scrollToCard = (index: number) => {
+    const container = cardsContainerRef.current;
+    if (!container) return;
+    const cards = container.querySelectorAll(".team-card");
+    if (cards[index]) {
+      (cards[index] as HTMLElement).scrollIntoView({
+        behavior: "smooth",
+        inline: "center",
+        block: "nearest",
+      });
+      setActiveCardIndex(index);
+    }
+  };
+
   useEffect(() => {
     if (isCarouselPaused) return;
     const interval = setInterval(() => {
@@ -188,38 +243,90 @@ const TeamSection = () => {
             </p> */}
           </div>
 
-          {/* Member Cards Grid (Rectangular Photo Header - Image Top, Text Below) */}
-          <div className="team-showcase__cards" data-aos="fade-up" data-aos-delay="100">
+          {/* Member Cards Grid (3D Flip enabled for Mobile, static photo+body for Desktop) */}
+          <div
+            ref={cardsContainerRef}
+            className="team-showcase__cards"
+            data-aos="fade-up"
+            data-aos-delay="100"
+            onTouchStart={handleCardsTouchStart}
+            onTouchMove={handleCardsTouchMove}
+            onScroll={handleCardsScroll}
+          >
             {teamMembers.map((member, index) => (
               <div
-                className={`team-card team-card--${member.themeColor}`}
+                className={`team-card team-card--${member.themeColor} ${flippedCards[index] ? "is-flipped" : ""}`}
                 key={index}
                 data-aos="fade-up"
                 data-aos-delay={150 + index * 80}
+                onClick={() => handleCardClick(index)}
               >
-                {/* Top Rounded Rectangular Image Box */}
-                <div className="team-card__image-box">
-                  <span className="team-card__circuit-line" aria-hidden="true"></span>
-                  {/* Floating Top Left Glass Badge Icon */}
-                  <div className="team-card__top-icon">
-                    <i className={member.topIcon}></i>
+                {/* 3D Flipper Container */}
+                <div className="team-card__flipper">
+                  {/* FRONT: Rectangular Photo Header */}
+                  <div className="team-card__front">
+                    <div className="team-card__image-box">
+                      <span className="team-card__circuit-line" aria-hidden="true"></span>
+                      {/* Floating Top Left Glass Badge Icon */}
+                      <div className="team-card__top-icon">
+                        <i className={member.topIcon}></i>
+                      </div>
+                      <span className="team-card__member-code">{member.memberCode}</span>
+
+                      {/* Rectangular Photo Avatar */}
+                      <img
+                        src={member.avatar}
+                        alt={member.name}
+                        className="team-card__rect-avatar-img"
+                      />
+
+                      {/* Role Pill Badge anchored at base of image */}
+                      <div className="team-card__role-pill">
+                        <span>{member.roleTag}</span>
+                      </div>
+
+                      {/* Flip Hint button visible on mobile */}
+                      <div className="team-card__flip-hint" aria-hidden="true">
+                        <i className="ri-repeat-2-line"></i>
+                        <span>Chạm xem thông tin</span>
+                      </div>
+                    </div>
                   </div>
-                  <span className="team-card__member-code">{member.memberCode}</span>
 
-                  {/* Rectangular Photo Avatar */}
-                  <img
-                    src={member.avatar}
-                    alt={member.name}
-                    className="team-card__rect-avatar-img"
-                  />
+                  {/* BACK: Detailed Info (3D flipped over to cover the photo on mobile) */}
+                  <div className="team-card__back">
+                    <span className="team-card__circuit-line" aria-hidden="true"></span>
+                    <div className="team-card__back-top">
+                      <div className="team-card__top-icon">
+                        <i className={member.topIcon}></i>
+                      </div>
+                      <span className="team-card__member-code">{member.memberCode}</span>
+                    </div>
 
-                  {/* Role Pill Badge anchored at base of image */}
-                  <div className="team-card__role-pill">
-                    <span>{member.roleTag}</span>
+                    <div className="team-card__back-main">
+                      <div className="team-card__back-role">
+                        <span>{member.roleTag}</span>
+                      </div>
+                      <h3 className="team-card__back-name">{member.name}</h3>
+                      <div className="team-card__name-accent"></div>
+                      <p className="team-card__back-task">{member.task}</p>
+
+                      <div className="team-card__skill-pill">
+                        <i className={member.skillIcon}></i>
+                        <span>EaAgri Core Team</span>
+                      </div>
+                    </div>
+
+                    <div className="team-card__back-bottom">
+                      <div className="team-card__back-return-pill">
+                        <i className="ri-arrow-go-back-line"></i>
+                        <span>Chạm để lật lại ảnh</span>
+                      </div>
+                    </div>
                   </div>
                 </div>
 
-                {/* Text Content Below Image */}
+                {/* Text Content Below Image (Kept for Desktop, hidden on Mobile) */}
                 <div className="team-card__body">
                   {/* Member Name */}
                   <h3 className="team-card__name">{member.name}</h3>
@@ -240,20 +347,43 @@ const TeamSection = () => {
             ))}
           </div>
 
-          {/* <aside className="team-advisors" data-aos="fade-up" data-aos-delay="180" aria-label="Cố vấn chuyên môn">
-          <div className="team-advisors__intro">
-            <span className="team-advisors__icon"><i className="ri-graduation-cap-line" /></span>
-            <div>
-              <small>ACADEMIC SUPPORT</small>
-              <strong>Cố vấn chuyên môn</strong>
+          {/* Mobile Pagination Dots & Swipe Helper */}
+          <div className="team-showcase__mobile-nav">
+            <div className="team-showcase__pagination" aria-label="Team members navigation">
+              {teamMembers.map((member, idx) => (
+                <button
+                  key={idx}
+                  type="button"
+                  className={`team-showcase__dot team-showcase__dot--${member.themeColor} ${activeCardIndex === idx ? "is-active" : ""}`}
+                  onClick={() => scrollToCard(idx)}
+                  aria-label={`Xem thành viên ${member.name}`}
+                />
+              ))}
+            </div>
+            <div className="team-showcase__swipe-hint" aria-hidden="true">
+              <i className="ri-arrow-left-s-line"></i>
+              <span>Vuốt để xem thêm</span>
+              <i className="ri-arrow-right-s-line"></i>
             </div>
           </div>
-          <div className="team-advisors__list">
-            <span><i className="ri-user-star-line" /> ThS. Nguyễn Huỳnh Thông</span>
-            <span><i className="ri-user-star-line" /> ThS. Phạm Đình Tài</span>
-            <span><i className="ri-user-star-line" /> TS. Hoàng Thịnh Nhân</span>
-          </div>
-        </aside> */}
+
+          {/* Academic Advisory Board from University */}
+          <aside className="academic-advisors" aria-label="Cố vấn chuyên môn học thuật" data-aos="fade-up" data-aos-delay="200">
+            <div className="academic-advisors__intro">
+              <span className="academic-advisors__icon">
+                <i className="ri-graduation-cap-line"></i>
+              </span>
+              <div>
+                <small>ACADEMIC ADVISORY</small>
+                <strong>Cố vấn chuyên môn Khoa CNTT — ĐH Nguyễn Tất Thành</strong>
+              </div>
+            </div>
+            <div className="academic-advisors__list">
+              <span><i className="ri-user-star-line"></i> ThS. Nguyễn Huỳnh Thông</span>
+              <span><i className="ri-user-star-line"></i> ThS. Phạm Đình Tài</span>
+              <span><i className="ri-user-star-line"></i> TS. Hoàng Thịnh Nhân</span>
+            </div>
+          </aside>
         </div>
       </section>
 
