@@ -42,36 +42,36 @@
 
   // Compact navigation: recognizable logo + touch-friendly icon tabs.
   nav.navbar-container {
-    top: .65rem;
+    top: .45rem;
     width: calc(100% - 1rem);
     gap: .35rem;
   }
 
-  .navbar-container.is-inner-page { top: .65rem; }
+  .navbar-container.is-inner-page { top: .45rem; }
 
   .navbar-container.is-scrolled .nav__logo,
   .navbar-container.is-inner-page .nav__logo {
-    min-height: 48px;
-    padding: .22rem .9rem;
+    min-height: 42px;
+    padding: .18rem .8rem;
     border-radius: 999px;
     overflow: hidden;
 
-    .nav__logo-img { width: auto; height: 48px; max-width: none; transform: scale(1.28); }
+    .nav__logo-img { width: auto; height: 42px; max-width: none; transform: scale(1.25); }
   }
 
   .nav__logo {
     padding: .2rem .35rem;
 
-    .nav__logo-img { width: auto; height: 95px; max-width: none; }
+    .nav__logo-img { width: auto; height: 85px; max-width: none; }
   }
-  .nav__right-capsule { margin-left: auto; gap: .35rem !important; }
+  .nav__right-capsule { margin-left: auto; gap: .25rem !important; }
 
   .navbar-container.is-scrolled .nav__right-capsule {
     .nav__menu,
     .nav__actions {
-      min-height: 50px;
-      border-radius: 16px;
-      padding: .2rem;
+      min-height: 42px;
+      border-radius: 999px;
+      padding: .18rem;
     }
   }
 
