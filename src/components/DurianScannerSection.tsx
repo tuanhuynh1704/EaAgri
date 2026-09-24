@@ -10,7 +10,7 @@ interface DiagnosticInfo {
   health: string;
   confidence: number;
   fleshQuality: string;
-  harvestWindow: string;
+  harvestWindow: string
 }
 
 const DurianScannerSection = () => {
