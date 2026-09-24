@@ -25,6 +25,64 @@ const ADMIN_USER_ENV = (import.meta.env.VITE_ADMIN_USERNAME || "admin").toLowerC
 const ADMIN_EMAIL_ENV = (import.meta.env.VITE_ADMIN_EMAIL || "admin@eaagri.vn").toLowerCase().trim();
 const ADMIN_PASSWORD_ENV = import.meta.env.VITE_ADMIN_PASSWORD || "admin@123";
 
+// Admin session: stored with the build it was created on and an expiry, so it
+// ends automatically after a new deploy or after ADMIN_SESSION_TTL_MS.
+const ADMIN_SESSION_KEY = "eaagri_admin_session";
+const BUILD_ID_KEY = "eaagri_build_id";
+const BUILD_ID: string = import.meta.env.VITE_BUILD_ID || "dev";
+const ADMIN_SESSION_TTL_MS = 8 * 60 * 60 * 1000; // 8 hours
+
+const saveAdminSession = () => {
+  localStorage.setItem(
+    ADMIN_SESSION_KEY,
+    JSON.stringify({ buildId: BUILD_ID, expiresAt: Date.now() + ADMIN_SESSION_TTL_MS })
+  );
+};
+
+const hasValidAdminSession = (): boolean => {
+  try {
+    const raw = localStorage.getItem(ADMIN_SESSION_KEY);
+    if (!raw) return false;
+    const { buildId, expiresAt } = JSON.parse(raw) as { buildId?: string; expiresAt?: number };
+    const valid = buildId === BUILD_ID && typeof expiresAt === "number" && Date.now() < expiresAt;
+    if (!valid) localStorage.removeItem(ADMIN_SESSION_KEY);
+    return valid;
+  } catch {
+    // Old "true" flag or corrupted value
+    localStorage.removeItem(ADMIN_SESSION_KEY);
+    return false;
+  }
+};
+
+const clearSupabaseStorage = () => {
+  try {
+    Object.keys(localStorage).forEach((key) => {
+      if (key.startsWith("sb-") || key.includes("supabase.auth.token")) {
+        localStorage.removeItem(key);
+      }
+    });
+    Object.keys(sessionStorage).forEach((key) => {
+      if (key.startsWith("sb-") || key.includes("supabase.auth.token")) {
+        sessionStorage.removeItem(key);
+      }
+    });
+  } catch (_) {}
+};
+
+// New deploy detected: drop every stored session before anything reads it
+const isNewBuild = (() => {
+  try {
+    const previous = localStorage.getItem(BUILD_ID_KEY);
+    localStorage.setItem(BUILD_ID_KEY, BUILD_ID);
+    if (previous !== null && previous !== BUILD_ID) {
+      localStorage.removeItem(ADMIN_SESSION_KEY);
+      clearSupabaseStorage();
+      return true;
+    }
+  } catch (_) {}
+  return false;
+})();
+
 const ADMIN_MOCK_USER: User = {
   id: "eaagri-admin-sa-master",
   email: ADMIN_EMAIL_ENV,
@@ -56,7 +114,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
       (inputId === ADMIN_USER_ENV || inputId === ADMIN_EMAIL_ENV || inputId === "admin" || inputId === "admin@eaagri.vn") &&
       pass === ADMIN_PASSWORD_ENV
     ) {
-      localStorage.setItem("eaagri_admin_session", "true");
+      saveAdminSession();
       setUser(ADMIN_MOCK_USER);
       setProfile(ADMIN_MOCK_PROFILE);
       setAuthError(null);
@@ -92,7 +150,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
   };
 
   const refreshProfile = async () => {
-    if (localStorage.getItem("eaagri_admin_session") === "true") {
+    if (hasValidAdminSession()) {
       setProfile(ADMIN_MOCK_PROFILE);
       return;
     }
@@ -102,9 +160,13 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
   };
 
   useEffect(() => {
+    // Also end the Supabase session server-side after a new deploy
+    if (isNewBuild) {
+      supabase.auth.signOut({ scope: "local" }).catch(() => {});
+    }
+
     // 0. Check local admin session first
-    const savedAdmin = localStorage.getItem("eaagri_admin_session");
-    if (savedAdmin === "true") {
+    if (hasValidAdminSession()) {
       setUser(ADMIN_MOCK_USER);
       setProfile(ADMIN_MOCK_PROFILE);
       setLoading(false);
@@ -126,7 +188,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
     // 2. Listen for auth changes
     const { data: { subscription } } = supabase.auth.onAuthStateChange(
       async (_event, session) => {
-        if (localStorage.getItem("eaagri_admin_session") === "true") {
+        if (hasValidAdminSession()) {
           return;
         }
         if (session) {
@@ -147,24 +209,13 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
 
   const signOut = async () => {
     setLoading(true);
-    localStorage.removeItem("eaagri_admin_session");
+    localStorage.removeItem(ADMIN_SESSION_KEY);
     try {
       await supabase.auth.signOut();
     } catch (err) {
       console.warn("AuthContext: Supabase signOut returned error, forcing local session clear:", err);
     } finally {
-      try {
-        Object.keys(localStorage).forEach((key) => {
-          if (key.startsWith("sb-") || key.includes("supabase.auth.token")) {
-            localStorage.removeItem(key);
-          }
-        });
-        Object.keys(sessionStorage).forEach((key) => {
-          if (key.startsWith("sb-") || key.includes("supabase.auth.token")) {
-            sessionStorage.removeItem(key);
-          }
-        });
-      } catch (_) {}
+      clearSupabaseStorage();
 
       setUser(null);
       setProfile(null);

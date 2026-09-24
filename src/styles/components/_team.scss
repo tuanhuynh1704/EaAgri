@@ -1078,25 +1078,173 @@
   }
 }
 
-// Academic Advisors Strip
+// Investor-mentor + Academic Advisors Strip
 .academic-advisors {
   width: 100%;
-  display: flex;
+  display: grid;
+  grid-template-columns: minmax(0, 1.55fr) auto minmax(0, 1fr);
   align-items: center;
-  justify-content: space-between;
-  gap: 1.25rem;
-  padding: 0.85rem 1.25rem;
-  border-radius: 18px;
+  gap: 1.75rem;
+  padding: 1.5rem 1.75rem;
+  border-radius: 22px;
   background: rgba(255, 255, 255, 0.85);
   border: 1px solid rgba(18, 132, 91, 0.14);
   box-shadow: 0 4px 16px rgba(0, 0, 0, 0.03);
+
+  @media (max-width: 1100px) {
+    grid-template-columns: 1fr;
+    gap: 0.9rem;
+  }
+}
+
+.academic-advisors__divider {
+  width: 1px;
+  align-self: stretch;
+  background: linear-gradient(180deg, transparent, rgba(18, 132, 91, 0.2), transparent);
+
+  @media (max-width: 1100px) {
+    width: auto;
+    height: 1px;
+    background: linear-gradient(90deg, transparent, rgba(18, 132, 91, 0.2), transparent);
+  }
+}
+
+// Left: investor-mentor (featured)
+.advisor-mentor {
+  display: flex;
+  align-items: center;
+  gap: 1.4rem;
+  min-width: 0;
+
+  @media (max-width: 640px) {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 1rem;
+  }
+}
+
+.advisor-mentor__photo-wrap {
+  position: relative;
+  flex-shrink: 0;
+}
+
+.advisor-mentor__photo {
+  display: block;
+  width: 124px;
+  height: 124px;
+  border-radius: 50%;
+  object-fit: cover;
+  border: 4px solid #ffffff;
+  box-shadow:
+    0 0 0 3px #facc15,
+    0 12px 28px rgba(15, 100, 72, 0.22);
+
+  @media (max-width: 1100px) {
+    width: 108px;
+    height: 108px;
+  }
+}
+
+.advisor-mentor__badge {
+  position: absolute;
+  right: 2px;
+  bottom: 4px;
+  width: 30px;
+  height: 30px;
+  border-radius: 50%;
+  display: grid;
+  place-items: center;
+  background: linear-gradient(135deg, #facc15, #ca8a04);
+  border: 3px solid #ffffff;
+  color: #ffffff;
+  font-size: 0.85rem;
+  box-shadow: 0 4px 10px rgba(202, 138, 4, 0.35);
+}
+
+.advisor-mentor__info {
+  display: flex;
+  flex-direction: column;
+  min-width: 0;
+
+  small {
+    color: #a16207;
+    font: 700 0.66rem/1.2 monospace;
+    letter-spacing: 1.4px;
+  }
+
+  strong {
+    margin-top: 0.3rem;
+    color: #0f3d2e;
+    font-size: clamp(1.3rem, 1.9vw, 1.6rem);
+    font-weight: 850;
+    line-height: 1.2;
+  }
+}
+
+.advisor-mentor__role {
+  margin-top: 0.2rem;
+  color: #2b594b;
+  font-size: 0.88rem;
+  font-weight: 600;
+  line-height: 1.4;
+}
+
+.advisor-mentor__stats {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 1.5rem;
+  margin-top: 0.8rem;
+
+  div {
+    display: flex;
+    align-items: baseline;
+    gap: 0.4rem;
+  }
+
+  b {
+    color: #ca8a04;
+    font-size: 1.6rem;
+    font-weight: 900;
+    line-height: 1;
+  }
+
+  span {
+    color: #475569;
+    font-size: 0.78rem;
+    font-weight: 600;
+  }
+}
+
+.advisor-mentor__fields {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.4rem;
+  margin-top: 0.75rem;
+
+  span {
+    padding: 0.22rem 0.7rem;
+    border-radius: 99px;
+    background: #f0fdf4;
+    border: 1px solid #bbf7d0;
+    color: #166534;
+    font-size: 0.72rem;
+    font-weight: 700;
+    white-space: nowrap;
+  }
+}
+
+// Right: academic advisory board
+.academic-advisors__board {
+  display: flex;
+  flex-direction: column;
+  gap: 0.9rem;
+  min-width: 0;
 }
 
 .academic-advisors__intro {
   display: flex;
   align-items: center;
   gap: 0.75rem;
-  flex-shrink: 0;
 
   div {
     display: flex;
@@ -1105,51 +1253,89 @@
 
   small {
     color: #648176;
-    font: 700 0.58rem/1.2 monospace;
-    letter-spacing: 1.2px;
+    font: 700 0.64rem/1.2 monospace;
+    letter-spacing: 1.3px;
   }
 
   strong {
-    margin-top: 0.15rem;
+    margin-top: 0.2rem;
     color: #174c3a;
-    font-size: 0.84rem;
+    font-size: 0.92rem;
+    line-height: 1.35;
+  }
+
+  // Let the long faculty name wrap instead of being clipped
+  > div {
+    min-width: 0;
   }
 }
 
 .academic-advisors__icon {
   display: grid;
   place-items: center;
-  width: 36px;
-  height: 36px;
-  border-radius: 10px;
+  flex-shrink: 0;
+  width: 40px;
+  height: 40px;
+  border-radius: 11px;
   color: #087f63;
   background: #ffffff;
   box-shadow: 0 3px 10px rgba(15, 100, 72, 0.1);
-  font-size: 1.1rem;
+  font-size: 1.2rem;
 }
 
+// Secondary column: advisors stacked vertically
 .academic-advisors__list {
   display: flex;
-  align-items: center;
-  justify-content: flex-end;
-  gap: 0.55rem;
-  flex-wrap: wrap;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 0.6rem;
+
+  @media (max-width: 1100px) {
+    flex-direction: row;
+    flex-wrap: wrap;
+  }
 
   span {
     display: inline-flex;
     align-items: center;
-    gap: 0.35rem;
-    padding: 0.35rem 0.65rem;
+    gap: 0.55rem;
+    padding: 0.25rem 0.9rem 0.25rem 0.25rem;
     border-radius: 99px;
-    color: #2b594b;
-    background: rgba(240, 250, 246, 0.85);
-    border: 1px solid rgba(18, 132, 91, 0.12);
-    font-size: 0.72rem;
-    font-weight: 650;
+    color: #174c3a;
+    background: rgba(240, 250, 246, 0.9);
+    border: 1px solid rgba(18, 132, 91, 0.14);
+    font-size: 0.84rem;
+    font-weight: 700;
+    transition: background 0.2s ease, border-color 0.2s ease;
 
-    i {
-      color: #168b68;
+    &:hover {
+      background: #ffffff;
+      border-color: rgba(18, 132, 91, 0.3);
     }
+  }
+
+  img,
+  b {
+    width: 38px;
+    height: 38px;
+    border-radius: 50%;
+    flex-shrink: 0;
+    border: 2px solid #ffffff;
+    box-shadow: 0 3px 10px rgba(15, 100, 72, 0.16);
+  }
+
+  img {
+    object-fit: cover;
+  }
+
+  // Initials fallback when there is no photo
+  b {
+    display: grid;
+    place-items: center;
+    background: linear-gradient(135deg, #d1fae5, #a7f3d0);
+    color: #087f63;
+    font-size: 0.78rem;
+    font-weight: 800;
   }
 }
 

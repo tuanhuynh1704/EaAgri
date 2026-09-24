@@ -64,24 +64,24 @@ nav.navbar-container.is-hidden {
   transition: all 0.35s cubic-bezier(0.16, 1, 0.3, 1);
 
   .nav__logo-img {
-    height: clamp(130px, 10vw, 155px);
+    height: clamp(112px, 9vw, 136px);
     width: auto;
     object-fit: contain;
-    transition: transform 0.3s ease, filter 0.3s ease;
+    transition: transform 0.4s cubic-bezier(0.16, 1, 0.3, 1), filter 0.3s ease, height 0.4s cubic-bezier(0.16, 1, 0.3, 1);
     filter: drop-shadow(0 4px 14px rgba(0, 0, 0, 0.08));
 
     @media (max-width: 1024px) {
-      height: 135px;
-      transform: scale(1.08);
+      height: 118px;
+      transform: scale(1.06);
     }
 
     @media (max-width: $tablet) {
-      height: 125px;
-      transform: scale(1.05);
+      height: 110px;
+      transform: scale(1.04);
     }
 
     @media (max-width: $mobile) {
-      height: 95px;
+      height: 92px;
     }
   }
 
@@ -528,25 +528,26 @@ nav.navbar-container.is-hidden {
     }
 
     .nav__logo-img {
-      height: 64px;
+      height: 72px;
       width: auto;
       max-width: none;
       object-fit: contain;
       transform: scale(1.44);
       transform-origin: center;
+      transition: transform 0.4s cubic-bezier(0.16, 1, 0.3, 1), height 0.4s cubic-bezier(0.16, 1, 0.3, 1);
 
       @media (max-width: 1024px) {
-        height: 60px;
+        height: 66px;
         transform: scale(1.46);
       }
 
       @media (max-width: $tablet) {
-        height: 56px;
+        height: 60px;
         transform: scale(1.4);
       }
 
       @media (max-width: $mobile) {
-        height: 46px;
+        height: 50px;
         transform: scale(1.32);
       }
     }
@@ -612,6 +613,47 @@ nav.navbar-container.is-hidden {
         font-weight: 750;
       }
     }
+  }
+}
+
+// ==========================================
+// INNER PAGES: MERGE LOGO + MENU INTO ONE BAR
+// (home page keeps the two floating capsules)
+// ==========================================
+
+nav.navbar-container.is-inner-page {
+  padding: 0.3rem 0.4rem 0.3rem 0.6rem;
+  border-radius: 999px;
+  background: rgba(255, 255, 255, 0.92);
+  backdrop-filter: blur(16px);
+  -webkit-backdrop-filter: blur(16px);
+  border: 1px solid rgba(255, 255, 255, 0.88);
+  box-shadow:
+    0 8px 28px rgba(18, 60, 42, 0.1),
+    inset 0 1px 0 rgba(255, 255, 255, 0.95);
+  pointer-events: auto;
+
+  @media (max-width: $mobile) {
+    padding: 0.2rem 0.3rem 0.2rem 0.4rem;
+  }
+
+  .nav__logo,
+  .nav__right-capsule {
+    background: transparent;
+    backdrop-filter: none;
+    -webkit-backdrop-filter: none;
+    border-color: transparent;
+    box-shadow: none;
+  }
+
+  .nav__logo {
+    min-height: 44px;
+    padding: 0 0.6rem;
+  }
+
+  .nav__right-capsule {
+    min-height: 44px;
+    padding: 0;
   }
 }
 

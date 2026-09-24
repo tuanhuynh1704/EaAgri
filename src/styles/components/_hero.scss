@@ -822,6 +822,11 @@
     flex-grow: 1; // Stretch to fill space between navbar and bottom bar
   }
 
+  // Nudge the whole composition a little lower, away from the navbar
+  @media (min-width: 1025px) {
+    transform: translateY(clamp(14px, 3vh, 32px));
+  }
+
   @media (max-width: 1024px) {
     grid-template-columns: 1fr;
     gap: 2.25rem;

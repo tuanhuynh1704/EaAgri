@@ -108,6 +108,24 @@ const teamMembers: TeamMember[] = [
   },
 ];
 
+const mentor = {
+  name: "Nguyễn Khắc Minh Trí",
+  role: "Co-Founder & CEO, Công ty TNHH Mimosa Technology (MimosaTEK)",
+  avatar: "/images/webp/advisors/nguyen-khac-minh-tri.webp",
+  stats: [
+    { value: "20+", label: "năm CNTT & Viễn thông" },
+    { value: "12+", label: "năm điều hành Founder/CEO" },
+  ],
+  fields: ["Agtech", "Internet vạn vật (IoT)", "Chuyển đổi số", "Phát triển bền vững"],
+};
+
+// avatar is optional; advisors without a photo fall back to initials
+const academicAdvisors: { name: string; avatar?: string; initials: string }[] = [
+  { name: "ThS. Nguyễn Huỳnh Thông", avatar: "/images/webp/advisors/nguyen-huynh-thong.webp", initials: "HT" },
+  { name: "ThS. Phạm Đình Tài", avatar: "/images/webp/advisors/pham-dinh-tai.webp", initials: "ĐT" },
+  { name: "TS. Hoàng Thịnh Nhân", avatar: "/images/webp/advisors/hoang-thinh-nhan.webp", initials: "HN" },
+];
+
 const TeamSection = () => {
   const [currentIndex, setCurrentIndex] = useState(0);
   const [touchStart, setTouchStart] = useState<number | null>(null);
@@ -403,21 +421,68 @@ const TeamSection = () => {
             </div>
           </div>
 
-          {/* Academic Advisory Board from University */}
-          <aside className="academic-advisors" aria-label="Cố vấn chuyên môn học thuật" data-aos="fade-up" data-aos-delay="200">
-            <div className="academic-advisors__intro">
-              <span className="academic-advisors__icon">
-                <i className="ri-graduation-cap-line"></i>
-              </span>
-              <div>
-                <small>ACADEMIC ADVISORY</small>
-                <strong>Cố vấn chuyên môn Khoa CNTT — ĐH Nguyễn Tất Thành</strong>
+          {/* Investor-mentor + academic advisory board */}
+          <aside className="academic-advisors" aria-label="Nhà đầu tư, mentor và cố vấn chuyên môn" data-aos="fade-up" data-aos-delay="200">
+            <div className="advisor-mentor">
+              <div className="advisor-mentor__photo-wrap">
+                <img
+                  src={mentor.avatar}
+                  alt={mentor.name}
+                  className="advisor-mentor__photo"
+                  loading="lazy"
+                  decoding="async"
+                />
+                <span className="advisor-mentor__badge" aria-hidden="true">
+                  <i className="ri-star-fill"></i>
+                </span>
+              </div>
+
+              <div className="advisor-mentor__info">
+                <small>NHÀ ĐẦU TƯ & MENTOR DỰ ÁN</small>
+                <strong>{mentor.name}</strong>
+                <span className="advisor-mentor__role">{mentor.role}</span>
+
+                <div className="advisor-mentor__stats">
+                  {mentor.stats.map((stat) => (
+                    <div key={stat.label}>
+                      <b>{stat.value}</b>
+                      <span>{stat.label}</span>
+                    </div>
+                  ))}
+                </div>
+
+                <div className="advisor-mentor__fields">
+                  {mentor.fields.map((field) => (
+                    <span key={field}>{field}</span>
+                  ))}
+                </div>
               </div>
             </div>
-            <div className="academic-advisors__list">
-              <span><i className="ri-user-star-line"></i> ThS. Nguyễn Huỳnh Thông</span>
-              <span><i className="ri-user-star-line"></i> ThS. Phạm Đình Tài</span>
-              <span><i className="ri-user-star-line"></i> TS. Hoàng Thịnh Nhân</span>
+
+            <div className="academic-advisors__divider" aria-hidden="true" />
+
+            <div className="academic-advisors__board">
+              <div className="academic-advisors__intro">
+                <span className="academic-advisors__icon">
+                  <i className="ri-graduation-cap-line"></i>
+                </span>
+                <div>
+                  <small>ACADEMIC ADVISORY</small>
+                  <strong>Cố vấn chuyên môn Khoa CNTT — ĐH Nguyễn Tất Thành</strong>
+                </div>
+              </div>
+              <div className="academic-advisors__list">
+                {academicAdvisors.map((advisor) => (
+                  <span key={advisor.name}>
+                    {advisor.avatar ? (
+                      <img src={advisor.avatar} alt="" loading="lazy" decoding="async" />
+                    ) : (
+                      <b aria-hidden="true">{advisor.initials}</b>
+                    )}
+                    {advisor.name}
+                  </span>
+                ))}
+              </div>
             </div>
           </aside>
         </div>

@@ -152,7 +152,7 @@ const Navbar = () => {
 
           <a
             href="/awards"
-            className={`nav__link ${pathname === "/awards" ? "active" : ""}`}
+            className={`nav__link ${pathname.startsWith("/awards") ? "active" : ""}`}
             onClick={(e) => {
               e.preventDefault();
               handleAwards();
@@ -395,7 +395,7 @@ const Navbar = () => {
 
         <a
           href="/awards"
-          className={`mobile-drawer__nav-item ${pathname === "/awards" ? "is-active" : ""}`}
+          className={`mobile-drawer__nav-item ${pathname.startsWith("/awards") ? "is-active" : ""}`}
           onClick={(e) => {
             e.preventDefault();
             setIsMobileMenuOpen(false);

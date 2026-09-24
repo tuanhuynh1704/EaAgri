@@ -1070,7 +1070,25 @@
   }
 
   .academic-advisors {
-    display: none !important;
+    padding: 0.85rem 0.9rem;
+  }
+
+  .advisor-mentor__photo {
+    width: 96px;
+    height: 96px;
+  }
+
+  .academic-advisors__list {
+    span {
+      font-size: 0.8rem;
+      gap: 0.5rem;
+    }
+
+    img,
+    b {
+      width: 34px;
+      height: 34px;
+    }
   }
 
   // Product screenshots: center phone only, swipe-friendly controls.
