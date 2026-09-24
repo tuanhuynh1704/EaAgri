@@ -9,10 +9,23 @@ const Navbar = () => {
   const [isScrolled, setIsScrolled] = useState(false);
   const [isHidden, setIsHidden] = useState(false);
   const [isUserMenuOpen, setIsUserMenuOpen] = useState(false);
+  const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
   const lastScrollY = useRef(0);
   const userMenuRef = useRef<HTMLDivElement>(null);
   const isHomePage = pathname === "/";
   const useCapsuleStyle = !isHomePage || isScrolled;
+
+  // Khóa cuộn trang nền khi mở Drawer Mobile
+  useEffect(() => {
+    if (isMobileMenuOpen) {
+      document.body.style.overflow = "hidden";
+    } else {
+      document.body.style.overflow = "";
+    }
+    return () => {
+      document.body.style.overflow = "";
+    };
+  }, [isMobileMenuOpen]);
 
   useEffect(() => {
     const handleScroll = () => {
@@ -45,6 +58,7 @@ const Navbar = () => {
     setIsHidden(false);
     lastScrollY.current = window.scrollY;
     setIsUserMenuOpen(false); // Close user menu on route navigation
+    setIsMobileMenuOpen(false); // Close mobile drawer on route navigation
   }, [pathname]);
 
   // Click outside to close user menu
@@ -64,6 +78,10 @@ const Navbar = () => {
 
   const handleLogin = () => {
     navigate("/login");
+  };
+
+  const handleAwards = () => {
+    navigate("/awards");
   };
 
   const handleHome = () => {
@@ -92,7 +110,8 @@ const Navbar = () => {
   const isAdmin = profile?.role === "SA";
 
   return (
-    <nav
+    <>
+      <nav
       className={`navbar-container ${useCapsuleStyle ? "is-scrolled" : ""} ${!isHomePage ? "is-inner-page" : ""} ${isHidden ? "is-hidden" : ""}`}
       data-aos="fade-down"
       onFocusCapture={() => setIsHidden(false)}
@@ -129,6 +148,18 @@ const Navbar = () => {
           >
             <i className="ri-layout-grid-line nav__link-icon"></i>
             <span className="nav__link-text">Kiến trúc</span>
+          </a>
+
+          <a
+            href="/awards"
+            className={`nav__link ${pathname === "/awards" ? "active" : ""}`}
+            onClick={(e) => {
+              e.preventDefault();
+              handleAwards();
+            }}
+          >
+            <i className="ri-trophy-line nav__link-icon"></i>
+            <span className="nav__link-text">Giải thưởng</span>
           </a>
 
           <a
@@ -259,9 +290,231 @@ const Navbar = () => {
               <span>Đăng nhập</span>
             </button>
           )}
+
+          {/* Mobile Hamburger Toggle Button */}
+          <button
+            type="button"
+            className={`nav__mobile-toggle ${isMobileMenuOpen ? "is-active" : ""}`}
+            onClick={() => setIsMobileMenuOpen((prev) => !prev)}
+            aria-label={isMobileMenuOpen ? "Đóng menu" : "Mở menu"}
+            aria-expanded={isMobileMenuOpen}
+          >
+            <i className={isMobileMenuOpen ? "ri-close-line" : "ri-menu-4-line"} />
+          </button>
         </div>
       </div>
     </nav>
+
+    {/* Mobile Drawer Menu Backdrop */}
+    <div
+      className={`mobile-drawer-backdrop ${isMobileMenuOpen ? "is-open" : ""}`}
+      onClick={() => setIsMobileMenuOpen(false)}
+      aria-hidden={!isMobileMenuOpen}
+    />
+
+    {/* Mobile Drawer Menu Sheet */}
+    <aside
+      className={`mobile-drawer ${isMobileMenuOpen ? "is-open" : ""}`}
+      aria-hidden={!isMobileMenuOpen}
+    >
+      <div className="mobile-drawer__header">
+        <div
+          className="mobile-drawer__brand"
+          onClick={() => {
+            setIsMobileMenuOpen(false);
+            handleHome();
+          }}
+        >
+          <img src="/logo_banner.jpg" alt="EaAgri" className="mobile-drawer__logo-img" />
+        </div>
+        <button
+          type="button"
+          className="mobile-drawer__close-btn"
+          onClick={() => setIsMobileMenuOpen(false)}
+          aria-label="Đóng menu"
+        >
+          <i className="ri-close-line" />
+        </button>
+      </div>
+
+      {/* User Card (if logged in) */}
+      {user && (
+        <div className="mobile-drawer__user-card">
+          <div className="mobile-drawer__user-avatar">{initialChar}</div>
+          <div className="mobile-drawer__user-info">
+            <strong className="mobile-drawer__user-name">{displayName}</strong>
+            <span className="mobile-drawer__user-email">{user.email}</span>
+            {isAdmin && (
+              <span className="mobile-drawer__admin-pill">
+                <i className="ri-shield-star-fill" /> Quản Trị Viên
+              </span>
+            )}
+          </div>
+        </div>
+      )}
+
+      {/* Main Navigation Links */}
+      <div className="mobile-drawer__nav-list">
+        <a
+          href="/"
+          className={`mobile-drawer__nav-item ${pathname === "/" ? "is-active" : ""}`}
+          onClick={(e) => {
+            e.preventDefault();
+            setIsMobileMenuOpen(false);
+            handleHome();
+          }}
+        >
+          <div className="mobile-drawer__nav-icon-box">
+            <i className="ri-home-5-line" />
+          </div>
+          <div className="mobile-drawer__nav-text">
+            <span className="mobile-drawer__nav-title">Trang chủ</span>
+            <span className="mobile-drawer__nav-desc">Nền tảng nông nghiệp số EaAgri</span>
+          </div>
+          <i className="ri-arrow-right-s-line mobile-drawer__nav-chevron" />
+        </a>
+
+        <a
+          href="/architecture"
+          className={`mobile-drawer__nav-item ${pathname === "/architecture" ? "is-active" : ""}`}
+          onClick={(e) => {
+            e.preventDefault();
+            setIsMobileMenuOpen(false);
+            navigate("/architecture");
+          }}
+        >
+          <div className="mobile-drawer__nav-icon-box">
+            <i className="ri-layout-grid-line" />
+          </div>
+          <div className="mobile-drawer__nav-text">
+            <span className="mobile-drawer__nav-title">Kiến trúc hệ thống</span>
+            <span className="mobile-drawer__nav-desc">Hạ tầng IoT & AI vườn sầu riêng</span>
+          </div>
+          <i className="ri-arrow-right-s-line mobile-drawer__nav-chevron" />
+        </a>
+
+        <a
+          href="/awards"
+          className={`mobile-drawer__nav-item ${pathname === "/awards" ? "is-active" : ""}`}
+          onClick={(e) => {
+            e.preventDefault();
+            setIsMobileMenuOpen(false);
+            navigate("/awards");
+          }}
+        >
+          <div className="mobile-drawer__nav-icon-box">
+            <i className="ri-trophy-line" />
+          </div>
+          <div className="mobile-drawer__nav-text">
+            <span className="mobile-drawer__nav-title">Phòng truyền thống & Giải thưởng</span>
+            <span className="mobile-drawer__nav-desc">Quán quân AI & NTTU Startup 2026</span>
+          </div>
+          <i className="ri-arrow-right-s-line mobile-drawer__nav-chevron" />
+        </a>
+
+        <a
+          href="/news"
+          className={`mobile-drawer__nav-item ${pathname.startsWith("/news") ? "is-active" : ""}`}
+          onClick={(e) => {
+            e.preventDefault();
+            setIsMobileMenuOpen(false);
+            handleNew();
+          }}
+        >
+          <div className="mobile-drawer__nav-icon-box">
+            <i className="ri-article-line" />
+          </div>
+          <div className="mobile-drawer__nav-text">
+            <span className="mobile-drawer__nav-title">Tin tức & Sự kiện</span>
+            <span className="mobile-drawer__nav-desc">Kỹ thuật & chuyển giao công nghệ</span>
+          </div>
+          <i className="ri-arrow-right-s-line mobile-drawer__nav-chevron" />
+        </a>
+      </div>
+
+      {/* Admin Section (if admin) */}
+      {user && isAdmin && (
+        <div className="mobile-drawer__admin-section">
+          <span className="mobile-drawer__section-title">QUẢN TRỊ VIÊN</span>
+          <div className="mobile-drawer__admin-grid">
+            <button
+              type="button"
+              className="mobile-drawer__admin-btn"
+              onClick={() => {
+                setIsMobileMenuOpen(false);
+                navigate("/admin/cooperation");
+              }}
+            >
+              <i className="ri-shake-hands-line" />
+              <span>Hợp tác</span>
+            </button>
+            <button
+              type="button"
+              className="mobile-drawer__admin-btn"
+              onClick={() => {
+                setIsMobileMenuOpen(false);
+                navigate("/admin/news");
+              }}
+            >
+              <i className="ri-file-list-3-line" />
+              <span>Bài viết</span>
+            </button>
+            <button
+              type="button"
+              className="mobile-drawer__admin-btn"
+              onClick={() => {
+                setIsMobileMenuOpen(false);
+                navigate("/admin/accounts");
+              }}
+            >
+              <i className="ri-group-line" />
+              <span>Tài khoản</span>
+            </button>
+            <button
+              type="button"
+              className="mobile-drawer__admin-btn mobile-drawer__admin-btn--create"
+              onClick={() => {
+                setIsMobileMenuOpen(false);
+                navigate("/news/create");
+              }}
+            >
+              <i className="ri-edit-box-line" />
+              <span>Đăng bài</span>
+            </button>
+          </div>
+        </div>
+      )}
+
+      {/* Auth Button */}
+      <div className="mobile-drawer__auth-box">
+        {user ? (
+          <button
+            type="button"
+            className="mobile-drawer__logout-btn"
+            onClick={() => {
+              setIsMobileMenuOpen(false);
+              handleSignOut();
+            }}
+          >
+            <i className="ri-logout-box-r-line" />
+            <span>Đăng xuất tài khoản</span>
+          </button>
+        ) : (
+          <button
+            type="button"
+            className="mobile-drawer__login-btn"
+            onClick={() => {
+              setIsMobileMenuOpen(false);
+              handleLogin();
+            }}
+          >
+            <i className="ri-user-line" />
+            <span>Đăng nhập vào EaAgri</span>
+          </button>
+        )}
+      </div>
+    </aside>
+  </>
   );
 };
 

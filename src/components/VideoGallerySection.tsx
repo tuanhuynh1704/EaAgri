@@ -78,7 +78,13 @@ export default function VideoGallerySection() {
               >
                 {thumbUrl ? (
                   <>
-                    <img src={thumbUrl} alt={video.title} className="video-gallery__thumbnail" />
+                    <img
+                      src={thumbUrl}
+                      alt={video.title}
+                      className="video-gallery__thumbnail"
+                      loading="lazy"
+                      decoding="async"
+                    />
                     <div className="video-gallery__play-btn">
                       <i className="ri-play-circle-fill"></i>
                     </div>

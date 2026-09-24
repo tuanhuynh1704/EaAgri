@@ -49,6 +49,7 @@
   object-fit: contain;
 }
 .ea3d-status {
+  display: none;
   position: relative;
   max-width: 320px;
   text-align: center;
@@ -56,6 +57,9 @@
   background: #f1fcf4e8;
   border-radius: 16px;
   font-size: 14px;
+}
+.ea3d[data-state="error"] .ea3d-status {
+  display: block;
 }
 .ea3d-markers {
   position: absolute;
@@ -102,6 +106,36 @@
   inset: 0;
   pointer-events: none;
   z-index: 4;
+  opacity: 0;
+  transition: opacity 0.35s ease;
+}
+.ea3d-cards.ea3d-cards--visible {
+  opacity: 1;
+}
+.ea3d-cards.ea3d-cards--visible .ea3d-card {
+  animation: ea3dCardPop 0.5s cubic-bezier(0.34, 1.56, 0.64, 1) backwards;
+}
+.ea3d-cards.ea3d-cards--visible .ea3d-card-overview {
+  animation-delay: 0.08s;
+}
+.ea3d-cards.ea3d-cards--visible .ea3d-card-weather {
+  animation-delay: 0.18s;
+}
+.ea3d-cards.ea3d-cards--visible .ea3d-card-soil {
+  animation-delay: 0.28s;
+}
+.ea3d-cards.ea3d-cards--visible .ea3d-card-disease {
+  animation-delay: 0.38s;
+}
+
+@keyframes ea3dCardPop {
+  0% {
+    opacity: 0;
+    transform: scale(0.7) translateY(14px);
+  }
+  100% {
+    opacity: 1;
+  }
 }
 .ea3d-card {
   position: absolute;
@@ -113,14 +147,14 @@
   padding: 10px 12px;
   border: 1px solid rgba(116, 220, 201, 0.42);
   border-radius: 14px;
-  background: linear-gradient(135deg, rgba(14, 52, 60, 0.88), rgba(15, 68, 72, 0.82));
+  background: linear-gradient(135deg, rgba(14, 52, 60, 0.94), rgba(15, 68, 72, 0.9));
   color: #eefff9;
-  box-shadow: 0 12px 30px rgba(10, 40, 30, 0.28), 0 0 14px rgba(60, 200, 150, 0.12);
+  box-shadow: 0 8px 24px rgba(10, 40, 30, 0.28), 0 0 10px rgba(60, 200, 150, 0.1);
   pointer-events: auto;
   cursor: pointer;
   font-family: inherit;
-  backdrop-filter: blur(12px);
-  -webkit-backdrop-filter: blur(12px);
+  backdrop-filter: blur(4px);
+  -webkit-backdrop-filter: blur(4px);
   transition:
     transform 0.26s cubic-bezier(0.34, 1.56, 0.64, 1),
     border-color 0.26s ease,

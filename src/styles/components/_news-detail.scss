@@ -213,6 +213,56 @@
       color: $primary-color;
       font-size: 1.1rem;
     }
+
+    &--source {
+      background: rgba(46, 125, 50, 0.08);
+      padding: 0.35rem 0.85rem;
+      border-radius: 8px;
+      border: 1px solid rgba(46, 125, 50, 0.15);
+      color: #1b5e20;
+
+      i {
+        color: #2e7d32;
+      }
+    }
+  }
+
+  &__summary-box {
+    background: linear-gradient(135deg, rgba(232, 245, 233, 0.75) 0%, rgba(241, 248, 233, 0.65) 100%);
+    border-left: 4px solid #2e7d32;
+    border-radius: 0 12px 12px 0;
+    padding: 1.25rem 1.6rem;
+    margin-bottom: 2.5rem;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.03);
+    border-top: 1px solid rgba(46, 125, 50, 0.1);
+    border-right: 1px solid rgba(46, 125, 50, 0.1);
+    border-bottom: 1px solid rgba(46, 125, 50, 0.1);
+  }
+
+  &__summary-header {
+    display: flex;
+    align-items: center;
+    gap: 0.45rem;
+    font-size: 0.82rem;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.6px;
+    color: #1b5e20;
+    margin-bottom: 0.6rem;
+
+    i {
+      font-size: 1rem;
+      color: #2e7d32;
+    }
+  }
+
+  &__summary-text {
+    font-size: 1.1rem;
+    font-weight: 500;
+    line-height: 1.7;
+    color: #1b3323;
+    margin: 0;
+    font-style: italic;
   }
 
   &__content {
@@ -224,6 +274,10 @@
 
     p {
       margin-bottom: 1.5rem;
+    }
+
+    .news-article-lead-box {
+      display: none !important;
     }
 
     // Reset image display to inline-block so Quill's text-align classes can center them

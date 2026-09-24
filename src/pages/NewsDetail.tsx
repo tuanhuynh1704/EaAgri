@@ -4,7 +4,7 @@ import { useSEO } from "../hooks/useSEO";
 import { supabase } from "../utils/supabase/client";
 import { useAuth } from "../context/AuthContext";
 import "react-quill-new/dist/quill.snow.css";
-import { cleanContent } from "../utils/cleanContent";
+import { cleanContent, extractSummaryAndBody } from "../utils/cleanContent";
 import { parseImageUrlAndPosition } from "../utils/imageUtils";
 
 interface NewsItem {
@@ -29,12 +29,16 @@ export default function NewsDetail() {
   const isSA = profile?.role === "SA";
 
   const { url: imageUrl } = article ? parseImageUrlAndPosition(article.image_url) : { url: null };
-  const articleSnippet = article
-    ? (new DOMParser().parseFromString(cleanContent(article.content), "text/html").body.textContent || "")
+  const { summary: articleSummary, body: articleBody } = article
+    ? extractSummaryAndBody(article.content)
+    : { summary: "", body: "" };
+
+  const articleSnippet = articleSummary || (article
+    ? (new DOMParser().parseFromString(cleanContent(articleBody), "text/html").body.textContent || "")
         .replace(/\s+/g, " ")
         .trim()
         .slice(0, 160)
-    : "";
+    : "");
 
   useSEO({
     title: article ? article.title : "Chi Tiết Bản Tin",
@@ -220,20 +224,33 @@ export default function NewsDetail() {
             <h1 className="news-detail__title">{cleanContent(article.title)}</h1>
 
             <div className="news-detail__meta">
-              <div className="news-detail__meta-item">
-                <i className="ri-user-3-line"></i>
-                <span>Tác giả: <strong>{article.author}</strong></span>
-              </div>
+              {article.author && article.author !== "EaAgri" && (
+                <div className="news-detail__meta-item news-detail__meta-item--source">
+                  <i className="ri-newspaper-fill"></i>
+                  <span>Nguồn: <strong>{article.author}</strong></span>
+                </div>
+              )}
               <div className="news-detail__meta-item">
                 <i className="ri-calendar-line"></i>
                 <span>Ngày đăng: <strong>{formatDate(article.created_at)}</strong></span>
               </div>
             </div>
 
+            {/* Ghi chú / Tóm tắt Box */}
+            {articleSummary && (
+              <div className="news-detail__summary-box">
+                <div className="news-detail__summary-header">
+                  <i className="ri-sticky-note-line"></i>
+                  <span>Ghi chú / Tóm tắt</span>
+                </div>
+                <p className="news-detail__summary-text">{articleSummary}</p>
+              </div>
+            )}
+
             {/* Main Content */}
             <div 
               className="news-detail__content ql-editor"
-              dangerouslySetInnerHTML={{ __html: cleanContent(article.content) }}
+              dangerouslySetInnerHTML={{ __html: cleanContent(articleBody) }}
             />
 
           </div>

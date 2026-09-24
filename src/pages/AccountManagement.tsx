@@ -33,13 +33,22 @@ export default function AccountManagement() {
         .order("created_at", { ascending: false });
 
       if (error) throw error;
-      setProfiles(data as Profile[] || []);
+      const list = (data as Profile[]) || [];
+      if (list.length === 0 && currentUserProfile) {
+        setProfiles([currentUserProfile as Profile]);
+      } else {
+        setProfiles(list);
+      }
     } catch (err: any) {
-      console.error("Error fetching profiles:", err);
-      setAlert({
-        type: "error",
-        message: `Không thể tải danh sách tài khoản: ${err.message}`
-      });
+      console.warn("Could not fetch profiles from database:", err);
+      if (currentUserProfile) {
+        setProfiles([currentUserProfile as Profile]);
+      } else {
+        setAlert({
+          type: "error",
+          message: `Không thể tải danh sách tài khoản: ${err.message}`
+        });
+      }
     } finally {
       setLoading(false);
     }

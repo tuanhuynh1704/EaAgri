@@ -18,7 +18,29 @@ interface AuthContextType {
   signOut: () => Promise<void>;
   refreshProfile: () => Promise<void>;
   authError: string | null;
+  loginAdminEnv: (identifier: string, pass: string) => boolean;
 }
+
+const ADMIN_USER_ENV = (import.meta.env.VITE_ADMIN_USERNAME || "admin").toLowerCase().trim();
+const ADMIN_EMAIL_ENV = (import.meta.env.VITE_ADMIN_EMAIL || "admin@eaagri.vn").toLowerCase().trim();
+const ADMIN_PASSWORD_ENV = import.meta.env.VITE_ADMIN_PASSWORD || "admin@123";
+
+const ADMIN_MOCK_USER: User = {
+  id: "eaagri-admin-sa-master",
+  email: ADMIN_EMAIL_ENV,
+  app_metadata: { provider: "email", role: "SA" },
+  user_metadata: { full_name: "Super Admin EaAgri", role: "SA" },
+  aud: "authenticated",
+  created_at: "2026-01-01T00:00:00.000Z",
+} as User;
+
+const ADMIN_MOCK_PROFILE: Profile = {
+  id: "eaagri-admin-sa-master",
+  email: ADMIN_EMAIL_ENV,
+  full_name: "Super Admin EaAgri",
+  role: "SA",
+  created_at: "2026-01-01T00:00:00.000Z",
+};
 
 const AuthContext = createContext<AuthContextType | undefined>(undefined);
 
@@ -27,6 +49,22 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
   const [profile, setProfile] = useState<Profile | null>(null);
   const [authError, setAuthError] = useState<string | null>(null);
   const [loading, setLoading] = useState(true);
+
+  const loginAdminEnv = (identifier: string, pass: string): boolean => {
+    const inputId = identifier.toLowerCase().trim();
+    if (
+      (inputId === ADMIN_USER_ENV || inputId === ADMIN_EMAIL_ENV || inputId === "admin" || inputId === "admin@eaagri.vn") &&
+      pass === ADMIN_PASSWORD_ENV
+    ) {
+      localStorage.setItem("eaagri_admin_session", "true");
+      setUser(ADMIN_MOCK_USER);
+      setProfile(ADMIN_MOCK_PROFILE);
+      setAuthError(null);
+      setLoading(false);
+      return true;
+    }
+    return false;
+  };
 
   const fetchProfile = async (userId: string) => {
     try {
@@ -54,13 +92,26 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
   };
 
   const refreshProfile = async () => {
+    if (localStorage.getItem("eaagri_admin_session") === "true") {
+      setProfile(ADMIN_MOCK_PROFILE);
+      return;
+    }
     if (user) {
       await fetchProfile(user.id);
     }
   };
 
   useEffect(() => {
-    // 1. Check current session
+    // 0. Check local admin session first
+    const savedAdmin = localStorage.getItem("eaagri_admin_session");
+    if (savedAdmin === "true") {
+      setUser(ADMIN_MOCK_USER);
+      setProfile(ADMIN_MOCK_PROFILE);
+      setLoading(false);
+      return;
+    }
+
+    // 1. Check current session from Supabase
     supabase.auth.getSession().then(({ data: { session } }) => {
       if (session) {
         setUser(session.user);
@@ -75,6 +126,9 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
     // 2. Listen for auth changes
     const { data: { subscription } } = supabase.auth.onAuthStateChange(
       async (_event, session) => {
+        if (localStorage.getItem("eaagri_admin_session") === "true") {
+          return;
+        }
         if (session) {
           setUser(session.user);
           await fetchProfile(session.user.id);
@@ -93,6 +147,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
 
   const signOut = async () => {
     setLoading(true);
+    localStorage.removeItem("eaagri_admin_session");
     try {
       await supabase.auth.signOut();
     } catch (err) {
@@ -119,7 +174,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
   };
 
   return (
-    <AuthContext.Provider value={{ user, profile, loading, signOut, refreshProfile, authError }}>
+    <AuthContext.Provider value={{ user, profile, loading, signOut, refreshProfile, authError, loginAdminEnv }}>
       {children}
     </AuthContext.Provider>
   );

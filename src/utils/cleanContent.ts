@@ -15,3 +15,42 @@ export const cleanContent = (content?: string | null): string => {
 
   return cleaned;
 };
+
+/**
+ * Tách ghi chú/tóm tắt và phần thân nội dung của bài viết
+ */
+export const extractSummaryAndBody = (rawContent?: string | null): { summary: string; body: string } => {
+  if (!rawContent) return { summary: "", body: "" };
+
+  const match = rawContent.match(/<div class="news-article-lead-box"[^>]*>([\s\S]*?)<\/div>/i);
+  if (match) {
+    const summaryText = match[1]
+      .replace(/<[^>]+>/g, " ")
+      .replace(/Ghi chú:\s*/i, "")
+      .replace(/\s+/g, " ")
+      .trim();
+    const bodyContent = rawContent.replace(match[0], "").trim();
+    return {
+      summary: summaryText,
+      body: bodyContent,
+    };
+  }
+
+  return {
+    summary: "",
+    body: rawContent,
+  };
+};
+
+/**
+ * Ghép ghi chú/tóm tắt vào nội dung để lưu trữ nhất quán
+ */
+export const buildContentWithSummary = (summary?: string | null, body?: string | null): string => {
+  const cleanBody = cleanContent(body || "").trim();
+  const cleanSummary = (summary || "").trim();
+
+  if (!cleanSummary) return cleanBody;
+
+  return `<div class="news-article-lead-box" data-summary="true"><strong>Ghi chú:</strong> ${cleanSummary}</div>\n${cleanBody}`;
+};
+

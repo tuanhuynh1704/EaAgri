@@ -135,7 +135,7 @@
   @media (min-width: 1025px) {
     height: 100vh;
     min-height: 560px;
-    padding: clamp(6.5rem, 10vh, 10rem) 0 clamp(2rem, 3vh, 3rem) 0;
+    padding: clamp(4.2rem, 5.8vh, 5.8rem) 0 clamp(3.4rem, 4.8vh, 4.4rem) 0;
     display: flex;
     flex-direction: column;
     justify-content: center;
@@ -910,7 +910,7 @@
   perspective: 1200px;
 
   @media (min-width: 1025px) {
-    margin-top: clamp(40px, 6vh, 70px);
+    margin-top: clamp(14px, 2.5vh, 30px);
   }
 
   .image-wrapper-container {
@@ -921,7 +921,8 @@
     display: flex;
     align-items: center;
     justify-content: center;
-    filter: drop-shadow(0 28px 35px rgba(25, 79, 52, 0.14));
+    filter: none;
+    will-change: auto;
 
     @media (max-width: 1024px) {
       max-width: min(480px, 92vw);
@@ -957,7 +958,7 @@
 
   &:hover {
     .image-wrapper-container {
-      filter: drop-shadow(0 34px 42px rgba(25, 79, 52, 0.2));
+      filter: none;
     }
 
     .main-hero-image {
@@ -1775,6 +1776,10 @@
     pointer-events: none;
   }
 
+  &__mobile {
+    display: none;
+  }
+
   .hero-highlight {
     display: inline-block;
     color: #14532d;
@@ -1835,6 +1840,10 @@
   display: flex;
   gap: 1rem;
   margin-bottom: 0.5rem;
+
+  &--mobile {
+    display: none;
+  }
 
   @media (max-width: $mobile) {
     flex-direction: row;

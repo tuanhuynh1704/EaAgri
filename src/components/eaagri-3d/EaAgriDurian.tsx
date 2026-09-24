@@ -14,6 +14,7 @@ export interface EaAgriDurianProps {
   showHotspots?: boolean;
   showFarmer?: boolean;
   autoRotate?: boolean;
+  lazy?: boolean;
   className?: string;
   style?: React.CSSProperties;
 }
@@ -38,6 +39,7 @@ export default function EaAgriDurian({
   showHotspots = true,
   showFarmer = true,
   autoRotate = false,
+  lazy = false,
   className = '',
   style,
 }: EaAgriDurianProps) {
@@ -58,6 +60,7 @@ export default function EaAgriDurian({
       showHotspots,
       showFarmer,
       autoRotate,
+      lazy,
       data: currentData.current,
       onSelect: (event) => callback.current?.(event),
     });
@@ -67,7 +70,7 @@ export default function EaAgriDurian({
       scene.destroy();
       if (viewer.current === scene) viewer.current = null;
     };
-  }, [assetBaseUrl, posterUrl, quality, showCards, showHotspots, showFarmer, autoRotate]);
+  }, [assetBaseUrl, posterUrl, quality, showCards, showHotspots, showFarmer, autoRotate, lazy]);
 
   useEffect(() => {
     viewer.current?.setData(data);
