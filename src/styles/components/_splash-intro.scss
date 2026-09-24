@@ -61,51 +61,56 @@ body.homepage-splash-reveal #root {
     z-index: 1;
   }
 
-  // Soft daylight flash warp explosion
-  &__flash-wrap {
+  // Luminous Daylight Bloom portal reveal
+  &__bloom {
     position: absolute;
     inset: 0;
     z-index: 2;
-    display: flex;
-    align-items: center;
-    justify-content: center;
     pointer-events: none;
-  }
-
-  &__flash {
-    width: 60vmax;
-    height: 60vmax;
-    border-radius: 50%;
     background: radial-gradient(
-      circle,
+      circle at 50% 50%,
       rgba(255, 255, 255, 1) 0%,
-      rgba(236, 253, 245, 0.9) 30%,
-      rgba(167, 243, 208, 0.6) 55%,
-      transparent 75%
+      rgba(240, 253, 244, 0.94) 36%,
+      rgba(167, 243, 208, 0.45) 62%,
+      transparent 84%
     );
     opacity: 0;
-    transform: scale(0.12);
+    transform: scale(0.25);
+    transition: opacity 0.5s ease-out, transform 0.75s cubic-bezier(0.16, 1, 0.3, 1);
 
-    &.is-on {
-      animation: splash-flash 1.2s cubic-bezier(0.4, 0, 0.2, 1) forwards;
+    &.is-blooming {
+      opacity: 1;
+      transform: scale(2.8);
     }
   }
 
-  // Pure Floating Title
-  &__title-wrap {
+  // Centered Luminous Content Container
+  &__content {
     position: absolute;
     inset: 0;
     z-index: 3;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    padding: 0 32px;
     pointer-events: none;
-    transition: opacity 0.5s ease, transform 0.6s cubic-bezier(0.16, 1, 0.3, 1);
+  }
 
-    &.is-warping {
+  // Title Box: Centered at first, smoothly dissolves and vanishes ("mất chữ")
+  &__title-box {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    width: 100%;
+    max-width: min(1180px, calc(100vw - 48px));
+    padding: 0 24px;
+    text-align: center;
+    transition: opacity 0.4s ease-out,
+                transform 0.45s cubic-bezier(0.4, 0, 0.2, 1),
+                filter 0.4s ease-out;
+
+    &.is-faded {
       opacity: 0;
-      transform: scale(1.12);
+      transform: translate(-50%, -50%) scale(1.1);
+      filter: blur(8px);
+      pointer-events: none;
     }
   }
 
@@ -118,8 +123,48 @@ body.homepage-splash-reveal #root {
     font-weight: 750;
     line-height: 1.45;
     letter-spacing: 0.015em;
-    max-width: min(1180px, calc(100vw - 48px));
     white-space: pre-line;
+  }
+
+  // Logo Box: Appears proudly in the center during the fly-through ("chạy vào sẽ hiện logo thêm")
+  &__logo-box {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%) scale(0.68);
+    opacity: 0;
+    pointer-events: none;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    transition: opacity 0.55s cubic-bezier(0.16, 1, 0.3, 1),
+                transform 0.65s cubic-bezier(0.16, 1, 0.3, 1),
+                filter 0.5s ease;
+
+    &.is-visible {
+      opacity: 1;
+      transform: translate(-50%, -50%) scale(1);
+    }
+
+    &.is-leaving {
+      opacity: 0;
+      transform: translate(-50%, -50%) scale(1.35);
+      filter: blur(12px);
+      transition: opacity 0.45s ease-in, transform 0.6s cubic-bezier(0.4, 0, 0.2, 1), filter 0.5s ease;
+    }
+  }
+
+  &__logo {
+    height: clamp(75px, 9.5vw, 125px);
+    width: auto;
+    max-width: 85vw;
+    object-fit: contain;
+    mix-blend-mode: multiply;
+    filter: drop-shadow(0 8px 30px rgba(4, 120, 87, 0.28));
+    user-select: none;
+    -webkit-user-drag: none;
+    animation: splash-logo-float 3.5s ease-in-out infinite;
   }
 
   // Gradient text with deep emerald and rich forest tones
@@ -207,26 +252,23 @@ body.homepage-splash-reveal #root {
   }
 }
 
-@keyframes splash-flash {
+@keyframes splash-logo-in {
   0% {
     opacity: 0;
-    transform: scale(0.12);
-  }
-  35% {
-    opacity: 0.7;
-    transform: scale(1.4);
-  }
-  58% {
-    opacity: 0.9;
-    transform: scale(2.8);
-  }
-  75% {
-    opacity: 0.75;
-    transform: scale(4.2);
+    transform: translateY(-14px) scale(0.92);
   }
   100% {
-    opacity: 0;
-    transform: scale(5.5);
+    opacity: 1;
+    transform: translateY(0) scale(1);
+  }
+}
+
+@keyframes splash-logo-float {
+  0%, 100% {
+    transform: translateY(0);
+  }
+  50% {
+    transform: translateY(-5px);
   }
 }
 

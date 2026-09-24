@@ -1,15 +1,18 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef } from "react";
 
 export default function FloatingContact() {
   const [showScrollTop, setShowScrollTop] = useState(false);
-  const [showContact, setShowContact] = useState(false);
   const [isContactOpen, setIsContactOpen] = useState(false);
+  const contactRef = useRef<HTMLDivElement>(null);
+
+  // Kiểm tra thiết bị chuột (PC / Laptop) vs thiết bị cảm ứng thuần (Mobile / Tablet)
+  const isMouseDevice = () => {
+    if (typeof window === "undefined") return false;
+    return window.matchMedia("(hover: hover) and (pointer: fine)").matches;
+  };
 
   useEffect(() => {
     const handleScroll = () => {
-      const isPastHero = window.scrollY >= window.innerHeight * 0.5;
-      setShowContact(isPastHero);
-
       if (window.scrollY > 300) {
         setShowScrollTop(true);
       } else {
@@ -17,10 +20,36 @@ export default function FloatingContact() {
       }
     };
 
-    window.addEventListener("scroll", handleScroll);
+    window.addEventListener("scroll", handleScroll, { passive: true });
     handleScroll();
     return () => window.removeEventListener("scroll", handleScroll);
   }, []);
+
+  // Đóng menu liên hệ khi click/chạm ra bên ngoài hoặc chuyển tab
+  useEffect(() => {
+    if (!isContactOpen) return;
+
+    const handleClickOutside = (e: MouseEvent | TouchEvent) => {
+      const target = e.target as HTMLElement;
+      if (contactRef.current && !contactRef.current.contains(target)) {
+        setIsContactOpen(false);
+      }
+    };
+
+    const handleWindowBlur = () => {
+      setIsContactOpen(false);
+    };
+
+    document.addEventListener("touchstart", handleClickOutside, { passive: true });
+    document.addEventListener("mousedown", handleClickOutside);
+    window.addEventListener("blur", handleWindowBlur);
+
+    return () => {
+      document.removeEventListener("touchstart", handleClickOutside);
+      document.removeEventListener("mousedown", handleClickOutside);
+      window.removeEventListener("blur", handleWindowBlur);
+    };
+  }, [isContactOpen]);
 
   const scrollToTop = () => {
     window.scrollTo({
@@ -29,10 +58,36 @@ export default function FloatingContact() {
     });
   };
 
+  // Rê chuột vào trên PC / Laptop -> Tự động mở
+  const handleMouseEnter = () => {
+    if (isMouseDevice()) {
+      setIsContactOpen(true);
+    }
+  };
+
+  // Rê chuột ra ngoài trên PC / Laptop -> Tự động đóng
+  const handleMouseLeave = () => {
+    if (isMouseDevice()) {
+      setIsContactOpen(false);
+    }
+  };
+
+  // Khi click/nhấn nút ở Ảnh 2 (Headset / Toggle button):
+  // - Gỡ bỏ focus ngay lập tức để tránh trình duyệt giữ trạng thái focus
+  // - Toggle mở / đóng (nếu đang mở thì đóng lại ngay, không bao giờ bị đứng/đơ)
+  const handleToggleClick = (e: React.MouseEvent<HTMLButtonElement>) => {
+    e.currentTarget.blur();
+    setIsContactOpen((prev) => !prev);
+  };
+
   return (
-    <div className={`floating-contact-container ${showContact ? "is-visible" : ""}`}>
+    <div
+      className="floating-contact-container"
+      onMouseLeave={handleMouseLeave}
+    >
       {/* Scroll To Top Button */}
       <button
+        type="button"
         onClick={scrollToTop}
         className={`floating-contact__btn floating-contact__btn--scroll-top ${
           showScrollTop ? "show" : ""
@@ -44,7 +99,12 @@ export default function FloatingContact() {
       </button>
 
       {/* Floating Contact Panel (Headset and channels) */}
-      <div className={`floating-contact ${isContactOpen ? "is-open" : ""}`}>
+      <div
+        ref={contactRef}
+        className={`floating-contact ${isContactOpen ? "is-open" : ""}`}
+        onMouseEnter={handleMouseEnter}
+        onMouseLeave={handleMouseLeave}
+      >
         <div className="floating-contact__channels">
           {/* Zalo Button */}
           <a
@@ -84,7 +144,7 @@ export default function FloatingContact() {
         <button
           type="button"
           className="floating-contact__btn floating-contact__btn--toggle"
-          onClick={() => setIsContactOpen((open) => !open)}
+          onClick={handleToggleClick}
           aria-expanded={isContactOpen}
           aria-label={isContactOpen ? "Đóng kênh liên hệ" : "Mở kênh liên hệ"}
         >

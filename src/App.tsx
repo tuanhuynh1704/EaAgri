@@ -1,4 +1,4 @@
-import { useEffect } from "react";
+import { useEffect, Suspense } from "react";
 import "./styles/main.scss";
 import AOS from "aos";
 import "aos/dist/aos.css";
@@ -8,6 +8,14 @@ import Footer from "./components/Footer";
 import FloatingContact from "./components/FloatingContact";
 import AppStoreNoticeModal from "./components/AppStoreNoticeModal";
 import { AuthProvider } from "./context/AuthContext";
+
+function RouteFallback() {
+  return (
+    <div className="route-page-loader" aria-busy="true" aria-label="Đang tải trang...">
+      <div className="route-page-loader__spinner" />
+    </div>
+  );
+}
 
 function App() {
   const { pathname } = useLocation();
@@ -33,7 +41,9 @@ function App() {
   return (
     <AuthProvider>
       {!isAuthPage && <Navbar />}
-      <Outlet />
+      <Suspense fallback={<RouteFallback />}>
+        <Outlet />
+      </Suspense>
       {!isAuthPage && <Footer />}
       {!isAuthPage && <FloatingContact />}
       <AppStoreNoticeModal />
@@ -41,4 +51,4 @@ function App() {
   );
 }
 
-export default App
+export default App;

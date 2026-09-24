@@ -53,7 +53,7 @@ const teamMembers: TeamMember[] = [
     task: "Chiến lược sản phẩm - Điều phối - Gọi vốn",
     // major: "Khoa học dữ liệu",
     // id: "2311559215",
-    avatar: "/huy.jpg",
+    avatar: "/images/webp/huy.webp",
     themeColor: "green",
     topIcon: "ri-shield-star-line",
     roleIcon: "ri-vip-crown-fill",
@@ -67,7 +67,7 @@ const teamMembers: TeamMember[] = [
     roleTag: "CTO / AI & DATA LEAD",
     task: "AI & dữ liệu - Kiến trúc kỹ thuật - Phát triển giải pháp",
     // id: "2311558913",
-    avatar: "/Giảng-1.jpg",
+    avatar: "/images/webp/giang-1.webp",
     themeColor: "blue",
     topIcon: "ri-brain-line",
     roleIcon: "ri-user-fill",
@@ -82,7 +82,7 @@ const teamMembers: TeamMember[] = [
     task: "Khảo sát vườn - Hỗ trợ kỹ thuật - Triển khai Pilot",
     // major: "Khoa học dữ liệu",
     // id: "2311559253",
-    avatar: "/chung-1.jpg",
+    avatar: "/images/webp/chung-1.webp",
     themeColor: "purple",
     topIcon: "ri-code-s-slash-line",
     roleIcon: "ri-user-fill",
@@ -97,7 +97,7 @@ const teamMembers: TeamMember[] = [
     task: "Truyền thông - Onboarding người dùng - Vận hành.",
     // major: "Khoa học dữ liệu",
     // id: "2200005725",
-    avatar: "/Tuấn1.jpg",
+    avatar: "/images/webp/tuan1.webp",
     themeColor: "orange",
     topIcon: "ri-megaphone-line",
     roleIcon: "ri-user-fill",
@@ -120,19 +120,45 @@ const TeamSection = () => {
   const cardsContainerRef = useRef<HTMLDivElement>(null);
   const touchStartXRef = useRef<number>(0);
   const touchStartYRef = useRef<number>(0);
+  const touchStartTimeRef = useRef<number>(0);
   const isSwipingRef = useRef<boolean>(false);
+  const swipeTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
 
   const handleCardsTouchStart = (e: React.TouchEvent) => {
     touchStartXRef.current = e.touches[0].clientX;
     touchStartYRef.current = e.touches[0].clientY;
+    touchStartTimeRef.current = Date.now();
     isSwipingRef.current = false;
+    if (swipeTimerRef.current) {
+      clearTimeout(swipeTimerRef.current);
+      swipeTimerRef.current = null;
+    }
   };
 
   const handleCardsTouchMove = (e: React.TouchEvent) => {
     const deltaX = Math.abs(e.touches[0].clientX - touchStartXRef.current);
     const deltaY = Math.abs(e.touches[0].clientY - touchStartYRef.current);
-    if (deltaX > 8 || deltaY > 8) {
+    if (deltaX > 10 || deltaY > 10) {
       isSwipingRef.current = true;
+    }
+  };
+
+  const handleCardsTouchEnd = (e: React.TouchEvent) => {
+    const touchDuration = Date.now() - touchStartTimeRef.current;
+    if (e.changedTouches && e.changedTouches[0]) {
+      const deltaX = Math.abs(e.changedTouches[0].clientX - touchStartXRef.current);
+      const deltaY = Math.abs(e.changedTouches[0].clientY - touchStartYRef.current);
+      // Chạm dứt khoát nhanh dưới 350ms và không dịch chuyển quá 10px -> chắc chắn là click lật thẻ
+      if (deltaX <= 10 && deltaY <= 10 && touchDuration < 350) {
+        isSwipingRef.current = false;
+        return;
+      }
+    }
+    // Nếu là vuốt lướt slider, nhả lock sau 100ms để lần bấm sau không bị kẹt
+    if (isSwipingRef.current) {
+      swipeTimerRef.current = setTimeout(() => {
+        isSwipingRef.current = false;
+      }, 100);
     }
   };
 
@@ -148,7 +174,12 @@ const TeamSection = () => {
   };
 
   const handleCardClick = (index: number) => {
-    if (isSwipingRef.current) return;
+    // Chỉ kích hoạt lật thẻ ở giao diện mobile (<= 768px)
+    if (typeof window !== "undefined" && window.innerWidth > 768) return;
+    if (isSwipingRef.current) {
+      isSwipingRef.current = false;
+      return;
+    }
     setFlippedCards((prev) => ({
       ...prev,
       [index]: !prev[index],
@@ -251,22 +282,20 @@ const TeamSection = () => {
             data-aos-delay="100"
             onTouchStart={handleCardsTouchStart}
             onTouchMove={handleCardsTouchMove}
+            onTouchEnd={handleCardsTouchEnd}
             onScroll={handleCardsScroll}
           >
             {teamMembers.map((member, index) => (
               <div
                 className={`team-card team-card--${member.themeColor} ${flippedCards[index] ? "is-flipped" : ""}`}
                 key={index}
-                data-aos="fade-up"
-                data-aos-delay={150 + index * 80}
                 onClick={() => handleCardClick(index)}
               >
                 {/* 3D Flipper Container */}
                 <div className="team-card__flipper">
-                  {/* FRONT: Rectangular Photo Header */}
+                  {/* FRONT: Entire Front Card (Image Header + Body Info) */}
                   <div className="team-card__front">
                     <div className="team-card__image-box">
-                      <span className="team-card__circuit-line" aria-hidden="true"></span>
                       {/* Floating Top Left Glass Badge Icon */}
                       <div className="team-card__top-icon">
                         <i className={member.topIcon}></i>
@@ -278,6 +307,8 @@ const TeamSection = () => {
                         src={member.avatar}
                         alt={member.name}
                         className="team-card__rect-avatar-img"
+                        loading="lazy"
+                        decoding="async"
                       />
 
                       {/* Role Pill Badge anchored at base of image */}
@@ -291,11 +322,28 @@ const TeamSection = () => {
                         <span>Chạm xem thông tin</span>
                       </div>
                     </div>
+
+                    {/* Text Content Below Image (Inside Front face) */}
+                    <div className="team-card__body">
+                      {/* Member Name */}
+                      <h3 className="team-card__name">{member.name}</h3>
+
+                      {/* Symmetrical Underline Accent */}
+                      <div className="team-card__name-accent"></div>
+
+                      {/* Task description */}
+                      <p className="team-card__task">{member.task}</p>
+
+                      {/* Bottom Skill Capsule Badge */}
+                      <div className="team-card__skill-pill">
+                        <i className={member.skillIcon}></i>
+                        <span>EaAgri Core Team</span>
+                      </div>
+                    </div>
                   </div>
 
-                  {/* BACK: Detailed Info (3D flipped over to cover the photo on mobile) */}
+                  {/* BACK: Detailed Info (Full-card 3D flip) */}
                   <div className="team-card__back">
-                    <span className="team-card__circuit-line" aria-hidden="true"></span>
                     <div className="team-card__back-top">
                       <div className="team-card__top-icon">
                         <i className={member.topIcon}></i>
@@ -318,29 +366,17 @@ const TeamSection = () => {
                     </div>
 
                     <div className="team-card__back-bottom">
-                      <div className="team-card__back-return-pill">
+                      <div
+                        className="team-card__back-return-pill"
+                        onClick={(e) => {
+                          e.stopPropagation();
+                          handleCardClick(index);
+                        }}
+                      >
                         <i className="ri-arrow-go-back-line"></i>
-                        <span>Chạm để lật lại ảnh</span>
+                        <span>Lật lại ảnh</span>
                       </div>
                     </div>
-                  </div>
-                </div>
-
-                {/* Text Content Below Image (Kept for Desktop, hidden on Mobile) */}
-                <div className="team-card__body">
-                  {/* Member Name */}
-                  <h3 className="team-card__name">{member.name}</h3>
-
-                  {/* Symmetrical Underline Accent */}
-                  <div className="team-card__name-accent"></div>
-
-                  {/* Task description */}
-                  <p className="team-card__task">{member.task}</p>
-
-                  {/* Bottom Skill Capsule Badge */}
-                  <div className="team-card__skill-pill">
-                    <i className={member.skillIcon}></i>
-                    {/* <span>{member.major}</span> */}
                   </div>
                 </div>
               </div>
@@ -427,6 +463,8 @@ const TeamSection = () => {
                       src={appScreenshots[imgIndex]}
                       alt={`App screenshot ${imgIndex + 1}`}
                       className="phone-mockup__screenshot"
+                      loading="lazy"
+                      decoding="async"
                     />
                   </div>
                 </div>
@@ -435,7 +473,16 @@ const TeamSection = () => {
 
             {/* Fixed transparent device frame over the 9:20 screenshot */}
             <div className="phone-mockup__fixed-wrapper" aria-hidden="true">
-              <img src="/Iphone.png" alt="" className="phone-mockup__frame" />
+              <img
+                src="/images/webp/iphone.webp"
+                alt=""
+                className="phone-mockup__frame"
+                loading="lazy"
+                decoding="async"
+                onError={(e) => {
+                  (e.target as HTMLImageElement).src = "/Iphone.png";
+                }}
+              />
             </div>
 
             <button className="carousel-btn carousel-btn--next" onClick={handleNext} aria-label="Next">

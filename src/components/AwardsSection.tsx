@@ -1,5 +1,6 @@
 import { useState, useEffect, useRef, useCallback } from "react";
 import { createPortal } from "react-dom";
+import { Link } from "react-router-dom";
 
 interface AwardImage {
   url: string;
@@ -304,6 +305,7 @@ export default function AwardsSection() {
   return (
     <>
       <section
+        id="section-awards"
         className={`section__container awards-section__container awards-section--theme-${currentAward.themeColor}`}
         onMouseEnter={() => setIsPaused(true)}
         onMouseLeave={() => setIsPaused(false)}
@@ -600,6 +602,15 @@ export default function AwardsSection() {
                   </div>
                 </div>
               ))}
+            </div>
+
+            {/* Link to Dedicated Awards Page */}
+            <div className="awards-section__explore-btn-wrap">
+              <Link to="/awards" className="awards-section__explore-btn">
+                <i className="ri-award-fill"></i>
+                <span>Xem đầy đủ Phòng truyền thống & Bằng chứng nhận</span>
+                <i className="ri-arrow-right-line"></i>
+              </Link>
             </div>
           </div>
         </div>

@@ -15,7 +15,7 @@ export default function Login() {
   const [isLoading, setIsLoading] = useState(false);
   const [alert, setAlert] = useState<AlertState>({ type: null, message: "" });
 
-  const { user } = useAuth();
+  const { user, loginAdminEnv } = useAuth();
   const navigate = useNavigate();
   const location = useLocation();
 
@@ -59,7 +59,7 @@ export default function Login() {
 
     // Validate inputs
     if (!email.trim() || !password.trim()) {
-      setAlert({ type: "error", message: "Vui lòng điền đầy đủ email và mật khẩu." });
+      setAlert({ type: "error", message: "Vui lòng điền đầy đủ email/tên đăng nhập và mật khẩu." });
       return;
     }
 
@@ -70,6 +70,20 @@ export default function Login() {
 
     setIsLoading(true);
 
+    // 1. Kiểm tra tài khoản Quản trị viên (Super Admin) từ cấu hình .env
+    if (loginAdminEnv && loginAdminEnv(email.trim(), password)) {
+      setAlert({
+        type: "success",
+        message: "Đăng nhập Quản Trị Viên thành công! Đang chuyển hướng..."
+      });
+      setTimeout(() => {
+        navigate(from, { replace: true });
+      }, 500);
+      setIsLoading(false);
+      return;
+    }
+
+    // 2. Fallback sang Supabase Auth
     try {
       const { error } = await supabase.auth.signInWithPassword({
         email: email.trim(),
@@ -82,7 +96,7 @@ export default function Login() {
       console.error("Auth action error:", err);
       let errMsg = err.message || "Đã xảy ra lỗi trong quá trình xác thực.";
       if (errMsg.includes("Invalid login credentials")) {
-        errMsg = "Email hoặc mật khẩu không chính xác.";
+        errMsg = "Tài khoản hoặc mật khẩu không chính xác.";
       }
       setAlert({ type: "error", message: errMsg });
     } finally {
@@ -152,18 +166,19 @@ export default function Login() {
           {/* Authentication Form */}
           <form onSubmit={handleSubmit} className="auth-page__form">
 
-            {/* Email */}
+            {/* Email or Username */}
             <div className="auth-page__group">
-              <label htmlFor="email">Email</label>
+              <label htmlFor="email">Email hoặc Tên đăng nhập</label>
               <div className="auth-page__input-wrapper">
-                <i className="ri-mail-line"></i>
+                <i className="ri-user-3-line"></i>
                 <input
-                  type="email"
+                  type="text"
                   id="email"
-                  placeholder="email@example.com"
+                  placeholder="admin hoặc email@example.com"
                   className="auth-page__input"
                   value={email}
                   onChange={(e) => setEmail(e.target.value)}
+                  autoComplete="username"
                   required
                 />
               </div>
@@ -193,6 +208,28 @@ export default function Login() {
                   <i className={showPassword ? "ri-eye-off-line" : "ri-eye-line"}></i>
                 </button>
               </div>
+            </div>
+
+            {/* Quick Tip for Admin */}
+            <div
+              style={{
+                display: "flex",
+                alignItems: "center",
+                gap: "0.55rem",
+                padding: "0.6rem 0.85rem",
+                background: "rgba(16, 185, 129, 0.08)",
+                border: "1px dashed rgba(16, 185, 129, 0.3)",
+                borderRadius: "12px",
+                fontSize: "0.82rem",
+                color: "#065f46",
+                marginBottom: "1.2rem",
+                lineHeight: 1.4,
+              }}
+            >
+              <i className="ri-shield-keyhole-line" style={{ fontSize: "1.1rem", color: "#10b981", flexShrink: 0 }} />
+              <span>
+                Tài khoản quản trị (.env): <strong>admin</strong> / <strong>admin@123</strong>
+              </span>
             </div>
 
             {/* Submit Button */}

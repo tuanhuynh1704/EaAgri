@@ -1,15 +1,17 @@
-import { useEffect } from "react";
+import { useEffect, lazy } from "react";
 import { useSEO } from "../hooks/useSEO";
 import Hero from "../components/Hero";
-import TeamSection from "../components/TeamSection";
-import AwardsSection from "../components/AwardsSection";
-import ProblemSolutionSection from "../components/ProblemSolutionSection";
-import VideoGallerySection from "../components/VideoGallerySection";
-import ResultSection from "../components/ResultSection";
-import RoadmapSection from "../components/RoadmapSection";
 import SplashIntro from "../components/SplashIntro";
-import ExpertSection from "../components/ExpertSection";
 import LogoMarqueeSection from "../components/LogoMarqueeSection";
+import LazySection from "../components/common/LazySection";
+
+// Progressive on-scroll loading: Only load below-the-fold sections when user scrolls down
+const ExpertSection = lazy(() => import("../components/ExpertSection"));
+const TeamSection = lazy(() => import("../components/TeamSection"));
+const ProblemSolutionSection = lazy(() => import("../components/ProblemSolutionSection"));
+const VideoGallerySection = lazy(() => import("../components/VideoGallerySection"));
+const ResultSection = lazy(() => import("../components/ResultSection"));
+const RoadmapSection = lazy(() => import("../components/RoadmapSection"));
 
 export default function HomePage() {
   useSEO({
@@ -73,31 +75,35 @@ export default function HomePage() {
 
   return (
     <>
+      {/* 1. Ưu tiên hàng đầu: Màn hình chào + Hero + Logo Marquee tải tức thì */}
       <SplashIntro />
       <Hero />
       <LogoMarqueeSection />
-      <ExpertSection />
-      <TeamSection />
 
-      <div className="section-bg--gradient-soft fullpage-slide">
-        <AwardsSection />
-      </div>
+      {/* 2. Tải dần từng phần khi cuộn chuột xuống (Lazy Loading on Scroll) */}
+      <LazySection minHeight="600px">
+        <ExpertSection />
+      </LazySection>
 
-      <div className="section-bg--gradient-teal fullpage-slide">
+      <LazySection minHeight="700px">
+        <TeamSection />
+      </LazySection>
+
+      <LazySection minHeight="650px" className="section-bg--gradient-teal fullpage-slide">
         <ProblemSolutionSection />
-      </div>
+      </LazySection>
 
-      <div className="section-bg--gradient-warm fullpage-slide">
+      <LazySection minHeight="550px" className="section-bg--gradient-warm fullpage-slide">
         <VideoGallerySection />
-      </div>
+      </LazySection>
 
-      <div className="section-bg--gradient-warm fullpage-slide">
+      <LazySection minHeight="550px" className="section-bg--gradient-warm fullpage-slide">
         <ResultSection />
-      </div>
+      </LazySection>
 
-      <div className="fullpage-slide">
+      <LazySection minHeight="600px" className="fullpage-slide">
         <RoadmapSection />
-      </div>
+      </LazySection>
     </>
   );
 }

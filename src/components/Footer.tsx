@@ -78,16 +78,13 @@ export default function Footer() {
             </li>
             <li>
               <a
-                href="#awards"
+                href="/awards"
                 onClick={(e) => {
                   e.preventDefault();
-                  navigate("/");
-                  setTimeout(() => {
-                    document.querySelector('.awards-section__container')?.scrollIntoView({ behavior: 'smooth' });
-                  }, 100);
+                  navigate("/awards");
                 }}
               >
-                <i className="ri-trophy-line"></i> <span>Danh hiệu & Giải thưởng</span>
+                <i className="ri-trophy-line"></i> <span>Phòng truyền thống & Giải thưởng</span>
               </a>
             </li>
           </ul>

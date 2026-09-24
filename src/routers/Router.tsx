@@ -1,17 +1,20 @@
+import { lazy } from "react";
 import { createBrowserRouter } from "react-router-dom";
 import App from "../App";
 import HomePage from "../pages/HomePage";
-import UploadNews from "../pages/UploadNews";
-import NewsList from "../pages/NewsList";
-import NewsDetail from "../pages/NewsDetail";
-import Login from "../pages/Login";
-import Register from "../pages/Register";
-import AccountManagement from "../pages/AccountManagement";
-import ManageNews from "../pages/ManageNews";
-import ManageCooperation from "../pages/ManageCooperation";
 
-import ArchitecturePage from "../pages/ArchitecturePage";
-import PrivacyPolicy from "../pages/PrivacyPolicy";
+// Code splitting: Lazy load secondary pages to avoid bundling heavy dependencies (e.g. Quill, Supabase) on initial load
+const ArchitecturePage = lazy(() => import("../pages/ArchitecturePage"));
+const AwardsPage = lazy(() => import("../pages/AwardsPage"));
+const PrivacyPolicy = lazy(() => import("../pages/PrivacyPolicy"));
+const NewsList = lazy(() => import("../pages/NewsList"));
+const NewsDetail = lazy(() => import("../pages/NewsDetail"));
+const UploadNews = lazy(() => import("../pages/UploadNews"));
+const Login = lazy(() => import("../pages/Login"));
+const Register = lazy(() => import("../pages/Register"));
+const AccountManagement = lazy(() => import("../pages/AccountManagement"));
+const ManageNews = lazy(() => import("../pages/ManageNews"));
+const ManageCooperation = lazy(() => import("../pages/ManageCooperation"));
 
 export const router = createBrowserRouter([
   {
@@ -20,6 +23,7 @@ export const router = createBrowserRouter([
     children: [
       { path: "/", element: <HomePage /> },
       { path: "/architecture", element: <ArchitecturePage /> },
+      { path: "/awards", element: <AwardsPage /> },
       { path: "/privacy", element: <PrivacyPolicy /> },
       { path: "/privacy-policy", element: <PrivacyPolicy /> },
       { path: "/chinh-sach-bao-mat", element: <PrivacyPolicy /> },

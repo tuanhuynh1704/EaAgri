@@ -260,3 +260,50 @@ body::-webkit-scrollbar {
     padding-block: 3rem;
   }
 }
+
+// Progressive Lazy Loading & Route Fallback
+.lazy-section-container {
+  width: 100%;
+  position: relative;
+  transition: opacity 0.35s ease;
+}
+
+.lazy-section-placeholder {
+  width: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: transparent;
+}
+
+.lazy-section-spinner {
+  width: 36px;
+  height: 36px;
+  border: 3px solid rgba(46, 125, 50, 0.15);
+  border-top-color: #2e7d32;
+  border-radius: 50%;
+  animation: spin 0.8s linear infinite;
+}
+
+.route-page-loader {
+  min-height: 70vh;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 100%;
+
+  &__spinner {
+    width: 46px;
+    height: 46px;
+    border: 3.5px solid rgba(46, 125, 50, 0.15);
+    border-top-color: #2e7d32;
+    border-radius: 50%;
+    animation: spin 0.8s linear infinite;
+  }
+}
+
+@keyframes spin {
+  to {
+    transform: rotate(360deg);
+  }
+}

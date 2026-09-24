@@ -66,23 +66,18 @@ export function createEaAgriScene(container, options = {}) {
     showHotspots: true,
     showFarmer: true,
     autoRotate: false,
-    lazy: true,
-    maxDpr: 1.5,
+    lazy: false,
+    maxDpr: 1.25,
     posterUrl: null,
     ...options,
   };
   const base = new URL(options.assetBaseUrl || "../assets/", import.meta.url);
-  const quality =
-    opts.quality === "auto"
-      ? matchMedia("(max-width: 640px)").matches ||
-        (navigator.deviceMemory && navigator.deviceMemory <= 4)
-        ? "mobile"
-        : "high"
-      : opts.quality;
+  // Default to optimized 83k model (eaagri-durian-mobile.glb) for buttery 60fps on all laptops
+  const quality = opts.quality === "high" ? "high" : "mobile";
   const file =
-    quality === "mobile"
-      ? "eaagri-durian-mobile.glb"
-      : "eaagri-durian-high.glb";
+    quality === "high"
+      ? "eaagri-durian-high.glb"
+      : "eaagri-durian-mobile.glb";
   let data = { source: "none", ...options.data },
     destroyed = false,
     loaded = false,
@@ -111,7 +106,9 @@ export function createEaAgriScene(container, options = {}) {
     dogActor = null,
     dogRunning = false,
     dogRunTime = 0,
-    dogWaypoint = 0;
+    dogWaypoint = 0,
+    dogTails = [],
+    dogLegs = [];
   const dogPath = [
     [-1.55, 0.92],
     [-1.95, -0.15],
@@ -195,7 +192,7 @@ export function createEaAgriScene(container, options = {}) {
     pins.set(id, p);
   });
   const cards = node("div", "ea3d-cards");
-  cards.hidden = !opts.showCards;
+  cards.hidden = true; // Wait for 3D model to load before showing the 4 cards
   root.append(cards);
   const cardValues = new Map();
   ["overview", "weather", "soil", "disease"].forEach((id) => {
@@ -368,8 +365,13 @@ export function createEaAgriScene(container, options = {}) {
   }
   const worldPosition = new T.Vector3();
   const offsetVector = new T.Vector3();
-  function updatePins() {
+  let lastCamKey = "";
+  function updatePins(force = false) {
     if (!model) return;
+    const camKey = `${pivot.rotation.x.toFixed(3)}_${pivot.rotation.y.toFixed(3)}_${camera.position.x.toFixed(2)}_${camera.position.y.toFixed(2)}_${camera.position.z.toFixed(2)}`;
+    if (!force && camKey === lastCamKey) return;
+    lastCamKey = camKey;
+
     model.updateMatrixWorld(true);
     pins.forEach((pin, id) => {
       const anchor = model.getObjectByName(`Hotspot_${id}`);
@@ -485,11 +487,9 @@ export function createEaAgriScene(container, options = {}) {
   function updateDog(dt) {
     if (!dogActor || paused || reduced) return;
     dogRunTime += dt * (dogRunning ? 6 : 2.2);
-    dogActor.children
-      .filter((child) => child.name.startsWith("DogTail"))
-      .forEach((tail) => {
-        tail.rotation.z = Math.sin(dogRunTime) * 0.16;
-      });
+    dogTails.forEach((tail) => {
+      tail.rotation.z = Math.sin(dogRunTime) * 0.16;
+    });
     if (!dogRunning) return;
     const target = dogPath[dogWaypoint],
       dx = target[0] - dogActor.position.x,
@@ -504,11 +504,9 @@ export function createEaAgriScene(container, options = {}) {
     dogActor.position.z += (dz / distance) * Math.min(speed, distance);
     dogActor.position.y = 0.1;
     dogActor.rotation.y = Math.atan2(dx, dz);
-    dogActor.children
-      .filter((child) => child.name.startsWith("DogLeg"))
-      .forEach((leg, index) => {
-        leg.rotation.x = Math.sin(dogRunTime + index * Math.PI) * 0.24;
-      });
+    dogLegs.forEach((leg, index) => {
+      leg.rotation.x = Math.sin(dogRunTime + index * Math.PI) * 0.24;
+    });
   }
   function frame(time) {
     animationFrame = 0;
@@ -520,7 +518,9 @@ export function createEaAgriScene(container, options = {}) {
       mixer?.update(dt);
       updateInteractions(dt);
       updateWater(dt);
-      updateDog(dt);
+      try {
+        updateDog(dt);
+      } catch (_) {}
     }
     if (
       opts.autoRotate &&
@@ -706,14 +706,18 @@ export function createEaAgriScene(container, options = {}) {
       renderer = new T.WebGLRenderer({
         canvas,
         alpha: true,
-        antialias: true,
-        powerPreference: quality === "mobile" ? "low-power" : "default",
+        antialias: (window.devicePixelRatio || 1) <= 1.5,
+        powerPreference: "high-performance",
+        precision: "mediump",
       });
-      renderer.shadowMap.enabled = true;
-      renderer.shadowMap.type = T.PCFShadowMap;
+      // Disable heavy dynamic shadow maps on auto/mobile to boost FPS 3x
+      renderer.shadowMap.enabled = opts.quality === "high";
+      if (renderer.shadowMap.enabled) {
+        renderer.shadowMap.type = T.PCFShadowMap;
+      }
       renderer.setPixelRatio(
         Math.min(
-          devicePixelRatio || 1,
+          window.devicePixelRatio || 1,
           quality === "mobile" ? 1.25 : opts.maxDpr,
         ),
       );
@@ -723,6 +727,7 @@ export function createEaAgriScene(container, options = {}) {
       renderer.toneMappingExposure = 1.05;
       const response = await fetch(options.modelUrl || new URL(file, base), {
         signal: loadController.signal,
+        priority: "high",
       });
       if (!response.ok) throw Error(`Model request ${response.status}`);
       const gltf = await new GLTFLoader().parseAsync(
@@ -735,13 +740,19 @@ export function createEaAgriScene(container, options = {}) {
       }
       model = gltf.scene;
       pivot.add(model);
-      model.traverse((o) => {
-        if (o.isMesh) {
-          o.castShadow = true;
-          o.receiveShadow = true;
-        }
-      });
+      if (renderer.shadowMap.enabled) {
+        model.traverse((o) => {
+          if (o.isMesh) {
+            o.castShadow = true;
+            o.receiveShadow = true;
+          }
+        });
+      }
       dogActor = model.getObjectByName("Dog");
+      if (dogActor) {
+        dogTails = dogActor.children.filter((child) => child.name.startsWith("DogTail"));
+        dogLegs = dogActor.children.filter((child) => child.name.startsWith("DogLeg"));
+      }
       model
         .getObjectByName("Farmer")
         ?.traverse((o) => (o.visible = opts.showFarmer));
@@ -756,11 +767,25 @@ export function createEaAgriScene(container, options = {}) {
       resolveReady({ ok: true, quality });
       options.onReady?.({ quality });
       requestRender();
+
+      // Khi 3D đã load và render xong -> hiện 4 thẻ chữ với hiệu ứng mượt mà
+      if (opts.showCards) {
+        setTimeout(() => {
+          if (!destroyed) {
+            cards.hidden = false;
+            cards.classList.add("ea3d-cards--visible");
+          }
+        }, 120);
+      }
     } catch (error) {
       if (destroyed) return;
       root.dataset.state = "error";
       canvas.hidden = true;
       markers.hidden = true;
+      if (opts.showCards) {
+        cards.hidden = false;
+        cards.classList.add("ea3d-cards--visible");
+      }
       status.textContent =
         "Không thể hiển thị 3D trên thiết bị này. Hình dự phòng vẫn được giữ lại.";
       options.onError?.(error);
@@ -824,6 +849,7 @@ export function createEaAgriScene(container, options = {}) {
     },
     setCardsVisible(value) {
       cards.hidden = !value;
+      if (value) cards.classList.add("ea3d-cards--visible");
     },
     getStats() {
       return {

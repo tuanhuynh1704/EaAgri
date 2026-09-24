@@ -1,4 +1,4 @@
-import React, { useEffect, useState, useRef } from "react";
+import React, { useEffect, useState, useRef, useCallback, useMemo } from "react";
 import { Link, 
   // useNavigate
  } from "react-router-dom";
@@ -6,7 +6,7 @@ import { supabase } from "../utils/supabase/client";
 import { useAuth } from "../context/AuthContext";
 import ReactQuill from "react-quill-new";
 import "react-quill-new/dist/quill.snow.css";
-import { cleanContent } from "../utils/cleanContent";
+import { cleanContent, extractSummaryAndBody, buildContentWithSummary } from "../utils/cleanContent";
 import { quillModules, quillFormats } from "../utils/quillConfig";
 import { parseImageUrlAndPosition, buildImageUrlWithPosition } from "../utils/imageUtils";
 
@@ -44,6 +44,7 @@ export default function ManageNews() {
   
   // Form states
   const [formTitle, setFormTitle] = useState("");
+  const [formSummary, setFormSummary] = useState("");
   const [formAuthor, setFormAuthor] = useState("");
   const [formCategory, setFormCategory] = useState("Kỹ thuật");
   const [formContent, setFormContent] = useState("");
@@ -61,6 +62,76 @@ export default function ManageNews() {
   const [dragStart, setDragStart] = useState({ x: 0, y: 0 });
   
   const fileInputRef = useRef<HTMLInputElement>(null);
+  const modalQuillRef = useRef<any>(null);
+
+  // Custom image handler for ReactQuill in ManageNews modal
+  const handleModalImageUpload = useCallback(() => {
+    const input = document.createElement("input");
+    input.setAttribute("type", "file");
+    input.setAttribute("accept", "image/*");
+    input.click();
+
+    input.onchange = async () => {
+      const file = input.files ? input.files[0] : null;
+      if (!file) return;
+
+      if (file.size > 5 * 1024 * 1024) {
+        alert("Kích thước ảnh quá lớn. Vui lòng chọn ảnh nhỏ hơn 5MB.");
+        return;
+      }
+
+      const cleanFileName = file.name.replace(/[^\w.-]/g, "_");
+      const fileName = `content-${Date.now()}-${cleanFileName}`;
+
+      try {
+        const { error: uploadError } = await supabase.storage
+          .from("news-images")
+          .upload(fileName, file, { cacheControl: "3600", upsert: false });
+
+        let insertedUrl = "";
+        if (!uploadError) {
+          const { data } = supabase.storage.from("news-images").getPublicUrl(fileName);
+          insertedUrl = data.publicUrl;
+        }
+
+        const editor = modalQuillRef.current?.getEditor();
+        if (editor) {
+          const range = editor.getSelection(true) || { index: editor.getLength() };
+          if (insertedUrl) {
+            editor.insertEmbed(range.index, "image", insertedUrl);
+            editor.setSelection(range.index + 1);
+          } else {
+            const reader = new FileReader();
+            reader.onload = () => {
+              editor.insertEmbed(range.index, "image", reader.result);
+              editor.setSelection(range.index + 1);
+            };
+            reader.readAsDataURL(file);
+          }
+        }
+      } catch {
+        const editor = modalQuillRef.current?.getEditor();
+        if (editor) {
+          const range = editor.getSelection(true) || { index: editor.getLength() };
+          const reader = new FileReader();
+          reader.onload = () => {
+            editor.insertEmbed(range.index, "image", reader.result);
+            editor.setSelection(range.index + 1);
+          };
+          reader.readAsDataURL(file);
+        }
+      }
+    };
+  }, []);
+
+  const modalQuillModules = useMemo(() => ({
+    toolbar: {
+      container: quillModules.toolbar,
+      handlers: {
+        image: handleModalImageUpload,
+      },
+    },
+  }), [handleModalImageUpload]);
 
   const categories = [
     "Kỹ thuật",
@@ -167,6 +238,7 @@ export default function ManageNews() {
     setModalMode("create");
     setEditingId(null);
     setFormTitle("");
+    setFormSummary("");
     setFormAuthor(profile?.full_name || "");
     setFormCategory("Kỹ thuật");
     setFormContent("");
@@ -186,7 +258,10 @@ export default function ManageNews() {
     setFormTitle(cleanContent(item.title));
     setFormAuthor(item.author);
     setFormCategory(item.category);
-    setFormContent(cleanContent(item.content));
+    
+    const { summary, body } = extractSummaryAndBody(item.content);
+    setFormSummary(summary);
+    setFormContent(cleanContent(body));
     
     const parsed = parseImageUrlAndPosition(item.image_url);
     setFormImageUrl(parsed.url || "");
@@ -253,10 +328,6 @@ export default function ManageNews() {
       alert("Vui lòng nhập tiêu đề bài viết.");
       return;
     }
-    if (!formAuthor.trim()) {
-      alert("Vui lòng nhập tên tác giả.");
-      return;
-    }
     if (!formContent.trim()) {
       alert("Vui lòng nhập nội dung bài viết.");
       return;
@@ -292,6 +363,7 @@ export default function ManageNews() {
       }
 
       const finalImageUrlWithPos = finalImageUrl ? buildImageUrlWithPosition(finalImageUrl, formImagePosX, formImagePosY) : null;
+      const finalContent = buildContentWithSummary(formSummary, formContent);
 
       if (modalMode === "create") {
         // Insert new post
@@ -300,8 +372,8 @@ export default function ManageNews() {
           .insert([
             {
               title: cleanContent(formTitle.trim()),
-              content: cleanContent(formContent.trim()),
-              author: formAuthor.trim(),
+              content: finalContent,
+              author: formAuthor.trim() || "EaAgri",
               category: formCategory,
               image_url: finalImageUrlWithPos
             }
@@ -330,8 +402,8 @@ export default function ManageNews() {
           .from("news")
           .update({
             title: cleanContent(formTitle.trim()),
-            content: cleanContent(formContent.trim()),
-            author: formAuthor.trim(),
+            content: finalContent,
+            author: formAuthor.trim() || "EaAgri",
             category: formCategory,
             image_url: finalImageUrlWithPos
           })
@@ -465,9 +537,9 @@ export default function ManageNews() {
                 <thead>
                   <tr>
                     <th>Ảnh</th>
-                    <th>Tiêu đề bài viết</th>
+                    <th>Tiêu đề & Ghi chú</th>
                     <th>Danh mục</th>
-                    <th>Tác giả</th>
+                    <th>Tên báo / Nguồn</th>
                     <th>Ngày tạo</th>
                     <th style={{ textAlign: "center" }}>Hành động</th>
                   </tr>
@@ -488,12 +560,18 @@ export default function ManageNews() {
                         </div>
                       </td>
 
-                      {/* Title */}
+                      {/* Title & Summary */}
                       <td>
                         <div className="manage-news__item-title">
                           <Link to={`/tintuc/${item.id}`} className="title-link">
                             {cleanContent(item.title)}
                           </Link>
+                          {extractSummaryAndBody(item.content).summary && (
+                            <div className="manage-news__item-summary" style={{ fontSize: "0.82rem", color: "#64748b", marginTop: "4px", display: "-webkit-box", WebkitLineClamp: 2, WebkitBoxOrient: "vertical", overflow: "hidden" }}>
+                              <i className="ri-sticky-note-line" style={{ marginRight: "4px", color: "#2e7d32" }}></i>
+                              {extractSummaryAndBody(item.content).summary}
+                            </div>
+                          )}
                         </div>
                       </td>
 
@@ -504,9 +582,12 @@ export default function ManageNews() {
                         </span>
                       </td>
 
-                      {/* Author */}
+                      {/* Newspaper / Source */}
                       <td>
-                        <span className="manage-news__author">{item.author}</span>
+                        <span className="manage-news__author" style={{ display: "inline-flex", alignItems: "center", gap: "4px" }}>
+                          <i className="ri-newspaper-line" style={{ color: "#2e7d32" }}></i>
+                          {item.author}
+                        </span>
                       </td>
 
                       {/* Date */}
@@ -624,24 +705,8 @@ export default function ManageNews() {
                     )}
                   </div>
 
-                  <div className="modal-url-input">
-                    <span className="or-divider">Hoặc liên kết ảnh bên ngoài</span>
-                    <input
-                      type="url"
-                      placeholder="https://example.com/image.jpg"
-                      value={formImageUrl}
-                      onChange={(e) => {
-                        setFormImageUrl(e.target.value);
-                        setFormImageFile(null);
-                        setFormImagePreview(e.target.value || null);
-                      }}
-                      className="modal-input"
-                      disabled={formImageFile !== null || isSaving}
-                    />
-                  </div>
-
                   {/* Image Position Sliders */}
-                  {(formImagePreview || formImageUrl) && (
+                  {formImagePreview && (
                     <div className="upload-news__group" style={{ marginTop: '1.5rem', background: '#f8faf9', padding: '1rem', borderRadius: '12px', border: '1px solid #e1e8e3' }}>
                       <label style={{ marginBottom: '1rem', display: 'block', fontWeight: 600 }}>Căn chỉnh vị trí ảnh bìa</label>
                       
@@ -687,7 +752,7 @@ export default function ManageNews() {
                     <input
                       type="text"
                       id="modal-title"
-                      placeholder="Nhập tiêu đề..."
+                      placeholder="Nhập tiêu đề bài viết..."
                       value={formTitle}
                       onChange={(e) => setFormTitle(e.target.value)}
                       className="modal-input"
@@ -696,55 +761,54 @@ export default function ManageNews() {
                     />
                   </div>
 
-                  {/* Row grid: Author & Category */}
-                  <div className="modal-fields-row">
-                    
-                    {/* Author */}
-                    <div className="modal-field">
-                      <label htmlFor="modal-author">Tác giả <span className="required">*</span></label>
-                      <input
-                        type="text"
-                        id="modal-author"
-                        placeholder="Tác giả..."
-                        value={formAuthor}
-                        onChange={(e) => setFormAuthor(e.target.value)}
-                        className="modal-input"
-                        required
-                        disabled={isSaving}
-                      />
-                    </div>
-
-                    {/* Category */}
-                    <div className="modal-field">
-                      <label htmlFor="modal-category">Danh mục</label>
-                      <select
-                        id="modal-category"
-                        value={formCategory}
-                        onChange={(e) => setFormCategory(e.target.value)}
-                        className="modal-select"
-                        disabled={isSaving}
-                      >
-                        {categories.map((cat) => (
-                          <option key={cat} value={cat}>
-                            {cat}
-                          </option>
-                        ))}
-                      </select>
-                    </div>
-
+                  {/* Ghi chú / Tóm tắt bài viết */}
+                  <div className="modal-field">
+                    <label htmlFor="modal-summary">Ghi chú / Tóm tắt bài viết</label>
+                    <textarea
+                      id="modal-summary"
+                      placeholder="Nhập ghi chú hoặc tóm tắt ngắn cho bài viết (sapo)..."
+                      value={formSummary}
+                      onChange={(e) => setFormSummary(e.target.value)}
+                      className="modal-textarea"
+                      style={{ minHeight: "80px", resize: "vertical", fontFamily: "inherit" }}
+                      disabled={isSaving}
+                    />
                   </div>
 
-                  {/* Content */}
+                  {/* Category */}
+                  <div className="modal-field">
+                    <label htmlFor="modal-category">Danh mục bài viết</label>
+                    <select
+                      id="modal-category"
+                      value={formCategory}
+                      onChange={(e) => setFormCategory(e.target.value)}
+                      className="modal-select"
+                      disabled={isSaving}
+                    >
+                      {categories.map((cat) => (
+                        <option key={cat} value={cat}>
+                          {cat}
+                        </option>
+                      ))}
+                    </select>
+                  </div>
+
+                  {/* Content (Có chèn ảnh và chữ) */}
                   <div className="modal-field modal-field--full" style={{ gridColumn: "1 / -1", minHeight: "350px", display: "flex", flexDirection: "column" }}>
-                    <label htmlFor="modal-content">Nội dung chi tiết <span className="required">*</span></label>
+                    <label htmlFor="modal-content">Nội dung chi tiết (Có chèn ảnh và chữ) <span className="required">*</span></label>
+                    <small style={{ display: "block", color: "#64748b", fontSize: "0.85rem", marginTop: "-0.25rem", marginBottom: "0.6rem" }}>
+                      <i className="ri-information-line" style={{ color: "#2e7d32", marginRight: "4px" }}></i>
+                      Soạn thảo nội dung và nhấn vào biểu tượng <strong>🖼️ (Ảnh)</strong> trên thanh công cụ hoặc <strong>dán (Ctrl+V)</strong> để chèn ảnh.
+                    </small>
                     <ReactQuill
+                      ref={modalQuillRef}
                       theme="snow"
                       value={formContent}
                       onChange={setFormContent}
-                      modules={quillModules}
+                      modules={modalQuillModules}
                       formats={quillFormats}
                       readOnly={isSaving}
-                      placeholder="Nhập nội dung bài viết..."
+                      placeholder="Nhập nội dung bài viết, có thể chèn ảnh, định dạng tiêu đề, danh sách..."
                       style={{ flex: 1, display: "flex", flexDirection: "column" }}
                     />
                   </div>

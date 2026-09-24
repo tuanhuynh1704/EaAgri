@@ -40,54 +40,592 @@
   [data-aos="fade-left"],
   [data-aos="fade-right"] { transform: translate3d(0, 20px, 0); }
 
-  // Compact navigation: recognizable logo + touch-friendly icon tabs.
-  nav.navbar-container {
-    top: .45rem;
-    width: calc(100% - 1rem);
-    gap: .35rem;
+  // ==========================================
+  // PHƯƠNG ÁN 1: UNIFIED GLASS BAR + MOBILE DRAWER (COMPACT & SLEEK)
+  // ==========================================
+  nav.navbar-container,
+  .navbar-container.is-inner-page,
+  .navbar-container.is-scrolled {
+    top: max(0.55rem, env(safe-area-inset-top, 0.55rem));
+    width: calc(100% - 1.5rem);
+    max-width: 440px;
+    height: 54px;
+    min-height: 54px;
+    padding: 0.25rem 0.55rem 0.25rem 0.95rem;
+    border-radius: 999px;
+    background: rgba(255, 255, 255, 0.95) !important;
+    backdrop-filter: blur(20px);
+    -webkit-backdrop-filter: blur(20px);
+    border: none !important;
+    box-shadow:
+      0 6px 22px rgba(18, 60, 42, 0.08),
+      0 2px 6px rgba(0, 0, 0, 0.04) !important;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 0.45rem;
+    pointer-events: auto;
+    z-index: 1000;
   }
 
-  .navbar-container.is-inner-page { top: .45rem; }
-
+  // Logo inside unified bar (to rõ, sắc nét, không khung viền riêng)
+  .nav__logo,
   .navbar-container.is-scrolled .nav__logo,
   .navbar-container.is-inner-page .nav__logo {
-    min-height: 42px;
-    padding: .18rem .8rem;
-    border-radius: 999px;
-    overflow: hidden;
+    background: transparent !important;
+    box-shadow: none !important;
+    border: none !important;
+    padding: 0 !important;
+    min-height: auto !important;
+    height: 46px !important;
+    display: inline-flex;
+    align-items: center;
+    overflow: visible !important;
 
-    .nav__logo-img { width: auto; height: 42px; max-width: none; transform: scale(1.25); }
-  }
-
-  .nav__logo {
-    padding: .2rem .35rem;
-
-    .nav__logo-img { width: auto; height: 85px; max-width: none; }
-  }
-  .nav__right-capsule { margin-left: auto; gap: .25rem !important; }
-
-  .navbar-container.is-scrolled .nav__right-capsule {
-    .nav__menu,
-    .nav__actions {
-      min-height: 42px;
-      border-radius: 999px;
-      padding: .18rem;
+    .nav__logo-img {
+      width: auto;
+      height: 44px;
+      max-width: 180px;
+      transform: scale(1.36) !important;
+      transform-origin: left center;
+      object-fit: contain;
+      filter: drop-shadow(0 2px 6px rgba(0, 0, 0, 0.07));
     }
   }
 
-  .nav__menu { gap: 0; }
-  .nav__link { min-height: 42px; padding: .35rem; }
-  .nav__link .nav__link-text { display: none; }
-  .nav__link .nav__link-icon { width: 30px; height: 30px; font-size: 1.05rem; }
-  .nav__link.active::after { left: .35rem; right: .35rem; bottom: 1px; }
-  .nav__actions { gap: .25rem; }
-  .nav__actions .btn { min-height: 42px; padding: .45rem .65rem; }
+  // Right capsule inside unified bar
+  .nav__right-capsule,
+  .navbar-container.is-scrolled .nav__right-capsule,
+  .navbar-container.is-inner-page .nav__right-capsule {
+    background: transparent !important;
+    box-shadow: none !important;
+    border: none !important;
+    padding: 0 !important;
+    min-height: auto !important;
+    height: auto !important;
+    display: inline-flex;
+    align-items: center;
+    gap: 0.3rem !important;
+    margin-left: auto;
+
+    // Hide the plain crammed icons on mobile
+    .nav__menu {
+      display: none !important;
+    }
+  }
+
+  // Actions on mobile (Avatar/Login + Hamburger)
+  .nav__actions {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.3rem;
+
+    .btn--login {
+      min-height: 32px;
+      height: 32px;
+      padding: 0 0.75rem;
+      font-size: 0.78rem;
+      font-weight: 750;
+      border-radius: 999px;
+      background: linear-gradient(135deg, #10b981 0%, #059669 100%);
+      color: #ffffff;
+      border: 1px solid rgba(255, 255, 255, 0.4);
+      box-shadow: 0 3px 10px rgba(16, 185, 129, 0.25);
+      gap: 0.3rem;
+
+      span {
+        display: inline-block;
+      }
+
+      i {
+        font-size: 0.9rem;
+      }
+    }
+
+    .nav__user-pill {
+      min-height: 32px;
+      height: 32px;
+      padding: 0.12rem 0.55rem 0.12rem 0.2rem;
+      border-radius: 999px;
+      background: rgba(236, 253, 245, 0.9);
+      border: 1px solid rgba(16, 185, 129, 0.25);
+
+      .nav__user-avatar {
+        width: 25px;
+        height: 25px;
+        font-size: 0.75rem;
+      }
+
+      .nav__user-name {
+        display: inline-block;
+        font-size: 0.75rem;
+        max-width: 70px;
+      }
+
+      .nav__user-role-tag,
+      .nav__user-chevron {
+        display: none;
+      }
+    }
+  }
+
+  // Hamburger Toggle Button
+  .nav__mobile-toggle {
+    display: inline-flex !important;
+    align-items: center;
+    justify-content: center;
+    width: 34px;
+    height: 34px;
+    border-radius: 50%;
+    background: rgba(16, 185, 129, 0.08);
+    border: 1px solid rgba(16, 185, 129, 0.18);
+    color: #065f46;
+    cursor: pointer;
+    transition: all 0.25s cubic-bezier(0.16, 1, 0.3, 1);
+    outline: none;
+    -webkit-tap-highlight-color: transparent;
+
+    i {
+      font-size: 1.15rem;
+      font-weight: 400;
+      transition: transform 0.25s ease, color 0.25s ease;
+    }
+
+    &:active {
+      transform: scale(0.9);
+      background: rgba(16, 185, 129, 0.18);
+    }
+
+    &.is-active {
+      background: #10b981;
+      color: #ffffff;
+      border-color: #10b981;
+      box-shadow: 0 3px 12px rgba(16, 185, 129, 0.32);
+
+      i {
+        transform: rotate(90deg);
+      }
+    }
+  }
+
+  // Mobile Drawer Backdrop Overlay
+  .mobile-drawer-backdrop {
+    position: fixed;
+    inset: 0;
+    z-index: 1001;
+    background: rgba(10, 28, 20, 0.45);
+    backdrop-filter: blur(6px);
+    -webkit-backdrop-filter: blur(6px);
+    opacity: 0;
+    visibility: hidden;
+    transition: opacity 0.28s ease, visibility 0.28s;
+
+    &.is-open {
+      opacity: 1;
+      visibility: visible;
+    }
+  }
+
+  // Mobile Drawer Modal Sheet (Compact & Centered)
+  .mobile-drawer {
+    position: fixed;
+    top: calc(max(0.55rem, env(safe-area-inset-top, 0.55rem)) + 58px);
+    left: 50%;
+    transform: translateX(-50%) translateY(-10px) scale(0.97);
+    width: calc(100% - 1.8rem);
+    max-width: 380px;
+    max-height: calc(100dvh - max(0.55rem, env(safe-area-inset-top, 0.55rem)) - 70px);
+    overflow-y: auto;
+    -webkit-overflow-scrolling: touch;
+    z-index: 1002;
+    background: rgba(255, 255, 255, 0.98);
+    backdrop-filter: blur(28px);
+    -webkit-backdrop-filter: blur(28px);
+    border: none !important;
+    border-radius: 22px;
+    box-shadow:
+      0 18px 48px rgba(12, 50, 35, 0.16),
+      0 4px 14px rgba(0, 0, 0, 0.04);
+    padding: 0.85rem 0.95rem;
+    opacity: 0;
+    visibility: hidden;
+    pointer-events: none;
+    transition: all 0.28s cubic-bezier(0.16, 1, 0.3, 1);
+    display: flex;
+    flex-direction: column;
+    gap: 0.65rem;
+
+    &.is-open {
+      opacity: 1;
+      visibility: visible;
+      pointer-events: auto;
+      transform: translateX(-50%) translateY(0) scale(1);
+    }
+
+    &__header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding-bottom: 0.45rem;
+      border-bottom: 1px solid rgba(16, 185, 129, 0.12);
+    }
+
+    &__brand {
+      cursor: pointer;
+      display: inline-flex;
+      align-items: center;
+
+      .mobile-drawer__logo-img {
+        height: 40px;
+        width: auto;
+        transform: scale(1.34);
+        transform-origin: left center;
+        max-width: 175px;
+        object-fit: contain;
+      }
+    }
+
+    &__close-btn {
+      width: 32px;
+      height: 32px;
+      border-radius: 50%;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      background: rgba(0, 0, 0, 0.05);
+      border: none;
+      color: #2b4538;
+      cursor: pointer;
+      font-size: 1.25rem;
+      transition: all 0.2s ease;
+
+      &:active {
+        background: rgba(239, 68, 68, 0.15);
+        color: #dc2626;
+        transform: scale(0.92);
+      }
+    }
+
+    // User card inside drawer
+    &__user-card {
+      display: flex;
+      align-items: center;
+      gap: 0.6rem;
+      padding: 0.55rem 0.75rem;
+      border-radius: 14px;
+      background: linear-gradient(135deg, rgba(236, 253, 245, 0.85) 0%, rgba(209, 250, 229, 0.6) 100%);
+      border: 1px solid rgba(16, 185, 129, 0.2);
+    }
+
+    &__user-avatar {
+      width: 32px;
+      height: 32px;
+      border-radius: 50%;
+      background: linear-gradient(135deg, #10b981 0%, #059669 100%);
+      color: #ffffff;
+      font-size: 0.9rem;
+      font-weight: 850;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      box-shadow: 0 2px 8px rgba(16, 185, 129, 0.3);
+      flex-shrink: 0;
+    }
+
+    &__user-info {
+      display: flex;
+      flex-direction: column;
+      overflow: hidden;
+    }
+
+    &__user-name {
+      font-size: 0.84rem;
+      font-weight: 800;
+      color: #0c3e29;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+
+    &__user-email {
+      font-size: 0.7rem;
+      color: #4b6b5b;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+
+    &__admin-pill {
+      display: inline-flex;
+      align-items: center;
+      gap: 0.2rem;
+      font-size: 0.62rem;
+      font-weight: 800;
+      padding: 0.08rem 0.4rem;
+      border-radius: 99px;
+      background: rgba(245, 158, 11, 0.16);
+      color: #d97706;
+      width: fit-content;
+      margin-top: 0.2rem;
+    }
+
+    // Nav list
+    &__nav-list {
+      display: flex;
+      flex-direction: column;
+      gap: 0.35rem;
+    }
+
+    &__nav-item {
+      display: flex;
+      align-items: center;
+      gap: 0.65rem;
+      padding: 0.52rem 0.75rem;
+      border-radius: 13px;
+      text-decoration: none;
+      background: rgba(246, 250, 248, 0.65);
+      border: 1px solid rgba(16, 185, 129, 0.08);
+      transition: all 0.22s ease;
+      -webkit-tap-highlight-color: transparent;
+
+      &:active {
+        background: rgba(16, 185, 129, 0.12);
+        transform: scale(0.98);
+      }
+
+      &.is-active {
+        background: linear-gradient(135deg, rgba(236, 253, 245, 0.95), rgba(209, 250, 229, 0.75));
+        border-color: rgba(16, 185, 129, 0.35);
+        box-shadow: 0 3px 12px rgba(16, 185, 129, 0.1);
+
+        .mobile-drawer__nav-icon-box {
+          background: #10b981;
+          color: #ffffff;
+          box-shadow: 0 3px 10px rgba(16, 185, 129, 0.3);
+        }
+
+        .mobile-drawer__nav-title {
+          color: #047857;
+          font-weight: 850;
+        }
+
+        .mobile-drawer__nav-chevron {
+          color: #059669;
+          transform: translateX(2px);
+        }
+      }
+    }
+
+    &__nav-icon-box {
+      width: 30px;
+      height: 30px;
+      border-radius: 9px;
+      background: rgba(16, 185, 129, 0.1);
+      color: #059669;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 1.05rem;
+      flex-shrink: 0;
+      transition: all 0.2s ease;
+    }
+
+    &__nav-text {
+      display: flex;
+      flex-direction: column;
+      flex-grow: 1;
+    }
+
+    &__nav-title {
+      font-size: 0.86rem;
+      font-weight: 750;
+      color: #173827;
+      line-height: 1.25;
+    }
+
+    &__nav-desc {
+      font-size: 0.66rem;
+      color: #5c796b;
+      margin-top: 0.05rem;
+    }
+
+    &__nav-chevron {
+      font-size: 1rem;
+      color: #94ab9f;
+      transition: transform 0.2s ease;
+    }
+
+    // Admin Section
+    &__admin-section {
+      padding-top: 0.35rem;
+      border-top: 1px dashed rgba(16, 185, 129, 0.18);
+    }
+
+    &__section-title {
+      font-size: 0.64rem;
+      font-weight: 850;
+      letter-spacing: 0.8px;
+      color: #059669;
+      margin-bottom: 0.35rem;
+      display: block;
+    }
+
+    &__admin-grid {
+      display: grid;
+      grid-template-columns: repeat(2, 1fr);
+      gap: 0.35rem;
+    }
+
+    &__admin-btn {
+      display: flex;
+      align-items: center;
+      gap: 0.4rem;
+      padding: 0.45rem 0.65rem;
+      border-radius: 10px;
+      background: rgba(246, 250, 248, 0.8);
+      border: 1px solid rgba(16, 185, 129, 0.15);
+      color: #1a4532;
+      font-size: 0.76rem;
+      font-weight: 750;
+      cursor: pointer;
+      text-align: left;
+      transition: all 0.2s ease;
+
+      i {
+        font-size: 0.9rem;
+        color: #10b981;
+      }
+
+      &:active {
+        background: rgba(16, 185, 129, 0.15);
+        transform: scale(0.97);
+      }
+
+      &--create {
+        background: rgba(16, 185, 129, 0.12);
+        color: #047857;
+        border-color: rgba(16, 185, 129, 0.3);
+      }
+    }
+
+    // Auth box
+    &__auth-box {
+      margin-top: 0.1rem;
+    }
+
+    &__login-btn {
+      width: 100%;
+      min-height: 38px;
+      height: 38px;
+      border-radius: 11px;
+      background: linear-gradient(135deg, #10b981 0%, #059669 100%);
+      color: #ffffff;
+      border: none;
+      font-size: 0.84rem;
+      font-weight: 800;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 0.45rem;
+      box-shadow: 0 4px 14px rgba(16, 185, 129, 0.28);
+      cursor: pointer;
+      transition: all 0.2s ease;
+
+      &:active {
+        transform: scale(0.98);
+        box-shadow: 0 2px 6px rgba(16, 185, 129, 0.18);
+      }
+
+      i {
+        font-size: 1rem;
+      }
+    }
+
+    &__logout-btn {
+      width: 100%;
+      min-height: 36px;
+      height: 36px;
+      border-radius: 11px;
+      background: rgba(239, 68, 68, 0.08);
+      color: #dc2626;
+      border: 1px solid rgba(239, 68, 68, 0.2);
+      font-size: 0.8rem;
+      font-weight: 750;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 0.45rem;
+      cursor: pointer;
+      transition: all 0.2s ease;
+
+      &:active {
+        background: rgba(239, 68, 68, 0.16);
+        transform: scale(0.98);
+      }
+
+      i {
+        font-size: 0.95rem;
+      }
+    }
+
+    // Footer
+    &__footer {
+      padding-top: 0.45rem;
+      border-top: 1px solid rgba(16, 185, 129, 0.12);
+      display: flex;
+      flex-direction: column;
+      gap: 0.35rem;
+    }
+
+    &__footer-label {
+      font-size: 0.62rem;
+      font-weight: 750;
+      color: #638273;
+      text-align: center;
+    }
+
+    &__contact-chips {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 0.35rem;
+    }
+
+    &__contact-chip {
+      display: inline-flex;
+      align-items: center;
+      gap: 0.28rem;
+      padding: 0.22rem 0.55rem;
+      border-radius: 99px;
+      background: rgba(240, 250, 245, 0.9);
+      border: 1px solid rgba(16, 185, 129, 0.18);
+      color: #14583c;
+      font-size: 0.68rem;
+      font-weight: 700;
+      text-decoration: none;
+      transition: all 0.2s ease;
+
+      i {
+        font-size: 0.8rem;
+        color: #10b981;
+      }
+
+      &:active {
+        background: #14583c;
+        color: #ffffff;
+
+        i {
+          color: #ffffff;
+        }
+      }
+    }
+  }
 
   // Homepage hero becomes a natural vertical story.
   .hero-section {
     min-height: 100svh;
     height: auto;
-    padding: 6.1rem 1rem 2.5rem;
+    padding: 5.6rem 1rem 2.2rem;
     overflow-x: clip;
     overflow-y: visible;
   }
@@ -95,22 +633,95 @@
   .hero-grid-layout {
     display: flex;
     flex-direction: column;
-    gap: 1.6rem;
+    gap: 1.15rem;
   }
 
-  .hero__content { order: 1; }
-  .hero__visual { order: 2; }
-  .hero-badge { margin-bottom: .8rem; padding: .35rem .75rem; }
-  .hero-title { margin-bottom: 1rem; }
-  .hero-title .text-ea-agri { font-size: clamp(2.65rem, 14vw, 3.25rem); letter-spacing: -2px; }
-  .hero-title .text-sub { font-size: clamp(1.35rem, 6.6vw, 1.72rem); }
-  .hero-title .text-sub--accent { gap: .48rem; }
-  .hero-title .text-sub--accent small { min-height: 1.35rem; padding: .15rem .38rem; font-size: .43rem; }
-  .hero-description { margin-bottom: 1.2rem; font-size: .9rem; line-height: 1.65; }
+  .hero__content {
+    order: 1;
+    text-align: center;
+  }
+
+  .hero__visual {
+    order: 2;
+    margin-top: 0.2rem;
+    margin-bottom: 0.2rem;
+  }
+
+  // Dual download buttons: hide desktop version, show mobile version below 3D tree
+  .hero-download-links--desktop {
+    display: none !important;
+  }
+
+  .hero-download-links--mobile {
+    display: flex !important;
+    order: 3;
+    justify-content: center;
+    width: 100%;
+    margin-top: 0.35rem;
+    margin-bottom: 0.4rem;
+  }
+
+  // Bỏ bớt chữ trên mobile:
+  // 1. Ẩn dòng chữ xám lặp lại ("Trợ lý cây sầu riêng") vì badge ở ngay trên đã có
+  .hero-title .text-sub.text-gray {
+    display: none !important;
+  }
+
+  // 2. Chuyển sang mô tả ngắn gọn, súc tích
+  .hero-description {
+    margin-bottom: 0.8rem;
+    font-size: 0.84rem;
+    line-height: 1.55;
+    max-width: 325px;
+    margin-inline: auto;
+    text-align: center;
+    padding-left: 0;
+    border-left: none;
+
+    .hero-description__energy-bar {
+      display: none;
+    }
+
+    .hero-description__full {
+      display: none !important;
+    }
+
+    .hero-description__mobile {
+      display: inline !important;
+    }
+  }
+
+  .hero-badge {
+    margin-bottom: 0.55rem;
+    padding: 0.32rem 0.72rem;
+  }
+
+  .hero-title {
+    margin-bottom: 0.65rem;
+
+    .text-ea-agri {
+      font-size: clamp(2.45rem, 13vw, 3rem);
+      letter-spacing: -1.5px;
+      line-height: 1.1;
+    }
+
+    .text-sub--accent {
+      font-size: clamp(1.2rem, 6.2vw, 1.55rem);
+      gap: 0.45rem;
+      margin-top: 0.15rem;
+
+      small {
+        min-height: 1.25rem;
+        padding: 0.12rem 0.35rem;
+        font-size: 0.45rem;
+      }
+    }
+  }
+
   .hero__visual .image-wrapper-container { width: min(90vw, 350px); height: clamp(320px, 85vw, 380px); }
   .hero-download-links { gap: .55rem; }
-  .hero-download-links .download-btn { flex: 1; min-width: 0; min-height: 54px; max-width: 165px; padding: .48rem .65rem; gap: .45rem; }
-  .hero-download-links .download-btn__icon { font-size: 1.55rem; }
+  .hero-download-links .download-btn { flex: 1; min-width: 0; min-height: 52px; max-width: 165px; padding: .45rem .65rem; gap: .45rem; }
+  .hero-download-links .download-btn__icon { font-size: 1.5rem; }
   .hero-download-links .download-btn__small { font-size: .48rem; }
   .hero-download-links .download-btn__store { font-size: .72rem; }
   .scroll-down-hint, .features-bar-section { display: none; }
@@ -164,7 +775,8 @@
     }
   }
 
-  // 2. Thu nhỏ khung 1 thành viên lại
+  // 2. Thu nhỏ khung 1 thành viên lại & Cấu hình lật thẻ 3D siêu mượt không chớp trắng
+  // 2. Thu nhỏ khung 1 thành viên lại & Cấu hình lật thẻ 3D siêu mượt không chớp trắng
   .team-card {
     flex: 0 0 clamp(230px, 68vw, 260px) !important;
     width: clamp(230px, 68vw, 260px) !important;
@@ -175,23 +787,52 @@
     background: transparent !important;
     border: none !important;
     box-shadow: none !important;
-    cursor: pointer;
+    cursor: pointer !important;
     user-select: none;
     -webkit-tap-highlight-color: transparent;
     padding: 0;
+    perspective: 1000px;
+    -webkit-perspective: 1000px;
+    opacity: 1 !important;
+    visibility: visible !important;
+    transform: none !important;
   }
 
   .team-card__flipper {
+    position: relative;
     width: 100%;
     height: 100%;
     border-radius: 22px;
+    transform-style: preserve-3d;
+    -webkit-transform-style: preserve-3d;
+    transition: transform 0.55s cubic-bezier(0.25, 1, 0.5, 1);
+  }
+
+  // Flipped state: Xoay flipper 180deg mượt mà
+  .team-card.is-flipped .team-card__flipper {
+    transform: rotateY(180deg) !important;
+    -webkit-transform: rotateY(180deg) !important;
   }
 
   .team-card__front {
+    position: absolute;
+    inset: 0;
+    width: 100%;
+    height: 100%;
     border-radius: 22px;
-    overflow: hidden;
-    box-shadow: 0 12px 30px rgba(0, 0, 0, 0.16), 0 4px 10px rgba(0, 0, 0, 0.08);
     border: 1px solid rgba(255, 255, 255, 0.18);
+    background: #111714;
+    overflow: hidden;
+    box-shadow: 0 12px 30px rgba(0, 0, 0, 0.2) !important;
+    z-index: 2;
+    transform: rotateY(0deg);
+    -webkit-transform: rotateY(0deg);
+    opacity: 1 !important;
+    visibility: visible !important;
+    backface-visibility: hidden !important;
+    -webkit-backface-visibility: hidden !important;
+    transform-style: preserve-3d;
+    -webkit-transform-style: preserve-3d;
   }
 
   .team-card__image-box {
@@ -251,6 +892,65 @@
 
   .team-card__back {
     display: flex !important;
+    position: absolute;
+    inset: 0;
+    width: 100%;
+    height: 100%;
+    border-radius: 22px !important;
+    border: 1.5px solid rgba(255, 255, 255, 0.14) !important;
+    background: #111714;
+    box-shadow: 0 12px 30px rgba(0, 0, 0, 0.2) !important;
+    z-index: 1;
+    overflow: hidden;
+    transform: rotateY(180deg);
+    -webkit-transform: rotateY(180deg);
+    opacity: 1 !important;
+    visibility: visible !important;
+    backface-visibility: hidden !important;
+    -webkit-backface-visibility: hidden !important;
+    transform-style: preserve-3d;
+    -webkit-transform-style: preserve-3d;
+  }
+
+  // Theme gradient backgrounds cho mặt sau thẻ trên mobile
+  .team-card--green .team-card__back {
+    background: radial-gradient(circle at 50% 10%, rgba(37, 138, 76, 0.45) 0%, #111a15 65%, #0a110d 100%) !important;
+    border-color: rgba(46, 204, 113, 0.45) !important;
+  }
+  .team-card--blue .team-card__back {
+    background: radial-gradient(circle at 50% 10%, rgba(22, 141, 179, 0.45) 0%, #0d1920 65%, #081015 100%) !important;
+    border-color: rgba(56, 189, 248, 0.45) !important;
+  }
+  .team-card--purple .team-card__back {
+    background: radial-gradient(circle at 50% 10%, rgba(102, 115, 200, 0.45) 0%, #161524 65%, #0d0c17 100%) !important;
+    border-color: rgba(167, 139, 250, 0.45) !important;
+  }
+  .team-card--orange .team-card__back {
+    background: radial-gradient(circle at 50% 10%, rgba(189, 138, 45, 0.45) 0%, #201912 65%, #15100a 100%) !important;
+    border-color: rgba(245, 158, 11, 0.45) !important;
+  }
+
+  // State pointer-events & z-index switching
+  .team-card:not(.is-flipped) {
+    .team-card__front {
+      pointer-events: auto !important;
+      z-index: 5 !important;
+    }
+    .team-card__back {
+      pointer-events: none !important;
+      z-index: 1 !important;
+    }
+  }
+
+  .team-card.is-flipped {
+    .team-card__front {
+      pointer-events: none !important;
+      z-index: 1 !important;
+    }
+    .team-card__back {
+      pointer-events: auto !important;
+      z-index: 5 !important;
+    }
   }
 
   // Mobile Navigation Dots & Swipe Hint
@@ -370,23 +1070,7 @@
   }
 
   .academic-advisors {
-    flex-direction: column;
-    align-items: stretch;
-    padding: 1rem;
-    gap: 0.85rem;
-    border-radius: 16px;
-  }
-
-  .academic-advisors__list {
-    display: grid;
-    grid-template-columns: 1fr;
-    gap: 0.4rem;
-
-    span {
-      justify-content: center;
-      border-radius: 10px;
-      padding: 0.45rem 0.6rem;
-    }
+    display: none !important;
   }
 
   // Product screenshots: center phone only, swipe-friendly controls.
@@ -495,11 +1179,98 @@
   .news-list__categories { flex-wrap: nowrap; overflow-x: auto; padding: .15rem .05rem .45rem; scrollbar-width: none; }
   .news-list__categories::-webkit-scrollbar { display: none; }
   .news-list__categories button { padding: .48rem .85rem; font-size: .78rem; }
-  .news-list__grid { grid-template-columns: 1fr; gap: 1rem; }
-  .news-list__card { border-radius: 18px; }
-  .news-list__card-content { padding: 1rem; }
-  .news-list__card-meta { gap: .7rem; flex-wrap: wrap; font-size: .72rem; }
-  .news-list__card-title { height: auto; font-size: 1.15rem; }
+  // Institutional Feature Article on Mobile (Compact & Sleek)
+  .news-list__institutional-feature {
+    grid-template-columns: 1fr;
+    margin: -1rem 0 1.5rem;
+    border-radius: 16px;
+    box-shadow: 0 8px 24px rgba(25, 86, 62, 0.08);
+
+    .news-list__institutional-image {
+      min-height: 160px;
+      max-height: 180px;
+      aspect-ratio: 16 / 9;
+
+      > span {
+        top: 0.65rem;
+        left: 0.65rem;
+        padding: 0.25rem 0.55rem;
+        font-size: 0.64rem;
+      }
+    }
+
+    .news-list__institutional-content {
+      padding: 0.85rem 1rem 1rem;
+
+      > small {
+        font-size: 0.62rem;
+        letter-spacing: 0.8px;
+      }
+
+      h2 {
+        font-size: 1.08rem;
+        line-height: 1.35;
+        margin: 0.35rem 0 0.45rem;
+        letter-spacing: -0.01em;
+      }
+
+      p {
+        font-size: 0.8rem;
+        line-height: 1.5;
+        display: -webkit-box;
+        -webkit-line-clamp: 2;
+        -webkit-box-orient: vertical;
+        overflow: hidden;
+      }
+
+      .news-list__institutional-actions {
+        margin-top: 0.75rem;
+        gap: 0.45rem;
+
+        a {
+          padding: 0.42rem 0.75rem;
+          font-size: 0.74rem;
+          border-radius: 8px;
+        }
+      }
+    }
+  }
+
+  .news-list__grid { grid-template-columns: 1fr; gap: 1.15rem; }
+  .news-list__card {
+    border-radius: 16px;
+
+    .news-list__card-image-wrapper {
+      aspect-ratio: 16 / 9;
+    }
+
+    .news-list__card-content {
+      padding: 0.85rem 1rem;
+    }
+
+    .news-list__card-meta {
+      gap: 0.6rem;
+      flex-wrap: wrap;
+      font-size: 0.7rem;
+      margin-bottom: 0.35rem;
+    }
+
+    .news-list__card-title {
+      height: auto;
+      font-size: 1.02rem;
+      line-height: 1.35;
+      margin-bottom: 0.4rem;
+    }
+
+    .news-list__card-snippet {
+      font-size: 0.8rem;
+      line-height: 1.5;
+      display: -webkit-box;
+      -webkit-line-clamp: 2;
+      -webkit-box-orient: vertical;
+      overflow: hidden;
+    }
+  }
 
   .news-detail { padding: 6.2rem .75rem 3rem; }
   .news-detail__container { width: 100%; }
@@ -542,12 +1313,6 @@
 
 @media (max-width: 390px) {
   nav.navbar-container { width: calc(100% - .6rem); }
-  .navbar-container.is-scrolled .nav__logo,
-  .navbar-container.is-inner-page .nav__logo { padding-inline: .35rem; }
-  .nav__logo .nav__logo-img,
-  .navbar-container.is-inner-page .nav__logo .nav__logo-img { width: 62px; }
-  .nav__link { padding-inline: .22rem; }
-  .nav__link .nav__link-icon { width: 28px; height: 28px; }
   .nav__actions .btn { padding-inline: .5rem; }
 
   .hero-download-links .download-btn { padding-inline: .45rem; }

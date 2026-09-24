@@ -362,24 +362,43 @@
     flex-grow: 1;
   }
 
-  &__card-meta {
-    display: flex;
+  &__card-source {
+    display: inline-flex;
     align-items: center;
-    gap: 1.25rem;
+    gap: 0.4rem;
+    font-size: 0.78rem;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.6px;
+    color: #1b5e20;
+    background: rgba(46, 125, 50, 0.08);
+    padding: 0.28rem 0.65rem;
+    border-radius: 6px;
+    margin-bottom: 0.75rem;
+    align-self: flex-start;
+    border: 1px solid rgba(46, 125, 50, 0.15);
+    max-width: 100%;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+
+    i {
+      font-size: 0.9rem;
+      color: #2e7d32;
+      flex-shrink: 0;
+    }
+  }
+
+  &__card-date {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.35rem;
     color: #64748b;
-    font-size: 0.8rem;
+    font-size: 0.82rem;
     font-weight: 500;
-    margin-bottom: 1rem;
 
-    span {
-      display: flex;
-      align-items: center;
-      gap: 0.35rem;
-
-      i {
-        font-size: 0.95rem;
-        color: rgba($primary-color, 0.8);
-      }
+    i {
+      color: #2e7d32;
     }
   }
 

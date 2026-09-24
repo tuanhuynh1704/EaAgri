@@ -20,7 +20,7 @@ const Hero = () => {
   }, []);
 
   const fallingLeaves = useMemo(() => (
-    Array.from({ length: 16 }, (_, index) => {
+    Array.from({ length: 8 }, (_, index) => {
       const depth = Math.random();
       const size = 18 + depth * 38;
       const rotationDirection = Math.random() > 0.5 ? 1 : -1;
@@ -74,45 +74,11 @@ const Hero = () => {
     hero.style.setProperty("--hero-pointer-y", `${yRatio * 100}%`);
     hero.style.setProperty("--content-shift-x", `${(xRatio - 0.5) * 5}px`);
     hero.style.setProperty("--content-shift-y", `${(yRatio - 0.5) * 3}px`);
-
-    hero.querySelectorAll<HTMLElement>(".floating-leaf").forEach((leaf) => {
-      const leafBounds = leaf.getBoundingClientRect();
-      const centerX = leafBounds.left + leafBounds.width / 2;
-      const centerY = leafBounds.top + leafBounds.height / 2;
-      const dx = centerX - event.clientX;
-      const dy = centerY - event.clientY;
-      const distance = Math.hypot(dx, dy);
-      const radius = 130;
-
-      if (distance < radius) {
-        const force = (radius - distance) / radius;
-        const smoothForce = force * force; // Soft quadratic falloff for natural breeze physics
-        const safeDistance = Math.max(distance, 1);
-        leaf.style.setProperty("--leaf-repel-x", `${(dx / safeDistance) * smoothForce * 26}px`);
-        leaf.style.setProperty("--leaf-repel-y", `${(dy / safeDistance) * smoothForce * 16}px`);
-        leaf.style.setProperty("--leaf-repel-rotate", `${(dx >= 0 ? 1 : -1) * smoothForce * 14}deg`);
-        leaf.style.setProperty("--leaf-repel-scale", `${1 + smoothForce * 0.03}`);
-        leaf.classList.add("is-repelled");
-      } else {
-        leaf.style.setProperty("--leaf-repel-x", "0px");
-        leaf.style.setProperty("--leaf-repel-y", "0px");
-        leaf.style.setProperty("--leaf-repel-rotate", "0deg");
-        leaf.style.setProperty("--leaf-repel-scale", "1");
-        leaf.classList.remove("is-repelled");
-      }
-    });
   };
 
   const resetHeroPointer = (event: MouseEvent<HTMLElement>) => {
     event.currentTarget.style.setProperty("--content-shift-x", "0px");
     event.currentTarget.style.setProperty("--content-shift-y", "0px");
-    event.currentTarget.querySelectorAll<HTMLElement>(".floating-leaf").forEach((leaf) => {
-      leaf.style.setProperty("--leaf-repel-x", "0px");
-      leaf.style.setProperty("--leaf-repel-y", "0px");
-      leaf.style.setProperty("--leaf-repel-rotate", "0deg");
-      leaf.style.setProperty("--leaf-repel-scale", "1");
-      leaf.classList.remove("is-repelled");
-    });
   };
 
   return (
@@ -171,11 +137,12 @@ const Hero = () => {
             {/* The 3D Tree, IoT devices and Farmer interactive model */}
             <EaAgriDurian
               assetBaseUrl="/eaagri-3d/assets/"
-              posterUrl="/Cây 1.png"
+              posterUrl="/images/webp/cay-1.webp"
               quality="auto"
               showCards={true}
               showHotspots={true}
               showFarmer={true}
+              lazy={false}
             />
 
             {/* Glowing Sunlight Sparkles & Pollen Bokeh */}
@@ -185,6 +152,42 @@ const Hero = () => {
               ))}
             </div>
           </div>
+        </div>
+
+        {/* MOBILE ONLY: App Store & Google Play placed directly below 3D Tree */}
+        <div className="hero-download-links hero-download-links--mobile">
+          <a
+            href="#app-store"
+            className="download-btn"
+            onClick={(e) => {
+              e.preventDefault();
+              triggerAppStoreNotice();
+            }}
+            title="Tải về trên App Store (iOS)"
+          >
+            <span className="download-btn__icon apple-store-icon">
+              <i className="ri-apple-fill"></i>
+            </span>
+            <div className="download-btn__text">
+              <span className="download-btn__lbl">Tải về trên</span>
+              <span className="download-btn__store">App Store</span>
+            </div>
+          </a>
+
+          <a 
+            href="https://play.google.com/store/apps/details?id=com.eaagri.app&hl=vi" 
+            target="_blank" 
+            rel="noopener noreferrer" 
+            className="download-btn"
+          >
+            <span className="download-btn__icon google-play-icon">
+              <i className="ri-google-play-fill"></i>
+            </span>
+            <div className="download-btn__text">
+              <span className="download-btn__lbl">Tải về trên</span>
+              <span className="download-btn__store">Google Play</span>
+            </div>
+          </a>
         </div>
 
         {/* RIGHT COLUMN: Heading, Subtext, App links, Key Stats & Social Proof */}
@@ -220,10 +223,15 @@ const Hero = () => {
 
           <p className="hero-description">
             <span className="hero-description__energy-bar" aria-hidden="true" />
-            Ứng dụng AI & IoT theo dõi sức khỏe, chẩn đoán sâu bệnh và tối ưu năng suất cho <strong className="hero-highlight">cây sầu riêng</strong>.
+            <span className="hero-description__full">
+              Ứng dụng AI & IoT theo dõi sức khỏe, chẩn đoán sâu bệnh và tối ưu năng suất cho <strong className="hero-highlight">cây sầu riêng</strong>.
+            </span>
+            <span className="hero-description__mobile">
+              Ứng dụng AI & IoT theo dõi sức khỏe, chẩn đoán sâu bệnh & tối ưu năng suất sầu riêng.
+            </span>
           </p>
 
-          <div className="hero-download-links">
+          <div className="hero-download-links hero-download-links--desktop">
             <a
               href="#app-store"
               className="download-btn"

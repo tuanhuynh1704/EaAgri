@@ -40,7 +40,7 @@ const ResultSection = () => (
     <div className="result__gallery">
       {resultImages.map((image, index) => (
         <figure className={`result__photo result__photo--${index + 1}`} key={image.src} data-aos="zoom-in" data-aos-delay={index * 70}>
-          <img src={image.src} alt={image.label} />
+          <img src={image.src} alt={image.label} loading="lazy" decoding="async" />
           <figcaption><i className={image.icon} /><span>{image.label}</span></figcaption>
         </figure>
       ))}
