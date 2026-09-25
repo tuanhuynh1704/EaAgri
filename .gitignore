@@ -25,3 +25,6 @@ ui-ux-pro-max-skill
 *.njsproj
 *.sln
 *.sw?
+
+# Source/design files moved out of public/ (not served by the site). Keep a copy on Drive.
+design-assets/

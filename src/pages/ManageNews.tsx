@@ -551,7 +551,7 @@ export default function ManageNews() {
                       <td style={{ width: "80px" }}>
                         <div className="manage-news__thumb">
                           {item.image_url ? (
-                            <img src={parseImageUrlAndPosition(item.image_url).url!} alt={cleanContent(item.title)} style={{ objectPosition: `${parseImageUrlAndPosition(item.image_url).posX}% ${parseImageUrlAndPosition(item.image_url).posY}%` }} />
+                            <img loading="lazy" decoding="async" src={parseImageUrlAndPosition(item.image_url).url!} alt={cleanContent(item.title)} style={{ objectPosition: `${parseImageUrlAndPosition(item.image_url).posX}% ${parseImageUrlAndPosition(item.image_url).posY}%` }} />
                           ) : (
                             <div className="manage-news__thumb-placeholder">
                               <i className="ri-image-line"></i>
@@ -676,7 +676,7 @@ export default function ManageNews() {
                     
                     {formImagePreview ? (
                       <div className="preview-container">
-                        <img 
+                        <img loading="lazy" decoding="async" 
                           src={formImagePreview} 
                           alt="Preview" 
                           onMouseDown={handleMouseDown}

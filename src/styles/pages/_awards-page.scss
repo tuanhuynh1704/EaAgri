@@ -46,7 +46,7 @@
 // ==========================================
 .awards-hero {
   position: relative;
-  background: url("/assets/awards-hero-landscape.jpg") right center / cover no-repeat;
+  background: url("/assets/awards-hero-landscape.webp") right center / cover no-repeat;
   color: $text-dark;
   overflow: hidden;
   min-height: 480px;
@@ -1058,7 +1058,7 @@ a.award-stage-card {
 }
 
 // ==========================================
-// 4. AWARD DETAIL PAGE (/awards/:id)
+// 4. AWARD DETAIL PAGE (/giai-thuong/:id)
 // ==========================================
 .award-detail-page {
   position: relative;
@@ -1071,7 +1071,7 @@ a.award-stage-card {
     padding-bottom: 3.5rem;
   }
 
-  // Detail card overlaps the bottom of the banner, like the honors plaque on /awards
+  // Detail card overlaps the bottom of the banner, like the honors plaque on /giai-thuong
   &__container {
     position: relative;
     z-index: 3;
@@ -1097,7 +1097,7 @@ a.award-stage-card {
   }
 }
 
-// Shorter variant of the /awards hero used on the detail page
+// Shorter variant of the /giai-thuong hero used on the detail page
 .awards-hero--compact {
   min-height: 0;
 

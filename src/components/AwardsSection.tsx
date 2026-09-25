@@ -70,7 +70,7 @@ const AWARDS_DATA: AwardItem[] = [
     },
     images: [
       {
-        url: "/assets/IMG_2695.JPEG",
+        url: "/assets/IMG_2695.webp",
         alt: "Vinh danh Cuộc thi Trí Tuệ Nhân Tạo 2026",
         caption: "Giấy chứng nhận Quán quân & Cúp Vinh danh",
         shortTitle: "Bằng chứng nhận & Cúp",
@@ -120,19 +120,19 @@ const AWARDS_DATA: AwardItem[] = [
     },
     images: [
       {
-        url: "/Khởi nghiệp 3.jpg",
+        url: "/Khởi nghiệp 3.webp",
         alt: "Bằng chứng nhận Giải Nhất Bảng 1C và Huy chương Bán kết",
         caption: "Bằng chứng nhận Nhất Bảng 1C & Huy chương Bán Kết",
         shortTitle: "Bằng khen & Huy chương",
       },
       {
-        url: "/Khởi nghiệp 1.jpg",
+        url: "/Khởi nghiệp 1.webp",
         alt: "Đội thi EaAgri thuyết trình mô hình với Ban giám khảo",
         caption: "Trình diễn thiết bị IoT & Mô hình AI cho Hội đồng Giám Khảo",
         shortTitle: "Báo cáo Hội đồng",
       },
       {
-        url: "/Khởi nghiệp 2.jpg",
+        url: "/Khởi nghiệp 2.webp",
         alt: "Đội ngũ kỹ sư sáng lập dự án EaAgri",
         caption: "Đội ngũ kỹ sư EaAgri tại vòng Bán kết Khởi nghiệp",
         shortTitle: "Đội ngũ EaAgri",
@@ -449,7 +449,7 @@ export default function AwardsSection() {
                   title="Nhấn để phóng to & lướt xem ảnh sắc nét"
                 >
                   {currentAward.images.map((img, imgIdx) => (
-                    <img
+                    <img loading="lazy" decoding="async"
                       key={img.url}
                       src={img.url}
                       alt={img.alt}
@@ -511,7 +511,7 @@ export default function AwardsSection() {
                           }}
                         >
                           <div className="awards-section__thumb-img-wrap">
-                            <img src={thumb.url} alt={thumb.shortTitle} />
+                            <img loading="lazy" decoding="async" src={thumb.url} alt={thumb.shortTitle} />
                             {isThumbActive && (
                               <span className="awards-section__thumb-live-dot" />
                             )}
@@ -606,7 +606,7 @@ export default function AwardsSection() {
 
             {/* Link to Dedicated Awards Page */}
             <div className="awards-section__explore-btn-wrap">
-              <Link to="/awards" className="awards-section__explore-btn">
+              <Link to="/giai-thuong" className="awards-section__explore-btn">
                 <i className="ri-award-fill"></i>
                 <span>Xem đầy đủ Phòng truyền thống & Bằng chứng nhận</span>
                 <i className="ri-arrow-right-line"></i>
@@ -654,7 +654,7 @@ export default function AwardsSection() {
               <div className="awards-section__modal-viewport">
                 <div className="awards-section__modal-img-wrap">
                   {currentAward.images.map((img, imgIdx) => (
-                    <img
+                    <img loading="lazy" decoding="async"
                       key={img.url}
                       src={img.url}
                       alt={img.alt}
@@ -708,7 +708,7 @@ export default function AwardsSection() {
                         onClick={() => setActiveImgIdx(tIdx)}
                         title={thumb.shortTitle}
                       >
-                        <img src={thumb.url} alt={thumb.shortTitle} />
+                        <img loading="lazy" decoding="async" src={thumb.url} alt={thumb.shortTitle} />
                         <span>{thumb.shortTitle}</span>
                       </button>
                     );

@@ -1,7 +1,7 @@
 import { useState, useEffect } from "react";
-import { Link, useParams } from "react-router-dom";
+import { Link, Navigate, useParams } from "react-router-dom";
 import { useSEO } from "../hooks/useSEO";
-import { AWARDS_LIST, getAwardById } from "../data/awards";
+import { AWARDS_LIST, AWARDS_PATH, awardPath, getAwardById, getAwardByLegacyId } from "../data/awards";
 
 export default function AwardDetailPage() {
   const { id } = useParams<{ id: string }>();
@@ -17,7 +17,7 @@ export default function AwardDetailPage() {
     title: award ? `${award.title} – Giải thưởng` : "Không tìm thấy giải thưởng",
     description: award?.description,
     ogImage: award ? `https://www.eaagri.vn${encodeURI(award.images[0].url)}` : undefined,
-    canonicalUrl: award ? `https://www.eaagri.vn/awards/${award.id}` : undefined,
+    canonicalUrl: award ? `https://www.eaagri.vn${awardPath(award.id)}` : undefined,
   });
 
   useEffect(() => {
@@ -48,12 +48,16 @@ export default function AwardDetailPage() {
     return () => window.clearInterval(timer);
   }, [photoIdx, photoCount, isPaused]);
 
+  // Old English slug (/awards/ai-champion-2026) -> new Vietnamese URL
   if (!award) {
+    const renamed = getAwardByLegacyId(id);
+    if (renamed) return <Navigate to={awardPath(renamed.id)} replace />;
+
     return (
       <div className="award-detail-page">
         <div className="section__container award-detail-page__container award-detail-page__empty">
           <h1>Không tìm thấy giải thưởng</h1>
-          <Link to="/awards" className="award-detail-back">
+          <Link to={AWARDS_PATH} className="award-detail-back">
             <i className="ri-arrow-left-line"></i>
             <span>Quay lại Phòng truyền thống</span>
           </Link>
@@ -67,14 +71,14 @@ export default function AwardDetailPage() {
 
   return (
     <div className={`award-detail-page award-detail-page--${award.category}`}>
-      {/* Compact banner, same landscape as the /awards hero */}
+      {/* Compact banner, same landscape as the awards list hero */}
       <header className="awards-hero awards-hero--compact">
         <div className="awards-hero__bg-overlay" />
 
         <div className="section__container awards-hero__container">
           <div className="awards-hero__content-col">
             <nav className="award-detail-breadcrumb" aria-label="Breadcrumb">
-              <Link to="/awards">
+              <Link to={AWARDS_PATH}>
                 <i className="ri-arrow-left-line"></i>
                 <span>Phòng truyền thống</span>
               </Link>
@@ -251,7 +255,7 @@ export default function AwardDetailPage() {
             <span className="award-detail-subheading">Giải thưởng khác</span>
             <div className="award-detail-others__list">
               {otherAwards.map((a) => (
-                <Link key={a.id} to={`/awards/${a.id}`} className="award-detail-others__item">
+                <Link key={a.id} to={awardPath(a.id)} className="award-detail-others__item">
                   <img src={a.images[0].url} alt="" loading="lazy" />
                   <div>
                     <small>{a.shortBadge}</small>

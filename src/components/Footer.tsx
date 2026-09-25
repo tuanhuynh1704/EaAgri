@@ -26,7 +26,7 @@ export default function Footer() {
         <div className="footer__brand-col" data-aos="fade-up">
           <div className="footer__logo-box" onClick={handleFooterHome} title="EaAgri - Về đầu trang">
             <div className="footer__logo-icon-wrap">
-              <img
+              <img loading="lazy" decoding="async"
                 src="/logo_v1.jpg"
                 alt="EaAgri Durian AI Mascot"
                 className="footer__logo-icon"
@@ -78,10 +78,10 @@ export default function Footer() {
             </li>
             <li>
               <a
-                href="/awards"
+                href="/giai-thuong"
                 onClick={(e) => {
                   e.preventDefault();
-                  navigate("/awards");
+                  navigate("/giai-thuong");
                 }}
               >
                 <i className="ri-trophy-line"></i> <span>Phòng truyền thống & Giải thưởng</span>
@@ -151,7 +151,7 @@ export default function Footer() {
               aria-label="App Store (iOS)"
               title="Tải trên App Store (iOS)"
             >
-              <img
+              <img loading="lazy" decoding="async"
                 src="/assets/apple.png"
                 alt="Tải trên App Store"
               />
@@ -163,7 +163,7 @@ export default function Footer() {
               className="footer__download-btn" 
               aria-label="Google Play"
             >
-              <img
+              <img loading="lazy" decoding="async"
                 src="/assets/google.png"
                 alt="Tải trên Google Play"
               />

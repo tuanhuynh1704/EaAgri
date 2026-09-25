@@ -194,7 +194,7 @@ export default function NewsList() {
                   {/* Card Image */}
                   <Link to={`/news/${item.id}`} className="news-list__card-image-wrapper">
                     {parsedImg.url ? (
-                      <img 
+                      <img loading="lazy" decoding="async" 
                         src={parsedImg.url} 
                         alt={cleanContent(item.title)} 
                         style={{ objectPosition: `${parsedImg.posX}% ${parsedImg.posY}%` }} 

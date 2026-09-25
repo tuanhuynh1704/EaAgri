@@ -1,4 +1,8 @@
-// Shared award data for the /awards list and /awards/:id detail pages
+// Shared award data for the /giai-thuong list and /giai-thuong/:id detail pages
+
+/** Vietnamese, unaccented base path (SEO-friendly, no %-encoding when shared) */
+export const AWARDS_PATH = "/giai-thuong";
+export const awardPath = (id: string) => `${AWARDS_PATH}/${id}`;
 
 export interface GalleryImage {
   url: string;
@@ -7,7 +11,10 @@ export interface GalleryImage {
 }
 
 export interface AwardDetail {
+  /** URL slug: Vietnamese keywords without diacritics */
   id: string;
+  /** Previous English slug under /awards, kept so old shared links redirect */
+  legacyId?: string;
   category: "ai" | "startup";
   year: string;
   trophyIcon: string;
@@ -49,7 +56,8 @@ export interface AwardDetail {
 
 export const AWARDS_LIST: AwardDetail[] = [
   {
-    id: "ai-champion-2026",
+    id: "quan-quan-tri-tue-nhan-tao-2026",
+    legacyId: "ai-champion-2026",
     category: "ai",
     year: "2026",
     trophyIcon: "ri-vip-crown-fill",
@@ -79,7 +87,7 @@ export const AWARDS_LIST: AwardDetail[] = [
     ],
     images: [
       {
-        url: "/assets/IMG_2695-crop.jpg",
+        url: "/assets/IMG_2695-crop.webp",
         title: "Giấy Chứng Nhận & Cúp Vinh Danh Quán Quân",
         caption: "Bằng khen Quán quân cuộc thi Trí Tuệ Nhân Tạo 2026 cùng cúp vinh danh trao tặng cho dự án EaAgri.",
       },
@@ -91,7 +99,8 @@ export const AWARDS_LIST: AwardDetail[] = [
     ],
   },
   {
-    id: "nttu-startup-2026",
+    id: "nhat-bang-1c-nttu-startup-challenge-2026",
+    legacyId: "nttu-startup-2026",
     category: "startup",
     year: "2026",
     trophyIcon: "ri-rocket-2-fill",
@@ -121,17 +130,17 @@ export const AWARDS_LIST: AwardDetail[] = [
     ],
     images: [
       {
-        url: "/Khởi nghiệp 3.jpg",
+        url: "/Khởi nghiệp 3.webp",
         title: "Bằng Khen Giải Nhất Bảng 1C & Huy Chương",
         caption: "Giấy chứng nhận Giải Nhất Bảng 1C cùng Huy chương danh dự từ Ban Tổ Chức NTTU Innovation Startup 2026.",
       },
       {
-        url: "/Khởi nghiệp 1.jpg",
+        url: "/Khởi nghiệp 1.webp",
         title: "Trình Báo Cáo Hội Đồng Ban Giám Khảo",
         caption: "Đội ngũ kỹ sư EaAgri thuyết minh mô hình trạm quan trắc IoT và giải thuật AI tại bàn triển lãm vòng Bán kết.",
       },
       {
-        url: "/Khởi nghiệp 2.jpg",
+        url: "/Khởi nghiệp 2.webp",
         title: "Đội Ngũ Sáng Lập EaAgri",
         caption: "Các thành viên nòng cốt của dự án EaAgri trong ngày vinh danh chiến thắng vòng Bán kết.",
       },
@@ -146,7 +155,8 @@ export const AWARDS_LIST: AwardDetail[] = [
     facebookUrl: "https://www.facebook.com/share/p/1CA44S7p5M/",
   },
   {
-    id: "khoi-nghiep-xanh-2026",
+    id: "chung-ket-khoi-nghiep-xanh-2026",
+    legacyId: "khoi-nghiep-xanh-2026",
     category: "startup",
     year: "2026",
     trophyIcon: "ri-plant-fill",
@@ -176,27 +186,27 @@ export const AWARDS_LIST: AwardDetail[] = [
     ],
     images: [
       {
-        url: "/assets/khoi-nghiep-xanh/doi-thi-ban-ket.jpg",
+        url: "/assets/khoi-nghiep-xanh/doi-thi-ban-ket.webp",
         title: "Đội EaAgri tại Vòng Bán kết 03",
         caption: "Các thành viên EaAgri tại sân khấu Vòng Bán kết 03 – Khu vực phía Nam, cuộc thi Khởi Nghiệp Xanh lần 12 – 2026.",
       },
       {
-        url: "/assets/khoi-nghiep-xanh/chung-nhan-vao-chung-ket.jpg",
+        url: "/assets/khoi-nghiep-xanh/chung-nhan-vao-chung-ket.webp",
         title: "Chứng Nhận Vào Chung Kết",
         caption: "Đại diện đội EaAgri nhận Giấy chứng nhận Vào Chung kết cuộc thi Khởi Nghiệp Xanh lần 12.",
       },
       {
-        url: "/assets/khoi-nghiep-xanh/vinh-danh-san-khau.jpg",
+        url: "/assets/khoi-nghiep-xanh/vinh-danh-san-khau.webp",
         title: "Vinh Danh Trên Sân Khấu",
         caption: "Các đội vào Chung kết nhận chứng nhận trên sân khấu Vòng Bán kết 03 tại ĐH KHXH&NV – ĐHQG TP.HCM.",
       },
       {
-        url: "/assets/khoi-nghiep-xanh/chung-nhan-ban-ket.jpg",
+        url: "/assets/khoi-nghiep-xanh/chung-nhan-ban-ket.webp",
         title: "Chứng Nhận Thi Vòng Bán Kết – Bảng A",
         caption: "Giấy chứng nhận dự án EaAgri – Hệ sinh thái Nông nghiệp thông minh được xét chọn thi Vòng Bán kết, Bảng A.",
       },
       {
-        url: "/assets/khoi-nghiep-xanh/gian-hang-eaagri.jpg",
+        url: "/assets/khoi-nghiep-xanh/gian-hang-eaagri.webp",
         title: "Gian Hàng Trưng Bày EaAgri",
         caption: "Tờ rơi giới thiệu ứng dụng EaAgri, mã QR tải app và bảng nhận diện tại gian hàng của đội.",
       },
@@ -233,3 +243,6 @@ export const AWARDS_LIST: AwardDetail[] = [
 
 export const getAwardById = (id: string | undefined) =>
   AWARDS_LIST.find((a) => a.id === id);
+
+export const getAwardByLegacyId = (id: string | undefined) =>
+  AWARDS_LIST.find((a) => a.legacyId === id);

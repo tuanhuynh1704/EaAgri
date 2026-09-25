@@ -1,6 +1,7 @@
 import { useEffect, useRef, useState, useCallback } from "react";
 import { createPortal } from "react-dom";
-import * as THREE from "three";
+// three.js is loaded on demand inside the effect so it stays out of the main bundle
+import type * as T3 from "three";
 
 interface SplashIntroProps {
   onComplete?: () => void;
@@ -176,6 +177,12 @@ export default function SplashIntro({
     if (!shouldRender || !canvasRef.current) return;
 
     const canvas = canvasRef.current;
+    let cancelled = false;
+
+    // Dynamic import: the typed text + gradient fallback show immediately; the particle
+    // tunnel fades in once three.js arrives. finish() already copes with no wormhole.
+    import("three").then((THREE) => {
+    if (cancelled) return;
     const isMobile = window.innerWidth <= 768;
     const numRings = isMobile ? 100 : 160;
     const pointsPerRing = isMobile ? 90 : 150;
@@ -184,12 +191,12 @@ export default function SplashIntro({
     const tunnelLength = zStart - zEnd;
     const warpDuration = WARP_FLY_DURATION / 1000; // in seconds
 
-    let renderer: THREE.WebGLRenderer | null = null;
-    let scene: THREE.Scene | null = null;
-    let camera: THREE.PerspectiveCamera | null = null;
-    let points: THREE.Points | null = null;
-    let material: THREE.ShaderMaterial | null = null;
-    let clock: THREE.Clock | null = null;
+    let renderer: T3.WebGLRenderer | null = null;
+    let scene: T3.Scene | null = null;
+    let camera: T3.PerspectiveCamera | null = null;
+    let points: T3.Points | null = null;
+    let material: T3.ShaderMaterial | null = null;
+    let clock: T3.Clock | null = null;
     let rafId = 0;
     let disposed = false;
     let hovering = false;
@@ -374,15 +381,25 @@ export default function SplashIntro({
           canvas.removeEventListener("pointerleave", handlePointerLeave);
           if (geometry) geometry.dispose();
           if (material) material.dispose();
-          if (renderer) renderer.dispose();
+          // Release the WebGL context now so it doesn't count against the browser's
+          // context limit and evict the hero's 3D model.
+          if (renderer) {
+            renderer.forceContextLoss();
+            renderer.dispose();
+          }
         },
       };
     } catch (err) {
       console.warn("WebGL initialization failed, running in fallback mode", err);
     }
+    }).catch((err) => {
+      console.warn("three.js failed to load, running in fallback mode", err);
+    });
 
     return () => {
+      cancelled = true;
       wormholeRef.current?.dispose();
+      wormholeRef.current = null;
     };
   }, [shouldRender]);
 

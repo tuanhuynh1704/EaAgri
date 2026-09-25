@@ -229,8 +229,8 @@ const DurianScannerSection = () => {
               </div>
 
               {/* Central 3D Smart Durian Image */}
-              <img
-                src="/assets/smart_durian_hero.png"
+              <img loading="lazy" decoding="async"
+                src="/assets/smart_durian_hero.webp"
                 alt="Quả sầu riêng đang được AI truy quét chất lượng"
                 className="durian-scan-subject"
               />

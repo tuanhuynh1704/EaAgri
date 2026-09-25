@@ -1,7 +1,7 @@
 import { useEffect } from "react";
 import { Link } from "react-router-dom";
 import { useSEO } from "../hooks/useSEO";
-import { AWARDS_LIST } from "../data/awards";
+import { AWARDS_LIST, AWARDS_PATH, awardPath } from "../data/awards";
 
 const DAY_MS = 24 * 60 * 60 * 1000;
 
@@ -41,14 +41,14 @@ export default function AwardsPage() {
       "Khám phá các dấu ấn danh giá của EaAgri: Quán quân Cuộc thi Trí Tuệ Nhân Tạo 2026, Giải Nhất Bảng 1C NTTU Innovation Startup Challenge 2026.",
     keywords:
       "Giải thưởng EaAgri, Quán quân AI 2026, NTTU Startup 2026, Khởi nghiệp nông nghiệp số, thành tựu EaAgri, bằng khen sầu riêng AI",
-    canonicalUrl: "https://www.eaagri.vn/awards",
+    canonicalUrl: `https://www.eaagri.vn${AWARDS_PATH}`,
     structuredData: {
       "@context": "https://schema.org",
       "@type": "CollectionPage",
       "name": "Phòng Truyền Thống & Giải Thưởng EaAgri",
       "description":
         "Hồ sơ thành tích, bằng khen và danh hiệu khoa học công nghệ của hệ sinh thái nông nghiệp thông minh EaAgri.",
-      "url": "https://www.eaagri.vn/awards",
+      "url": `https://www.eaagri.vn${AWARDS_PATH}`,
     },
   });
 
@@ -178,7 +178,7 @@ export default function AwardsPage() {
             return (
               <Link
                 key={award.id}
-                to={`/awards/${award.id}`}
+                to={awardPath(award.id)}
                 className={`award-stage-card award-stage-card--${award.category}`}
                 data-aos="fade-up"
                 data-aos-delay={`${aIdx * 100}`}
@@ -231,7 +231,7 @@ export default function AwardsPage() {
           {/* Upcoming event strip, derived from award timelines; hides itself once the event ends */}
           {upcomingEvent && (
             <Link
-              to={`/awards/${upcomingEvent.award.id}`}
+              to={awardPath(upcomingEvent.award.id)}
               className="awards-upcoming-event"
               data-aos="fade-up"
             >

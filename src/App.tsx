@@ -8,6 +8,7 @@ import Footer from "./components/Footer";
 import FloatingContact from "./components/FloatingContact";
 import AppStoreNoticeModal from "./components/AppStoreNoticeModal";
 import { AuthProvider } from "./context/AuthContext";
+import { usePauseOffscreenAnimations } from "./hooks/usePauseOffscreenAnimations";
 
 function RouteFallback() {
   return (
@@ -20,6 +21,8 @@ function RouteFallback() {
 function App() {
   const { pathname } = useLocation();
   const isAuthPage = pathname === "/login" || pathname === "/register";
+
+  usePauseOffscreenAnimations();
 
   useEffect(() => {
     if ('scrollRestoration' in window.history) {

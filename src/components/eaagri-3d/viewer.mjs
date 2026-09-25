@@ -1,5 +1,6 @@
 import * as T from "three";
 import { GLTFLoader } from "three/addons/loaders/GLTFLoader.js";
+import { MeshoptDecoder } from "three/addons/libs/meshopt_decoder.module.js";
 
 export const HOTSPOT_IDS = Object.freeze([
   "overview",
@@ -72,12 +73,14 @@ export function createEaAgriScene(container, options = {}) {
     ...options,
   };
   const base = new URL(options.assetBaseUrl || "../assets/", import.meta.url);
-  // Default to optimized 83k model (eaagri-durian-mobile.glb) for buttery 60fps on all laptops
+  // Default model: meshopt-compressed copy of eaagri-durian-mobile.glb (4.3 MB -> 1.3 MB,
+  // same nodes/animation). Regenerate with:
+  //   npx @gltf-transform/cli meshopt eaagri-durian-mobile.glb eaagri-durian-mobile.meshopt.glb
   const quality = opts.quality === "high" ? "high" : "mobile";
   const file =
     quality === "high"
       ? "eaagri-durian-high.glb"
-      : "eaagri-durian-mobile.glb";
+      : "eaagri-durian-mobile.meshopt.glb";
   let data = { source: "none", ...options.data },
     destroyed = false,
     loaded = false,
@@ -108,7 +111,18 @@ export function createEaAgriScene(container, options = {}) {
     dogRunTime = 0,
     dogWaypoint = 0,
     dogTails = [],
-    dogLegs = [];
+    dogLegs = [],
+    lastRender = 0,
+    scrollingUntil = 0;
+  // Perf: hold the last frame while the page scrolls, and drop to ~30fps when nobody
+  // is interacting. Full 60fps while dragging / tapping / camera easing.
+  const IDLE_FRAME_MS = 33;
+  const INTERACTION_GRACE_MS = 2500;
+  const lowEndDevice =
+    (navigator.hardwareConcurrency || 8) <= 4 || (navigator.deviceMemory || 8) <= 4;
+  const onPageScroll = () => {
+    scrollingUntil = performance.now() + 160;
+  };
   const dogPath = [
     [-1.55, 0.92],
     [-1.95, -0.15],
@@ -511,6 +525,17 @@ export function createEaAgriScene(container, options = {}) {
   function frame(time) {
     animationFrame = 0;
     if (!canRender()) return;
+    const interacting =
+      drag ||
+      time - lastTouch < INTERACTION_GRACE_MS ||
+      Math.abs(targetYaw - yaw) > 0.001 ||
+      Math.abs(targetPitch - pitch) > 0.001 ||
+      focusPoint.distanceToSquared(targetFocusPoint) > 0.0001;
+    if (!interacting && (time < scrollingUntil || time - lastRender < IDLE_FRAME_MS)) {
+      requestRender();
+      return;
+    }
+    lastRender = time;
     const dt = lastTime ? Math.min(0.05, (time - lastTime) / 1000) : 0;
     lastTime = time;
     if (!paused && !reduced) {
@@ -697,6 +722,7 @@ export function createEaAgriScene(container, options = {}) {
   ];
   handlers.forEach(([type, fn]) => canvas.addEventListener(type, fn));
   document.addEventListener("visibilitychange", onVisibility);
+  window.addEventListener("scroll", onPageScroll, { passive: true });
   media.addEventListener("change", onMotion);
 
   async function load() {
@@ -718,7 +744,7 @@ export function createEaAgriScene(container, options = {}) {
       renderer.setPixelRatio(
         Math.min(
           window.devicePixelRatio || 1,
-          quality === "mobile" ? 1.25 : opts.maxDpr,
+          lowEndDevice ? 1 : quality === "mobile" ? 1.25 : opts.maxDpr,
         ),
       );
       renderer.setClearColor(0x000000, 0);
@@ -730,7 +756,7 @@ export function createEaAgriScene(container, options = {}) {
         priority: "high",
       });
       if (!response.ok) throw Error(`Model request ${response.status}`);
-      const gltf = await new GLTFLoader().parseAsync(
+      const gltf = await new GLTFLoader().setMeshoptDecoder(MeshoptDecoder).parseAsync(
         await response.arrayBuffer(),
         base.href,
       );
@@ -894,10 +920,15 @@ export function createEaAgriScene(container, options = {}) {
       resizeObserver.disconnect();
       handlers.forEach(([type, fn]) => canvas.removeEventListener(type, fn));
       document.removeEventListener("visibilitychange", onVisibility);
+      window.removeEventListener("scroll", onPageScroll);
       media.removeEventListener("change", onMotion);
       mixer?.stopAllAction();
       if (model) mixer?.uncacheRoot(model);
       disposeModel(model);
+      // dispose() alone leaves the WebGL context alive until GC. Browsers cap live
+      // contexts (~16) and silently kill the oldest one, which is how the visible
+      // model "disappears" after route changes / HMR. Release it explicitly.
+      renderer?.forceContextLoss();
       renderer?.dispose();
       root.remove();
       active.delete(container);

@@ -136,7 +136,7 @@ export default function Register() {
       {/* Full-screen Background Banner Image */}
       <div
         className="auth-page__bg"
-        style={{ backgroundImage: "url('/Banner 3.png')" }}
+        style={{ backgroundImage: "url('/Banner 3.webp')" }}
       ></div>
       <div className="auth-page__overlay"></div>
 
@@ -144,7 +144,7 @@ export default function Register() {
       <div className="auth-page__leaves" aria-hidden="true">
         {fallingLeaves.map((leaf) => (
           <span className="auth-leaf" style={leaf.style} key={leaf.id}>
-            <img src="/assets/floating-leaf.png" alt="" className="auth-leaf-img" />
+            <img src="/assets/floating-leaf.webp" alt="" className="auth-leaf-img" />
           </span>
         ))}
       </div>
@@ -156,7 +156,7 @@ export default function Register() {
           <span className="auth-page__intro-label">
             <i className="ri-sparkling-2-line" /> EA AGRI ECOSYSTEM
           </span>
-          <img src="/logo_navbar.png" alt="Ea Agri" className="auth-page__intro-logo" />
+          <img src="/logo_navbar.webp" alt="Ea Agri" className="auth-page__intro-logo" />
           <h2>
             Đồng hành cùng<br />
             <span>Nông nghiệp số 4.0.</span>

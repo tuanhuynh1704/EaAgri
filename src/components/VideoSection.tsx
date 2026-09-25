@@ -66,7 +66,7 @@ const VideoSection = ({
       <div className="architecture__video" onClick={() => setIsModalOpen(true)}>
         {thumbnailUrl ? (
           <>
-            <img src={thumbnailUrl} alt={title} className="video__thumbnail" />
+            <img loading="lazy" decoding="async" src={thumbnailUrl} alt={title} className="video__thumbnail" />
             <div className="video__play-btn">
               <i className="ri-play-fill"></i>
             </div>

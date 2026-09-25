@@ -117,14 +117,14 @@ export default function Login() {
       </button>
 
       {/* Full-screen Background Banner Image */}
-      <div className="auth-page__bg" style={{ backgroundImage: "url('/Banner 3.png')" }}></div>
+      <div className="auth-page__bg" style={{ backgroundImage: "url('/Banner 3.webp')" }}></div>
       <div className="auth-page__overlay"></div>
 
       {/* Animated Falling Leaves across the entire viewport */}
       <div className="auth-page__leaves" aria-hidden="true">
         {fallingLeaves.map((leaf) => (
           <span className="auth-leaf" style={leaf.style} key={leaf.id}>
-            <img src="/assets/floating-leaf.png" alt="" className="auth-leaf-img" />
+            <img src="/assets/floating-leaf.webp" alt="" className="auth-leaf-img" />
           </span>
         ))}
       </div>
@@ -133,7 +133,7 @@ export default function Login() {
       <div className="auth-page__card-wrapper">
         <aside className="auth-page__intro" data-aos="fade-right">
           <span className="auth-page__intro-label"><i className="ri-sparkling-2-line" /> EA AGRI ECOSYSTEM</span>
-          <img src="/logo_navbar.png" alt="Ea Agri" className="auth-page__intro-logo" />
+          <img src="/logo_navbar.webp" alt="Ea Agri" className="auth-page__intro-logo" />
           <h2>Kiến tạo tương lai<br /><span>nông nghiệp thông minh.</span></h2>
           <p>Website giới thiệu dự án Ea Agri — nền tảng kết nối AI, IoT và tri thức chuyên gia cho chuỗi giá trị sầu riêng Tây Nguyên.</p>
           <div className="auth-page__signals">

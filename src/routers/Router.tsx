@@ -1,5 +1,5 @@
 import { lazy } from "react";
-import { createBrowserRouter } from "react-router-dom";
+import { createBrowserRouter, Navigate } from "react-router-dom";
 import App from "../App";
 import HomePage from "../pages/HomePage";
 
@@ -24,7 +24,10 @@ export const router = createBrowserRouter([
     children: [
       { path: "/", element: <HomePage /> },
       { path: "/architecture", element: <ArchitecturePage /> },
-      { path: "/awards", element: <AwardsPage /> },
+      { path: "/giai-thuong", element: <AwardsPage /> },
+      { path: "/giai-thuong/:id", element: <AwardDetailPage /> },
+      // Legacy English URLs: keep old shared links working
+      { path: "/awards", element: <Navigate to="/giai-thuong" replace /> },
       { path: "/awards/:id", element: <AwardDetailPage /> },
       { path: "/privacy", element: <PrivacyPolicy /> },
       { path: "/privacy-policy", element: <PrivacyPolicy /> },

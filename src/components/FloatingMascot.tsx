@@ -37,38 +37,38 @@ const IDLE_IMAGE = "/Amination/logo EaAgri.png";
 const MASCOT_FRAMES: Record<MascotMood, string[]> = {
   idle: [
     IDLE_IMAGE, IDLE_IMAGE, IDLE_IMAGE, IDLE_IMAGE,
-    "/Amination/Đứng chớp mắt.png",
-    "/Amination/Đứng chớp mắt 2.png",
+    "/Amination/Đứng chớp mắt.webp",
+    "/Amination/Đứng chớp mắt 2.webp",
   ],
   wave: [
-    "/Amination/Chào 01.png",
-    "/Amination/Chào 02.png",
-    "/Amination/Chào 03.png",
-    "/Amination/Chào 02.png",
+    "/Amination/Chào 01.webp",
+    "/Amination/Chào 02.webp",
+    "/Amination/Chào 03.webp",
+    "/Amination/Chào 02.webp",
   ],
   bounce: [
-    "/Amination/Nhảy chuẩn bị.png",
-    "/Amination/Nhảy trên không.png",
-    "/Amination/Nhảy tiếp đất.png",
+    "/Amination/Nhảy chuẩn bị.webp",
+    "/Amination/Nhảy trên không.webp",
+    "/Amination/Nhảy tiếp đất.webp",
   ],
-  spin: ["/Amination/Phấn khích.png"],
+  spin: ["/Amination/Phấn khích.webp"],
   wiggle: [
     IDLE_IMAGE,
-    "/Amination/Đứng nghiêng phải.png",
+    "/Amination/Đứng nghiêng phải.webp",
     IDLE_IMAGE,
-    "/Amination/Chỉ tay.png",
+    "/Amination/Chỉ tay.webp",
   ],
-  sleep: ["/Amination/Ngủ thở 01.png", "/Amination/Ngủ thở 02.png"],
+  sleep: ["/Amination/Ngủ thở 01.webp", "/Amination/Ngủ thở 02.webp"],
 };
 
 const RUN_FRAMES = [
-  "/Amination/Chạy 03.png",
-  "/Amination/Chạy 04.png",
-  "/Amination/Chạy 05.png",
-  "/Amination/Chạy 04.png",
+  "/Amination/Chạy 03.webp",
+  "/Amination/Chạy 04.webp",
+  "/Amination/Chạy 05.webp",
+  "/Amination/Chạy 04.webp",
 ];
-const HEART_FRAMES = ["/Amination/trái tim.png"];
-const DRAG_FRAMES = ["/Amination/Chụp hình.png"];
+const HEART_FRAMES = ["/Amination/trái tim.webp"];
+const DRAG_FRAMES = ["/Amination/Chụp hình.webp"];
 
 const ALL_MASCOT_IMAGES = Array.from(
   new Set([
@@ -76,9 +76,9 @@ const ALL_MASCOT_IMAGES = Array.from(
     ...RUN_FRAMES,
     ...HEART_FRAMES,
     ...DRAG_FRAMES,
-    "/Amination/logo EaAgri chào.png",
-    "/Amination/Tưới cây.png",
-    "/Amination/Phát hiện.png",
+    "/Amination/logo EaAgri chào.webp",
+    "/Amination/Tưới cây.webp",
+    "/Amination/Phát hiện.webp",
   ])
 );
 

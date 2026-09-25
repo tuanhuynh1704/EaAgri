@@ -193,6 +193,23 @@ nav.navbar-container.is-hidden {
   }
 }
 
+// Keyboard focus: brand-green ring instead of the browser's black outline,
+// shown only for keyboard navigation (not after a mouse click).
+.nav__link,
+.nav__logo,
+.nav__user-pill,
+.nav__mobile-toggle,
+.navbar-container .btn {
+  &:focus {
+    outline: none;
+  }
+
+  &:focus-visible {
+    outline: 2px solid #10b981;
+    outline-offset: 2px;
+  }
+}
+
 // ==========================================
 // USER MENU & PROFILE DROPDOWN
 // ==========================================
@@ -463,18 +480,24 @@ nav.navbar-container.is-hidden {
       font-size: 1.15rem;
     }
 
-    // Login Button: Premium Emerald Pill
+    // Login Button: light outline pill. Login is mostly for admins/members,
+    // so it should not outshine the main navigation (phones keep the filled style).
     &--login {
-      background: linear-gradient(135deg, #10b981 0%, #059669 100%);
-      color: #ffffff;
-      border: 1px solid rgba(255, 255, 255, 0.35);
-      box-shadow: 0 4px 16px rgba(5, 150, 105, 0.3);
+      background: #ffffff;
+      color: #047857;
+      border: 1.5px solid rgba(16, 185, 129, 0.45);
+      box-shadow: none;
+
+      i {
+        color: #059669;
+      }
 
       &:hover {
-        background: linear-gradient(135deg, #059669 0%, #047857 100%);
-        transform: translateY(-1px);
-        box-shadow: 0 6px 20px rgba(5, 150, 105, 0.42);
-        border-color: rgba(255, 255, 255, 0.6);
+        background: #ecfdf5;
+        border-color: #10b981;
+        color: #065f46;
+        transform: none;
+        box-shadow: 0 3px 10px rgba(16, 185, 129, 0.12);
       }
 
       @media (max-width: $mobile) {
@@ -587,14 +610,14 @@ nav.navbar-container.is-hidden {
     }
 
     .btn--login {
-      min-height: 40px;
-      padding: 0.36rem 1.35rem;
-      font-size: 0.94rem;
+      min-height: 38px;
+      padding: 0.3rem 1rem;
+      font-size: 0.9rem;
       font-weight: 750;
-      gap: 0.45rem;
+      gap: 0.4rem;
 
       i {
-        font-size: 1.15rem;
+        font-size: 1.05rem;
       }
     }
 

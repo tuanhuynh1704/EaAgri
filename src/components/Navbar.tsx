@@ -45,11 +45,23 @@ const Navbar = () => {
       if (event.clientY <= 72) setIsHidden(false);
     };
 
-    window.addEventListener("scroll", handleScroll);
+    // Passive + one update per animation frame: scroll events can fire far more often
+    // than the screen refreshes, and a non-passive listener can delay scrolling itself.
+    let scrollFrame = 0;
+    const onScroll = () => {
+      if (scrollFrame) return;
+      scrollFrame = requestAnimationFrame(() => {
+        scrollFrame = 0;
+        handleScroll();
+      });
+    };
+
+    window.addEventListener("scroll", onScroll, { passive: true });
     window.addEventListener("pointermove", handlePointerMove, { passive: true });
     handleScroll(); // Initial check
     return () => {
-      window.removeEventListener("scroll", handleScroll);
+      cancelAnimationFrame(scrollFrame);
+      window.removeEventListener("scroll", onScroll);
       window.removeEventListener("pointermove", handlePointerMove);
     };
   }, []);
@@ -81,7 +93,7 @@ const Navbar = () => {
   };
 
   const handleAwards = () => {
-    navigate("/awards");
+    navigate("/giai-thuong");
   };
 
   const handleHome = () => {
@@ -151,8 +163,8 @@ const Navbar = () => {
           </a>
 
           <a
-            href="/awards"
-            className={`nav__link ${pathname.startsWith("/awards") ? "active" : ""}`}
+            href="/giai-thuong"
+            className={`nav__link ${pathname.startsWith("/giai-thuong") ? "active" : ""}`}
             onClick={(e) => {
               e.preventDefault();
               handleAwards();
@@ -394,12 +406,12 @@ const Navbar = () => {
         </a>
 
         <a
-          href="/awards"
-          className={`mobile-drawer__nav-item ${pathname.startsWith("/awards") ? "is-active" : ""}`}
+          href="/giai-thuong"
+          className={`mobile-drawer__nav-item ${pathname.startsWith("/giai-thuong") ? "is-active" : ""}`}
           onClick={(e) => {
             e.preventDefault();
             setIsMobileMenuOpen(false);
-            navigate("/awards");
+            navigate("/giai-thuong");
           }}
         >
           <div className="mobile-drawer__nav-icon-box">
