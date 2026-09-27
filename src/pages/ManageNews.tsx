@@ -563,7 +563,7 @@ export default function ManageNews() {
                       {/* Title & Summary */}
                       <td>
                         <div className="manage-news__item-title">
-                          <Link to={`/news/${item.id}`} className="title-link">
+                          <Link to={`/tintuc/${item.id}`} className="title-link">
                             {cleanContent(item.title)}
                           </Link>
                           {extractSummaryAndBody(item.content).summary && (

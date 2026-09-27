@@ -19,14 +19,20 @@
     <priority>0.8</priority>
   </url>
   <url>
-    <loc>https://www.eaagri.vn/news</loc>
-    <lastmod>2026-09-11</lastmod>
+    <loc>https://www.eaagri.vn/giai-thuong</loc>
+    <lastmod>2026-09-27</lastmod>
+    <changefreq>weekly</changefreq>
+    <priority>0.8</priority>
+  </url>
+  <url>
+    <loc>https://www.eaagri.vn/tintuc</loc>
+    <lastmod>2026-09-27</lastmod>
     <changefreq>daily</changefreq>
     <priority>0.8</priority>
   </url>
   <url>
     <loc>https://www.eaagri.vn/privacy-policy</loc>
-    <lastmod>2026-09-11</lastmod>
+    <lastmod>2026-09-27</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.5</priority>
   </url>

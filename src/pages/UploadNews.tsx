@@ -508,7 +508,7 @@ export default function UploadNews() {
 
             {/* Bottom Section: Clean Actions Bar */}
             <div className="upload-news__actions-bar">
-              <Link to="/news" className="upload-news__btn-cancel">
+              <Link to="/tintuc" className="upload-news__btn-cancel">
                 <i className="ri-arrow-left-line"></i>
                 <span>Hủy bỏ</span>
               </Link>

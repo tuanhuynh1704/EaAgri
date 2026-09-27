@@ -1,10 +1,11 @@
 import { useState, useEffect } from "react";
-import { Link, Navigate, useParams } from "react-router-dom";
+import { Link, Navigate, useParams, useLocation } from "react-router-dom";
 import { useSEO } from "../hooks/useSEO";
 import { AWARDS_LIST, AWARDS_PATH, awardPath, getAwardById, getAwardByLegacyId } from "../data/awards";
 
 export default function AwardDetailPage() {
   const { id } = useParams<{ id: string }>();
+  const location = useLocation();
   const award = getAwardById(id);
   const [photoIdx, setPhotoIdx] = useState(0);
   const [isPaused, setIsPaused] = useState(false);
@@ -48,7 +49,11 @@ export default function AwardDetailPage() {
     return () => window.clearInterval(timer);
   }, [photoIdx, photoCount, isPaused]);
 
-  // Old English slug (/awards/ai-champion-2026) -> new Vietnamese URL
+  // Old English slug (/awards/ai-champion-2026 or /awards/...) -> new Vietnamese URL
+  if (award && location.pathname.startsWith("/awards/")) {
+    return <Navigate to={awardPath(award.id)} replace />;
+  }
+
   if (!award) {
     const renamed = getAwardByLegacyId(id);
     if (renamed) return <Navigate to={awardPath(renamed.id)} replace />;

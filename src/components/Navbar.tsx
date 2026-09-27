@@ -85,7 +85,7 @@ const Navbar = () => {
   }, []);
 
   const handleNew = () => {
-    navigate("/news");
+    navigate("/tintuc");
   };
 
   const handleLogin = () => {
@@ -175,8 +175,8 @@ const Navbar = () => {
           </a>
 
           <a
-            href="/news"
-            className={`nav__link ${pathname.startsWith("/news") ? "active" : ""}`}
+            href="/tintuc"
+            className={`nav__link ${pathname.startsWith("/tintuc") ? "active" : ""}`}
             onClick={(e) => {
               e.preventDefault();
               handleNew();
@@ -249,7 +249,7 @@ const Navbar = () => {
                           className="nav__user-dropdown-item"
                           onClick={() => {
                             setIsUserMenuOpen(false);
-                            navigate("/admin/news");
+                            navigate("/admin/tintuc");
                           }}
                         >
                           <i className="ri-file-list-3-line" />
@@ -273,7 +273,7 @@ const Navbar = () => {
                           className="nav__user-dropdown-item"
                           onClick={() => {
                             setIsUserMenuOpen(false);
-                            navigate("/news/create");
+                            navigate("/tintuc/create");
                           }}
                         >
                           <i className="ri-edit-box-line" />
@@ -425,8 +425,8 @@ const Navbar = () => {
         </a>
 
         <a
-          href="/news"
-          className={`mobile-drawer__nav-item ${pathname.startsWith("/news") ? "is-active" : ""}`}
+          href="/tintuc"
+          className={`mobile-drawer__nav-item ${pathname.startsWith("/tintuc") ? "is-active" : ""}`}
           onClick={(e) => {
             e.preventDefault();
             setIsMobileMenuOpen(false);
@@ -465,7 +465,7 @@ const Navbar = () => {
               className="mobile-drawer__admin-btn"
               onClick={() => {
                 setIsMobileMenuOpen(false);
-                navigate("/admin/news");
+                navigate("/admin/tintuc");
               }}
             >
               <i className="ri-file-list-3-line" />
@@ -487,7 +487,7 @@ const Navbar = () => {
               className="mobile-drawer__admin-btn mobile-drawer__admin-btn--create"
               onClick={() => {
                 setIsMobileMenuOpen(false);
-                navigate("/news/create");
+                navigate("/tintuc/create");
               }}
             >
               <i className="ri-edit-box-line" />

@@ -72,7 +72,13 @@ export default function Footer() {
               </a>
             </li>
             <li>
-              <a href="#" onClick={(e) => { e.preventDefault(); navigate("/news"); }}>
+              <a
+                href="/tintuc"
+                onClick={(e) => {
+                  e.preventDefault();
+                  navigate("/tintuc");
+                }}
+              >
                 <i className="ri-newspaper-line"></i> <span>Tin tức & Sự kiện</span>
               </a>
             </li>
