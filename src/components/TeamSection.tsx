@@ -108,22 +108,96 @@ const teamMembers: TeamMember[] = [
   },
 ];
 
-const mentor = {
-  name: "Nguyễn Khắc Minh Trí",
-  role: "Co-Founder & CEO, Công ty TNHH Mimosa Technology (MimosaTEK)",
-  avatar: "/images/webp/advisors/nguyen-khac-minh-tri.webp",
-  stats: [
-    { value: "20+", label: "năm CNTT & Viễn thông" },
-    { value: "12+", label: "năm điều hành Founder/CEO" },
-  ],
-  fields: ["Agtech", "Internet vạn vật (IoT)", "Chuyển đổi số", "Phát triển bền vững"],
-};
+interface AdvisorMember {
+  name: string;
+  roleTag: string;
+  subRole: string;
+  organization: string;
+  task: string;
+  avatar: string;
+  themeColor: "gold" | "emerald" | "blue" | "teal" | "purple";
+  topIcon: string;
+  advisorCode: string;
+  orgIcon: string;
+  stats?: { value: string; label: string }[];
+  fields?: string[];
+  contact?: { phone?: string; email?: string };
+}
 
-// avatar is optional; advisors without a photo fall back to initials
-const academicAdvisors: { name: string; avatar?: string; initials: string }[] = [
-  { name: "ThS. Nguyễn Huỳnh Thông", avatar: "/images/webp/advisors/nguyen-huynh-thong.webp", initials: "HT" },
-  { name: "ThS. Phạm Đình Tài", avatar: "/images/webp/advisors/pham-dinh-tai.webp", initials: "ĐT" },
-  { name: "TS. Hoàng Thịnh Nhân", avatar: "/images/webp/advisors/hoang-thinh-nhan.webp", initials: "HN" },
+const advisors: AdvisorMember[] = [
+  {
+    name: "Nguyễn Khắc Minh Trí",
+    roleTag: "NHÀ ĐẦU TƯ & MENTOR",
+    subRole: "Co-Founder & CEO, MimosaTEK",
+    organization: "Mimosa Technology",
+    task: "Định hướng chiến lược IoT, giải pháp Agtech & mô hình thương mại hóa bền vững.",
+    avatar: "/images/webp/advisors/nguyen-khac-minh-tri.webp",
+    themeColor: "gold",
+    topIcon: "ri-star-smile-fill",
+    advisorCode: "ADV-01",
+    orgIcon: "ri-medal-fill",
+    stats: [
+      { value: "20+", label: "năm CNTT & Viễn thông" },
+      { value: "12+", label: "năm Founder / CEO" },
+    ],
+    fields: ["Agtech", "IoT nông nghiệp", "Chuyển đổi số", "Phát triển bền vững"],
+  },
+  {
+    name: "ThS. LIANG GUEI JIA",
+    roleTag: "CỐ VẤN KHOA HỌC QUỐC TẾ",
+    subRole: "Nghiên cứu viên Dự án — NSTC Đài Loan",
+    organization: "NSTC Đài Loan 🇹🇼",
+    task: "Cố vấn canh tác sinh thái, quản lý dinh dưỡng & chuẩn hóa sầu riêng chất lượng cao.",
+    avatar: "/images/webp/chuyen-gia.webp",
+    themeColor: "emerald",
+    topIcon: "ri-global-line",
+    advisorCode: "ADV-02",
+    orgIcon: "ri-global-line",
+    fields: ["Canh tác sinh thái", "Dinh dưỡng cây trồng", "Quy trình xuất khẩu"],
+    contact: {
+      phone: "0782-711721",
+      email: "horticulture1992@gmail.com",
+    },
+  },
+  {
+    name: "ThS. NGUYỄN HUỲNH THÔNG",
+    roleTag: "CỐ VẤN CHUYÊN MÔN CNTT",
+    subRole: "Giảng viên Khoa CNTT — ĐH Nguyễn Tất Thành",
+    organization: "ĐH Nguyễn Tất Thành",
+    task: "Cố vấn kiến trúc hệ thống phần mềm, an toàn thông tin & công nghệ nền tảng.",
+    avatar: "/images/webp/advisors/nguyen-huynh-thong.webp",
+    themeColor: "blue",
+    topIcon: "ri-graduation-cap-fill",
+    advisorCode: "ADV-03",
+    orgIcon: "ri-school-line",
+    fields: ["Kiến trúc phần mềm", "Bảo mật hệ thống", "Cloud & Web"],
+  },
+  {
+    name: "ThS. PHẠM ĐÌNH TÀI",
+    roleTag: "CỐ VẤN CHUYÊN MÔN CNTT",
+    subRole: "Giảng viên Khoa CNTT — ĐH Nguyễn Tất Thành",
+    organization: "ĐH Nguyễn Tất Thành",
+    task: "Cố vấn giải pháp hệ thống thông tin, tối ưu hóa CSDL & số hóa nông nghiệp.",
+    avatar: "/images/webp/advisors/pham-dinh-tai.webp",
+    themeColor: "teal",
+    topIcon: "ri-graduation-cap-fill",
+    advisorCode: "ADV-04",
+    orgIcon: "ri-school-line",
+    fields: ["Hệ thống thông tin", "Cơ sở dữ liệu", "Phân tích dữ liệu"],
+  },
+  {
+    name: "TS. HOÀNG THỊNH NHÂN",
+    roleTag: "CỐ VẤN CHUYÊN MÔN CNTT",
+    subRole: "Giảng viên Khoa CNTT — ĐH Nguyễn Tất Thành",
+    organization: "ĐH Nguyễn Tất Thành",
+    task: "Cố vấn học thuật, mô hình giải thuật toán học & phương pháp nghiên cứu AI chuyên sâu.",
+    avatar: "/images/webp/advisors/hoang-thinh-nhan.webp",
+    themeColor: "purple",
+    topIcon: "ri-graduation-cap-fill",
+    advisorCode: "ADV-05",
+    orgIcon: "ri-school-line",
+    fields: ["Khoa học máy tính", "Mô hình toán học", "Thuật toán AI"],
+  },
 ];
 
 const TeamSection = () => {
@@ -132,7 +206,90 @@ const TeamSection = () => {
   const [touchEnd, setTouchEnd] = useState<number | null>(null);
   const [isCarouselPaused, setIsCarouselPaused] = useState(false);
 
-  // Mobile Team Cards: Flip & Swipe state
+  // Mobile Advisor Cards: Flip & Swipe state
+  const [flippedAdvisorCards, setFlippedAdvisorCards] = useState<{ [key: number]: boolean }>({});
+  const [activeAdvisorIndex, setActiveAdvisorIndex] = useState(0);
+  const advisorCardsContainerRef = useRef<HTMLDivElement>(null);
+  const advisorTouchStartXRef = useRef<number>(0);
+  const advisorTouchStartYRef = useRef<number>(0);
+  const advisorTouchStartTimeRef = useRef<number>(0);
+  const advisorIsSwipingRef = useRef<boolean>(false);
+  const advisorSwipeTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
+
+  const handleAdvisorTouchStart = (e: React.TouchEvent) => {
+    advisorTouchStartXRef.current = e.touches[0].clientX;
+    advisorTouchStartYRef.current = e.touches[0].clientY;
+    advisorTouchStartTimeRef.current = Date.now();
+    advisorIsSwipingRef.current = false;
+    if (advisorSwipeTimerRef.current) {
+      clearTimeout(advisorSwipeTimerRef.current);
+      advisorSwipeTimerRef.current = null;
+    }
+  };
+
+  const handleAdvisorTouchMove = (e: React.TouchEvent) => {
+    const deltaX = Math.abs(e.touches[0].clientX - advisorTouchStartXRef.current);
+    const deltaY = Math.abs(e.touches[0].clientY - advisorTouchStartYRef.current);
+    if (deltaX > 10 || deltaY > 10) {
+      advisorIsSwipingRef.current = true;
+    }
+  };
+
+  const handleAdvisorTouchEnd = (e: React.TouchEvent) => {
+    const touchDuration = Date.now() - advisorTouchStartTimeRef.current;
+    if (e.changedTouches && e.changedTouches[0]) {
+      const deltaX = Math.abs(e.changedTouches[0].clientX - advisorTouchStartXRef.current);
+      const deltaY = Math.abs(e.changedTouches[0].clientY - advisorTouchStartYRef.current);
+      if (deltaX <= 10 && deltaY <= 10 && touchDuration < 350) {
+        advisorIsSwipingRef.current = false;
+        return;
+      }
+    }
+    if (advisorIsSwipingRef.current) {
+      advisorSwipeTimerRef.current = setTimeout(() => {
+        advisorIsSwipingRef.current = false;
+      }, 100);
+    }
+  };
+
+  const handleAdvisorScroll = () => {
+    const container = advisorCardsContainerRef.current;
+    if (!container) return;
+    const scrollLeft = container.scrollLeft;
+    const firstCard = container.firstElementChild as HTMLElement | null;
+    const cardWidth = firstCard ? firstCard.offsetWidth : 250;
+    const gap = 14;
+    const index = Math.round(scrollLeft / (cardWidth + gap));
+    setActiveAdvisorIndex(Math.max(0, Math.min(advisors.length - 1, index)));
+  };
+
+  const handleAdvisorCardClick = (index: number) => {
+    if (typeof window !== "undefined" && window.innerWidth > 768) return;
+    if (advisorIsSwipingRef.current) {
+      advisorIsSwipingRef.current = false;
+      return;
+    }
+    setFlippedAdvisorCards((prev) => ({
+      ...prev,
+      [index]: !prev[index],
+    }));
+  };
+
+  const scrollToAdvisorCard = (index: number) => {
+    const container = advisorCardsContainerRef.current;
+    if (!container) return;
+    const cards = container.querySelectorAll(".advisor-card");
+    if (cards[index]) {
+      (cards[index] as HTMLElement).scrollIntoView({
+        behavior: "smooth",
+        inline: "center",
+        block: "nearest",
+      });
+      setActiveAdvisorIndex(index);
+    }
+  };
+
+  // Mobile Core Team Cards: Flip & Swipe state
   const [flippedCards, setFlippedCards] = useState<{ [key: number]: boolean }>({});
   const [activeCardIndex, setActiveCardIndex] = useState(0);
   const cardsContainerRef = useRef<HTMLDivElement>(null);
@@ -229,7 +386,6 @@ const TeamSection = () => {
 
   const getVisibleScreenshots = () => {
     const total = appScreenshots.length;
-    // We want 5 visible phones: 2 left, 1 center, 2 right
     const indices = [
       (currentIndex - 2 + total) % total,
       (currentIndex - 1 + total) % total,
@@ -277,8 +433,200 @@ const TeamSection = () => {
   return (
     <>
       <section id="section-team" className="team-showcase fullpage-slide">
+        <div id="section-advisors" style={{ position: "relative", top: "-80px" }}></div>
+        <div id="section-expert" style={{ position: "relative", top: "-80px" }}></div>
         <div className="team-showcase__container">
-          {/* TOP: Team Info Header */}
+          {/* 1. TOP: ADVISORY & MENTOR BOARD (5 cards) */}
+          <div className="team-showcase__header" data-aos="fade-up">
+            <span className="team-showcase__label team-showcase__label--gold">
+              <span className="team-showcase__status-dot team-showcase__status-dot--gold"></span>
+              EAAGRI / ADVISORY &amp; MENTORS
+            </span>
+            <h2 className="team-showcase__title">
+              Hội Đồng <span className="team-showcase__title-highlight team-showcase__title-highlight--gold">Cố Vấn &amp; Chuyên Gia<i className="ri-award-fill team-title-tech-icon team-title-tech-icon--gold"></i><span className="team-title-underline team-title-underline--gold"></span></span>
+            </h2>
+            <p className="team-showcase__desc">
+              Đội ngũ cố vấn khoa học quốc tế, nhà đầu tư giàu kinh nghiệm và các chuyên gia học thuật hàng đầu đồng hành cùng sự phát triển của EaAgri.
+            </p>
+          </div>
+
+          {/* 5 Advisor Cards Grid (Responsive + Mobile 3D Flip) */}
+          <div
+            ref={advisorCardsContainerRef}
+            className="advisor-cards"
+            data-aos="fade-up"
+            data-aos-delay="100"
+            onTouchStart={handleAdvisorTouchStart}
+            onTouchMove={handleAdvisorTouchMove}
+            onTouchEnd={handleAdvisorTouchEnd}
+            onScroll={handleAdvisorScroll}
+          >
+            {advisors.map((advisor, index) => (
+              <div
+                className={`advisor-card advisor-card--${advisor.themeColor} ${flippedAdvisorCards[index] ? "is-flipped" : ""}`}
+                key={advisor.advisorCode}
+                onClick={() => handleAdvisorCardClick(index)}
+              >
+                <div className="advisor-card__flipper">
+                  {/* FRONT */}
+                  <div className="advisor-card__front">
+                    <div className="advisor-card__image-box">
+                      <div className="advisor-card__top-icon">
+                        <i className={advisor.topIcon}></i>
+                      </div>
+                      <span className="advisor-card__code">{advisor.advisorCode}</span>
+
+                      <img
+                        src={advisor.avatar}
+                        alt={advisor.name}
+                        className="advisor-card__avatar-img"
+                        loading="lazy"
+                        decoding="async"
+                        onError={(e) => {
+                          if (advisor.avatar.includes("chuyen-gia")) {
+                            (e.target as HTMLImageElement).src = "/chuyen-gia.webp";
+                          }
+                        }}
+                      />
+
+                      <div className="advisor-card__role-pill">
+                        <span>{advisor.roleTag}</span>
+                      </div>
+
+                      <div className="advisor-card__flip-hint" aria-hidden="true">
+                        <i className="ri-repeat-2-line"></i>
+                        <span>Chạm xem thông tin</span>
+                      </div>
+                    </div>
+
+                    <div className="advisor-card__body">
+                      <h3 className="advisor-card__name">{advisor.name}</h3>
+                      <p className="advisor-card__subrole">{advisor.subRole}</p>
+                      <div className="advisor-card__name-accent"></div>
+                      <p className="advisor-card__task">{advisor.task}</p>
+                      <div className="advisor-card__skill-pill">
+                        <i className={advisor.orgIcon}></i>
+                        <span>{advisor.organization}</span>
+                      </div>
+                    </div>
+                  </div>
+
+                  {/* BACK */}
+                  <div className="advisor-card__back">
+                    <div className="advisor-card__back-top">
+                      <div className="advisor-card__top-icon">
+                        <i className={advisor.topIcon}></i>
+                      </div>
+                      <span className="advisor-card__code">{advisor.advisorCode}</span>
+                    </div>
+
+                    <div className="advisor-card__back-main">
+                      <div className="advisor-card__back-role">
+                        <span>{advisor.roleTag}</span>
+                      </div>
+                      <h3 className="advisor-card__back-name">{advisor.name}</h3>
+                      <p className="advisor-card__back-subrole">{advisor.subRole}</p>
+                      <div className="advisor-card__name-accent"></div>
+
+                      {advisor.stats && (
+                        <div className="advisor-card__back-stats">
+                          {advisor.stats.map((s) => (
+                            <div key={s.label} className="advisor-card__back-stat-item">
+                              <b>{s.value}</b>
+                              <span>{s.label}</span>
+                            </div>
+                          ))}
+                        </div>
+                      )}
+
+                      {advisor.contact && (
+                        <div className="advisor-card__back-contact">
+                          {advisor.contact.phone && (
+                            <a
+                              href={`tel:${advisor.contact.phone.replace(/[^0-9]/g, "")}`}
+                              className="advisor-card__contact-btn"
+                              onClick={(e) => e.stopPropagation()}
+                            >
+                              <i className="ri-phone-line"></i>
+                              <span>{advisor.contact.phone}</span>
+                            </a>
+                          )}
+                          {advisor.contact.email && (
+                            <a
+                              href={`mailto:${advisor.contact.email}`}
+                              className="advisor-card__contact-btn"
+                              onClick={(e) => e.stopPropagation()}
+                            >
+                              <i className="ri-mail-line"></i>
+                              <span>Email</span>
+                            </a>
+                          )}
+                        </div>
+                      )}
+
+                      {advisor.fields && (
+                        <div className="advisor-card__back-fields">
+                          {advisor.fields.map((f) => (
+                            <span key={f}>{f}</span>
+                          ))}
+                        </div>
+                      )}
+
+                      <div className="advisor-card__skill-pill">
+                        <i className={advisor.orgIcon}></i>
+                        <span>{advisor.organization}</span>
+                      </div>
+                    </div>
+
+                    <div className="advisor-card__back-bottom">
+                      <div
+                        className="advisor-card__back-return-pill"
+                        onClick={(e) => {
+                          e.stopPropagation();
+                          handleAdvisorCardClick(index);
+                        }}
+                      >
+                        <i className="ri-arrow-go-back-line"></i>
+                        <span>Lật lại ảnh</span>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            ))}
+          </div>
+
+          {/* Advisor Mobile Pagination Dots */}
+          <div className="team-showcase__mobile-nav">
+            <div className="team-showcase__pagination" aria-label="Advisors navigation">
+              {advisors.map((advisor, idx) => (
+                <button
+                  key={idx}
+                  type="button"
+                  className={`team-showcase__dot team-showcase__dot--${advisor.themeColor} ${activeAdvisorIndex === idx ? "is-active" : ""}`}
+                  onClick={() => scrollToAdvisorCard(idx)}
+                  aria-label={`Xem cố vấn ${advisor.name}`}
+                />
+              ))}
+            </div>
+            <div className="team-showcase__swipe-hint" aria-hidden="true">
+              <i className="ri-arrow-left-s-line"></i>
+              <span>Vuốt để xem thêm cố vấn</span>
+              <i className="ri-arrow-right-s-line"></i>
+            </div>
+          </div>
+
+          {/* Section Divider */}
+          <div className="team-section-divider" aria-hidden="true">
+            <span className="team-section-divider__line"></span>
+            <div className="team-section-divider__chip">
+              <i className="ri-team-line"></i>
+              <span>BAN ĐIỀU HÀNH &amp; KỸ THUẬT</span>
+            </div>
+            <span className="team-section-divider__line"></span>
+          </div>
+
+          {/* 2. CORE TEAM: ĐỘI NGŨ VẬN HÀNH (4 cards) */}
           <div className="team-showcase__header" data-aos="fade-up">
             <span className="team-showcase__label">
               <span className="team-showcase__status-dot"></span>
@@ -287,9 +635,6 @@ const TeamSection = () => {
             <h2 className="team-showcase__title">
               Đội Ngũ <span className="team-showcase__title-highlight">Vận Hành<i className="ri-cpu-line team-title-tech-icon"></i><span className="team-title-underline"></span></span>
             </h2>
-            {/* <p className="team-showcase__desc">
-              Dự án được thực hiện bởi sinh viên <span className="team-desc-highlight">Khoa Công nghệ Thông tin</span> — <span className="team-desc-highlight">Trường Đại học Nguyễn Tất Thành</span>.
-            </p> */}
           </div>
 
           {/* Member Cards Grid (3D Flip enabled for Mobile, static photo+body for Desktop) */}
@@ -420,71 +765,6 @@ const TeamSection = () => {
               <i className="ri-arrow-right-s-line"></i>
             </div>
           </div>
-
-          {/* Investor-mentor + academic advisory board */}
-          <aside className="academic-advisors" aria-label="Nhà đầu tư, mentor và cố vấn chuyên môn" data-aos="fade-up" data-aos-delay="200">
-            <div className="advisor-mentor">
-              <div className="advisor-mentor__photo-wrap">
-                <img
-                  src={mentor.avatar}
-                  alt={mentor.name}
-                  className="advisor-mentor__photo"
-                  loading="lazy"
-                  decoding="async"
-                />
-                <span className="advisor-mentor__badge" aria-hidden="true">
-                  <i className="ri-star-fill"></i>
-                </span>
-              </div>
-
-              <div className="advisor-mentor__info">
-                <small>NHÀ ĐẦU TƯ & MENTOR DỰ ÁN</small>
-                <strong>{mentor.name}</strong>
-                <span className="advisor-mentor__role">{mentor.role}</span>
-
-                <div className="advisor-mentor__stats">
-                  {mentor.stats.map((stat) => (
-                    <div key={stat.label}>
-                      <b>{stat.value}</b>
-                      <span>{stat.label}</span>
-                    </div>
-                  ))}
-                </div>
-
-                <div className="advisor-mentor__fields">
-                  {mentor.fields.map((field) => (
-                    <span key={field}>{field}</span>
-                  ))}
-                </div>
-              </div>
-            </div>
-
-            <div className="academic-advisors__divider" aria-hidden="true" />
-
-            <div className="academic-advisors__board">
-              <div className="academic-advisors__intro">
-                <span className="academic-advisors__icon">
-                  <i className="ri-graduation-cap-line"></i>
-                </span>
-                <div>
-                  <small>ACADEMIC ADVISORY</small>
-                  <strong>Cố vấn chuyên môn Khoa CNTT — ĐH Nguyễn Tất Thành</strong>
-                </div>
-              </div>
-              <div className="academic-advisors__list">
-                {academicAdvisors.map((advisor) => (
-                  <span key={advisor.name}>
-                    {advisor.avatar ? (
-                      <img src={advisor.avatar} alt="" loading="lazy" decoding="async" />
-                    ) : (
-                      <b aria-hidden="true">{advisor.initials}</b>
-                    )}
-                    {advisor.name}
-                  </span>
-                ))}
-              </div>
-            </div>
-          </aside>
         </div>
       </section>
 

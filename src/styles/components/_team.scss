@@ -1078,265 +1078,773 @@
   }
 }
 
-// Investor-mentor + Academic Advisors Strip
-.academic-advisors {
+// ============================================
+// ADVISORY & MENTOR BOARD CARDS (TOP SECTION)
+// ============================================
+
+.team-showcase__label--gold {
+  background: rgba(254, 243, 199, 0.88);
+  color: #92400e;
+  border-color: rgba(217, 119, 6, 0.3);
+  box-shadow: inset 0 1px 0 #fff, 0 6px 18px rgba(180, 83, 9, 0.12);
+}
+
+.team-showcase__status-dot--gold {
+  background: #f59e0b;
+  box-shadow: 0 0 0 4px rgba(245, 158, 11, 0.15), 0 0 12px rgba(245, 158, 11, 0.5);
+}
+
+.team-title-tech-icon--gold {
+  color: #d97706 !important;
+}
+
+.team-title-underline--gold {
+  background: linear-gradient(90deg, #f59e0b, #d97706) !important;
+}
+
+.advisor-cards {
+  display: grid;
+  grid-template-columns: repeat(5, 1fr);
+  gap: clamp(0.75rem, 1.2vw, 1.25rem);
   width: 100%;
-  display: grid;
-  grid-template-columns: minmax(0, 1.55fr) auto minmax(0, 1fr);
-  align-items: center;
-  gap: 1.75rem;
-  padding: 1.5rem 1.75rem;
-  border-radius: 22px;
-  background: rgba(255, 255, 255, 0.85);
-  border: 1px solid rgba(18, 132, 91, 0.14);
-  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.03);
+  max-width: 1280px;
+  align-items: stretch;
 
-  @media (max-width: 1100px) {
-    grid-template-columns: 1fr;
-    gap: 0.9rem;
+  @media (max-width: 1180px) {
+    grid-template-columns: repeat(3, 1fr);
+    max-width: 880px;
+    gap: 1.15rem;
+  }
+
+  @media (max-width: 768px) {
+    display: flex !important;
+    flex-direction: row !important;
+    flex-wrap: nowrap !important;
+    overflow-x: auto !important;
+    overflow-y: hidden !important;
+    -webkit-overflow-scrolling: touch;
+    scroll-snap-type: x mandatory;
+    scroll-behavior: smooth;
+    gap: 14px;
+    width: 100%;
+    max-width: 100%;
+    padding: 0.5rem calc((100vw - clamp(230px, 68vw, 260px)) / 2) 0.8rem;
+    margin: 0;
+    scrollbar-width: none;
+    &::-webkit-scrollbar {
+      display: none;
+    }
   }
 }
 
-.academic-advisors__divider {
-  width: 1px;
-  align-self: stretch;
-  background: linear-gradient(180deg, transparent, rgba(18, 132, 91, 0.2), transparent);
-
-  @media (max-width: 1100px) {
-    width: auto;
-    height: 1px;
-    background: linear-gradient(90deg, transparent, rgba(18, 132, 91, 0.2), transparent);
-  }
-}
-
-// Left: investor-mentor (featured)
-.advisor-mentor {
-  display: flex;
-  align-items: center;
-  gap: 1.4rem;
-  min-width: 0;
-
-  @media (max-width: 640px) {
-    flex-direction: column;
-    align-items: flex-start;
-    gap: 1rem;
-  }
-}
-
-.advisor-mentor__photo-wrap {
+.advisor-card {
   position: relative;
-  flex-shrink: 0;
-}
-
-.advisor-mentor__photo {
-  display: block;
-  width: 124px;
-  height: 124px;
-  border-radius: 50%;
-  object-fit: cover;
-  border: 4px solid #ffffff;
-  box-shadow:
-    0 0 0 3px #facc15,
-    0 12px 28px rgba(15, 100, 72, 0.22);
-
-  @media (max-width: 1100px) {
-    width: 108px;
-    height: 108px;
-  }
-}
-
-.advisor-mentor__badge {
-  position: absolute;
-  right: 2px;
-  bottom: 4px;
-  width: 30px;
-  height: 30px;
-  border-radius: 50%;
-  display: grid;
-  place-items: center;
-  background: linear-gradient(135deg, #facc15, #ca8a04);
-  border: 3px solid #ffffff;
-  color: #ffffff;
-  font-size: 0.85rem;
-  box-shadow: 0 4px 10px rgba(202, 138, 4, 0.35);
-}
-
-.advisor-mentor__info {
   display: flex;
   flex-direction: column;
+  background: #111714;
+  border-radius: 24px;
+  overflow: visible !important;
+  border: none !important;
+  box-shadow: none !important;
+  transition: transform 0.35s cubic-bezier(0.25, 0.46, 0.45, 0.94);
   min-width: 0;
+  height: 100%;
+  cursor: default;
+  user-select: none;
+  -webkit-tap-highlight-color: transparent;
 
-  small {
-    color: #a16207;
-    font: 700 0.66rem/1.2 monospace;
-    letter-spacing: 1.4px;
+  &:hover {
+    transform: translateY(-7px);
   }
 
-  strong {
-    margin-top: 0.3rem;
-    color: #0f3d2e;
-    font-size: clamp(1.3rem, 1.9vw, 1.6rem);
-    font-weight: 850;
-    line-height: 1.2;
+  @media (max-width: 768px) {
+    flex: 0 0 clamp(230px, 68vw, 260px) !important;
+    width: clamp(230px, 68vw, 260px) !important;
+    height: clamp(340px, 50vh, 395px) !important;
+    scroll-snap-align: center;
+    scroll-snap-stop: always;
+    cursor: pointer !important;
+    perspective: 1000px;
+    -webkit-perspective: 1000px;
   }
 }
 
-.advisor-mentor__role {
-  margin-top: 0.2rem;
-  color: #2b594b;
-  font-size: 0.88rem;
+// Advisor Card Flipper
+.advisor-card__flipper {
+  position: relative;
+  width: 100%;
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+}
+
+@media (min-width: 769px) {
+  .advisor-card.is-flipped .advisor-card__flipper {
+    transform: none;
+  }
+}
+
+@media (max-width: 768px) {
+  .advisor-card__flipper {
+    border-radius: 22px;
+    transform-style: preserve-3d;
+    -webkit-transform-style: preserve-3d;
+    transition: transform 0.55s cubic-bezier(0.25, 1, 0.5, 1);
+  }
+
+  .advisor-card.is-flipped .advisor-card__flipper {
+    transform: rotateY(180deg);
+  }
+}
+
+// Front face
+.advisor-card__front {
+  position: relative;
+  width: 100%;
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+  background: #ffffff;
+  border-radius: 24px;
+  overflow: hidden;
+  border: 1px solid rgba(19, 120, 89, 0.14);
+  box-shadow:
+    0 10px 30px rgba(0, 0, 0, 0.04),
+    0 20px 40px rgba(0, 0, 0, 0.02);
+  z-index: 2;
+  transition: box-shadow 0.35s ease;
+}
+
+.advisor-card:hover .advisor-card__front {
+  box-shadow:
+    0 18px 40px rgba(0, 0, 0, 0.09),
+    0 30px 60px rgba(0, 0, 0, 0.05);
+}
+
+// Image Header
+.advisor-card__image-box {
+  position: relative;
+  width: 100%;
+  height: clamp(235px, 27vh, 285px);
+  overflow: hidden;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: flex-end;
+  padding-bottom: 0.75rem;
+  background: radial-gradient(circle at center, #2b2d30 0%, #151618 100%);
+}
+
+// Top Left Icon Glass Badge
+.advisor-card__top-icon {
+  position: absolute;
+  top: 0.85rem;
+  left: 0.85rem;
+  width: 38px;
+  height: 38px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 1.15rem;
+  z-index: 3;
+  background: rgba(255, 255, 255, 0.92);
+  backdrop-filter: blur(6px);
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.16);
+}
+
+// Top Right Code Badge
+.advisor-card__code {
+  position: absolute;
+  top: 0.85rem;
+  right: 0.85rem;
+  padding: 0.22rem 0.55rem;
+  border-radius: 99px;
+  font-size: 0.62rem;
+  font-weight: 800;
+  letter-spacing: 0.5px;
+  z-index: 3;
+  background: rgba(0, 0, 0, 0.55);
+  color: #ffffff;
+  border: 1px solid rgba(255, 255, 255, 0.25);
+  backdrop-filter: blur(4px);
+}
+
+// Advisor Avatar Image
+.advisor-card__avatar-img {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  object-position: center 20%;
+  z-index: 1;
+  padding-top: 0.2rem;
+  transition: transform 0.4s ease;
+}
+
+.advisor-card:hover .advisor-card__avatar-img {
+  transform: scale(1.05);
+}
+
+// Role Pill Badge anchored over bottom of image
+.advisor-card__role-pill {
+  position: relative;
+  z-index: 3;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: min(85%, 215px);
+  min-height: 32px;
+  padding: 0.35rem 0.75rem;
+  border-radius: 99px;
+  font-size: 0.64rem;
+  font-weight: 800;
+  letter-spacing: 0.4px;
+  border: 1.5px solid #ffffff;
+  box-shadow: 0 4px 14px rgba(0, 0, 0, 0.2);
+  text-align: center;
+}
+
+// Flip hint on mobile
+.advisor-card__flip-hint {
+  display: none;
+}
+
+@media (max-width: 768px) {
+  .advisor-card__flip-hint {
+    position: absolute;
+    bottom: 3rem;
+    left: 50%;
+    transform: translateX(-50%);
+    display: inline-flex;
+    align-items: center;
+    gap: 0.35rem;
+    padding: 0.28rem 0.75rem;
+    border-radius: 99px;
+    background: rgba(0, 0, 0, 0.68);
+    backdrop-filter: blur(6px);
+    border: 1px solid rgba(255, 255, 255, 0.25);
+    color: #ffffff;
+    font-size: 0.62rem;
+    font-weight: 600;
+    z-index: 4;
+    white-space: nowrap;
+    pointer-events: none;
+  }
+}
+
+// Card Body
+.advisor-card__body {
+  position: relative;
+  z-index: 2;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  text-align: center;
+  padding: 1.15rem 0.95rem 1.1rem;
+  background: #ffffff;
+  flex-grow: 1;
+}
+
+.advisor-card__name {
+  font-size: 0.92rem;
+  font-weight: 800;
+  text-transform: uppercase;
+  letter-spacing: 0.3px;
+  margin: 0 0 0.25rem;
+  line-height: 1.25;
+  min-height: 2.4em;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.advisor-card__subrole {
+  font-size: 0.72rem;
   font-weight: 600;
-  line-height: 1.4;
+  line-height: 1.35;
+  margin: 0 0 0.5rem;
+  min-height: 2.6em;
+  display: flex;
+  align-items: center;
+  justify-content: center;
 }
 
-.advisor-mentor__stats {
+.advisor-card__name-accent {
+  width: 28px;
+  height: 3px;
+  border-radius: 99px;
+  margin: 0 auto 0.65rem;
+}
+
+.advisor-card__task {
+  font-size: 0.76rem;
+  color: #555555;
+  line-height: 1.45;
+  font-weight: 500;
+  margin: 0 0 0.85rem;
+  min-height: 3.8em;
+  display: flex;
+  align-items: flex-start;
+  justify-content: center;
+  flex-grow: 1;
+}
+
+.advisor-card__skill-pill {
+  width: 100%;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.45rem;
+  padding: 0.45rem 0.8rem;
+  border-radius: 99px;
+  font-size: 0.74rem;
+  font-weight: 700;
+  transition: all 0.25s ease;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+
+  i {
+    font-size: 0.88rem;
+    flex-shrink: 0;
+  }
+}
+
+// Back Face (Interactive / Mobile Flip)
+.advisor-card__back {
+  display: none;
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  border-radius: 24px;
+  overflow: hidden;
+  box-shadow: 0 16px 36px rgba(0, 0, 0, 0.28), 0 4px 12px rgba(0, 0, 0, 0.12);
+  flex-direction: column;
+  justify-content: space-between;
+  padding: 1.35rem 1.15rem 1.15rem;
+  z-index: 5;
+  background: #111714;
+  border: 1.5px solid rgba(255, 255, 255, 0.12);
+}
+
+@media (max-width: 768px) {
+  .advisor-card__back {
+    display: flex;
+    transform: rotateY(180deg);
+    -webkit-backface-visibility: hidden;
+    backface-visibility: hidden;
+  }
+
+  .advisor-card__front {
+    -webkit-backface-visibility: hidden;
+    backface-visibility: hidden;
+  }
+}
+
+.advisor-card__back-top {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  width: 100%;
+  position: relative;
+  z-index: 2;
+
+  .advisor-card__top-icon {
+    position: static;
+    width: 34px;
+    height: 34px;
+    font-size: 1rem;
+  }
+
+  .advisor-card__code {
+    position: static;
+    font-size: 0.65rem;
+  }
+}
+
+.advisor-card__back-main {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  text-align: center;
+  padding: 0.4rem 0.2rem;
+  flex-grow: 1;
+  justify-content: center;
+  position: relative;
+  z-index: 2;
+}
+
+.advisor-card__back-role {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  padding: 0.3rem 0.75rem;
+  border-radius: 99px;
+  font-size: 0.62rem;
+  font-weight: 700;
+  letter-spacing: 0.3px;
+  border: 1px solid rgba(255, 255, 255, 0.2);
+  background: rgba(0, 0, 0, 0.45);
+  color: #ffffff;
+  margin-bottom: 0.45rem;
+  backdrop-filter: blur(8px);
+}
+
+.advisor-card__back-name {
+  font-size: 0.95rem;
+  font-weight: 800;
+  color: #ffffff !important;
+  text-transform: uppercase;
+  letter-spacing: 0.4px;
+  margin: 0 0 0.2rem;
+  line-height: 1.25;
+}
+
+.advisor-card__back-subrole {
+  font-size: 0.72rem;
+  color: rgba(255, 255, 255, 0.75);
+  margin: 0 0 0.5rem;
+}
+
+.advisor-card__back-stats {
+  display: flex;
+  gap: 0.8rem;
+  margin: 0.4rem 0 0.6rem;
+
+  .advisor-card__back-stat-item {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    padding: 0.35rem 0.6rem;
+    border-radius: 10px;
+    background: rgba(255, 255, 255, 0.08);
+    border: 1px solid rgba(255, 255, 255, 0.12);
+
+    b {
+      color: #facc15;
+      font-size: 1.1rem;
+      font-weight: 900;
+      line-height: 1.1;
+    }
+
+    span {
+      color: rgba(255, 255, 255, 0.8);
+      font-size: 0.65rem;
+      font-weight: 600;
+    }
+  }
+}
+
+.advisor-card__back-contact {
+  display: flex;
+  gap: 0.5rem;
+  margin: 0.4rem 0 0.6rem;
+
+  .advisor-card__contact-btn {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.35rem;
+    padding: 0.35rem 0.75rem;
+    border-radius: 99px;
+    font-size: 0.7rem;
+    font-weight: 700;
+    text-decoration: none;
+    color: #ffffff;
+    background: rgba(16, 185, 129, 0.25);
+    border: 1px solid rgba(52, 211, 153, 0.4);
+    transition: all 0.2s ease;
+
+    &:hover {
+      background: rgba(16, 185, 129, 0.4);
+    }
+  }
+}
+
+.advisor-card__back-fields {
   display: flex;
   flex-wrap: wrap;
-  gap: 1.5rem;
-  margin-top: 0.8rem;
-
-  div {
-    display: flex;
-    align-items: baseline;
-    gap: 0.4rem;
-  }
-
-  b {
-    color: #ca8a04;
-    font-size: 1.6rem;
-    font-weight: 900;
-    line-height: 1;
-  }
+  justify-content: center;
+  gap: 0.3rem;
+  margin: 0.3rem 0 0.75rem;
 
   span {
-    color: #475569;
-    font-size: 0.78rem;
+    padding: 0.18rem 0.55rem;
+    border-radius: 99px;
+    background: rgba(255, 255, 255, 0.08);
+    border: 1px solid rgba(255, 255, 255, 0.12);
+    color: rgba(255, 255, 255, 0.88);
+    font-size: 0.64rem;
     font-weight: 600;
   }
 }
 
-.advisor-mentor__fields {
-  display: flex;
-  flex-wrap: wrap;
-  gap: 0.4rem;
-  margin-top: 0.75rem;
-
-  span {
-    padding: 0.22rem 0.7rem;
-    border-radius: 99px;
-    background: #f0fdf4;
-    border: 1px solid #bbf7d0;
-    color: #166534;
-    font-size: 0.72rem;
-    font-weight: 700;
-    white-space: nowrap;
-  }
-}
-
-// Right: academic advisory board
-.academic-advisors__board {
-  display: flex;
-  flex-direction: column;
-  gap: 0.9rem;
-  min-width: 0;
-}
-
-.academic-advisors__intro {
+.advisor-card__back-bottom {
   display: flex;
   align-items: center;
-  gap: 0.75rem;
+  justify-content: center;
+  width: 100%;
+  position: relative;
+  z-index: 2;
+}
 
-  div {
-    display: flex;
-    flex-direction: column;
-  }
+.advisor-card__back-return-pill {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.4rem;
+  font-size: 0.7rem;
+  font-weight: 600;
+  color: rgba(255, 255, 255, 0.9);
+  padding: 0.35rem 0.9rem;
+  border-radius: 99px;
+  background: rgba(255, 255, 255, 0.14);
+  border: 1px solid rgba(255, 255, 255, 0.22);
+  backdrop-filter: blur(10px);
+  cursor: pointer;
+  transition: all 0.25s ease;
 
-  small {
-    color: #648176;
-    font: 700 0.64rem/1.2 monospace;
-    letter-spacing: 1.3px;
-  }
-
-  strong {
-    margin-top: 0.2rem;
-    color: #174c3a;
-    font-size: 0.92rem;
-    line-height: 1.35;
-  }
-
-  // Let the long faculty name wrap instead of being clipped
-  > div {
-    min-width: 0;
+  &:hover {
+    background: rgba(255, 255, 255, 0.24);
+    transform: translateY(-2px);
   }
 }
 
-.academic-advisors__icon {
-  display: grid;
-  place-items: center;
-  flex-shrink: 0;
-  width: 40px;
-  height: 40px;
-  border-radius: 11px;
-  color: #087f63;
-  background: #ffffff;
-  box-shadow: 0 3px 10px rgba(15, 100, 72, 0.1);
-  font-size: 1.2rem;
+// ============================================
+// ADVISOR COLOR THEMES
+// ============================================
+
+// 1. Gold Theme: Nguyễn Khắc Minh Trí
+.advisor-card--gold {
+  .advisor-card__top-icon {
+    color: #d97706;
+    background: rgba(254, 243, 199, 0.95);
+  }
+  .advisor-card__role-pill {
+    background: linear-gradient(135deg, #f59e0b 0%, #d97706 100%);
+    color: #ffffff;
+  }
+  .advisor-card__name {
+    color: #78350f;
+  }
+  .advisor-card__subrole {
+    color: #b45309;
+  }
+  .advisor-card__name-accent {
+    background: #f59e0b;
+  }
+  .advisor-card__skill-pill {
+    background: #fef3c7;
+    color: #92400e;
+    i { color: #d97706; }
+  }
+  .advisor-card__back {
+    background: radial-gradient(circle at 50% 10%, rgba(217, 119, 6, 0.38) 0%, #1e170c 65%, #120e07 100%);
+    border: 1.5px solid rgba(245, 158, 11, 0.4);
+    box-shadow: 0 16px 36px rgba(80, 50, 10, 0.35);
+  }
+  .advisor-card__back-role {
+    border-color: rgba(251, 191, 36, 0.45);
+    background: rgba(66, 44, 15, 0.7);
+    color: #fef08a;
+  }
 }
 
-// Secondary column: advisors stacked vertically
-.academic-advisors__list {
+// 2. Emerald Theme: ThS. LIANG GUEI JIA
+.advisor-card--emerald {
+  .advisor-card__top-icon {
+    color: #059669;
+    background: rgba(209, 250, 229, 0.95);
+  }
+  .advisor-card__role-pill {
+    background: linear-gradient(135deg, #10b981 0%, #059669 100%);
+    color: #ffffff;
+  }
+  .advisor-card__name {
+    color: #064e3b;
+  }
+  .advisor-card__subrole {
+    color: #047857;
+  }
+  .advisor-card__name-accent {
+    background: #10b981;
+  }
+  .advisor-card__skill-pill {
+    background: #d1fae5;
+    color: #065f46;
+    i { color: #059669; }
+  }
+  .advisor-card__back {
+    background: radial-gradient(circle at 50% 10%, rgba(16, 185, 129, 0.38) 0%, #0d1a14 65%, #08110d 100%);
+    border: 1.5px solid rgba(52, 211, 153, 0.4);
+    box-shadow: 0 16px 36px rgba(10, 60, 40, 0.35);
+  }
+  .advisor-card__back-role {
+    border-color: rgba(74, 222, 128, 0.45);
+    background: rgba(14, 56, 38, 0.7);
+    color: #bbf7d0;
+  }
+}
+
+// 3. Blue Theme: ThS. NGUYỄN HUỲNH THÔNG
+.advisor-card--blue {
+  .advisor-card__top-icon {
+    color: #2563eb;
+    background: rgba(219, 234, 254, 0.95);
+  }
+  .advisor-card__role-pill {
+    background: linear-gradient(135deg, #3b82f6 0%, #1d4ed8 100%);
+    color: #ffffff;
+  }
+  .advisor-card__name {
+    color: #1e3a8a;
+  }
+  .advisor-card__subrole {
+    color: #1d4ed8;
+  }
+  .advisor-card__name-accent {
+    background: #3b82f6;
+  }
+  .advisor-card__skill-pill {
+    background: #dbeafe;
+    color: #1e40af;
+    i { color: #2563eb; }
+  }
+  .advisor-card__back {
+    background: radial-gradient(circle at 50% 10%, rgba(37, 99, 235, 0.38) 0%, #0f1626 65%, #0a0e19 100%);
+    border: 1.5px solid rgba(96, 165, 250, 0.4);
+    box-shadow: 0 16px 36px rgba(15, 40, 80, 0.35);
+  }
+  .advisor-card__back-role {
+    border-color: rgba(96, 165, 250, 0.45);
+    background: rgba(18, 45, 90, 0.7);
+    color: #bfdbfe;
+  }
+}
+
+// 4. Teal Theme: ThS. PHẠM ĐÌNH TÀI
+.advisor-card--teal {
+  .advisor-card__top-icon {
+    color: #0d9488;
+    background: rgba(204, 251, 241, 0.95);
+  }
+  .advisor-card__role-pill {
+    background: linear-gradient(135deg, #14b8a6 0%, #0f766e 100%);
+    color: #ffffff;
+  }
+  .advisor-card__name {
+    color: #134e4a;
+  }
+  .advisor-card__subrole {
+    color: #0f766e;
+  }
+  .advisor-card__name-accent {
+    background: #14b8a6;
+  }
+  .advisor-card__skill-pill {
+    background: #ccfbf1;
+    color: #115e59;
+    i { color: #0d9488; }
+  }
+  .advisor-card__back {
+    background: radial-gradient(circle at 50% 10%, rgba(20, 184, 166, 0.38) 0%, #0c1817 65%, #081010 100%);
+    border: 1.5px solid rgba(45, 212, 191, 0.4);
+    box-shadow: 0 16px 36px rgba(10, 50, 50, 0.35);
+  }
+  .advisor-card__back-role {
+    border-color: rgba(45, 212, 191, 0.45);
+    background: rgba(15, 55, 50, 0.7);
+    color: #99f6e4;
+  }
+}
+
+// 5. Purple Theme: TS. HOÀNG THỊNH NHÂN
+.advisor-card--purple {
+  .advisor-card__top-icon {
+    color: #7c3aed;
+    background: rgba(237, 233, 254, 0.95);
+  }
+  .advisor-card__role-pill {
+    background: linear-gradient(135deg, #8b5cf6 0%, #6d28d9 100%);
+    color: #ffffff;
+  }
+  .advisor-card__name {
+    color: #4c1d95;
+  }
+  .advisor-card__subrole {
+    color: #6d28d9;
+  }
+  .advisor-card__name-accent {
+    background: #8b5cf6;
+  }
+  .advisor-card__skill-pill {
+    background: #ede9fe;
+    color: #5b21b6;
+    i { color: #7c3aed; }
+  }
+  .advisor-card__back {
+    background: radial-gradient(circle at 50% 10%, rgba(139, 92, 246, 0.38) 0%, #161024 65%, #0f0b18 100%);
+    border: 1.5px solid rgba(167, 139, 250, 0.4);
+    box-shadow: 0 16px 36px rgba(45, 25, 80, 0.35);
+  }
+  .advisor-card__back-role {
+    border-color: rgba(196, 181, 253, 0.45);
+    background: rgba(43, 29, 74, 0.7);
+    color: #ddd6fe;
+  }
+}
+
+// Section Divider
+.team-section-divider {
+  width: 100%;
+  max-width: 1100px;
   display: flex;
-  flex-direction: column;
-  align-items: flex-start;
-  gap: 0.6rem;
+  align-items: center;
+  justify-content: center;
+  gap: 1.25rem;
+  margin: 2.2rem 0 1rem;
 
-  @media (max-width: 1100px) {
-    flex-direction: row;
-    flex-wrap: wrap;
+  &__line {
+    flex: 1;
+    height: 1px;
+    background: linear-gradient(90deg, transparent, rgba(18, 132, 91, 0.25), transparent);
   }
 
-  span {
+  &__chip {
     display: inline-flex;
     align-items: center;
-    gap: 0.55rem;
-    padding: 0.25rem 0.9rem 0.25rem 0.25rem;
+    gap: 0.5rem;
+    padding: 0.4rem 1.15rem;
     border-radius: 99px;
-    color: #174c3a;
-    background: rgba(240, 250, 246, 0.9);
-    border: 1px solid rgba(18, 132, 91, 0.14);
-    font-size: 0.84rem;
-    font-weight: 700;
-    transition: background 0.2s ease, border-color 0.2s ease;
+    background: rgba(240, 252, 246, 0.95);
+    border: 1px solid rgba(18, 132, 91, 0.2);
+    color: #166534;
+    font-size: 0.7rem;
+    font-weight: 800;
+    letter-spacing: 1.2px;
+    box-shadow: 0 2px 10px rgba(0, 0, 0, 0.04);
 
-    &:hover {
-      background: #ffffff;
-      border-color: rgba(18, 132, 91, 0.3);
+    i {
+      font-size: 0.9rem;
+      color: #15803d;
     }
   }
+}
 
-  img,
-  b {
-    width: 38px;
-    height: 38px;
-    border-radius: 50%;
-    flex-shrink: 0;
-    border: 2px solid #ffffff;
-    box-shadow: 0 3px 10px rgba(15, 100, 72, 0.16);
-  }
-
-  img {
-    object-fit: cover;
-  }
-
-  // Initials fallback when there is no photo
-  b {
-    display: grid;
-    place-items: center;
-    background: linear-gradient(135deg, #d1fae5, #a7f3d0);
-    color: #087f63;
-    font-size: 0.78rem;
-    font-weight: 800;
-  }
+// Dot themes for advisors
+.team-showcase__dot--gold.is-active {
+  background: #f59e0b !important;
+  box-shadow: 0 0 10px rgba(245, 158, 11, 0.5);
+}
+.team-showcase__dot--emerald.is-active {
+  background: #10b981 !important;
+  box-shadow: 0 0 10px rgba(16, 185, 129, 0.5);
+}
+.team-showcase__dot--teal.is-active {
+  background: #14b8a6 !important;
+  box-shadow: 0 0 10px rgba(20, 184, 166, 0.5);
 }
 
 .carousel-3d {
