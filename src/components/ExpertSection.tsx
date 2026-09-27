@@ -31,7 +31,7 @@ const ExpertSection = () => {
                 loading="lazy"
                 decoding="async"
                 onError={(e) => {
-                  (e.target as HTMLImageElement).src = "/chuyen-gia.jpg";
+                  (e.target as HTMLImageElement).src = "/chuyen-gia.webp";
                 }}
               />
               <div className="expert-mobile-tag">
@@ -92,7 +92,7 @@ const ExpertSection = () => {
               loading="lazy"
               decoding="async"
               onError={(e) => {
-                (e.target as HTMLImageElement).src = "/chuyen-gia.jpg";
+                (e.target as HTMLImageElement).src = "/chuyen-gia.webp";
               }}
             />
 

@@ -1,5 +1,8 @@
-import { useMemo, useState, useEffect, type CSSProperties, type MouseEvent } from "react";
-import EaAgriDurian from "./eaagri-3d/EaAgriDurian";
+import { lazy, Suspense, useMemo, useRef, useState, useEffect, type CSSProperties, type MouseEvent } from "react";
+
+// three.js (~600 KB) lives in this chunk; loading it lazily lets the hero text paint first
+const EaAgriDurian = lazy(() => import("./eaagri-3d/EaAgriDurian"));
+const HERO_POSTER = "/images/webp/cay-1.webp";
 import { triggerAppStoreNotice } from "./AppStoreNoticeModal";
 
 const ROTATING_HIGHLIGHTS = [
@@ -64,26 +67,42 @@ const Hero = () => {
     }
   };
 
-  const handleHeroPointerMove = (event: MouseEvent<HTMLElement>) => {
-    const hero = event.currentTarget;
-    const bounds = hero.getBoundingClientRect();
-    const xRatio = (event.clientX - bounds.left) / bounds.width;
-    const yRatio = (event.clientY - bounds.top) / bounds.height;
+  // mousemove can fire 100+ times/s; each write restyles the whole hero. Coalesce to
+  // at most one layout read + style write per animation frame.
+  const pointerFrame = useRef(0);
+  const lastPointer = useRef({ x: 0, y: 0, hero: null as HTMLElement | null });
 
-    hero.style.setProperty("--hero-pointer-x", `${xRatio * 100}%`);
-    hero.style.setProperty("--hero-pointer-y", `${yRatio * 100}%`);
-    hero.style.setProperty("--content-shift-x", `${(xRatio - 0.5) * 5}px`);
-    hero.style.setProperty("--content-shift-y", `${(yRatio - 0.5) * 3}px`);
+  const handleHeroPointerMove = (event: MouseEvent<HTMLElement>) => {
+    lastPointer.current = { x: event.clientX, y: event.clientY, hero: event.currentTarget };
+    if (pointerFrame.current) return;
+    pointerFrame.current = requestAnimationFrame(() => {
+      pointerFrame.current = 0;
+      const { x, y, hero } = lastPointer.current;
+      if (!hero) return;
+      const bounds = hero.getBoundingClientRect();
+      const xRatio = (x - bounds.left) / bounds.width;
+      const yRatio = (y - bounds.top) / bounds.height;
+
+      hero.style.setProperty("--hero-pointer-x", `${xRatio * 100}%`);
+      hero.style.setProperty("--hero-pointer-y", `${yRatio * 100}%`);
+      hero.style.setProperty("--content-shift-x", `${(xRatio - 0.5) * 5}px`);
+      hero.style.setProperty("--content-shift-y", `${(yRatio - 0.5) * 3}px`);
+    });
   };
 
   const resetHeroPointer = (event: MouseEvent<HTMLElement>) => {
+    cancelAnimationFrame(pointerFrame.current);
+    pointerFrame.current = 0;
     event.currentTarget.style.setProperty("--content-shift-x", "0px");
     event.currentTarget.style.setProperty("--content-shift-y", "0px");
   };
 
+  useEffect(() => () => cancelAnimationFrame(pointerFrame.current), []);
+
   return (
     <header
       className="hero-section fullpage-slide"
+      data-pause-offscreen
       onMouseMove={handleHeroPointerMove}
       onMouseLeave={resetHeroPointer}
     >
@@ -117,7 +136,7 @@ const Hero = () => {
           {fallingLeaves.map((leaf) => (
             <span className="floating-leaf" style={leaf.style} key={leaf.id}>
               <span className="floating-leaf-reactor">
-                <img src="/assets/floating-leaf.png" alt="" className="floating-leaf-img" />
+                <img src="/assets/floating-leaf.webp" alt="" className="floating-leaf-img" />
               </span>
             </span>
           ))}
@@ -135,15 +154,27 @@ const Hero = () => {
             <span className="hero-visual-depth-glow" aria-hidden="true"></span>
             
             {/* The 3D Tree, IoT devices and Farmer interactive model */}
-            <EaAgriDurian
-              assetBaseUrl="/eaagri-3d/assets/"
-              posterUrl="/images/webp/cay-1.webp"
-              quality="auto"
-              showCards={true}
-              showHotspots={true}
-              showFarmer={true}
-              lazy={false}
-            />
+            <Suspense
+              fallback={
+                <img
+                  src={HERO_POSTER}
+                  alt="Mô hình sầu riêng EaAgri"
+                  className="hero-3d-poster"
+                  fetchPriority="high"
+                  decoding="async"
+                />
+              }
+            >
+              <EaAgriDurian
+                assetBaseUrl="/eaagri-3d/assets/"
+                posterUrl={HERO_POSTER}
+                quality="auto"
+                showCards={true}
+                showHotspots={true}
+                showFarmer={true}
+                lazy={false}
+              />
+            </Suspense>
 
             {/* Glowing Sunlight Sparkles & Pollen Bokeh */}
             <div className="hero-sparkles-layer" aria-hidden="true">

@@ -1,5 +1,5 @@
 import { useEffect, useState } from "react";
-import { useParams, useNavigate, Link } from "react-router-dom";
+import { useParams, useNavigate, Link, useLocation, Navigate } from "react-router-dom";
 import { useSEO } from "../hooks/useSEO";
 import { supabase } from "../utils/supabase/client";
 import { useAuth } from "../context/AuthContext";
@@ -20,6 +20,7 @@ interface NewsItem {
 export default function NewsDetail() {
   const { id } = useParams<{ id: string }>();
   const navigate = useNavigate();
+  const location = useLocation();
   const { profile } = useAuth();
   const [article, setArticle] = useState<NewsItem | null>(null);
   const [loading, setLoading] = useState(true);
@@ -151,6 +152,11 @@ export default function NewsDetail() {
     };
     return new Date(dateString).toLocaleDateString("vi-VN", options);
   };
+
+  // Legacy /news/:id route -> redirect to /tintuc/:id
+  if (id && location.pathname.startsWith("/news/")) {
+    return <Navigate to={`/tintuc/${id}`} replace />;
+  }
 
   if (loading) {
     return (

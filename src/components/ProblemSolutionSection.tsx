@@ -61,7 +61,7 @@ const MATRIX_DATA: RiskSolutionPair[] = [
   {
     id: "water",
     number: "01",
-    image: "/ẢNh 1.png",
+    image: "/ẢNh 1.webp",
     imageAlt: "Mô hình 3D vườn sầu riêng thông minh kết nối cảm biến IoT và ứng dụng EaAgri",
     riskTitle: "Sốc Nước & Khô Hạn Cực Đoan",
     riskIcon: "ri-drop-line",
@@ -89,7 +89,7 @@ const MATRIX_DATA: RiskSolutionPair[] = [
   {
     id: "disease",
     number: "02",
-    image: "/assets/phantichanhbenh.png",
+    image: "/assets/phantichanhbenh.webp",
     imageAlt: "Mô hình AI Vision nhận diện sâu bệnh và nấm lá",
     riskTitle: "Dịch Bệnh & Nấm Phytophthora",
     riskIcon: "ri-virus-line",
@@ -117,7 +117,7 @@ const MATRIX_DATA: RiskSolutionPair[] = [
   {
     id: "knowledge",
     number: "03",
-    image: "/assets/Rag.jpg",
+    image: "/assets/Rag.webp",
     imageAlt: "Trợ lý AI chuyên gia RAG tư vấn kỹ thuật 24/7",
     riskTitle: "Thiếu Hụt Tri Thức Canh Tác Sâu",
     riskIcon: "ri-book-read-line",
@@ -145,7 +145,7 @@ const MATRIX_DATA: RiskSolutionPair[] = [
   {
     id: "market",
     number: "04",
-    image: "/assets/mohinhgia.jpg",
+    image: "/assets/mohinhgia.webp",
     imageAlt: "Biểu đồ biến động giá và phân tích thị trường nông sản",
     riskTitle: "Bất Đối Xứng Giá & Thị Trường",
     riskIcon: "ri-funds-line",
@@ -307,7 +307,7 @@ export default function ProblemSolutionSection({
                 onClick={() => setIsZoomOpen(true)}
                 title="Nhấn để phóng to xem chi tiết hình ảnh tính năng"
               >
-                <img
+                <img loading="lazy" decoding="async"
                   key={currentDisplay.image}
                   src={currentDisplay.image}
                   alt={currentDisplay.imageAlt}
@@ -571,7 +571,7 @@ export default function ProblemSolutionSection({
               </div>
 
               <div className="problem-solution__modal-img-wrap">
-                <img
+                <img loading="lazy" decoding="async"
                   src={currentDisplay.image}
                   alt={currentDisplay.imageAlt}
                   className="problem-solution__modal-img"

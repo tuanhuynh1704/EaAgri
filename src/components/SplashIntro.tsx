@@ -1,6 +1,7 @@
 import { useEffect, useRef, useState, useCallback } from "react";
 import { createPortal } from "react-dom";
-import * as THREE from "three";
+// three.js is loaded on demand inside the effect so it stays out of the main bundle
+import type * as T3 from "three";
 
 interface SplashIntroProps {
   onComplete?: () => void;
@@ -147,6 +148,7 @@ export default function SplashIntro({
   const [showCaret, setShowCaret] = useState(true);
 
   const canvasRef = useRef<HTMLCanvasElement | null>(null);
+  const logoBoxRef = useRef<HTMLDivElement | null>(null);
   const wormholeRef = useRef<{
     start: () => void;
     warpOut: () => Promise<void>;
@@ -175,6 +177,12 @@ export default function SplashIntro({
     if (!shouldRender || !canvasRef.current) return;
 
     const canvas = canvasRef.current;
+    let cancelled = false;
+
+    // Dynamic import: the typed text + gradient fallback show immediately; the particle
+    // tunnel fades in once three.js arrives. finish() already copes with no wormhole.
+    import("three").then((THREE) => {
+    if (cancelled) return;
     const isMobile = window.innerWidth <= 768;
     const numRings = isMobile ? 100 : 160;
     const pointsPerRing = isMobile ? 90 : 150;
@@ -183,12 +191,12 @@ export default function SplashIntro({
     const tunnelLength = zStart - zEnd;
     const warpDuration = WARP_FLY_DURATION / 1000; // in seconds
 
-    let renderer: THREE.WebGLRenderer | null = null;
-    let scene: THREE.Scene | null = null;
-    let camera: THREE.PerspectiveCamera | null = null;
-    let points: THREE.Points | null = null;
-    let material: THREE.ShaderMaterial | null = null;
-    let clock: THREE.Clock | null = null;
+    let renderer: T3.WebGLRenderer | null = null;
+    let scene: T3.Scene | null = null;
+    let camera: T3.PerspectiveCamera | null = null;
+    let points: T3.Points | null = null;
+    let material: T3.ShaderMaterial | null = null;
+    let clock: T3.Clock | null = null;
     let rafId = 0;
     let disposed = false;
     let hovering = false;
@@ -373,15 +381,25 @@ export default function SplashIntro({
           canvas.removeEventListener("pointerleave", handlePointerLeave);
           if (geometry) geometry.dispose();
           if (material) material.dispose();
-          if (renderer) renderer.dispose();
+          // Release the WebGL context now so it doesn't count against the browser's
+          // context limit and evict the hero's 3D model.
+          if (renderer) {
+            renderer.forceContextLoss();
+            renderer.dispose();
+          }
         },
       };
     } catch (err) {
       console.warn("WebGL initialization failed, running in fallback mode", err);
     }
+    }).catch((err) => {
+      console.warn("three.js failed to load, running in fallback mode", err);
+    });
 
     return () => {
+      cancelled = true;
       wormholeRef.current?.dispose();
+      wormholeRef.current = null;
     };
   }, [shouldRender]);
 
@@ -421,9 +439,56 @@ export default function SplashIntro({
     clearTimeout(bloomTimer);
     setIsBlooming(true);
 
-    // 4. Logo tan vào luồng sáng và mở vào trang chủ ("rầu vào web trang chủ")
+    // 4. Logo bay vào vị trí navbar logo
     setPhase("leaving");
     setIsLeaving(true);
+
+    // Tính toán vị trí navbar logo để bay vào chính xác
+    if (logoBoxRef.current) {
+      const navLogo = document.querySelector('.nav__logo-img') as HTMLElement;
+      if (navLogo) {
+        // #root is scaled to 1.03 during the splash (homepage-splash-prime) and eases back
+        // to none on reveal. Measure the navbar logo with that transform removed so the
+        // flight lands where the logo will actually sit, not where it is mid-animation.
+        // Same for the navbar's own AOS fade-down slide.
+        const root = document.getElementById('root');
+        const nav = navLogo.closest('nav') as HTMLElement | null;
+        const settled = [root, nav].filter(Boolean) as HTMLElement[];
+        settled.forEach((node) => {
+          node.style.setProperty('transition', 'none', 'important');
+          node.style.setProperty('transform', 'none', 'important');
+        });
+        const navRect = navLogo.getBoundingClientRect();
+        settled.forEach((node) => {
+          node.style.removeProperty('transform');
+          node.style.removeProperty('transition');
+        });
+
+        const el = logoBoxRef.current;
+        const splashRect = el.getBoundingClientRect();
+        const splashCenterX = splashRect.left + splashRect.width / 2;
+        const splashCenterY = splashRect.top + splashRect.height / 2;
+        const navCenterX = navRect.left + navRect.width / 2;
+        const navCenterY = navRect.top + navRect.height / 2;
+        const dx = navCenterX - splashCenterX;
+        const dy = navCenterY - splashCenterY;
+        // offsetHeight = untransformed size. The inline transform below replaces the
+        // CSS scale on the box, so the ratio must be taken against the unscaled height.
+        const scaleTarget = navRect.height / el.offsetHeight;
+
+        // Bước 1: Bay về đúng vị trí logo navbar — giữ rõ nét suốt đường bay
+        el.style.transition = 'transform 0.6s cubic-bezier(0.32, 0, 0.15, 1)';
+        el.style.transform = `translate(calc(-50% + ${dx}px), calc(-50% + ${dy}px)) scale(${scaleTarget})`;
+        el.style.filter = 'none';
+        el.style.opacity = '1';
+
+        // Bước 2: Đã tới đích -> hòa vào logo thật trên navbar
+        setTimeout(() => {
+          el.style.transition = 'opacity 0.15s ease-out';
+          el.style.opacity = '0';
+        }, 600);
+      }
+    }
 
     document.body.classList.remove("homepage-splash-prime");
     document.body.classList.add("homepage-splash-reveal");
@@ -436,7 +501,7 @@ export default function SplashIntro({
       );
       setShouldRender(false);
       if (onComplete) onComplete();
-    }, 650);
+    }, 750);
   }, [onComplete]);
 
   // Typing Effect
@@ -537,6 +602,7 @@ export default function SplashIntro({
 
         {/* Logo: Appears when camera flies into tunnel ("chạy vào sẽ hiện logo thêm") */}
         <div
+          ref={logoBoxRef}
           className={`homepage-splash__logo-box ${
             phase === "flying_logo" ? "is-visible" : phase === "leaving" ? "is-leaving" : ""
           }`}

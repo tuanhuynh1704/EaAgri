@@ -1,11 +1,11 @@
 const baseLogos = [
   { src: "/Logo/NTTU.jpg", alt: "Nguyễn Tất Thành University" },
-  { src: "/Logo/FIT.png", alt: "FIT" },
+  { src: "/Logo/FIT.webp", alt: "FIT" },
   { src: "/Logo/NIIC.jpg", alt: "NIIC" },
   { src: "/Logo/vietfuturelogo.png", alt: "VietFuture" },
-  { src: "/Logo/Intech.png", alt: "Intech" },
-  { src: "/Logo/BSA.png", alt: "BSA" },
-  { src: "/Logo/KNX.png", alt: "KNX" },
+  { src: "/Logo/Intech.webp", alt: "Intech" },
+  { src: "/Logo/BSA.webp", alt: "BSA" },
+  { src: "/Logo/KNX.webp", alt: "KNX" },
 ];
 
 // Nhân bản danh sách 3 lần trong mỗi nhóm để đảm bảo chiều dài vượt xa mọi kích thước màn hình (iPad, máy tính bảng, màn hình siêu rộng)

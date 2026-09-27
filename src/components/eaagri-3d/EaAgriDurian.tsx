@@ -21,7 +21,7 @@ export interface EaAgriDurianProps {
 
 export default function EaAgriDurian({
   assetBaseUrl = '/eaagri-3d/assets/',
-  posterUrl = '/eaagri-3d/assets/poster.png',
+  posterUrl = '/eaagri-3d/assets/poster.webp',
   data = {
     source: 'demo',
     treeName: 'Sầu riêng Ri6 EaAgri',

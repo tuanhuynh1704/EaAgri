@@ -131,7 +131,7 @@ body.homepage-splash-reveal #root {
     position: absolute;
     top: 50%;
     left: 50%;
-    transform: translate(-50%, -50%) scale(0.68);
+    transform: translate(-50%, -50%) scale(0.55);
     opacity: 0;
     pointer-events: none;
     display: flex;
@@ -139,7 +139,7 @@ body.homepage-splash-reveal #root {
     align-items: center;
     justify-content: center;
     transition: opacity 0.55s cubic-bezier(0.16, 1, 0.3, 1),
-                transform 0.65s cubic-bezier(0.16, 1, 0.3, 1),
+                transform 0.7s cubic-bezier(0.16, 1, 0.3, 1),
                 filter 0.5s ease;
 
     &.is-visible {
@@ -148,15 +148,14 @@ body.homepage-splash-reveal #root {
     }
 
     &.is-leaving {
-      opacity: 0;
-      transform: translate(-50%, -50%) scale(1.35);
-      filter: blur(12px);
-      transition: opacity 0.45s ease-in, transform 0.6s cubic-bezier(0.4, 0, 0.2, 1), filter 0.5s ease;
+      // Dynamic position is set by JavaScript inline styles
+      // This class just ensures pointer-events are disabled during flight
+      pointer-events: none;
     }
   }
 
   &__logo {
-    height: clamp(75px, 9.5vw, 125px);
+    height: clamp(110px, 15vw, 200px);
     width: auto;
     max-width: 85vw;
     object-fit: contain;
@@ -164,7 +163,7 @@ body.homepage-splash-reveal #root {
     filter: drop-shadow(0 8px 30px rgba(4, 120, 87, 0.28));
     user-select: none;
     -webkit-user-drag: none;
-    animation: splash-logo-float 3.5s ease-in-out infinite;
+    animation: splash-logo-float 3s ease-in-out infinite;
   }
 
   // Gradient text with deep emerald and rich forest tones
@@ -264,11 +263,20 @@ body.homepage-splash-reveal #root {
 }
 
 @keyframes splash-logo-float {
-  0%, 100% {
-    transform: translateY(0);
+  0% {
+    transform: translateY(0) scale(1) rotate(0deg);
+  }
+  25% {
+    transform: translateY(-8px) scale(1.03) rotate(0.5deg);
   }
   50% {
-    transform: translateY(-5px);
+    transform: translateY(-12px) scale(1.05) rotate(0deg);
+  }
+  75% {
+    transform: translateY(-6px) scale(1.02) rotate(-0.5deg);
+  }
+  100% {
+    transform: translateY(0) scale(1) rotate(0deg);
   }
 }
 
@@ -298,6 +306,9 @@ body.homepage-splash-reveal #root {
     &__title {
       font-size: 22px;
       line-height: 1.5;
+    }
+    &__logo {
+      height: clamp(90px, 22vw, 140px);
     }
     &__skip {
       right: 18px;

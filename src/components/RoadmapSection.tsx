@@ -155,8 +155,8 @@ export default function RoadmapSection() {
         <div className="roadmap__illustration-side" data-aos="fade-right">
           <div className="roadmap__mascot-card">
             <div className="roadmap__mascot-img-wrap">
-              <img
-                src="/assets/tải xuống.png"
+              <img loading="lazy" decoding="async"
+                src="/assets/tải xuống.webp"
                 alt="Mascot EaAgri"
                 className="roadmap__mascot-img"
               />

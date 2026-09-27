@@ -45,11 +45,23 @@ const Navbar = () => {
       if (event.clientY <= 72) setIsHidden(false);
     };
 
-    window.addEventListener("scroll", handleScroll);
+    // Passive + one update per animation frame: scroll events can fire far more often
+    // than the screen refreshes, and a non-passive listener can delay scrolling itself.
+    let scrollFrame = 0;
+    const onScroll = () => {
+      if (scrollFrame) return;
+      scrollFrame = requestAnimationFrame(() => {
+        scrollFrame = 0;
+        handleScroll();
+      });
+    };
+
+    window.addEventListener("scroll", onScroll, { passive: true });
     window.addEventListener("pointermove", handlePointerMove, { passive: true });
     handleScroll(); // Initial check
     return () => {
-      window.removeEventListener("scroll", handleScroll);
+      cancelAnimationFrame(scrollFrame);
+      window.removeEventListener("scroll", onScroll);
       window.removeEventListener("pointermove", handlePointerMove);
     };
   }, []);
@@ -152,7 +164,7 @@ const Navbar = () => {
 
           <a
             href="/giai-thuong"
-            className={`nav__link ${pathname === "/giai-thuong" ? "active" : ""}`}
+            className={`nav__link ${pathname.startsWith("/giai-thuong") ? "active" : ""}`}
             onClick={(e) => {
               e.preventDefault();
               handleAwards();
@@ -237,7 +249,7 @@ const Navbar = () => {
                           className="nav__user-dropdown-item"
                           onClick={() => {
                             setIsUserMenuOpen(false);
-                            navigate("//admintintuc");
+                            navigate("/admin/tintuc");
                           }}
                         >
                           <i className="ri-file-list-3-line" />
@@ -395,7 +407,7 @@ const Navbar = () => {
 
         <a
           href="/giai-thuong"
-          className={`mobile-drawer__nav-item ${pathname === "/giai-thuong" ? "is-active" : ""}`}
+          className={`mobile-drawer__nav-item ${pathname.startsWith("/giai-thuong") ? "is-active" : ""}`}
           onClick={(e) => {
             e.preventDefault();
             setIsMobileMenuOpen(false);

@@ -307,3 +307,27 @@ body::-webkit-scrollbar {
     transform: rotate(360deg);
   }
 }
+
+// ==========================================
+// PERFORMANCE: pause decorative animations the visitor can't see
+// usePauseOffscreenAnimations() toggles [data-offscreen] on sections/footers.
+// Paused (not removed), so they resume exactly where they were when scrolled back.
+// ==========================================
+[data-offscreen],
+[data-offscreen] *,
+[data-offscreen] *::before,
+[data-offscreen] *::after {
+  animation-play-state: paused !important;
+}
+
+// Respect the OS "reduce motion" setting site-wide (also lighter on low-end devices)
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+    scroll-behavior: auto !important;
+  }
+}

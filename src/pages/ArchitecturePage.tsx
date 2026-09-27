@@ -56,7 +56,7 @@ export default function ArchitecturePage() {
                 <div className="architecture-tech-hero__visual">
                     <span className="architecture-tech-hero__glow" aria-hidden="true"></span>
                     <img
-                        src="/Cây 2.png"
+                        src="/Cây 2.webp"
                         alt="Mô hình cây sầu riêng ứng dụng IoT và AI của Ea Agri"
                     />
                     <span className="architecture-tech-hero__status">
@@ -141,7 +141,7 @@ export default function ArchitecturePage() {
                 <StoryFeatureSection
                     title="3. Hệ thống RAG"
                     description="Hệ thống chuẩn hóa và chuyển đổi dữ liệu đầu vào thành vector để truy xuất ngữ cảnh chính xác từ cơ sở dữ liệu, từ đó giúp LLM phản hồi thông minh về giá cả và kỹ thuật canh tác cây trồng."
-                    image="/assets/Rag1.jpg"
+                    image="/assets/Rag1.webp"
                     list={[
                         {
                             title: "Prompt & Embedding",
@@ -167,7 +167,7 @@ export default function ArchitecturePage() {
                 <StoryFeatureSection
                     title="4. Module Dự Báo Thị Trường"
                     description="Giải quyết vấn đề bất đối xứng thông tin thị trường cho nông dân:"
-                    image="/assets/mohinhgia.jpg"
+                    image="/assets/mohinhgia.webp"
                     reverse
                     list={[
                         {
