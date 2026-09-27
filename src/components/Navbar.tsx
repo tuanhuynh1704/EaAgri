@@ -81,7 +81,7 @@ const Navbar = () => {
   };
 
   const handleAwards = () => {
-    navigate("/awards");
+    navigate("/gigi-thuong");
   };
 
   const handleHome = () => {
@@ -151,8 +151,8 @@ const Navbar = () => {
           </a>
 
           <a
-            href="/awards"
-            className={`nav__link ${pathname === "/awards" ? "active" : ""}`}
+            href="/gigi-thuong"
+            className={`nav__link ${pathname === "/gigi-thuong" ? "active" : ""}`}
             onClick={(e) => {
               e.preventDefault();
               handleAwards();
@@ -394,12 +394,12 @@ const Navbar = () => {
         </a>
 
         <a
-          href="/awards"
-          className={`mobile-drawer__nav-item ${pathname === "/awards" ? "is-active" : ""}`}
+          href="/gigi-thuong"
+          className={`mobile-drawer__nav-item ${pathname === "/gigi-thuong" ? "is-active" : ""}`}
           onClick={(e) => {
             e.preventDefault();
             setIsMobileMenuOpen(false);
-            navigate("/awards");
+            navigate("/gigi-thuong");
           }}
         >
           <div className="mobile-drawer__nav-icon-box">

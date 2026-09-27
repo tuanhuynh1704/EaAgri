@@ -78,10 +78,10 @@ export default function Footer() {
             </li>
             <li>
               <a
-                href="/awards"
+                href="/giai-thuong"
                 onClick={(e) => {
                   e.preventDefault();
-                  navigate("/awards");
+                  navigate("/giai-thuong");
                 }}
               >
                 <i className="ri-trophy-line"></i> <span>Phòng truyền thống & Giải thưởng</span>

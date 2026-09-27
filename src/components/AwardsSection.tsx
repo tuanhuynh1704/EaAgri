@@ -606,7 +606,7 @@ export default function AwardsSection() {
 
             {/* Link to Dedicated Awards Page */}
             <div className="awards-section__explore-btn-wrap">
-              <Link to="/awards" className="awards-section__explore-btn">
+              <Link to="/giai-thuong" className="awards-section__explore-btn">
                 <i className="ri-award-fill"></i>
                 <span>Xem đầy đủ Phòng truyền thống & Bằng chứng nhận</span>
                 <i className="ri-arrow-right-line"></i>

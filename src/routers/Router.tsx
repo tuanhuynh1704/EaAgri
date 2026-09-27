@@ -23,7 +23,7 @@ export const router = createBrowserRouter([
     children: [
       { path: "/", element: <HomePage /> },
       { path: "/architecture", element: <ArchitecturePage /> },
-      { path: "/awards", element: <AwardsPage /> },
+      { path: "/giai-thuong", element: <AwardsPage /> },
       { path: "/privacy", element: <PrivacyPolicy /> },
       { path: "/privacy-policy", element: <PrivacyPolicy /> },
       { path: "/chinh-sach-bao-mat", element: <PrivacyPolicy /> },

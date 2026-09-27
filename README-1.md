@@ -192,7 +192,7 @@ src/styles/
 
 ### III. Cổng Tin Tức & Quản Trị Hệ Thống Toàn Diện (News & Admin Portal)
 
-#### 1. Cổng Thông Tin & Kỹ Thuật Canh Tác (`/news`, `/news/:id`)
+#### 1. Cổng Thông Tin & Kỹ Thuật Canh Tác (`/tintuc`, `/tintuc/:id`)
 * **Danh sách tin tức (`NewsListComponent`):**
   * Hiển thị bài viết dạng lưới Card hiện đại với hình ảnh cover, tag chuyên mục, ngày đăng và tác giả.
   * Tìm kiếm bài viết theo từ khóa và bộ lọc danh mục (Kỹ thuật canh tác, Cảnh báo dịch hại, Giá cả thị trường) kết hợp `debounceTime` từ RxJS.
@@ -201,12 +201,12 @@ src/styles/
   * Lấy `paramMap` từ `ActivatedRoute`, giao diện đọc bài chuẩn báo điện tử, tối ưu Typography, hiển thị nội dung HTML/Markdown phong phú.
   * Thanh chia sẻ mạng xã hội (Facebook, Twitter, Copy Link), danh sách bài viết liên quan.
 
-#### 2. Trình Soạn Thảo Bài Viết Đa Phương Tiện (`/news/create`)
+#### 2. Trình Soạn Thảo Bài Viết Đa Phương Tiện (`/tintuc/create`)
 * **Trình soạn thảo WYSIWYG:** Tích hợp bộ soạn thảo đa phương tiện tùy biến thanh công cụ (Heading, Bold, Italic, Blockquote, Code block, List).
 * **Upload hình ảnh lên Cloud:** Xử lý kéo thả ảnh cover, upload trực tiếp lên **Supabase Storage Bucket**, sinh URL an toàn và hiển thị preview tức thì.
 * **Validation chặt chẽ:** Sử dụng Angular Reactive Forms (`FormGroup`, `Validators.required`) kiểm tra dữ liệu trước khi đăng tải.
 
-#### 3. Bảng Quản Lý Bài Viết Admin (`/admin/news`)
+#### 3. Bảng Quản Lý Bài Viết Admin (`/admin/tintuc`)
 * **Bảng dữ liệu (Data Table Component):** Hiển thị toàn bộ bài viết với các cột: Tiêu đề, Danh mục, Tác giả, Ngày tạo, Lượt xem và Trạng thái.
 * **Thao tác nhanh:** Tìm kiếm, lọc theo chuyên mục, xem trước bài viết, chỉnh sửa và xóa bài viết kèm Modal cảnh báo xác nhận.
 
