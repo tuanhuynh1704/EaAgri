@@ -211,7 +211,7 @@ export default function Login() {
             </div>
 
             {/* Quick Tip for Admin */}
-            <div
+            {/* <div
               style={{
                 display: "flex",
                 alignItems: "center",
@@ -230,7 +230,7 @@ export default function Login() {
               <span>
                 Tài khoản quản trị (.env): <strong>admin</strong> / <strong>admin@123</strong>
               </span>
-            </div>
+            </div> */}
 
             {/* Submit Button */}
             <button

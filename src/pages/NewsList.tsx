@@ -192,7 +192,7 @@ export default function NewsList() {
                   data-aos-delay={index * 50}
                 >
                   {/* Card Image */}
-                  <Link to={`/news/${item.id}`} className="news-list__card-image-wrapper">
+                  <Link to={`/tintuc/${item.id}`} className="news-list__card-image-wrapper">
                     {parsedImg.url ? (
                       <img 
                         src={parsedImg.url} 
@@ -219,7 +219,7 @@ export default function NewsList() {
                     )}
 
                     {/* Title */}
-                    <Link to={`/news/${item.id}`} style={{ textDecoration: "none" }}>
+                    <Link to={`/tintuc/${item.id}`} style={{ textDecoration: "none" }}>
                       <h2 className="news-list__card-title">{cleanContent(item.title)}</h2>
                     </Link>
 
@@ -234,7 +234,7 @@ export default function NewsList() {
 
                       <div style={{ display: "flex", alignItems: "center", gap: "0.75rem" }}>
                         <Link
-                          to={`/news/${item.id}`}
+                          to={`/tintuc/${item.id}`}
                           className="news-list__read-more"
                         >
                           <span>Xem tiếp</span>
