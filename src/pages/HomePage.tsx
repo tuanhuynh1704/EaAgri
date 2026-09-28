@@ -7,6 +7,7 @@ import LazySection from "../components/common/LazySection";
 
 // Progressive on-scroll loading: Only load below-the-fold sections when user scrolls down
 const TeamSection = lazy(() => import("../components/TeamSection"));
+const IntroductionProject = lazy(() => import("../components/IntroductionProject"));
 const ProblemSolutionSection = lazy(() => import("../components/ProblemSolutionSection"));
 const VideoGallerySection = lazy(() => import("../components/VideoGallerySection"));
 const ResultSection = lazy(() => import("../components/ResultSection"));
@@ -82,6 +83,10 @@ export default function HomePage() {
       {/* 2. Tải dần từng phần khi cuộn chuột xuống (Lazy Loading on Scroll) */}
       <LazySection minHeight="800px">
         <TeamSection />
+      </LazySection>
+
+      <LazySection minHeight="700px" className="section-bg--gradient-teal fullpage-slide">
+        <IntroductionProject />
       </LazySection>
 
       <LazySection minHeight="650px" className="section-bg--gradient-teal fullpage-slide">

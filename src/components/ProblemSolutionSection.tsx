@@ -236,7 +236,7 @@ export default function ProblemSolutionSection({
 
   return (
     <>
-      <section className="section__container problem-solution__container">
+      <section id="problem-solution" className="section__container problem-solution__container">
         {/* Dynamic Background Aurora */}
         <div
           className={`problem-solution__aurora-bg problem-solution__aurora-bg--${
