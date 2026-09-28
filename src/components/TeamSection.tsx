@@ -222,7 +222,7 @@ const TeamSection = () => {
   const [touchEnd, setTouchEnd] = useState<number | null>(null);
   const [isCarouselPaused, setIsCarouselPaused] = useState(false);
 
-  // Mobile Advisor Cards: Flip & Swipe state
+  // Mobile & Desktop Advisor Cards: Flip & Swipe state
   const [flippedAdvisorCards, setFlippedAdvisorCards] = useState<{ [key: number]: boolean }>({});
   const [activeAdvisorIndex, setActiveAdvisorIndex] = useState(0);
   const advisorCardsContainerRef = useRef<HTMLDivElement>(null);
@@ -268,17 +268,6 @@ const TeamSection = () => {
     }
   };
 
-  const handleAdvisorScroll = () => {
-    const container = advisorCardsContainerRef.current;
-    if (!container) return;
-    const scrollLeft = container.scrollLeft;
-    const firstCard = container.firstElementChild as HTMLElement | null;
-    const cardWidth = firstCard ? firstCard.offsetWidth : 250;
-    const gap = 14;
-    const index = Math.round(scrollLeft / (cardWidth + gap));
-    setActiveAdvisorIndex(Math.max(0, Math.min(advisors.length - 1, index)));
-  };
-
   const handleAdvisorCardClick = (index: number) => {
     if (advisorIsSwipingRef.current) {
       advisorIsSwipingRef.current = false;
@@ -288,6 +277,17 @@ const TeamSection = () => {
       ...prev,
       [index]: !prev[index],
     }));
+  };
+
+  const handleAdvisorScroll = () => {
+    const container = advisorCardsContainerRef.current;
+    if (!container) return;
+    const scrollLeft = container.scrollLeft;
+    const firstCard = container.firstElementChild as HTMLElement | null;
+    const cardWidth = firstCard ? firstCard.offsetWidth : 250;
+    const gap = 14;
+    const index = Math.round(scrollLeft / (cardWidth + gap));
+    setActiveAdvisorIndex(Math.max(0, Math.min(advisors.length - 1, index)));
   };
 
   const scrollToAdvisorCard = (index: number) => {
@@ -487,11 +487,10 @@ const TeamSection = () => {
                 }}
                 tabIndex={0}
                 role="button"
-                aria-label={`Xem hồ sơ cố vấn ${advisor.name}`}
+                aria-label={`Xem thông tin cố vấn ${advisor.name}`}
               >
                 <div className="advisor-card__flipper">
-                  {/* FRONT: Ảnh trên, chữ ở dưới - Không làm hình vuông, dạng thẻ đứng sang trọng */}
-                  {/* FRONT: Ảnh trên, chữ ở dưới - Tối giản, không icon/ADV/nút lật */}
+                  {/* FRONT: Ảnh trên, chữ ở dưới - Tối giản, thanh lịch */}
                   <div className="advisor-card__front">
                     {/* TOP: Khung ảnh chân dung tràn viền sạch sẽ */}
                     <div className="advisor-card__image-box">
@@ -511,11 +510,6 @@ const TeamSection = () => {
 
                     {/* BOTTOM: Khung chữ riêng biệt bên dưới ảnh */}
                     <div className="advisor-card__body">
-                      {/* Role Pill Badge */}
-                      <div className="advisor-card__role-pill">
-                        <span>{advisor.roleTag}</span>
-                      </div>
-
                       {/* Advisor Name */}
                       <h3 className="advisor-card__name">{advisor.name}</h3>
 
@@ -524,15 +518,14 @@ const TeamSection = () => {
                     </div>
                   </div>
 
-                  {/* BACK: Simplified credentials revealed upon flip */}
+                  {/* BACK: Detailed credentials revealed upon flip */}
                   <div className="advisor-card__back">
                     <div className="advisor-card__back-main">
-                      <div className="advisor-card__back-role">
-                        <span>{advisor.roleTag}</span>
-                      </div>
                       <h3 className="advisor-card__back-name">{advisor.name}</h3>
                       <p className="advisor-card__back-subrole">{advisor.subRole}</p>
-                      <p className="advisor-card__back-task">{advisor.task}</p>
+                      {advisor.task && (
+                        <p className="advisor-card__back-task">{advisor.task}</p>
+                      )}
                     </div>
 
                     <div className="advisor-card__back-bottom">

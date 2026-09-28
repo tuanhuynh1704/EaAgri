@@ -7,6 +7,7 @@ import Navbar from "./components/Navbar";
 import Footer from "./components/Footer";
 import FloatingContact from "./components/FloatingContact";
 import AppStoreNoticeModal from "./components/AppStoreNoticeModal";
+import PromoVideoModal from "./components/PromoVideoModal";
 import { AuthProvider } from "./context/AuthContext";
 import { usePauseOffscreenAnimations } from "./hooks/usePauseOffscreenAnimations";
 
@@ -50,6 +51,7 @@ function App() {
       {!isAuthPage && <Footer />}
       {!isAuthPage && <FloatingContact />}
       <AppStoreNoticeModal />
+      <PromoVideoModal />
     </AuthProvider>
   );
 }

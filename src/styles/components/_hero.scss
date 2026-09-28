@@ -1939,6 +1939,43 @@
         font-size: 0.82rem;
       }
     }
+
+    &--promo {
+      background: linear-gradient(135deg, rgba(236, 253, 245, 0.95), rgba(209, 250, 229, 0.9));
+      border-color: rgba(16, 185, 129, 0.42);
+      cursor: pointer;
+
+      .promo-video-icon {
+        color: #10b981;
+        transition: transform 0.28s ease, color 0.28s ease;
+      }
+
+      .download-btn__lbl {
+        color: #047857;
+        font-weight: 750;
+      }
+
+      .download-btn__store {
+        color: #065f46;
+        font-weight: 850;
+      }
+
+      &:hover {
+        background: linear-gradient(135deg, #10b981, #059669);
+        border-color: #059669;
+        box-shadow: 0 14px 30px rgba(16, 185, 129, 0.35);
+
+        .promo-video-icon {
+          color: #ffffff;
+          transform: scale(1.15);
+        }
+
+        .download-btn__lbl,
+        .download-btn__store {
+          color: #ffffff;
+        }
+      }
+    }
   }
 }
 

@@ -1,5 +1,6 @@
 import { useState, useEffect } from "react";
 import { createPortal } from "react-dom";
+import { triggerPromoVideo } from "./PromoVideoModal";
 
 interface VideoItem {
   title: string;
@@ -15,6 +16,23 @@ const getYoutubeId = (url: string) => {
 
 export default function VideoGallerySection() {
   const [activeVideo, setActiveVideo] = useState<VideoItem | null>(null);
+  const [isMobile, setIsMobile] = useState(() =>
+    typeof window !== "undefined" ? window.innerWidth <= 768 : false
+  );
+
+  useEffect(() => {
+    const handleResize = () => {
+      setIsMobile(window.innerWidth <= 768);
+    };
+    window.addEventListener("resize", handleResize);
+    return () => window.removeEventListener("resize", handleResize);
+  }, []);
+
+  const promoMode = isMobile ? "9x16" : "16x9";
+  const posterSrc = isMobile
+    ? "/Video/promo_9x16_poster.webp"
+    : "/Video/promo_16x9_poster.webp";
+  const badgeText = isMobile ? "BẢN ĐIỆN THOẠI • 9:16" : "BẢN WEB • 16:9";
 
   const videos: VideoItem[] = [
     {
@@ -58,6 +76,80 @@ export default function VideoGallerySection() {
         <p className="video-gallery__subtitle">
           Tìm hiểu câu chuyện phát triển dự án và xem quá trình vận hành trực quan của EaAgri.
         </p>
+      </div>
+
+      {/* Featured Spotlight Promo Video Card (Adaptive Web vs Phone) */}
+      <div className="video-gallery__spotlight" data-aos="zoom-in" data-aos-delay="100">
+        <div 
+          className={`video-gallery__spotlight-media video-gallery__spotlight-media--${promoMode}`}
+          onClick={() => triggerPromoVideo(promoMode)}
+          role="button"
+          tabIndex={0}
+          aria-label="Xem video giới thiệu EaAgri 45 giây"
+          onKeyDown={(e) => { if (e.key === "Enter" || e.key === " ") triggerPromoVideo(promoMode); }}
+        >
+          <picture className="video-gallery__spotlight-picture">
+            <source media="(max-width: 768px)" srcSet="/Video/promo_9x16_poster.webp" />
+            <img 
+              src={posterSrc} 
+              alt="Trailer giới thiệu EaAgri 45 giây"
+              className="video-gallery__spotlight-poster"
+              loading="lazy"
+              decoding="async"
+            />
+          </picture>
+          <div className="video-gallery__spotlight-overlay" />
+          
+          <div className="video-gallery__spotlight-play-wrap">
+            <span className="spotlight-play-pulse" />
+            <div className="spotlight-play-btn">
+              <i className="ri-play-fill" />
+            </div>
+            <span className="spotlight-play-label">Xem Teaser (45s)</span>
+          </div>
+
+          <span className="video-gallery__spotlight-badge">
+            <span className="spotlight-badge-dot" />
+            {badgeText}
+          </span>
+          <span className="video-gallery__spotlight-duration">0:45</span>
+        </div>
+
+        <div className="video-gallery__spotlight-content">
+          <div className="spotlight-header-meta">
+            <span className="spotlight-chip">
+              <i className="ri-sparkling-fill" /> TIÊU ĐIỂM TRUYỀN THÔNG
+            </span>
+            <span className="spotlight-hd-tag">
+              {isMobile ? "CHUẨN MOBILE • 9:16" : "FULL HD • 60FPS"}
+            </span>
+          </div>
+
+          <h3 className="spotlight-title">
+            EaAgri — Khát Vọng Số Hóa Nông Nghiệp Tây Nguyên
+          </h3>
+
+          <p className="spotlight-desc">
+            Trải nghiệm giải pháp trợ lý cây sầu riêng ứng dụng AI Dual-Brain kết hợp YOLOv9 nhận diện sâu bệnh và mạng lưới trạm quan trắc IoT vi khí hậu độc quyền.
+          </p>
+
+          <div className="spotlight-actions">
+            <button 
+              type="button"
+              className="spotlight-btn spotlight-btn--primary"
+              onClick={() => triggerPromoVideo(promoMode)}
+              title={isMobile ? "Xem video bản điện thoại (9:16)" : "Xem video bản web (16:9)"}
+            >
+              <i className="ri-play-circle-fill" />
+              <span>Xem Video Giới Thiệu (45s)</span>
+            </button>
+          </div>
+        </div>
+      </div>
+
+      {/* Section Divider */}
+      <div className="video-gallery__divider" data-aos="fade-up">
+        <span><i className="ri-film-line" /> PHIM TƯ LIỆU & THỰC ĐỊA</span>
       </div>
 
       <div className="video-gallery__grid">
