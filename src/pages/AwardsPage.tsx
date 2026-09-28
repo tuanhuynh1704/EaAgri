@@ -73,8 +73,8 @@ export default function AwardsPage() {
             </div>
 
             <h1 className="awards-hero__headline">
-              Vinh Danh Thành Tựu & <br />
-              <span className="green-accent-text">Giải Thưởng Quốc Gia</span>
+              <span className="awards-hero__headline-primary">Vinh Danh Thành Tựu</span>
+              <span className="green-accent-text">&amp; Giải Thưởng Quốc Gia</span>
             </h1>
 
             <p className="awards-hero__lead">
@@ -197,6 +197,14 @@ export default function AwardsPage() {
                         src={coverPhoto.url}
                         alt={coverPhoto.title}
                         className="award-photo-main"
+                        style={
+                          award.thumbnailPosition
+                            ? ({
+                                objectPosition: award.thumbnailPosition,
+                                "--photo-pos": award.thumbnailPosition,
+                              } as React.CSSProperties)
+                            : undefined
+                        }
                         loading="lazy"
                       />
                     </div>

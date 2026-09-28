@@ -19,6 +19,8 @@ interface TelemetryWidget {
 interface RiskSolutionPair {
   id: string;
   number: string;
+  categoryLabel: string;
+  themeColor: "cyan" | "purple" | "teal" | "amber";
   image: string;
   imageAlt: string;
   riskTitle: string;
@@ -37,6 +39,8 @@ const OVERVIEW_DATA = {
   id: "overview",
   number: "00",
   shortTitle: "Tổng quan",
+  categoryLabel: "Hệ Sinh Thái",
+  themeColor: "emerald",
   icon: "ri-dashboard-line",
   image: "/assets/mohinhtongquan",
   imageAlt: "Sơ đồ tổng quan kiến trúc hệ thống AI & IoT EaAgri - Lời Giải Cho Nông Dân",
@@ -61,6 +65,8 @@ const MATRIX_DATA: RiskSolutionPair[] = [
   {
     id: "water",
     number: "01",
+    categoryLabel: "Nước & Khí Hậu",
+    themeColor: "cyan",
     image: "/ẢNh 1.webp",
     imageAlt: "Mô hình 3D vườn sầu riêng thông minh kết nối cảm biến IoT và ứng dụng EaAgri",
     riskTitle: "Sốc Nước & Khô Hạn Cực Đoan",
@@ -89,6 +95,8 @@ const MATRIX_DATA: RiskSolutionPair[] = [
   {
     id: "disease",
     number: "02",
+    categoryLabel: "Sâu Bệnh & AI Vision",
+    themeColor: "purple",
     image: "/assets/phantichanhbenh.webp",
     imageAlt: "Mô hình AI Vision nhận diện sâu bệnh và nấm lá",
     riskTitle: "Dịch Bệnh & Nấm Phytophthora",
@@ -117,6 +125,8 @@ const MATRIX_DATA: RiskSolutionPair[] = [
   {
     id: "knowledge",
     number: "03",
+    categoryLabel: "Tri Thức & AI RAG",
+    themeColor: "teal",
     image: "/assets/Rag.webp",
     imageAlt: "Trợ lý AI chuyên gia RAG tư vấn kỹ thuật 24/7",
     riskTitle: "Thiếu Hụt Tri Thức Canh Tác Sâu",
@@ -145,6 +155,8 @@ const MATRIX_DATA: RiskSolutionPair[] = [
   {
     id: "market",
     number: "04",
+    categoryLabel: "Thị Trường & Giá Cả",
+    themeColor: "amber",
     image: "/assets/mohinhgia.webp",
     imageAlt: "Biểu đồ biến động giá và phân tích thị trường nông sản",
     riskTitle: "Bất Đối Xứng Giá & Thị Trường",
@@ -187,7 +199,8 @@ export default function ProblemSolutionSection({
     ? {
         image: matchedPair.image,
         imageAlt: matchedPair.imageAlt,
-        windowTitle: `Tính Năng 0${matchedPair.number} • ${matchedPair.solutionTitle}`,
+        windowTitle: `Tính Năng ${matchedPair.number} • ${matchedPair.solutionTitle}`,
+        shortTitle: `Tính Năng ${matchedPair.number}`,
         widget1: matchedPair.widget1,
         widget2: matchedPair.widget2,
       }
@@ -195,6 +208,7 @@ export default function ProblemSolutionSection({
         image: OVERVIEW_DATA.image,
         imageAlt: OVERVIEW_DATA.imageAlt,
         windowTitle: OVERVIEW_DATA.windowTitle,
+        shortTitle: "Sơ đồ hệ sinh thái",
         widget1: OVERVIEW_DATA.widget1,
         widget2: OVERVIEW_DATA.widget2,
       };
@@ -253,7 +267,8 @@ export default function ProblemSolutionSection({
               onClick={() => setActiveMode("comparison")}
             >
               <i className="ri-shuffle-line"></i>
-              <span>Đối chiếu 4 Cặp Rủi Ro & Lời Giải</span>
+              <span className="mode-btn__text-full">Đối chiếu 4 Cặp Rủi Ro & Lời Giải</span>
+              <span className="mode-btn__text-short">Đối chiếu</span>
             </button>
 
             <button
@@ -265,7 +280,8 @@ export default function ProblemSolutionSection({
               onClick={() => setActiveMode("problem")}
             >
               <i className="ri-error-warning-line"></i>
-              <span>⚠️ Tứ Giác Rủi Ro</span>
+              <span className="mode-btn__text-full">Tứ Giác Rủi Ro</span>
+              <span className="mode-btn__text-short">Rủi ro</span>
             </button>
 
             <button
@@ -276,8 +292,9 @@ export default function ProblemSolutionSection({
               }`}
               onClick={() => setActiveMode("solution")}
             >
-              <i className="ri-checkbox-circle-line"></i>
-              <span>🚀 Lời Giải EaAgri</span>
+              <i className="ri-rocket-2-line"></i>
+              <span className="mode-btn__text-full">Lời Giải EaAgri</span>
+              <span className="mode-btn__text-short">Lời giải</span>
             </button>
           </div>
         </div>
@@ -293,8 +310,9 @@ export default function ProblemSolutionSection({
                   <span className="dot dot--yellow"></span>
                   <span className="dot dot--green"></span>
                 </div>
-                <span className="problem-solution__window-title">
-                  {currentDisplay.windowTitle}
+                <span className="problem-solution__window-title" title={currentDisplay.windowTitle}>
+                  <span className="window-title--desktop">{currentDisplay.windowTitle}</span>
+                  <span className="window-title--mobile">{currentDisplay.shortTitle}</span>
                 </span>
                 <span className="problem-solution__status-pill">
                   <span className="live-dot" /> Online 24/7
@@ -318,20 +336,24 @@ export default function ProblemSolutionSection({
                     <i className="ri-zoom-in-line"></i> Phóng to ảnh
                   </div>
                 </div>
+                <div className="problem-solution__zoom-hint-mobile">
+                  <i className="ri-zoom-in-line"></i> Phóng to
+                </div>
               </div>
 
               {/* Quick Thumbnail Navigation (00 Tổng Quan + 01 Tưới IoT + 02-04) */}
               <div className="problem-solution__thumb-strip">
                 {/* Button 00: Overview (Ảnh 1 mohinhtongquan) */}
                 <button
-                  className={`problem-solution__thumb-item ${
+                  className={`problem-solution__thumb-item problem-solution__thumb-item--overview ${
                     activeItemId === "overview" ? "problem-solution__thumb-item--active" : ""
                   }`}
                   onClick={() => setActiveItemId("overview")}
                   title="00. Sơ đồ kiến trúc tổng quan EaAgri"
                 >
                   <i className={OVERVIEW_DATA.icon}></i>
-                  <span>00. Tổng quan</span>
+                  <span className="thumb-item__text-desktop">00. Tổng quan</span>
+                  <span className="thumb-item__text-mobile">00</span>
                 </button>
 
                 {/* Buttons 01 -> 04 */}
@@ -340,14 +362,14 @@ export default function ProblemSolutionSection({
                   return (
                     <button
                       key={item.id}
-                      className={`problem-solution__thumb-item ${
+                      className={`problem-solution__thumb-item problem-solution__thumb-item--${item.themeColor} ${
                         isSelected ? "problem-solution__thumb-item--active" : ""
                       }`}
                       onClick={() => setActiveItemId(item.id)}
-                      title={`0${item.number}. ${item.solutionTitle}`}
+                      title={`${item.number}. ${item.solutionTitle}`}
                     >
                       <i className={item.solutionIcon}></i>
-                      <span>0{item.number}</span>
+                      <span>{item.number}</span>
                     </button>
                   );
                 })}
@@ -396,7 +418,7 @@ export default function ProblemSolutionSection({
                   return (
                     <div
                       key={item.id}
-                      className={`problem-solution__matrix-card ${
+                      className={`problem-solution__matrix-card problem-solution__matrix-card--${item.themeColor} ${
                         isExpanded ? "problem-solution__matrix-card--active" : ""
                       }`}
                       onClick={() =>
@@ -404,26 +426,42 @@ export default function ProblemSolutionSection({
                       }
                       style={{ animationDelay: `${idx * 0.08}s` }}
                     >
+                      {/* Top Bar: Category Pill & Animated Toggle Arrow */}
+                      <div className="problem-solution__matrix-header-top">
+                        <div className="matrix-category-tag">
+                          <span className={`matrix-category-num matrix-category-num--${item.themeColor}`}>
+                            {item.number}
+                          </span>
+                          <span className="matrix-category-name">{item.categoryLabel}</span>
+                        </div>
+                        <div
+                          className={`matrix-toggle-circle ${
+                            isExpanded ? "matrix-toggle-circle--open" : ""
+                          }`}
+                        >
+                          <i className="ri-arrow-down-s-line"></i>
+                        </div>
+                      </div>
+
+                      {/* Before vs After Dual Badges */}
                       <div className="problem-solution__matrix-header">
-                        <span className="problem-solution__matrix-num">
-                          {item.number}
-                        </span>
                         <div className="problem-solution__matrix-titles">
-                          <div className="matrix-title-risk">
-                            <i className={item.riskIcon}></i>
-                            <span>{item.riskTitle}</span>
+                          <div className="matrix-badge matrix-badge--risk">
+                            <span className="matrix-badge__pill">
+                              <i className={item.riskIcon}></i> Rủi ro
+                            </span>
+                            <span className="matrix-badge__title">{item.riskTitle}</span>
                           </div>
-                          <i className="ri-arrow-right-line matrix-arrow-separator"></i>
-                          <div className="matrix-title-solution">
-                            <i className={item.solutionIcon}></i>
-                            <span>{item.solutionTitle}</span>
+                          <div className="matrix-badge__connector">
+                            <i className="ri-arrow-down-line"></i>
+                          </div>
+                          <div className="matrix-badge matrix-badge--solution">
+                            <span className="matrix-badge__pill">
+                              <i className={item.solutionIcon}></i> Lời giải
+                            </span>
+                            <span className="matrix-badge__title">{item.solutionTitle}</span>
                           </div>
                         </div>
-                        <i
-                          className={`ri-arrow-down-s-line matrix-toggle-icon ${
-                            isExpanded ? "matrix-toggle-icon--open" : ""
-                          }`}
-                        ></i>
                       </div>
 
                       {/* Detail Body */}
@@ -436,7 +474,7 @@ export default function ProblemSolutionSection({
                           {/* Risk Box */}
                           <div className="matrix-box matrix-box--risk">
                             <div className="matrix-box__badge">
-                              <i className="ri-error-warning-line"></i> Thách thức
+                              <i className="ri-error-warning-line"></i> Thách thức thực tế
                             </div>
                             <p>{item.riskDesc}</p>
                             <span className="matrix-box__chip matrix-box__chip--risk">
@@ -454,6 +492,22 @@ export default function ProblemSolutionSection({
                               {item.solutionTag}
                             </span>
                           </div>
+                        </div>
+
+                        {/* Interactive Hint: Tap to view image above */}
+                        <div
+                          className="matrix-box__action-hint"
+                          onClick={(e) => {
+                            e.stopPropagation();
+                            setActiveItemId(item.id);
+                            const imageEl = document.querySelector(".problem-solution__image-wrapper");
+                            if (imageEl) {
+                              imageEl.scrollIntoView({ behavior: "smooth", block: "center" });
+                            }
+                          }}
+                        >
+                          <i className="ri-eye-line"></i>
+                          <span>Xem mô hình tính năng {item.number} trên sơ đồ phía trên</span>
                         </div>
                       </div>
                     </div>

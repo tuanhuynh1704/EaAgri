@@ -23,7 +23,8 @@ export const router = createBrowserRouter([
     element: <App />,
     children: [
       { path: "/", element: <HomePage /> },
-      { path: "/architecture", element: <ArchitecturePage /> },
+      { path: "/kien-truc", element: <ArchitecturePage /> },
+      { path: "/architecture", element: <Navigate to="/kien-truc" replace /> },
       { path: "/giai-thuong", element: <AwardsPage /> },
       { path: "/giai-thuong/:id", element: <AwardDetailPage /> },
       // Legacy English URLs: keep old shared links working
@@ -35,6 +36,10 @@ export const router = createBrowserRouter([
       { path: "/tintuc", element: <NewsList /> },
       { path: "/tintuc/:id", element: <NewsDetail /> },
       { path: "/tintuc/create", element: <UploadNews /> },
+      // Support /tin-tuc path as well
+      { path: "/tin-tuc", element: <NewsList /> },
+      { path: "/tin-tuc/:id", element: <NewsDetail /> },
+      { path: "/tin-tuc/create", element: <UploadNews /> },
       // Legacy English / Old URLs: keep old shared links working
       { path: "/news", element: <Navigate to="/tintuc" replace /> },
       { path: "/news/:id", element: <NewsDetail /> },

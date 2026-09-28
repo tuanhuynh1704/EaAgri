@@ -1,8 +1,8 @@
 import { lazy, Suspense, useMemo, useRef, useState, useEffect, type CSSProperties, type MouseEvent } from "react";
 
-// three.js (~600 KB) lives in this chunk; loading it lazily lets the hero text paint first
-const EaAgriDurian = lazy(() => import("./eaagri-3d/EaAgriDurian"));
-const HERO_POSTER = "/images/webp/cay-1.webp";
+// three.js (~600 KB) chunk preloads in parallel without blocking initial paint
+const EaAgriDurianPromise = import("./eaagri-3d/EaAgriDurian");
+const EaAgriDurian = lazy(() => EaAgriDurianPromise);
 import { triggerAppStoreNotice } from "./AppStoreNoticeModal";
 
 const ROTATING_HIGHLIGHTS = [
@@ -156,18 +156,15 @@ const Hero = () => {
             {/* The 3D Tree, IoT devices and Farmer interactive model */}
             <Suspense
               fallback={
-                <img
-                  src={HERO_POSTER}
-                  alt="Mô hình sầu riêng EaAgri"
-                  className="hero-3d-poster"
-                  fetchPriority="high"
-                  decoding="async"
+                <div
+                  className="hero-3d-placeholder"
+                  aria-hidden="true"
                 />
               }
             >
               <EaAgriDurian
                 assetBaseUrl="/eaagri-3d/assets/"
-                posterUrl={HERO_POSTER}
+                posterUrl={null}
                 quality="auto"
                 showCards={true}
                 showHotspots={true}

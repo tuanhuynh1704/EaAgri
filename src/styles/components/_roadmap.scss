@@ -405,6 +405,164 @@
   to { transform: rotate(360deg); }
 }
 
+.roadmap__mobile-nav {
+  display: none;
+}
+
+// Tablet 4-column linear milestone layout (769px - 1024px)
+@media (min-width: 769px) and (max-width: 1024px) {
+  .roadmap__grid {
+    grid-template-columns: 1fr;
+    gap: 2.5rem;
+  }
+
+  .roadmap__timeline-side {
+    order: 1;
+    width: 100%;
+  }
+
+  .roadmap__header {
+    text-align: center;
+    margin-bottom: 2.25rem;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+  }
+
+  .roadmap__timeline {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 0.85rem;
+    padding-left: 0;
+    position: relative;
+
+    // Connecting horizontal milestone line across all 4 steps
+    &::before {
+      content: "";
+      position: absolute;
+      top: 14px;
+      left: 12%;
+      right: 12%;
+      height: 3px;
+      background: linear-gradient(90deg, #10b981 0%, #0284c7 40%, rgba(203, 213, 225, 0.8) 75%);
+      z-index: 1;
+    }
+  }
+
+  .roadmap__timeline-bar {
+    display: none;
+  }
+
+  .roadmap__timeline-item {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    position: relative;
+    z-index: 2;
+
+    .roadmap__timeline-icon {
+      position: relative;
+      left: auto;
+      top: 0;
+      width: 30px;
+      height: 30px;
+      min-width: 30px;
+      margin-bottom: 0.85rem;
+      z-index: 3;
+    }
+
+    .roadmap__timeline-content {
+      width: 100%;
+      height: 100%;
+      min-height: 220px;
+      padding: 1.15rem 0.95rem;
+      border-radius: 16px;
+      display: flex;
+      flex-direction: column;
+      justify-content: flex-start;
+      box-sizing: border-box;
+
+      h3 {
+        font-size: 0.92rem;
+        font-weight: 800;
+        margin-bottom: 0.4rem;
+        line-height: 1.35;
+      }
+
+      p {
+        font-size: 0.76rem;
+        line-height: 1.5;
+        color: #64748b;
+        margin: 0;
+      }
+    }
+
+    .roadmap__timeline-meta {
+      display: flex;
+      flex-direction: column;
+      gap: 0.25rem;
+      align-items: flex-start;
+      margin-bottom: 0.65rem;
+    }
+
+    .roadmap__timeline-time {
+      font-size: 0.68rem;
+      font-weight: 700;
+    }
+
+    .roadmap__timeline-status {
+      font-size: 0.62rem;
+      padding: 0.15rem 0.45rem;
+      border-radius: 4px;
+    }
+  }
+
+  // Mascot card as sleek horizontal banner below timeline
+  .roadmap__illustration-side {
+    order: 2;
+    width: 100%;
+  }
+
+  .roadmap__mascot-card {
+    max-width: 100%;
+    flex-direction: row;
+    align-items: center;
+    justify-content: space-between;
+    padding: 1.25rem 2rem;
+    border-radius: 20px;
+    text-align: left;
+    gap: 1.5rem;
+
+    .roadmap__mascot-img-wrap {
+      width: 90px;
+      height: 90px;
+      min-width: 90px;
+      margin-bottom: 0;
+    }
+
+    .roadmap__mascot-info {
+      flex: 1;
+      margin-bottom: 0;
+
+      h3 {
+        font-size: 1.15rem;
+        margin-bottom: 0.25rem;
+      }
+
+      p {
+        font-size: 0.85rem;
+      }
+    }
+
+    .roadmap__cta-btn {
+      width: auto;
+      min-width: 200px;
+      white-space: nowrap;
+      padding: 0.75rem 1.5rem;
+    }
+  }
+}
+
 // ==========================================
 // COOPERATION CONTACT MODAL
 // ==========================================

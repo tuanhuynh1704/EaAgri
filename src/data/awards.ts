@@ -37,6 +37,8 @@ export interface AwardDetail {
     value: string;
     icon: string;
   }[];
+  /** Custom object-position for square thumbnails (e.g. "center 60%" for portrait photos) */
+  thumbnailPosition?: string;
   /** Optional contest milestones shown as a "Hành trình" timeline */
   timeline?: {
     date: string;
@@ -163,6 +165,7 @@ export const AWARDS_LIST: AwardDetail[] = [
     badgeText: "VÀO CHUNG KẾT • BẢNG A",
     shortBadge: "Vào Chung kết",
     title: "Khởi Nghiệp Xanh Lần 12 – 2026",
+    thumbnailPosition: "center 60%",
     organizer: "Chương trình Khởi nghiệp xanh — Trung tâm Nghiên cứu Kinh doanh & Hỗ trợ Doanh nghiệp (BSA)",
     shortOrganizer: "Khởi nghiệp xanh · BSA",
     description:
@@ -186,14 +189,14 @@ export const AWARDS_LIST: AwardDetail[] = [
     ],
     images: [
       {
-        url: "/assets/khoi-nghiep-xanh/doi-thi-ban-ket.webp",
-        title: "Đội EaAgri tại Vòng Bán kết 03",
-        caption: "Các thành viên EaAgri tại sân khấu Vòng Bán kết 03 – Khu vực phía Nam, cuộc thi Khởi Nghiệp Xanh lần 12 – 2026.",
-      },
-      {
         url: "/assets/khoi-nghiep-xanh/chung-nhan-vao-chung-ket.webp",
         title: "Chứng Nhận Vào Chung Kết",
         caption: "Đại diện đội EaAgri nhận Giấy chứng nhận Vào Chung kết cuộc thi Khởi Nghiệp Xanh lần 12.",
+      },
+      {
+        url: "/assets/khoi-nghiep-xanh/doi-thi-ban-ket.webp",
+        title: "Đội EaAgri tại Vòng Bán kết 03",
+        caption: "Các thành viên EaAgri tại sân khấu Vòng Bán kết 03 – Khu vực phía Nam, cuộc thi Khởi Nghiệp Xanh lần 12 – 2026.",
       },
       {
         url: "/assets/khoi-nghiep-xanh/vinh-danh-san-khau.webp",

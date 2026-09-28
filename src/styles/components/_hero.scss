@@ -2081,12 +2081,12 @@
     transform: translateY(3px);
   }
 }
-// Shown while the lazy 3D chunk (three.js + model) loads; same box as the 3D canvas
-// so nothing shifts when the model takes over.
+// Placeholder while the 3D chunk loads; same dimensions to prevent any layout shift
+.hero-3d-placeholder,
 .hero-3d-poster {
   display: block;
   width: 100%;
   height: 100%;
   min-height: 380px;
-  object-fit: contain;
+  background: transparent;
 }

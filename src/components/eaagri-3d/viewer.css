@@ -43,10 +43,7 @@
   z-index: 0;
 }
 .ea3d-poster {
-  position: absolute;
-  width: 100%;
-  height: 100%;
-  object-fit: contain;
+  display: none !important;
 }
 .ea3d-status {
   display: none;

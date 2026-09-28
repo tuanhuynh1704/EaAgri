@@ -1,6 +1,10 @@
 @use "../abstracts/variables" as *;
 @use "../abstracts/mixins" as *;
 
+.architecture-page {
+  padding-top: 85px;
+}
+
 .architecture-tech-hero {
   display: grid;
   grid-template-columns: minmax(310px, 0.72fr) minmax(520px, 1.28fr);
