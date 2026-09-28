@@ -226,6 +226,19 @@ export default function AwardDetailPage() {
                 </div>
 
                 <div className="seal-links">
+                  {award.voteUrl && (
+                    <a
+                      href={award.voteUrl}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="seal-btn seal-btn--vote"
+                      title="Bình chọn dự án EaAgri trên cổng NIIC"
+                    >
+                      <i className="ri-fire-fill"></i>
+                      <span>Bình chọn dự án</span>
+                      <i className="ri-arrow-right-up-line"></i>
+                    </a>
+                  )}
                   {award.verificationUrl && (
                     <a
                       href={award.verificationUrl}

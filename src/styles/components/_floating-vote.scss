@@ -1,0 +1,209 @@
+@use "../abstracts/variables" as *;
+
+.floating-vote-badge {
+  position: fixed;
+  bottom: 2rem;
+  left: 2rem;
+  z-index: 9990;
+  display: flex;
+  align-items: center;
+  animation: floatVoteEntrance 0.45s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+
+  // On Mobile and Tablet: Hide the floating coin completely because the Top Announcement Bar is already active
+  // and having the floating coin on mobile covers the 3D Durian model's IoT Soil Sensor hotspot card!
+  @media (max-width: $tablet) {
+    display: none !important;
+  }
+
+  &__link {
+    position: relative;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 0.15rem;
+    width: 56px;
+    height: 56px;
+    border-radius: 50%;
+    background: radial-gradient(circle at 35% 30%, #065f46 0%, #022c22 80%);
+    border: 2px solid #fbbf24;
+    box-shadow: 0 10px 28px rgba(0, 0, 0, 0.45), 0 0 18px rgba(245, 158, 11, 0.38), inset 0 1px 2px rgba(255, 255, 255, 0.5), inset 0 -2px 4px rgba(0, 0, 0, 0.4);
+    text-decoration: none;
+    cursor: pointer;
+    transition: all 0.28s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+    user-select: none;
+    overflow: visible;
+
+    // Gloss Glass Reflection Sheen
+    &::before {
+      content: "";
+      position: absolute;
+      inset: 2px 2px auto 2px;
+      height: 48%;
+      border-radius: 999px 999px 0 0;
+      background: linear-gradient(180deg, rgba(255, 255, 255, 0.28) 0%, rgba(255, 255, 255, 0.02) 100%);
+      pointer-events: none;
+    }
+
+    &:hover {
+      transform: scale(1.12) translateY(-3px);
+      box-shadow: 0 14px 34px rgba(0, 0, 0, 0.55), 0 0 28px rgba(245, 158, 11, 0.6);
+      border-color: #fef08a;
+
+      .floating-vote-badge__tooltip {
+        opacity: 1;
+        visibility: visible;
+        transform: translateY(0);
+        pointer-events: auto;
+      }
+    }
+  }
+
+  &__pulse {
+    position: absolute;
+    inset: -6px;
+    border-radius: 50%;
+    border: 1.5px solid rgba(245, 158, 11, 0.55);
+    animation: voteCoinPulse 2.2s infinite;
+    pointer-events: none;
+  }
+
+  &__live-dot {
+    position: absolute;
+    top: 2px;
+    right: 2px;
+    width: 8px;
+    height: 8px;
+    border-radius: 50%;
+    background: #ef4444;
+    box-shadow: 0 0 8px #ef4444;
+    animation: voteRadarPulse 1.8s infinite;
+    z-index: 3;
+  }
+
+  &__icon {
+    font-size: 1.48rem;
+    line-height: 1;
+    background: linear-gradient(180deg, #fffbeb 0%, #fde047 30%, #f59e0b 70%, #b45309 100%);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    filter: drop-shadow(0 2px 4px rgba(0, 0, 0, 0.5));
+    animation: voteTrophyShake 4s ease infinite;
+  }
+
+  &__votes {
+    font-size: 0.56rem;
+    font-weight: 850;
+    color: #ffffff;
+    letter-spacing: 0.02em;
+    line-height: 1;
+    background: linear-gradient(135deg, #f59e0b, #d97706);
+    padding: 0.1rem 0.38rem;
+    border-radius: 999px;
+    border: 0.8px solid rgba(254, 240, 138, 0.6);
+    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.35);
+  }
+
+  // Floating Tooltip Callout on Desktop
+  &__tooltip {
+    position: absolute;
+    bottom: calc(100% + 12px);
+    left: 0;
+    min-width: 220px;
+    background: linear-gradient(135deg, rgba(6, 44, 25, 0.96), rgba(2, 44, 34, 0.98));
+    border: 1px solid rgba(245, 158, 11, 0.45);
+    border-radius: 12px;
+    padding: 0.6rem 0.85rem;
+    box-shadow: 0 10px 25px rgba(0, 0, 0, 0.45), 0 0 15px rgba(245, 158, 11, 0.15);
+    backdrop-filter: blur(10px);
+    display: flex;
+    flex-direction: column;
+    gap: 0.2rem;
+    opacity: 0;
+    visibility: hidden;
+    transform: translateY(6px);
+    transition: all 0.25s cubic-bezier(0.16, 1, 0.3, 1);
+    pointer-events: none;
+    white-space: nowrap;
+
+    &::after {
+      content: "";
+      position: absolute;
+      top: 100%;
+      left: 18px;
+      border: 6px solid transparent;
+      border-top-color: rgba(2, 44, 34, 0.98);
+    }
+
+    .tooltip-title {
+      font-size: 0.76rem;
+      font-weight: 800;
+      color: #ffffff;
+      letter-spacing: -0.01em;
+    }
+
+    .tooltip-sub {
+      font-size: 0.68rem;
+      color: rgba(255, 255, 255, 0.85);
+
+      strong {
+        color: #fde047;
+      }
+    }
+  }
+
+  // Dismiss button
+  &__close {
+    position: absolute;
+    top: -5px;
+    right: -5px;
+    width: 20px;
+    height: 20px;
+    border-radius: 50%;
+    border: 1px solid rgba(255, 255, 255, 0.25);
+    background: rgba(15, 23, 42, 0.85);
+    color: rgba(255, 255, 255, 0.9);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    font-size: 0.72rem;
+    box-shadow: 0 2px 6px rgba(0, 0, 0, 0.35);
+    transition: all 0.2s ease;
+    z-index: 4;
+
+    &:hover {
+      background: rgba(239, 68, 68, 0.9);
+      border-color: rgba(239, 68, 68, 0.9);
+      color: #ffffff;
+      transform: scale(1.15);
+    }
+  }
+}
+
+// Animations
+@keyframes floatVoteEntrance {
+  from {
+    transform: translateY(20px) scale(0.85);
+    opacity: 0;
+  }
+  to {
+    transform: translateY(0) scale(1);
+    opacity: 1;
+  }
+}
+
+@keyframes voteCoinPulse {
+  0% {
+    transform: scale(0.95);
+    opacity: 0.85;
+  }
+  50% {
+    transform: scale(1.2);
+    opacity: 0;
+  }
+  100% {
+    transform: scale(0.95);
+    opacity: 0;
+  }
+}

@@ -30,6 +30,7 @@
 @use "./components/news-detail";
 @use "./components/manage-news";
 @use "./components/manage-cooperation";
+@use "./pages/manage-traffic";
 @use "./components/floating-contact";
 @use "./components/ai-chat";
 @use "./components/quill-custom";
@@ -37,4 +38,6 @@
 @use "./components/privacy-policy";
 @use "./components/appstore-modal";
 @use "./components/promo-modal";
+@use "./components/vote-announcement";
+@use "./components/floating-vote";
 @use "./base/mobile";

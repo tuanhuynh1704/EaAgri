@@ -1,4 +1,5 @@
-// Shared award data for the /giai-thuong list and /giai-thuong/:id detail pages
+import { NTTU_VOTE_CONFIG } from "./voteConfig";
+export { NTTU_VOTE_CONFIG };
 
 /** Vietnamese, unaccented base path (SEO-friendly, no %-encoding when shared) */
 export const AWARDS_PATH = "/giai-thuong";
@@ -54,6 +55,7 @@ export interface AwardDetail {
   }[];
   verificationUrl?: string;
   facebookUrl?: string;
+  voteUrl?: string;
 }
 
 export const AWARDS_LIST: AwardDetail[] = [
@@ -155,6 +157,7 @@ export const AWARDS_LIST: AwardDetail[] = [
     verificationUrl:
       "https://cntt.ntt.edu.vn/nghien-cuu-khoa-hoc/phat-trien-san-pham/ea-agri-xuat-sac-gianh-giai-nhat-vong-ban-ket-nttu-innovation-startup-challenge-2026-bang-cong-nghe-nong-nghiep-va-cong-nghe-thuc-pham/",
     facebookUrl: "https://www.facebook.com/share/p/1CA44S7p5M/",
+    voteUrl: NTTU_VOTE_CONFIG.url,
   },
   {
     id: "chung-ket-khoi-nghiep-xanh-2026",
