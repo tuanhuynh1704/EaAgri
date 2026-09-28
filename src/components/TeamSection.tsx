@@ -1,18 +1,17 @@
 import { useState, useEffect, useRef } from "react";
 
 const appScreenshots = [
-  "/assets/main screen.webp",
-  "/assets/2.webp",
-  "/assets/3.webp",
-  "/assets/4.webp",
-  "/assets/5.webp",
-  "/assets/6.webp",
-  "/assets/7.webp",
-  "/assets/8.webp",
-  "/assets/9.webp",
-  "/assets/10.webp",
-  "/assets/11.webp",
-  "/assets/12.webp",
+  "/image-banner/1.jpg",
+  "/image-banner/2.jpg",
+  "/image-banner/3.jpg",
+  "/image-banner/4.jpg",
+  "/image-banner/5.jpg",
+  "/image-banner/6.jpg",
+  "/image-banner/7.jpg",
+  "/image-banner/8.jpg",
+  "/image-banner/9.jpg",
+  "/image-banner/10.jpg",
+  "/image-banner/11.jpg",
 ];
 
 const appSlideContent = [
@@ -127,7 +126,7 @@ interface AdvisorMember {
 const advisors: AdvisorMember[] = [
   {
     name: "Nguyễn Khắc Minh Trí",
-    roleTag: "NHÀ ĐẦU TƯ & MENTOR",
+    roleTag: "MENTOR",
     subRole: "Co-Founder & CEO, MimosaTEK",
     organization: "Mimosa Technology",
     task: "Định hướng chiến lược IoT, giải pháp Agtech & mô hình thương mại hóa bền vững.",
@@ -144,8 +143,8 @@ const advisors: AdvisorMember[] = [
   },
   {
     name: "Nguyễn Chí Hải",
-    roleTag: "MENTOR & NHÀ ĐẦU TƯ",
-    subRole: "Nhà đầu tư & Cố vấn Chiến lược Khởi nghiệp",
+    roleTag: "MENTOR",
+    subRole: "Cố vấn Chiến lược Khởi nghiệp",
     organization: "Mạng lưới Cố vấn Khởi nghiệp",
     task: "Cố vấn phát triển mô hình kinh doanh, quản trị doanh thu & chiến lược kết nối nguồn vốn đầu tư.",
     avatar: "/images/webp/advisors/nguyen-chi-hai.webp",
