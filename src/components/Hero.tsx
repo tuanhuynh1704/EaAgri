@@ -4,6 +4,7 @@ import { lazy, Suspense, useMemo, useRef, useState, useEffect, type CSSPropertie
 const EaAgriDurianPromise = import("./eaagri-3d/EaAgriDurian");
 const EaAgriDurian = lazy(() => EaAgriDurianPromise);
 import { triggerAppStoreNotice } from "./AppStoreNoticeModal";
+import { triggerPromoVideo } from "./PromoVideoModal";
 
 const ROTATING_HIGHLIGHTS = [
   { text: "thông minh", tag: "AI • IOT" },
@@ -216,6 +217,21 @@ const Hero = () => {
               <span className="download-btn__store">Google Play</span>
             </div>
           </a>
+
+          <button
+            type="button"
+            className="download-btn download-btn--promo"
+            onClick={() => triggerPromoVideo()}
+            title="Xem video giới thiệu EaAgri 45 giây"
+          >
+            <span className="download-btn__icon promo-video-icon">
+              <i className="ri-play-circle-fill"></i>
+            </span>
+            <div className="download-btn__text">
+              <span className="download-btn__lbl">Teaser 45s</span>
+              <span className="download-btn__store">Xem Video</span>
+            </div>
+          </button>
         </div>
 
         {/* RIGHT COLUMN: Heading, Subtext, App links, Key Stats & Social Proof */}
@@ -292,6 +308,21 @@ const Hero = () => {
                 <span className="download-btn__store">Google Play</span>
               </div>
             </a>
+
+            <button
+              type="button"
+              className="download-btn download-btn--promo"
+              onClick={() => triggerPromoVideo()}
+              title="Xem video giới thiệu EaAgri 45 giây"
+            >
+              <span className="download-btn__icon promo-video-icon">
+                <i className="ri-play-circle-fill"></i>
+              </span>
+              <div className="download-btn__text">
+                <span className="download-btn__lbl">Teaser 45s</span>
+                <span className="download-btn__store">Xem Video</span>
+              </div>
+            </button>
           </div>
         </div>
       </div>

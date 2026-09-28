@@ -1,0 +1,163 @@
+import { useState, useEffect, useRef } from "react";
+import { createPortal } from "react-dom";
+
+export const PROMO_VIDEO_EVENT = "eaagri:open-promo-video";
+
+export interface PromoVideoDetail {
+  mode?: "16x9" | "9x16";
+}
+
+export function triggerPromoVideo(mode?: "16x9" | "9x16") {
+  const isMobile =
+    typeof window !== "undefined" ? window.innerWidth <= 768 : false;
+  const targetMode = mode || (isMobile ? "9x16" : "16x9");
+  window.dispatchEvent(
+    new CustomEvent<PromoVideoDetail>(PROMO_VIDEO_EVENT, { detail: { mode: targetMode } })
+  );
+}
+
+export default function PromoVideoModal() {
+  const [isOpen, setIsOpen] = useState(false);
+  const [mode, setMode] = useState<"16x9" | "9x16">(() =>
+    typeof window !== "undefined" && window.innerWidth <= 768 ? "9x16" : "16x9"
+  );
+  const videoRef = useRef<HTMLVideoElement | null>(null);
+
+  useEffect(() => {
+    const handleOpen = (e: Event) => {
+      const customEvent = e as CustomEvent<PromoVideoDetail>;
+      const isMobile = window.innerWidth <= 768;
+      const preferredMode =
+        customEvent.detail?.mode || (isMobile ? "9x16" : "16x9");
+      setMode(preferredMode);
+      setIsOpen(true);
+    };
+
+    window.addEventListener(PROMO_VIDEO_EVENT, handleOpen);
+    return () => window.removeEventListener(PROMO_VIDEO_EVENT, handleOpen);
+  }, []);
+
+  // Auto adapt if screen is resized while open
+  useEffect(() => {
+    if (!isOpen) return;
+    const handleResize = () => {
+      setMode(window.innerWidth <= 768 ? "9x16" : "16x9");
+    };
+    window.addEventListener("resize", handleResize);
+    return () => window.removeEventListener("resize", handleResize);
+  }, [isOpen]);
+
+  // Lock background scroll when open
+  useEffect(() => {
+    if (isOpen) {
+      const origOverflow = document.body.style.overflow;
+      document.body.style.overflow = "hidden";
+      return () => {
+        document.body.style.overflow = origOverflow;
+      };
+    }
+  }, [isOpen]);
+
+  // Handle ESC key press
+  useEffect(() => {
+    const handleKeyDown = (e: KeyboardEvent) => {
+      if (e.key === "Escape" && isOpen) {
+        setIsOpen(false);
+      }
+    };
+    window.addEventListener("keydown", handleKeyDown);
+    return () => window.removeEventListener("keydown", handleKeyDown);
+  }, [isOpen]);
+
+
+
+  if (!isOpen) return null;
+
+  const videoSrc =
+    mode === "16x9"
+      ? "/Video/EaAgri_Promo_45s_16x9.mp4"
+      : "/Video/EaAgri_Promo_45s_9x16.mp4";
+
+  const posterSrc =
+    mode === "16x9"
+      ? "/Video/promo_16x9_poster.webp"
+      : "/Video/promo_9x16_poster.webp";
+
+  return createPortal(
+    <div
+      className="promo-video-backdrop"
+      onClick={() => setIsOpen(false)}
+      role="dialog"
+      aria-modal="true"
+      aria-labelledby="promo-video-modal-title"
+    >
+      <div
+        className={`promo-video-card promo-video-card--${mode}`}
+        onClick={(e) => e.stopPropagation()}
+      >
+        {/* Top Header Bar */}
+        <div className="promo-video-card__header">
+          <div className="promo-video-card__info">
+            <span className="promo-video-card__badge">
+              <span className="promo-video-card__badge-pulse" />
+              <i className={mode === "9x16" ? "ri-smartphone-line" : "ri-movie-2-fill"}></i>
+              {mode === "9x16" ? "BẢN ĐIỆN THOẠI (9:16)" : "BẢN WEB (16:9)"}
+            </span>
+            <h3 id="promo-video-modal-title" className="promo-video-card__title">
+              EaAgri • Trợ Lý Nông Nghiệp Thông Minh
+            </h3>
+          </div>
+
+          {/* Close button */}
+          <button
+            type="button"
+            className="promo-video-card__close-btn"
+            onClick={() => setIsOpen(false)}
+            aria-label="Đóng video"
+          >
+            <i className="ri-close-line"></i>
+          </button>
+        </div>
+
+        {/* Video Player Box */}
+        <div className={`promo-video-player-wrap promo-video-player-wrap--${mode}`}>
+          <video
+            ref={videoRef}
+            src={videoSrc}
+            poster={posterSrc}
+            controls
+            autoPlay
+            playsInline
+            preload="auto"
+            className="promo-video-player-wrap__element"
+          />
+        </div>
+
+        {/* Bottom Tagline & Actions */}
+        <div className="promo-video-card__footer">
+          <div className="promo-video-card__pills">
+            <span className="promo-pill">
+              <i className="ri-shield-check-fill"></i> Chuẩn VietGAP
+            </span>
+            <span className="promo-pill">
+              <i className="ri-cpu-line"></i> AI YOLOv9 Nhận Diện Bệnh
+            </span>
+            <span className="promo-pill">
+              <i className="ri-drop-line"></i> IoT Tưới 3 Lớp
+            </span>
+          </div>
+
+          <a
+            href="https://play.google.com/store/apps/details?id=com.eaagri.app&hl=vi"
+            target="_blank"
+            rel="noopener noreferrer"
+            className="promo-video-card__cta"
+          >
+            <i className="ri-google-play-fill"></i> Tải Ngay
+          </a>
+        </div>
+      </div>
+    </div>,
+    document.body
+  );
+}
