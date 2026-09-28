@@ -45,6 +45,10 @@ const ResultSection = () => (
         </figure>
       ))}
     </div>
+
+    <div className="result__gallery-hint">
+      <i className="ri-drag-move-fill" /> Vuốt ngang để xem trọn bộ 5 ảnh thực tế
+    </div>
   </section>
 );
 

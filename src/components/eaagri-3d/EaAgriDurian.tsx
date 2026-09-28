@@ -6,7 +6,7 @@ import './viewer.css';
 
 export interface EaAgriDurianProps {
   assetBaseUrl?: string;
-  posterUrl?: string;
+  posterUrl?: string | null;
   data?: EaAgriData;
   onSelect?: (e: Selection) => void;
   quality?: 'auto' | 'high' | 'mobile';
@@ -21,7 +21,7 @@ export interface EaAgriDurianProps {
 
 export default function EaAgriDurian({
   assetBaseUrl = '/eaagri-3d/assets/',
-  posterUrl = '/eaagri-3d/assets/poster.webp',
+  posterUrl = null,
   data = {
     source: 'demo',
     treeName: 'Sầu riêng Ri6 EaAgri',

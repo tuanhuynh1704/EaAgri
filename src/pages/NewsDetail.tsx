@@ -61,7 +61,7 @@ export default function NewsDetail() {
           "dateModified": article.created_at,
           "author": {
             "@type": "Person",
-            "name": article.author || "EaAgri Editor"
+            "name": article.author || "Ban biên tập EaAgri"
           },
           "publisher": {
             "@type": "Organization",

@@ -1,10 +1,11 @@
+import React, { useState, useRef } from "react";
+
 interface FeatureItem {
   id: string;
   title: string;
   subtitle: string;
   description: string;
   icon: string;
-  tag: string;
 }
 
 const features: FeatureItem[] = [
@@ -14,7 +15,6 @@ const features: FeatureItem[] = [
     subtitle: "Flutter cross-platform",
     description: "Đa nền tảng Android/iOS, đảm bảo trải nghiệm mượt mà, phản hồi tức thời cho người nông dân.",
     icon: "ri-smartphone-line",
-    tag: "CLIENT APP",
   },
   {
     id: "02",
@@ -22,7 +22,6 @@ const features: FeatureItem[] = [
     subtitle: "Firebase Ecosystem",
     description: "Sử dụng Firestore, Authentication, Cloud Functions cho việc đồng bộ và lưu trữ dữ liệu thời gian thực.",
     icon: "ri-server-line",
-    tag: "DATABASE & API",
   },
   {
     id: "03",
@@ -30,7 +29,6 @@ const features: FeatureItem[] = [
     subtitle: "YOLOv9 & Gemini 2.0",
     description: "Tích hợp YOLOv9 (PyTorch/TFLite) phát hiện sâu bệnh và Google Gemini API phân tích chuẩn đoán chuyên sâu.",
     icon: "ri-cpu-line",
-    tag: "COGNITIVE INTELLIGENCE",
   },
   {
     id: "04",
@@ -38,7 +36,6 @@ const features: FeatureItem[] = [
     subtitle: "ESP32 & Sensors",
     description: "Vi điều khiển chi phí thấp, hỗ trợ WiFi/Bluetooth kết nối các cảm biến độ ẩm đất và điều khiển rơ-le tưới.",
     icon: "ri-sensor-line",
-    tag: "IOT AUTOMATION",
   },
   {
     id: "05",
@@ -46,11 +43,37 @@ const features: FeatureItem[] = [
     subtitle: "Vector Search Pipeline",
     description: "Kết nối dữ liệu API thời tiết sầu riêng, chuẩn canh tác VietGAP để làm giàu tri thức địa phương.",
     icon: "ri-node-tree",
-    tag: "DATA ENRICHMENT",
   },
 ];
 
-const FeatureGrid = () => {
+const FeatureGrid: React.FC = () => {
+  const [activeSlide, setActiveSlide] = useState(0);
+  const scrollRef = useRef<HTMLDivElement>(null);
+
+  const handleScroll = () => {
+    if (!scrollRef.current) return;
+    const { scrollLeft, scrollWidth, clientWidth } = scrollRef.current;
+    const maxScroll = scrollWidth - clientWidth;
+    if (maxScroll <= 0) return;
+    const ratio = scrollLeft / maxScroll;
+    const newIndex = Math.min(
+      Math.round(ratio * (features.length - 1)),
+      features.length - 1
+    );
+    setActiveSlide(newIndex);
+  };
+
+  const scrollToSlide = (index: number) => {
+    if (!scrollRef.current) return;
+    const cards = scrollRef.current.children;
+    if (cards[index]) {
+      (cards[index] as HTMLElement).scrollIntoView({
+        behavior: "smooth",
+        block: "nearest",
+        inline: "center",
+      });
+    }
+  };
   return (
     <section className="section__container feature__container">
       <div className="feature__header-wrapper">
@@ -69,7 +92,11 @@ const FeatureGrid = () => {
         </p>
       </div>
 
-      <div className="feature__tech-grid">
+      <div
+        className="feature__tech-grid"
+        ref={scrollRef}
+        onScroll={handleScroll}
+      >
         {features.map((feature, index) => (
           <div
             key={feature.id}
@@ -85,7 +112,6 @@ const FeatureGrid = () => {
               <div className="feature__tech-icon-box">
                 <i className={feature.icon}></i>
               </div>
-              <span className="feature__tech-tag">{feature.tag}</span>
             </div>
 
             {/* Card Body */}
@@ -99,6 +125,23 @@ const FeatureGrid = () => {
             <div className="feature__tech-accent-bar"></div>
           </div>
         ))}
+      </div>
+
+      {/* Mobile Swipe Navigation Indicators & Hint */}
+      <div className="feature__mobile-nav">
+        <div className="feature__mobile-dots">
+          {features.map((feature, index) => (
+            <button
+              key={feature.id}
+              className={`feature__mobile-dot ${activeSlide === index ? "active" : ""}`}
+              onClick={() => scrollToSlide(index)}
+              aria-label={`Chuyển tới thẻ ${feature.id}: ${feature.title}`}
+            />
+          ))}
+        </div>
+        <div className="feature__mobile-hint">
+          <i className="ri-arrow-left-right-line"></i> Vuốt ngang để xem 5 tầng công nghệ
+        </div>
       </div>
     </section>
   );

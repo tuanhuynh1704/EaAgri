@@ -21,20 +21,28 @@
     text-align: center;
     margin-bottom: 4rem;
 
-    // Upcase Tech Meta Tag
     &::before {
-      content: 'NEWS & ARCHIVE // HỆ SINH THÁI EAAGRI';
-      display: inline-block;
-      font-family: monospace, sans-serif;
-      font-size: 0.8rem;
-      font-weight: 700;
+      display: none;
+    }
+
+    .news-list__meta-badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 0.45rem;
+      font-size: 0.78rem;
+      font-weight: 800;
       color: $primary-color;
-      letter-spacing: 2px;
-      margin-bottom: 0.75rem;
-      background: rgba($primary-color, 0.06);
-      padding: 0.3rem 0.8rem;
-      border-radius: 4px;
-      border: 1px solid rgba($primary-color, 0.15);
+      letter-spacing: 0.8px;
+      margin-bottom: 0.95rem;
+      background: rgba($primary-color, 0.08);
+      padding: 0.35rem 0.95rem;
+      border-radius: 999px;
+      border: 1px solid rgba($primary-color, 0.2);
+      box-shadow: 0 2px 8px rgba(46, 125, 50, 0.06);
+
+      i {
+        font-size: 0.95rem;
+      }
     }
 
     h1 {

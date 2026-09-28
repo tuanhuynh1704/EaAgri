@@ -132,6 +132,9 @@ export default function NewsList() {
 
         {/* Header */}
         <div className="news-list__header" data-aos="fade-up">
+          <span className="news-list__meta-badge">
+            <i className="ri-newspaper-line"></i> TIN TỨC &amp; BẢN TIN EAAGRI
+          </span>
           <h1>Bản Tin Nông Nghiệp</h1>
           <p>Cập nhật kỹ thuật canh tác, thông tin thị trường và thời tiết mới nhất</p>
         </div>
@@ -202,7 +205,7 @@ export default function NewsList() {
                     ) : (
                       <div className="placeholder">
                         <i className="ri-image-line"></i>
-                        <span>EaAgri News</span>
+                        <span>Bản tin EaAgri</span>
                       </div>
                     )}
                     <span className="news-list__card-badge">{item.category}</span>

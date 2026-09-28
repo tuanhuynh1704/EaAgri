@@ -115,7 +115,7 @@ interface AdvisorMember {
   organization: string;
   task: string;
   avatar: string;
-  themeColor: "gold" | "emerald" | "blue" | "teal" | "purple";
+  themeColor: "gold" | "emerald" | "blue" | "teal" | "purple" | "orange";
   topIcon: string;
   advisorCode: string;
   orgIcon: string;
@@ -143,15 +143,32 @@ const advisors: AdvisorMember[] = [
     fields: ["Agtech", "IoT nông nghiệp", "Chuyển đổi số", "Phát triển bền vững"],
   },
   {
+    name: "Nguyễn Chí Hải",
+    roleTag: "MENTOR & NHÀ ĐẦU TƯ",
+    subRole: "Nhà đầu tư & Cố vấn Chiến lược Khởi nghiệp",
+    organization: "Mạng lưới Cố vấn Khởi nghiệp",
+    task: "Cố vấn phát triển mô hình kinh doanh, quản trị doanh thu & chiến lược kết nối nguồn vốn đầu tư.",
+    avatar: "/images/webp/advisors/nguyen-chi-hai.webp",
+    themeColor: "orange",
+    topIcon: "ri-funds-line",
+    advisorCode: "ADV-02",
+    orgIcon: "ri-briefcase-4-fill",
+    stats: [
+      { value: "15+", label: "năm Đầu tư & Quản trị" },
+      { value: "Top", label: "Mentor Khởi nghiệp" },
+    ],
+    fields: ["Mô hình kinh doanh", "Chiến lược gọi vốn", "Phát triển thị trường"],
+  },
+  {
     name: "ThS. LIANG GUEI JIA",
     roleTag: "CỐ VẤN KHOA HỌC QUỐC TẾ",
     subRole: "Nghiên cứu viên Dự án — NSTC Đài Loan",
     organization: "NSTC Đài Loan 🇹🇼",
     task: "Cố vấn canh tác sinh thái, quản lý dinh dưỡng & chuẩn hóa sầu riêng chất lượng cao.",
-    avatar: "/images/webp/chuyen-gia.webp",
+    avatar: "/images/webp/advisors/liang-guei-jia.webp",
     themeColor: "emerald",
     topIcon: "ri-global-line",
-    advisorCode: "ADV-02",
+    advisorCode: "ADV-03",
     orgIcon: "ri-global-line",
     fields: ["Canh tác sinh thái", "Dinh dưỡng cây trồng", "Quy trình xuất khẩu"],
     contact: {
@@ -168,7 +185,7 @@ const advisors: AdvisorMember[] = [
     avatar: "/images/webp/advisors/nguyen-huynh-thong.webp",
     themeColor: "blue",
     topIcon: "ri-graduation-cap-fill",
-    advisorCode: "ADV-03",
+    advisorCode: "ADV-04",
     orgIcon: "ri-school-line",
     fields: ["Kiến trúc phần mềm", "Bảo mật hệ thống", "Cloud & Web"],
   },
@@ -181,7 +198,7 @@ const advisors: AdvisorMember[] = [
     avatar: "/images/webp/advisors/pham-dinh-tai.webp",
     themeColor: "teal",
     topIcon: "ri-graduation-cap-fill",
-    advisorCode: "ADV-04",
+    advisorCode: "ADV-05",
     orgIcon: "ri-school-line",
     fields: ["Hệ thống thông tin", "Cơ sở dữ liệu", "Phân tích dữ liệu"],
   },
@@ -194,7 +211,7 @@ const advisors: AdvisorMember[] = [
     avatar: "/images/webp/advisors/hoang-thinh-nhan.webp",
     themeColor: "purple",
     topIcon: "ri-graduation-cap-fill",
-    advisorCode: "ADV-05",
+    advisorCode: "ADV-06",
     orgIcon: "ri-school-line",
     fields: ["Khoa học máy tính", "Mô hình toán học", "Thuật toán AI"],
   },
@@ -264,7 +281,6 @@ const TeamSection = () => {
   };
 
   const handleAdvisorCardClick = (index: number) => {
-    if (typeof window !== "undefined" && window.innerWidth > 768) return;
     if (advisorIsSwipingRef.current) {
       advisorIsSwipingRef.current = false;
       return;
@@ -349,8 +365,6 @@ const TeamSection = () => {
   };
 
   const handleCardClick = (index: number) => {
-    // Chỉ kích hoạt lật thẻ ở giao diện mobile (<= 768px)
-    if (typeof window !== "undefined" && window.innerWidth > 768) return;
     if (isSwipingRef.current) {
       isSwipingRef.current = false;
       return;
@@ -443,7 +457,7 @@ const TeamSection = () => {
               EAAGRI / ADVISORY &amp; MENTORS
             </span>
             <h2 className="team-showcase__title">
-              Hội Đồng <span className="team-showcase__title-highlight team-showcase__title-highlight--gold">Cố Vấn &amp; Chuyên Gia<i className="ri-award-fill team-title-tech-icon team-title-tech-icon--gold"></i><span className="team-title-underline team-title-underline--gold"></span></span>
+              Hội Đồng <span className="team-showcase__title-highlight team-showcase__title-highlight--gold">Cố Vấn &amp; Chuyên Gia</span>
             </h2>
             <p className="team-showcase__desc">
               Đội ngũ cố vấn khoa học quốc tế, nhà đầu tư giàu kinh nghiệm và các chuyên gia học thuật hàng đầu đồng hành cùng sự phát triển của EaAgri.
@@ -466,16 +480,22 @@ const TeamSection = () => {
                 className={`advisor-card advisor-card--${advisor.themeColor} ${flippedAdvisorCards[index] ? "is-flipped" : ""}`}
                 key={advisor.advisorCode}
                 onClick={() => handleAdvisorCardClick(index)}
+                onKeyDown={(e) => {
+                  if (e.key === "Enter" || e.key === " ") {
+                    e.preventDefault();
+                    handleAdvisorCardClick(index);
+                  }
+                }}
+                tabIndex={0}
+                role="button"
+                aria-label={`Xem hồ sơ cố vấn ${advisor.name}`}
               >
                 <div className="advisor-card__flipper">
-                  {/* FRONT */}
+                  {/* FRONT: Ảnh trên, chữ ở dưới - Không làm hình vuông, dạng thẻ đứng sang trọng */}
+                  {/* FRONT: Ảnh trên, chữ ở dưới - Tối giản, không icon/ADV/nút lật */}
                   <div className="advisor-card__front">
+                    {/* TOP: Khung ảnh chân dung tràn viền sạch sẽ */}
                     <div className="advisor-card__image-box">
-                      <div className="advisor-card__top-icon">
-                        <i className={advisor.topIcon}></i>
-                      </div>
-                      <span className="advisor-card__code">{advisor.advisorCode}</span>
-
                       <img
                         src={advisor.avatar}
                         alt={advisor.name}
@@ -483,99 +503,37 @@ const TeamSection = () => {
                         loading="lazy"
                         decoding="async"
                         onError={(e) => {
-                          if (advisor.avatar.includes("chuyen-gia")) {
-                            (e.target as HTMLImageElement).src = "/chuyen-gia.webp";
+                          if (advisor.avatar.includes("chuyen-gia") || advisor.avatar.includes("liang-guei-jia")) {
+                            (e.target as HTMLImageElement).src = "/images/webp/chuyen-gia.webp";
                           }
                         }}
                       />
+                    </div>
 
+                    {/* BOTTOM: Khung chữ riêng biệt bên dưới ảnh */}
+                    <div className="advisor-card__body">
+                      {/* Role Pill Badge */}
                       <div className="advisor-card__role-pill">
                         <span>{advisor.roleTag}</span>
                       </div>
 
-                      <div className="advisor-card__flip-hint" aria-hidden="true">
-                        <i className="ri-repeat-2-line"></i>
-                        <span>Chạm xem thông tin</span>
-                      </div>
-                    </div>
-
-                    <div className="advisor-card__body">
+                      {/* Advisor Name */}
                       <h3 className="advisor-card__name">{advisor.name}</h3>
+
+                      {/* Advisor Subrole */}
                       <p className="advisor-card__subrole">{advisor.subRole}</p>
-                      <div className="advisor-card__name-accent"></div>
-                      <p className="advisor-card__task">{advisor.task}</p>
-                      <div className="advisor-card__skill-pill">
-                        <i className={advisor.orgIcon}></i>
-                        <span>{advisor.organization}</span>
-                      </div>
                     </div>
                   </div>
 
-                  {/* BACK */}
+                  {/* BACK: Simplified credentials revealed upon flip */}
                   <div className="advisor-card__back">
-                    <div className="advisor-card__back-top">
-                      <div className="advisor-card__top-icon">
-                        <i className={advisor.topIcon}></i>
-                      </div>
-                      <span className="advisor-card__code">{advisor.advisorCode}</span>
-                    </div>
-
                     <div className="advisor-card__back-main">
                       <div className="advisor-card__back-role">
                         <span>{advisor.roleTag}</span>
                       </div>
                       <h3 className="advisor-card__back-name">{advisor.name}</h3>
                       <p className="advisor-card__back-subrole">{advisor.subRole}</p>
-                      <div className="advisor-card__name-accent"></div>
-
-                      {advisor.stats && (
-                        <div className="advisor-card__back-stats">
-                          {advisor.stats.map((s) => (
-                            <div key={s.label} className="advisor-card__back-stat-item">
-                              <b>{s.value}</b>
-                              <span>{s.label}</span>
-                            </div>
-                          ))}
-                        </div>
-                      )}
-
-                      {advisor.contact && (
-                        <div className="advisor-card__back-contact">
-                          {advisor.contact.phone && (
-                            <a
-                              href={`tel:${advisor.contact.phone.replace(/[^0-9]/g, "")}`}
-                              className="advisor-card__contact-btn"
-                              onClick={(e) => e.stopPropagation()}
-                            >
-                              <i className="ri-phone-line"></i>
-                              <span>{advisor.contact.phone}</span>
-                            </a>
-                          )}
-                          {advisor.contact.email && (
-                            <a
-                              href={`mailto:${advisor.contact.email}`}
-                              className="advisor-card__contact-btn"
-                              onClick={(e) => e.stopPropagation()}
-                            >
-                              <i className="ri-mail-line"></i>
-                              <span>Email</span>
-                            </a>
-                          )}
-                        </div>
-                      )}
-
-                      {advisor.fields && (
-                        <div className="advisor-card__back-fields">
-                          {advisor.fields.map((f) => (
-                            <span key={f}>{f}</span>
-                          ))}
-                        </div>
-                      )}
-
-                      <div className="advisor-card__skill-pill">
-                        <i className={advisor.orgIcon}></i>
-                        <span>{advisor.organization}</span>
-                      </div>
+                      <p className="advisor-card__back-task">{advisor.task}</p>
                     </div>
 
                     <div className="advisor-card__back-bottom">
@@ -587,7 +545,7 @@ const TeamSection = () => {
                         }}
                       >
                         <i className="ri-arrow-go-back-line"></i>
-                        <span>Lật lại ảnh</span>
+                        <span>Lật lại</span>
                       </div>
                     </div>
                   </div>
@@ -619,21 +577,16 @@ const TeamSection = () => {
           {/* Section Divider */}
           <div className="team-section-divider" aria-hidden="true">
             <span className="team-section-divider__line"></span>
-            <div className="team-section-divider__chip">
-              <i className="ri-team-line"></i>
-              <span>BAN ĐIỀU HÀNH &amp; KỸ THUẬT</span>
-            </div>
-            <span className="team-section-divider__line"></span>
           </div>
 
           {/* 2. CORE TEAM: ĐỘI NGŨ VẬN HÀNH (4 cards) */}
           <div className="team-showcase__header" data-aos="fade-up">
             <span className="team-showcase__label">
               <span className="team-showcase__status-dot"></span>
-              EAAGRI / CORE TEAM
+              BAN ĐIỀU HÀNH &amp; KỸ THUẬT
             </span>
             <h2 className="team-showcase__title">
-              Đội Ngũ <span className="team-showcase__title-highlight">Vận Hành<i className="ri-cpu-line team-title-tech-icon"></i><span className="team-title-underline"></span></span>
+              Đội Ngũ <span className="team-showcase__title-highlight">Vận Hành</span>
             </h2>
           </div>
 
@@ -653,19 +606,22 @@ const TeamSection = () => {
                 className={`team-card team-card--${member.themeColor} ${flippedCards[index] ? "is-flipped" : ""}`}
                 key={index}
                 onClick={() => handleCardClick(index)}
+                onKeyDown={(e) => {
+                  if (e.key === "Enter" || e.key === " ") {
+                    e.preventDefault();
+                    handleCardClick(index);
+                  }
+                }}
+                tabIndex={0}
+                role="button"
+                aria-label={`Xem thông tin ${member.name}`}
               >
                 {/* 3D Flipper Container */}
                 <div className="team-card__flipper">
-                  {/* FRONT: Entire Front Card (Image Header + Body Info) */}
+                  {/* FRONT: Full Portrait Photo with Name & Role Pill Overlay */}
                   <div className="team-card__front">
                     <div className="team-card__image-box">
-                      {/* Floating Top Left Glass Badge Icon */}
-                      <div className="team-card__top-icon">
-                        <i className={member.topIcon}></i>
-                      </div>
-                      <span className="team-card__member-code">{member.memberCode}</span>
-
-                      {/* Rectangular Photo Avatar */}
+                      {/* Full Rectangular Photo Avatar */}
                       <img
                         src={member.avatar}
                         alt={member.name}
@@ -674,58 +630,28 @@ const TeamSection = () => {
                         decoding="async"
                       />
 
-                      {/* Role Pill Badge anchored at base of image */}
-                      <div className="team-card__role-pill">
-                        <span>{member.roleTag}</span>
-                      </div>
+                      {/* Bottom Info Overlay directly on photo */}
+                      <div className="team-card__front-overlay">
+                        {/* Role Pill Badge */}
+                        <div className="team-card__role-pill">
+                          <span>{member.roleTag}</span>
+                        </div>
 
-                      {/* Flip Hint button visible on mobile */}
-                      <div className="team-card__flip-hint" aria-hidden="true">
-                        <i className="ri-repeat-2-line"></i>
-                        <span>Chạm xem thông tin</span>
-                      </div>
-                    </div>
-
-                    {/* Text Content Below Image (Inside Front face) */}
-                    <div className="team-card__body">
-                      {/* Member Name */}
-                      <h3 className="team-card__name">{member.name}</h3>
-
-                      {/* Symmetrical Underline Accent */}
-                      <div className="team-card__name-accent"></div>
-
-                      {/* Task description */}
-                      <p className="team-card__task">{member.task}</p>
-
-                      {/* Bottom Skill Capsule Badge */}
-                      <div className="team-card__skill-pill">
-                        <i className={member.skillIcon}></i>
-                        <span>EaAgri Core Team</span>
+                        {/* Member Name */}
+                        <h3 className="team-card__name">{member.name}</h3>
                       </div>
                     </div>
                   </div>
 
                   {/* BACK: Detailed Info (Full-card 3D flip) */}
                   <div className="team-card__back">
-                    <div className="team-card__back-top">
-                      <div className="team-card__top-icon">
-                        <i className={member.topIcon}></i>
-                      </div>
-                      <span className="team-card__member-code">{member.memberCode}</span>
-                    </div>
 
                     <div className="team-card__back-main">
                       <div className="team-card__back-role">
                         <span>{member.roleTag}</span>
                       </div>
                       <h3 className="team-card__back-name">{member.name}</h3>
-                      <div className="team-card__name-accent"></div>
                       <p className="team-card__back-task">{member.task}</p>
-
-                      <div className="team-card__skill-pill">
-                        <i className={member.skillIcon}></i>
-                        <span>EaAgri Core Team</span>
-                      </div>
                     </div>
 
                     <div className="team-card__back-bottom">
@@ -737,7 +663,7 @@ const TeamSection = () => {
                         }}
                       >
                         <i className="ri-arrow-go-back-line"></i>
-                        <span>Lật lại ảnh</span>
+                        <span>Lật lại</span>
                       </div>
                     </div>
                   </div>

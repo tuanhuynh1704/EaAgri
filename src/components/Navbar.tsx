@@ -84,6 +84,7 @@ const Navbar = () => {
     return () => document.removeEventListener("mousedown", handleClickOutside);
   }, []);
 
+
   const handleNew = () => {
     navigate("/tintuc");
   };
@@ -151,11 +152,11 @@ const Navbar = () => {
           </a>
 
           <a
-            href="/architecture"
-            className={`nav__link ${pathname === "/architecture" ? "active" : ""}`}
+            href="/kien-truc"
+            className={`nav__link ${pathname === "/kien-truc" || pathname === "/architecture" ? "active" : ""}`}
             onClick={(e) => {
               e.preventDefault();
-              navigate("/architecture");
+              navigate("/kien-truc");
             }}
           >
             <i className="ri-layout-grid-line nav__link-icon"></i>
@@ -176,7 +177,7 @@ const Navbar = () => {
 
           <a
             href="/tintuc"
-            className={`nav__link ${pathname.startsWith("/tintuc") ? "active" : ""}`}
+            className={`nav__link ${pathname.startsWith("/tintuc") || pathname.startsWith("/tin-tuc") || pathname.startsWith("/news") ? "active" : ""}`}
             onClick={(e) => {
               e.preventDefault();
               handleNew();
@@ -185,6 +186,7 @@ const Navbar = () => {
             <i className="ri-article-line nav__link-icon"></i>
             <span className="nav__link-text">Tin tức</span>
           </a>
+
         </div>
 
         <div className="nav__actions">
@@ -387,12 +389,12 @@ const Navbar = () => {
         </a>
 
         <a
-          href="/architecture"
-          className={`mobile-drawer__nav-item ${pathname === "/architecture" ? "is-active" : ""}`}
+          href="/kien-truc"
+          className={`mobile-drawer__nav-item ${pathname === "/kien-truc" || pathname === "/architecture" ? "is-active" : ""}`}
           onClick={(e) => {
             e.preventDefault();
             setIsMobileMenuOpen(false);
-            navigate("/architecture");
+            navigate("/kien-truc");
           }}
         >
           <div className="mobile-drawer__nav-icon-box">
@@ -426,7 +428,7 @@ const Navbar = () => {
 
         <a
           href="/tintuc"
-          className={`mobile-drawer__nav-item ${pathname.startsWith("/tintuc") ? "is-active" : ""}`}
+          className={`mobile-drawer__nav-item ${pathname.startsWith("/tintuc") || pathname.startsWith("/tin-tuc") || pathname.startsWith("/news") ? "is-active" : ""}`}
           onClick={(e) => {
             e.preventDefault();
             setIsMobileMenuOpen(false);
@@ -442,6 +444,7 @@ const Navbar = () => {
           </div>
           <i className="ri-arrow-right-s-line mobile-drawer__nav-chevron" />
         </a>
+
       </div>
 
       {/* Admin Section (if admin) */}

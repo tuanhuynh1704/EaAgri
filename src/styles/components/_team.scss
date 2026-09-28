@@ -39,7 +39,7 @@
   flex-direction: column;
   align-items: center;
   justify-content: center;
-  gap: clamp(1.75rem, 4vh, 3rem);
+  gap: clamp(1.2rem, 2.5vh, 2rem);
   height: auto;
   width: 100%;
 }
@@ -202,48 +202,6 @@
     background-clip: text;
     -webkit-text-fill-color: transparent;
     display: inline-block;
-
-    .team-title-tech-icon {
-      position: absolute;
-      top: -10px;
-      right: -28px;
-      font-size: 1.25rem;
-      color: #07828a;
-      -webkit-text-fill-color: #07828a;
-      filter: drop-shadow(0 0 7px rgba(8, 130, 138, 0.25));
-    }
-
-    .team-title-underline {
-      position: absolute;
-      bottom: -4px;
-      left: 0;
-      width: 100%;
-      height: 3px;
-      background: linear-gradient(90deg, #18a65b 0%, #0b8791 100%);
-      border-radius: 99px;
-
-      &::before,
-      &::after {
-        content: '';
-        position: absolute;
-        top: 50%;
-        width: 7px;
-        height: 7px;
-        border: 2px solid #0b8791;
-        border-radius: 50%;
-        background: #fff;
-        transform: translateY(-50%);
-      }
-
-      &::before {
-        left: -3px;
-        border-color: #18a65b;
-      }
-
-      &::after {
-        right: -3px;
-      }
-    }
   }
 }
 
@@ -264,20 +222,20 @@
 .team-showcase__cards {
   display: grid;
   grid-template-columns: repeat(4, 1fr);
-  gap: clamp(1rem, 1.5vw, 1.5rem);
+  gap: 1.15rem;
   width: 100%;
-  max-width: 1240px;
+  max-width: 1040px;
   align-items: stretch;
 
   @media (max-width: 1024px) {
     grid-template-columns: repeat(2, 1fr);
-    max-width: 760px;
-    gap: 1.25rem;
+    max-width: 680px;
+    gap: 1.15rem;
   }
 
   @media (max-width: 640px) {
     grid-template-columns: 1fr;
-    max-width: 420px;
+    max-width: 340px;
   }
 }
 
@@ -285,102 +243,132 @@
   position: relative;
   display: flex;
   flex-direction: column;
-  background: #111714;
-  border-radius: 24px;
+  background: transparent;
+  border-radius: 18px;
   overflow: visible !important;
   border: none !important;
   box-shadow: none !important;
   transition: transform 0.35s cubic-bezier(0.25, 0.46, 0.45, 0.94);
   min-width: 0;
-  height: 100%;
-  cursor: default;
+  height: clamp(340px, 42vh, 375px);
+  cursor: pointer;
   user-select: none;
   -webkit-tap-highlight-color: transparent;
+  perspective: 1200px;
+  -webkit-perspective: 1200px;
 
   &:hover {
-    transform: translateY(-7px);
+    transform: translateY(-6px);
   }
 }
 
-// Card Flipper (Static on desktop, 3D flip active only on mobile)
+// Card Flipper (Smooth 3D flip active on both desktop and mobile)
 .team-card__flipper {
   position: relative;
   width: 100%;
   height: 100%;
-  display: flex;
-  flex-direction: column;
+  border-radius: 18px;
+  transform-style: preserve-3d;
+  -webkit-transform-style: preserve-3d;
+  transition: transform 0.65s cubic-bezier(0.34, 1.25, 0.64, 1);
 }
 
-// On desktop, do not flip
-@media (min-width: 769px) {
-  .team-card.is-flipped .team-card__flipper {
-    transform: none;
-  }
+.team-card.is-flipped .team-card__flipper {
+  transform: rotateY(180deg);
+  -webkit-transform: rotateY(180deg);
 }
 
 .team-card__front {
-  position: relative;
-  width: 100%;
-  height: 100%;
-  display: flex;
-  flex-direction: column;
-  background: #ffffff;
-  border-radius: 24px;
-  overflow: hidden;
-  border: 1px solid rgba(19, 120, 89, 0.12);
-  box-shadow:
-    0 10px 30px rgba(0, 0, 0, 0.04),
-    0 20px 40px rgba(0, 0, 0, 0.02);
-  z-index: 2;
-  transition: box-shadow 0.35s ease;
-}
-
-.team-card:hover .team-card__front {
-  box-shadow:
-    0 18px 40px rgba(0, 0, 0, 0.08),
-    0 30px 60px rgba(0, 0, 0, 0.04);
-}
-
-.team-card__flip-hint {
-  display: none; // Hidden on desktop
-}
-
-// Back face (Hidden on desktop, active on mobile)
-.team-card__back {
-  display: none; // Hidden on desktop
   position: absolute;
   inset: 0;
   width: 100%;
   height: 100%;
-  border-radius: 24px;
-  overflow: hidden;
-  box-shadow: 0 16px 36px rgba(0, 0, 0, 0.28), 0 4px 12px rgba(0, 0, 0, 0.12);
+  display: flex;
   flex-direction: column;
-  justify-content: space-between;
-  padding: 1.35rem 1.15rem 1.15rem;
-  z-index: 5;
   background: #111714;
-  border: 1.5px solid rgba(255, 255, 255, 0.12);
+  border-radius: 18px;
+  overflow: hidden;
+  border: 1px solid rgba(255, 255, 255, 0.14);
+  box-shadow:
+    0 12px 32px rgba(0, 0, 0, 0.28),
+    0 4px 12px rgba(0, 0, 0, 0.15);
+  z-index: 2;
+  transform: rotateY(0deg);
+  -webkit-transform: rotateY(0deg);
+  backface-visibility: hidden;
+  -webkit-backface-visibility: hidden;
+  transform-style: preserve-3d;
+  -webkit-transform-style: preserve-3d;
+  transition: border-color 0.35s ease, box-shadow 0.35s ease;
 }
 
-.team-card__back-top {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  width: 100%;
-  position: relative;
-  z-index: 2;
+.team-card:hover .team-card__front {
+  box-shadow:
+    0 20px 48px rgba(0, 0, 0, 0.4),
+    0 8px 20px rgba(0, 0, 0, 0.25);
+}
 
-  .team-card__top-icon {
-    position: static;
-    width: 34px;
-    height: 34px;
-    font-size: 1rem;
+.team-card__flip-hint {
+  display: inline-flex !important;
+}
+
+// Pulse animation for tech status dot
+@keyframes techPulse {
+  0%, 100% {
+    opacity: 1;
+    transform: scale(1);
+    box-shadow: 0 0 6px var(--tech-accent, #10b981);
   }
+  50% {
+    opacity: 0.35;
+    transform: scale(0.7);
+    box-shadow: 0 0 2px var(--tech-accent, #10b981);
+  }
+}
 
-  .team-card__member-code {
-    position: static;
-    font-size: 0.65rem;
+// Back face (Full-card 3D flip back face - Cyber AgTech Minimalist Design)
+.team-card__back {
+  display: flex !important;
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  border-radius: 18px;
+  overflow: hidden;
+  box-shadow:
+    0 16px 40px rgba(0, 0, 0, 0.55),
+    0 0 25px rgba(var(--tech-rgb, 16, 185, 129), 0.08),
+    inset 0 0 35px rgba(0, 0, 0, 0.7);
+  flex-direction: column;
+  justify-content: space-between;
+  padding: 1.15rem 0.95rem 0.95rem;
+  z-index: 1;
+  background-color: #070c0f;
+  background-image:
+    radial-gradient(circle at 50% 0%, var(--tech-glow, rgba(16, 185, 129, 0.22)) 0%, transparent 68%),
+    linear-gradient(rgba(255, 255, 255, 0.035) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(255, 255, 255, 0.035) 1px, transparent 1px);
+  background-size: 100% 100%, 20px 20px, 20px 20px;
+  border: 1.5px solid rgba(var(--tech-rgb, 16, 185, 129), 0.32);
+  transform: rotateY(180deg);
+  -webkit-transform: rotateY(180deg);
+  backface-visibility: hidden;
+  -webkit-backface-visibility: hidden;
+  transform-style: preserve-3d;
+  -webkit-transform-style: preserve-3d;
+  transition: border-color 0.3s ease, box-shadow 0.3s ease;
+
+  // Top Cyber Neon Ambient Bar
+  &::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 15%;
+    right: 15%;
+    height: 2px;
+    background: linear-gradient(90deg, transparent, var(--tech-accent, #10b981), transparent);
+    box-shadow: 0 0 12px var(--tech-accent, #10b981);
+    z-index: 3;
   }
 }
 
@@ -389,27 +377,41 @@
   flex-direction: column;
   align-items: center;
   text-align: center;
-  padding: 0.4rem 0.2rem;
+  padding: 0;
   flex-grow: 1;
   justify-content: center;
   position: relative;
   z-index: 2;
 }
 
+// Tech Status Badge (HUD indicator with pulsing dot)
 .team-card__back-role {
   display: inline-flex;
   align-items: center;
   justify-content: center;
-  padding: 0.3rem 0.75rem;
+  gap: 0.35rem;
+  padding: 0.22rem 0.7rem;
   border-radius: 99px;
-  font-size: 0.65rem;
+  font-size: 0.58rem;
   font-weight: 700;
-  letter-spacing: 0.3px;
-  border: 1px solid rgba(255, 255, 255, 0.2);
-  background: rgba(0, 0, 0, 0.45);
-  color: #ffffff;
-  margin-bottom: 0.55rem;
+  letter-spacing: 0.6px;
+  border: 1px solid rgba(var(--tech-rgb, 16, 185, 129), 0.38);
+  background: rgba(var(--tech-rgb, 16, 185, 129), 0.12);
+  color: var(--tech-light, #6ee7b7);
+  box-shadow: 0 0 14px rgba(var(--tech-rgb, 16, 185, 129), 0.15);
+  margin-bottom: 0.45rem;
   backdrop-filter: blur(8px);
+
+  &::before {
+    content: '';
+    display: inline-block;
+    width: 5px;
+    height: 5px;
+    border-radius: 50%;
+    background: var(--tech-accent, #10b981);
+    box-shadow: 0 0 6px var(--tech-accent, #10b981);
+    animation: techPulse 2s infinite ease-in-out;
+  }
 }
 
 .team-card__back-name {
@@ -417,24 +419,28 @@
   font-weight: 800;
   color: #ffffff !important;
   text-transform: uppercase;
-  letter-spacing: 0.5px;
-  margin: 0 0 0.4rem;
-  line-height: 1.25;
-  text-shadow: 0 2px 8px rgba(0, 0, 0, 0.4);
+  letter-spacing: 0.6px;
+  margin: 0 0 0.45rem;
+  line-height: 1.2;
+  text-shadow: 0 2px 10px rgba(0, 0, 0, 0.8), 0 0 18px rgba(var(--tech-rgb, 16, 185, 129), 0.25);
 }
 
+// Tech Telemetry / Directive Box
 .team-card__back-task {
-  font-size: 0.78rem;
-  color: rgba(235, 245, 240, 0.88);
-  line-height: 1.48;
-  font-weight: 500;
-  margin: 0 0 0.85rem;
-  padding: 0.5rem 0.6rem;
-  border-radius: 12px;
-  background: rgba(255, 255, 255, 0.05);
-  border: 1px solid rgba(255, 255, 255, 0.08);
-  backdrop-filter: blur(6px);
+  font-size: 0.68rem;
+  color: rgba(240, 248, 245, 0.92);
+  line-height: 1.55;
+  font-weight: 400;
+  margin: 0;
+  padding: 0.52rem 0.68rem;
+  border-radius: 8px;
+  background: rgba(0, 0, 0, 0.45);
+  border: 1px solid rgba(var(--tech-rgb, 16, 185, 129), 0.25);
+  border-top: 2px solid var(--tech-accent, #10b981);
+  box-shadow: inset 0 0 16px rgba(var(--tech-rgb, 16, 185, 129), 0.05);
+  backdrop-filter: blur(8px);
   width: 100%;
+  text-align: center;
 }
 
 .team-card__back-bottom {
@@ -444,37 +450,36 @@
   width: 100%;
   position: relative;
   z-index: 2;
+  margin-top: 0.4rem;
 }
 
 .team-card__back-return-pill {
   display: inline-flex;
   align-items: center;
   justify-content: center;
-  gap: 0.4rem;
-  font-size: 0.7rem;
+  gap: 0.35rem;
+  font-size: 0.62rem;
   font-weight: 600;
-  color: rgba(255, 255, 255, 0.9);
-  padding: 0.4rem 0.95rem;
+  color: var(--tech-light, #6ee7b7);
+  padding: 0.28rem 0.85rem;
   border-radius: 99px;
-  background: rgba(255, 255, 255, 0.14);
-  border: 1px solid rgba(255, 255, 255, 0.22);
+  background: rgba(var(--tech-rgb, 16, 185, 129), 0.12);
+  border: 1px solid rgba(var(--tech-rgb, 16, 185, 129), 0.32);
+  box-shadow: 0 0 10px rgba(var(--tech-rgb, 16, 185, 129), 0.1);
   backdrop-filter: blur(10px);
   cursor: pointer;
   transition: all 0.25s ease;
 
-  i {
-    font-size: 0.85rem;
-    transition: transform 0.3s ease;
+  &:hover {
+    background: rgba(var(--tech-rgb, 16, 185, 129), 0.22);
+    border-color: var(--tech-accent, #10b981);
+    box-shadow: 0 0 16px rgba(var(--tech-rgb, 16, 185, 129), 0.35);
+    transform: translateY(-1px);
+    color: #ffffff;
   }
 
-  &:hover {
-    background: rgba(255, 255, 255, 0.24);
-    transform: translateY(-2px);
-    box-shadow: 0 4px 14px rgba(0, 0, 0, 0.2);
-
-    i {
-      transform: rotate(-45deg);
-    }
+  i {
+    font-size: 0.72rem;
   }
 }
 
@@ -486,14 +491,13 @@
 .team-card__image-box {
   position: relative;
   width: 100%;
-  height: clamp(255px, 29vh, 305px);
+  height: 100%;
   overflow: hidden;
   display: flex;
   flex-direction: column;
   align-items: center;
   justify-content: flex-end;
-  padding-bottom: 0.75rem;
-  background: radial-gradient(circle at center, #2b2d30 0%, #151618 100%);
+  background: radial-gradient(circle at 50% 25%, #2a302d 0%, #151917 70%, #0d110f 100%);
 }
 
 // Floating Top Left Icon Glass Badge
@@ -521,14 +525,46 @@
   width: 100%;
   height: 100%;
   object-fit: cover;
-  object-position: center 34%;
+  object-position: center 15%;
   z-index: 1;
-  padding-top: 0.4rem;
-  transition: transform 0.4s ease;
+  transition: transform 0.5s cubic-bezier(0.25, 0.46, 0.45, 0.94);
 }
 
 .team-card:hover .team-card__rect-avatar-img {
   transform: scale(1.04);
+}
+
+// Bottom Info Overlay directly on photo
+.team-card__front-overlay {
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  padding: 2.2rem 0.85rem 1rem;
+  background: linear-gradient(
+    to top,
+    rgba(9, 14, 11, 0.96) 0%,
+    rgba(9, 14, 11, 0.82) 45%,
+    rgba(9, 14, 11, 0.35) 75%,
+    transparent 100%
+  );
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  text-align: center;
+  gap: 0.45rem;
+  z-index: 3;
+
+  .team-card__name {
+    color: #ffffff !important;
+    font-size: 1.05rem;
+    font-weight: 800;
+    letter-spacing: 0.5px;
+    text-transform: uppercase;
+    margin: 0;
+    line-height: 1.25;
+    text-shadow: 0 2px 10px rgba(0, 0, 0, 0.7);
+  }
 }
 
 // Role Pill Badge anchored over bottom of image
@@ -538,15 +574,51 @@
   display: inline-flex;
   align-items: center;
   justify-content: center;
-  width: min(78%, 205px);
-  min-height: 32px;
-  padding: 0.35rem 0.8rem;
+  width: auto;
+  max-width: 90%;
+  min-height: 28px;
+  padding: 0.32rem 0.9rem;
   border-radius: 99px;
   font-size: 0.68rem;
   font-weight: 700;
-  letter-spacing: 0.2px;
-  border: 1.5px solid #ffffff;
-  box-shadow: 0 4px 14px rgba(0, 0, 0, 0.15);
+  letter-spacing: 0.3px;
+  border: 1px solid rgba(255, 255, 255, 0.3);
+  box-shadow: 0 4px 14px rgba(0, 0, 0, 0.3);
+  backdrop-filter: blur(8px);
+}
+
+.team-card__flip-hint {
+  display: inline-flex !important;
+  align-items: center;
+  gap: 0.4rem;
+  font-size: 0.68rem;
+  font-weight: 600;
+  color: rgba(255, 255, 255, 0.92);
+  background: rgba(255, 255, 255, 0.14);
+  backdrop-filter: blur(10px);
+  -webkit-backdrop-filter: blur(10px);
+  padding: 0.32rem 0.85rem;
+  border-radius: 99px;
+  border: 1px solid rgba(255, 255, 255, 0.25);
+  margin-top: 0.25rem;
+  transition: all 0.3s ease;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
+
+  i {
+    font-size: 0.82rem;
+    transition: transform 0.4s ease;
+  }
+}
+
+.team-card:hover .team-card__flip-hint {
+  background: rgba(255, 255, 255, 0.24);
+  color: #ffffff;
+  border-color: rgba(255, 255, 255, 0.45);
+  transform: translateY(-1px);
+
+  i {
+    transform: rotate(180deg);
+  }
 }
 
 // Text Content Below Image
@@ -630,183 +702,55 @@
 // COLOR THEMES (RECTANGULAR DESIGN)
 // ================================
 
-// Card 1: Green Theme (Phan Đăng Huy)
+// Card 1: Cyber Emerald Theme (Phan Đăng Huy - CEO)
 .team-card--green {
-  .team-card__top-icon {
-    color: #2e7d32;
-  }
+  --tech-accent: #10b981;
+  --tech-light: #6ee7b7;
+  --tech-rgb: 16, 185, 129;
+  --tech-glow: rgba(16, 185, 129, 0.26);
 
-  .team-card__role-pill {
-    background: #2e7d32;
-    color: #ffffff;
-  }
-
-  .team-card__name {
-    color: #1b5e20;
-  }
-
-  .team-card__name-accent {
-    background: #2e7d32;
-  }
-
-  .team-card__skill-pill {
-    background: #e8f5e9;
-    color: #2e7d32;
-
-    i {
-      color: #2e7d32;
-    }
-  }
-
-  .team-card__back {
-    background: radial-gradient(circle at 50% 10%, rgba(37, 138, 76, 0.35) 0%, #111a15 65%, #0a110d 100%);
-    border: 1.5px solid rgba(46, 204, 113, 0.4);
-    box-shadow: 0 16px 36px rgba(13, 64, 40, 0.35), 0 4px 12px rgba(0, 0, 0, 0.18);
-  }
-  .team-card__back-role {
-    border-color: rgba(79, 210, 160, 0.45);
-    background: rgba(14, 56, 38, 0.7);
-    color: #bbf7d0;
-  }
-  .team-card__back-return-pill {
-    background: rgba(46, 204, 113, 0.18);
-    border-color: rgba(46, 204, 113, 0.35);
-    color: #e8fbf2;
+  &:hover .team-card__front {
+    border-color: rgba(16, 185, 129, 0.6);
+    box-shadow: 0 20px 48px rgba(16, 185, 129, 0.22);
   }
 }
 
-// Card 2: Blue Theme (Nguyễn Anh Giảng)
+// Card 2: Cyber Cyan Theme (Nguyễn Anh Giảng - CTO / AI)
 .team-card--blue {
-  .team-card__top-icon {
-    color: #1976d2;
-  }
+  --tech-accent: #06b6d4;
+  --tech-light: #67e8f9;
+  --tech-rgb: 6, 182, 212;
+  --tech-glow: rgba(6, 182, 212, 0.26);
 
-  .team-card__role-pill {
-    background: #1976d2;
-    color: #ffffff;
-  }
-
-  .team-card__name {
-    color: #0d47a1;
-  }
-
-  .team-card__name-accent {
-    background: #1976d2;
-  }
-
-  .team-card__skill-pill {
-    background: #e3f2fd;
-    color: #1976d2;
-
-    i {
-      color: #1976d2;
-    }
-  }
-
-  .team-card__back {
-    background: radial-gradient(circle at 50% 10%, rgba(22, 141, 179, 0.35) 0%, #111822 65%, #0b1017 100%);
-    border: 1.5px solid rgba(52, 152, 219, 0.4);
-    box-shadow: 0 16px 36px rgba(12, 53, 79, 0.35), 0 4px 12px rgba(0, 0, 0, 0.18);
-  }
-  .team-card__back-role {
-    border-color: rgba(56, 189, 248, 0.45);
-    background: rgba(14, 44, 68, 0.7);
-    color: #bae6fd;
-  }
-  .team-card__back-return-pill {
-    background: rgba(56, 189, 248, 0.18);
-    border-color: rgba(56, 189, 248, 0.35);
-    color: #f0f9ff;
+  &:hover .team-card__front {
+    border-color: rgba(6, 182, 212, 0.6);
+    box-shadow: 0 20px 48px rgba(6, 182, 212, 0.22);
   }
 }
 
-// Card 3: Purple Theme (Đặng Văn Chung)
+// Card 3: Cyber Violet Theme (Đặng Văn Chung - Field Ops)
 .team-card--purple {
-  .team-card__top-icon {
-    color: #7b1fa2;
-  }
+  --tech-accent: #a855f7;
+  --tech-light: #d8b4fe;
+  --tech-rgb: 168, 85, 247;
+  --tech-glow: rgba(168, 85, 247, 0.26);
 
-  .team-card__role-pill {
-    background: #7b1fa2;
-    color: #ffffff;
-  }
-
-  .team-card__name {
-    color: #4a148c;
-  }
-
-  .team-card__name-accent {
-    background: #7b1fa2;
-  }
-
-  .team-card__skill-pill {
-    background: #f3e5f5;
-    color: #7b1fa2;
-
-    i {
-      color: #7b1fa2;
-    }
-  }
-
-  .team-card__back {
-    background: radial-gradient(circle at 50% 10%, rgba(102, 115, 200, 0.35) 0%, #171524 65%, #0f0e19 100%);
-    border: 1.5px solid rgba(139, 92, 246, 0.4);
-    box-shadow: 0 16px 36px rgba(45, 30, 80, 0.35), 0 4px 12px rgba(0, 0, 0, 0.18);
-  }
-  .team-card__back-role {
-    border-color: rgba(167, 139, 250, 0.45);
-    background: rgba(43, 29, 74, 0.7);
-    color: #e9d5ff;
-  }
-  .team-card__back-return-pill {
-    background: rgba(167, 139, 250, 0.18);
-    border-color: rgba(167, 139, 250, 0.35);
-    color: #faf5ff;
+  &:hover .team-card__front {
+    border-color: rgba(168, 85, 247, 0.6);
+    box-shadow: 0 20px 48px rgba(168, 85, 247, 0.22);
   }
 }
 
-// Card 4: Orange Theme (Huỳnh Anh Tuấn)
+// Card 4: Cyber Amber Theme (Huỳnh Anh Tuấn - Growth)
 .team-card--orange {
-  .team-card__top-icon {
-    color: #e65100;
-  }
+  --tech-accent: #f59e0b;
+  --tech-light: #fcd34d;
+  --tech-rgb: 245, 158, 11;
+  --tech-glow: rgba(245, 158, 11, 0.26);
 
-  .team-card__role-pill {
-    background: #f57c00;
-    color: #ffffff;
-  }
-
-  .team-card__name {
-    color: #bf360c;
-  }
-
-  .team-card__name-accent {
-    background: #e65100;
-  }
-
-  .team-card__skill-pill {
-    background: #fff3e0;
-    color: #e65100;
-
-    i {
-      color: #e65100;
-    }
-  }
-
-  .team-card__back {
-    background: radial-gradient(circle at 50% 10%, rgba(189, 138, 45, 0.35) 0%, #201912 65%, #15100a 100%);
-    border: 1.5px solid rgba(245, 158, 11, 0.4);
-    box-shadow: 0 16px 36px rgba(78, 52, 15, 0.35), 0 4px 12px rgba(0, 0, 0, 0.18);
-  }
-  .team-card__back-role {
-    border-color: rgba(251, 191, 36, 0.45);
-    background: rgba(66, 44, 15, 0.7);
-    color: #fef08a;
-  }
-  .team-card__back-return-pill {
-    background: rgba(245, 158, 11, 0.18);
-    border-color: rgba(245, 158, 11, 0.35);
-    color: #fffbeb;
+  &:hover .team-card__front {
+    border-color: rgba(245, 158, 11, 0.6);
+    box-shadow: 0 20px 48px rgba(245, 158, 11, 0.22);
   }
 }
 
@@ -1104,19 +1048,14 @@
 
 .advisor-cards {
   display: grid;
-  grid-template-columns: repeat(5, 1fr);
-  gap: clamp(0.75rem, 1.2vw, 1.25rem);
+  grid-template-columns: repeat(6, 1fr);
+  gap: clamp(0.5rem, 0.8vw, 0.8rem);
   width: 100%;
-  max-width: 1280px;
+  max-width: 1220px;
+  margin: 0 auto;
   align-items: stretch;
 
-  @media (max-width: 1180px) {
-    grid-template-columns: repeat(3, 1fr);
-    max-width: 880px;
-    gap: 1.15rem;
-  }
-
-  @media (max-width: 768px) {
+  @media (max-width: 1080px) {
     display: flex !important;
     flex-direction: row !important;
     flex-wrap: nowrap !important;
@@ -1125,10 +1064,10 @@
     -webkit-overflow-scrolling: touch;
     scroll-snap-type: x mandatory;
     scroll-behavior: smooth;
-    gap: 14px;
+    gap: 12px;
     width: 100%;
     max-width: 100%;
-    padding: 0.5rem calc((100vw - clamp(230px, 68vw, 260px)) / 2) 0.8rem;
+    padding: 0.5rem calc((100vw - clamp(185px, 50vw, 215px)) / 2) 0.8rem;
     margin: 0;
     scrollbar-width: none;
     &::-webkit-scrollbar {
@@ -1141,307 +1080,205 @@
   position: relative;
   display: flex;
   flex-direction: column;
-  background: #111714;
-  border-radius: 24px;
+  background: transparent;
+  border-radius: 18px;
   overflow: visible !important;
   border: none !important;
   box-shadow: none !important;
   transition: transform 0.35s cubic-bezier(0.25, 0.46, 0.45, 0.94);
   min-width: 0;
-  height: 100%;
-  cursor: default;
+  height: clamp(325px, 38vh, 345px);
+  cursor: pointer;
   user-select: none;
   -webkit-tap-highlight-color: transparent;
+  perspective: 1200px;
+  -webkit-perspective: 1200px;
 
   &:hover {
-    transform: translateY(-7px);
+    transform: translateY(-6px);
   }
 
-  @media (max-width: 768px) {
-    flex: 0 0 clamp(230px, 68vw, 260px) !important;
-    width: clamp(230px, 68vw, 260px) !important;
-    height: clamp(340px, 50vh, 395px) !important;
+  @media (max-width: 1080px) {
+    flex: 0 0 clamp(185px, 50vw, 215px) !important;
+    width: clamp(185px, 50vw, 215px) !important;
+    height: clamp(320px, 45vh, 345px) !important;
     scroll-snap-align: center;
     scroll-snap-stop: always;
-    cursor: pointer !important;
-    perspective: 1000px;
-    -webkit-perspective: 1000px;
   }
 }
 
-// Advisor Card Flipper
+// Advisor Card Flipper (3D flip on both desktop and mobile)
 .advisor-card__flipper {
   position: relative;
   width: 100%;
   height: 100%;
-  display: flex;
-  flex-direction: column;
+  border-radius: 18px;
+  transform-style: preserve-3d;
+  -webkit-transform-style: preserve-3d;
+  transition: transform 0.65s cubic-bezier(0.34, 1.25, 0.64, 1);
 }
 
-@media (min-width: 769px) {
-  .advisor-card.is-flipped .advisor-card__flipper {
-    transform: none;
-  }
+.advisor-card.is-flipped .advisor-card__flipper {
+  transform: rotateY(180deg);
+  -webkit-transform: rotateY(180deg);
 }
 
-@media (max-width: 768px) {
-  .advisor-card__flipper {
-    border-radius: 22px;
-    transform-style: preserve-3d;
-    -webkit-transform-style: preserve-3d;
-    transition: transform 0.55s cubic-bezier(0.25, 1, 0.5, 1);
-  }
-
-  .advisor-card.is-flipped .advisor-card__flipper {
-    transform: rotateY(180deg);
-  }
-}
-
-// Front face
+// Front face: Thẻ đứng sang trọng, không vuông - ảnh ở trên, chữ ở dưới
 .advisor-card__front {
   position: relative;
   width: 100%;
   height: 100%;
   display: flex;
   flex-direction: column;
-  background: #ffffff;
-  border-radius: 24px;
+  background: #111714;
+  border-radius: 18px;
   overflow: hidden;
-  border: 1px solid rgba(19, 120, 89, 0.14);
+  border: 1.5px solid rgba(255, 255, 255, 0.12);
   box-shadow:
-    0 10px 30px rgba(0, 0, 0, 0.04),
-    0 20px 40px rgba(0, 0, 0, 0.02);
+    0 8px 24px rgba(0, 0, 0, 0.2),
+    0 16px 36px rgba(0, 0, 0, 0.14);
   z-index: 2;
-  transition: box-shadow 0.35s ease;
+  transform: rotateY(0deg);
+  -webkit-transform: rotateY(0deg);
+  backface-visibility: hidden;
+  -webkit-backface-visibility: hidden;
+  transform-style: preserve-3d;
+  -webkit-transform-style: preserve-3d;
+  transition: border-color 0.35s ease, box-shadow 0.35s ease;
 }
 
 .advisor-card:hover .advisor-card__front {
   box-shadow:
-    0 18px 40px rgba(0, 0, 0, 0.09),
-    0 30px 60px rgba(0, 0, 0, 0.05);
+    0 16px 38px rgba(0, 0, 0, 0.35),
+    0 24px 50px rgba(0, 0, 0, 0.2);
 }
 
-// Image Header
+// 1. TOP: Khung ảnh chân dung ở trên (tràn viền, không icon che mặt)
 .advisor-card__image-box {
   position: relative;
   width: 100%;
-  height: clamp(235px, 27vh, 285px);
+  height: 190px;
+  flex: 0 0 190px;
   overflow: hidden;
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  justify-content: flex-end;
-  padding-bottom: 0.75rem;
-  background: radial-gradient(circle at center, #2b2d30 0%, #151618 100%);
-}
-
-// Top Left Icon Glass Badge
-.advisor-card__top-icon {
-  position: absolute;
-  top: 0.85rem;
-  left: 0.85rem;
-  width: 38px;
-  height: 38px;
-  border-radius: 50%;
   display: flex;
   align-items: center;
   justify-content: center;
-  font-size: 1.15rem;
-  z-index: 3;
-  background: rgba(255, 255, 255, 0.92);
-  backdrop-filter: blur(6px);
-  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.16);
+  background: radial-gradient(circle at 50% 25%, #2a302d 0%, #151917 70%, #0d110f 100%);
+
+  // Gradient bóng mờ nhẹ chuyển tiếp mượt mà xuống phần chữ
+  &::after {
+    content: '';
+    position: absolute;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    height: 32px;
+    background: linear-gradient(to top, rgba(17, 23, 20, 0.95), transparent);
+    pointer-events: none;
+    z-index: 2;
+  }
 }
 
-// Top Right Code Badge
-.advisor-card__code {
-  position: absolute;
-  top: 0.85rem;
-  right: 0.85rem;
-  padding: 0.22rem 0.55rem;
-  border-radius: 99px;
-  font-size: 0.62rem;
-  font-weight: 800;
-  letter-spacing: 0.5px;
-  z-index: 3;
-  background: rgba(0, 0, 0, 0.55);
-  color: #ffffff;
-  border: 1px solid rgba(255, 255, 255, 0.25);
-  backdrop-filter: blur(4px);
-}
-
-// Advisor Avatar Image
+// Full Photo Avatar Image
 .advisor-card__avatar-img {
-  position: absolute;
-  inset: 0;
   width: 100%;
   height: 100%;
   object-fit: cover;
-  object-position: center 20%;
+  object-position: center 15%;
   z-index: 1;
-  padding-top: 0.2rem;
-  transition: transform 0.4s ease;
+  image-rendering: -webkit-optimize-contrast;
+  transition: transform 0.5s cubic-bezier(0.25, 0.46, 0.45, 0.94);
 }
 
 .advisor-card:hover .advisor-card__avatar-img {
   transform: scale(1.05);
 }
 
-// Role Pill Badge anchored over bottom of image
-.advisor-card__role-pill {
-  position: relative;
-  z-index: 3;
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-  width: min(85%, 215px);
-  min-height: 32px;
-  padding: 0.35rem 0.75rem;
-  border-radius: 99px;
-  font-size: 0.64rem;
-  font-weight: 800;
-  letter-spacing: 0.4px;
-  border: 1.5px solid #ffffff;
-  box-shadow: 0 4px 14px rgba(0, 0, 0, 0.2);
-  text-align: center;
-}
-
-// Flip hint on mobile
-.advisor-card__flip-hint {
-  display: none;
-}
-
-@media (max-width: 768px) {
-  .advisor-card__flip-hint {
-    position: absolute;
-    bottom: 3rem;
-    left: 50%;
-    transform: translateX(-50%);
-    display: inline-flex;
-    align-items: center;
-    gap: 0.35rem;
-    padding: 0.28rem 0.75rem;
-    border-radius: 99px;
-    background: rgba(0, 0, 0, 0.68);
-    backdrop-filter: blur(6px);
-    border: 1px solid rgba(255, 255, 255, 0.25);
-    color: #ffffff;
-    font-size: 0.62rem;
-    font-weight: 600;
-    z-index: 4;
-    white-space: nowrap;
-    pointer-events: none;
-  }
-}
-
-// Card Body
+// 2. BOTTOM: Khung chữ riêng biệt bên dưới ảnh (tối giản, sang trọng)
 .advisor-card__body {
   position: relative;
-  z-index: 2;
+  z-index: 3;
   display: flex;
   flex-direction: column;
   align-items: center;
   text-align: center;
-  padding: 1.15rem 0.95rem 1.1rem;
-  background: #ffffff;
-  flex-grow: 1;
-}
-
-.advisor-card__name {
-  font-size: 0.92rem;
-  font-weight: 800;
-  text-transform: uppercase;
-  letter-spacing: 0.3px;
-  margin: 0 0 0.25rem;
-  line-height: 1.25;
-  min-height: 2.4em;
-  display: flex;
-  align-items: center;
+  padding: 0.85rem 0.65rem 0.95rem;
+  flex: 1;
+  background: linear-gradient(180deg, #131a16 0%, #0c120f 100%);
   justify-content: center;
-}
+  gap: 0.35rem;
 
-.advisor-card__subrole {
-  font-size: 0.72rem;
-  font-weight: 600;
-  line-height: 1.35;
-  margin: 0 0 0.5rem;
-  min-height: 2.6em;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-}
+  .advisor-card__role-pill {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: auto;
+    max-width: 96%;
+    min-height: 20px;
+    padding: 0.16rem 0.58rem;
+    border-radius: 99px;
+    font-size: 0.53rem;
+    font-weight: 800;
+    letter-spacing: 0.25px;
+    background: linear-gradient(135deg, #f59e0b 0%, #d97706 100%) !important;
+    border: 1px solid rgba(255, 255, 255, 0.25) !important;
+    box-shadow: 0 2px 8px rgba(217, 119, 6, 0.35);
+    backdrop-filter: blur(8px);
+    color: #ffffff !important;
+    line-height: 1.1;
+    margin-bottom: 0.2rem;
+  }
 
-.advisor-card__name-accent {
-  width: 28px;
-  height: 3px;
-  border-radius: 99px;
-  margin: 0 auto 0.65rem;
-}
+  .advisor-card__name {
+    color: #ffffff !important;
+    font-size: 0.78rem;
+    font-weight: 800;
+    letter-spacing: 0.25px;
+    text-transform: uppercase;
+    margin: 0;
+    line-height: 1.25;
+    min-height: 2.2em;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    text-shadow: 0 2px 8px rgba(0, 0, 0, 0.6);
+  }
 
-.advisor-card__task {
-  font-size: 0.76rem;
-  color: #555555;
-  line-height: 1.45;
-  font-weight: 500;
-  margin: 0 0 0.85rem;
-  min-height: 3.8em;
-  display: flex;
-  align-items: flex-start;
-  justify-content: center;
-  flex-grow: 1;
-}
-
-.advisor-card__skill-pill {
-  width: 100%;
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-  gap: 0.45rem;
-  padding: 0.45rem 0.8rem;
-  border-radius: 99px;
-  font-size: 0.74rem;
-  font-weight: 700;
-  transition: all 0.25s ease;
-  white-space: nowrap;
-  overflow: hidden;
-  text-overflow: ellipsis;
-
-  i {
-    font-size: 0.88rem;
-    flex-shrink: 0;
+  .advisor-card__subrole {
+    font-size: 0.58rem;
+    font-weight: 500;
+    color: rgba(255, 255, 255, 0.78) !important;
+    line-height: 1.35;
+    margin: 0;
+    min-height: 2.4em;
+    display: flex;
+    align-items: flex-start;
+    justify-content: center;
   }
 }
 
-// Back Face (Interactive / Mobile Flip)
+// Back Face (Lật 3D hiện toàn bộ thông tin chi tiết)
 .advisor-card__back {
-  display: none;
+  display: flex !important;
   position: absolute;
   inset: 0;
   width: 100%;
   height: 100%;
-  border-radius: 24px;
+  border-radius: 18px;
   overflow: hidden;
-  box-shadow: 0 16px 36px rgba(0, 0, 0, 0.28), 0 4px 12px rgba(0, 0, 0, 0.12);
+  box-shadow: 0 14px 36px rgba(0, 0, 0, 0.35), 0 4px 12px rgba(0, 0, 0, 0.2);
   flex-direction: column;
   justify-content: space-between;
-  padding: 1.35rem 1.15rem 1.15rem;
-  z-index: 5;
+  padding: 0.85rem 0.65rem 0.75rem;
+  z-index: 1;
   background: #111714;
-  border: 1.5px solid rgba(255, 255, 255, 0.12);
-}
-
-@media (max-width: 768px) {
-  .advisor-card__back {
-    display: flex;
-    transform: rotateY(180deg);
-    -webkit-backface-visibility: hidden;
-    backface-visibility: hidden;
-  }
-
-  .advisor-card__front {
-    -webkit-backface-visibility: hidden;
-    backface-visibility: hidden;
-  }
+  border: 1.5px solid rgba(255, 255, 255, 0.14);
+  transform: rotateY(180deg);
+  -webkit-transform: rotateY(180deg);
+  backface-visibility: hidden;
+  -webkit-backface-visibility: hidden;
+  transform-style: preserve-3d;
+  -webkit-transform-style: preserve-3d;
 }
 
 .advisor-card__back-top {
@@ -1451,17 +1288,19 @@
   width: 100%;
   position: relative;
   z-index: 2;
+  margin-bottom: 0.3rem;
 
   .advisor-card__top-icon {
     position: static;
-    width: 34px;
-    height: 34px;
-    font-size: 1rem;
+    width: 27px;
+    height: 27px;
+    font-size: 0.82rem;
   }
 
   .advisor-card__code {
     position: static;
-    font-size: 0.65rem;
+    font-size: 0.52rem;
+    padding: 0.12rem 0.42rem;
   }
 }
 
@@ -1470,25 +1309,30 @@
   flex-direction: column;
   align-items: center;
   text-align: center;
-  padding: 0.4rem 0.2rem;
+  padding: 0;
   flex-grow: 1;
   justify-content: center;
   position: relative;
   z-index: 2;
+  overflow-y: auto;
+  scrollbar-width: none;
+  &::-webkit-scrollbar {
+    display: none;
+  }
 }
 
 .advisor-card__back-role {
   display: inline-flex;
   align-items: center;
   justify-content: center;
-  padding: 0.3rem 0.75rem;
+  padding: 0.2rem 0.65rem;
   border-radius: 99px;
-  font-size: 0.62rem;
+  font-size: 0.58rem;
   font-weight: 700;
-  letter-spacing: 0.3px;
-  border: 1px solid rgba(255, 255, 255, 0.2);
-  background: rgba(0, 0, 0, 0.45);
-  color: #ffffff;
+  letter-spacing: 0.25px;
+  border: 1px solid rgba(255, 255, 255, 0.22);
+  background: rgba(255, 255, 255, 0.1);
+  color: rgba(255, 255, 255, 0.9);
   margin-bottom: 0.45rem;
   backdrop-filter: blur(8px);
 }
@@ -1498,88 +1342,36 @@
   font-weight: 800;
   color: #ffffff !important;
   text-transform: uppercase;
-  letter-spacing: 0.4px;
+  letter-spacing: 0.5px;
   margin: 0 0 0.2rem;
-  line-height: 1.25;
+  line-height: 1.2;
 }
 
 .advisor-card__back-subrole {
-  font-size: 0.72rem;
-  color: rgba(255, 255, 255, 0.75);
-  margin: 0 0 0.5rem;
+  font-size: 0.65rem;
+  color: rgba(255, 255, 255, 0.72);
+  margin: 0 0 0.4rem;
+  line-height: 1.35;
 }
 
-.advisor-card__back-stats {
-  display: flex;
-  gap: 0.8rem;
-  margin: 0.4rem 0 0.6rem;
 
-  .advisor-card__back-stat-item {
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    padding: 0.35rem 0.6rem;
-    border-radius: 10px;
-    background: rgba(255, 255, 255, 0.08);
-    border: 1px solid rgba(255, 255, 255, 0.12);
 
-    b {
-      color: #facc15;
-      font-size: 1.1rem;
-      font-weight: 900;
-      line-height: 1.1;
-    }
-
-    span {
-      color: rgba(255, 255, 255, 0.8);
-      font-size: 0.65rem;
-      font-weight: 600;
-    }
-  }
+// Nhiệm vụ & Định hướng chuyên môn trên mặt sau
+.advisor-card__back-task {
+  font-size: 0.65rem;
+  line-height: 1.5;
+  color: rgba(255, 255, 255, 0.88);
+  background: rgba(255, 255, 255, 0.07);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  border-radius: 8px;
+  padding: 0.45rem 0.55rem;
+  margin: 0 0 0.3rem;
+  text-align: center;
+  width: 100%;
+  font-weight: 400;
 }
 
-.advisor-card__back-contact {
-  display: flex;
-  gap: 0.5rem;
-  margin: 0.4rem 0 0.6rem;
 
-  .advisor-card__contact-btn {
-    display: inline-flex;
-    align-items: center;
-    gap: 0.35rem;
-    padding: 0.35rem 0.75rem;
-    border-radius: 99px;
-    font-size: 0.7rem;
-    font-weight: 700;
-    text-decoration: none;
-    color: #ffffff;
-    background: rgba(16, 185, 129, 0.25);
-    border: 1px solid rgba(52, 211, 153, 0.4);
-    transition: all 0.2s ease;
-
-    &:hover {
-      background: rgba(16, 185, 129, 0.4);
-    }
-  }
-}
-
-.advisor-card__back-fields {
-  display: flex;
-  flex-wrap: wrap;
-  justify-content: center;
-  gap: 0.3rem;
-  margin: 0.3rem 0 0.75rem;
-
-  span {
-    padding: 0.18rem 0.55rem;
-    border-radius: 99px;
-    background: rgba(255, 255, 255, 0.08);
-    border: 1px solid rgba(255, 255, 255, 0.12);
-    color: rgba(255, 255, 255, 0.88);
-    font-size: 0.64rem;
-    font-weight: 600;
-  }
-}
 
 .advisor-card__back-bottom {
   display: flex;
@@ -1588,17 +1380,18 @@
   width: 100%;
   position: relative;
   z-index: 2;
+  margin-top: 0.35rem;
 }
 
 .advisor-card__back-return-pill {
   display: inline-flex;
   align-items: center;
   justify-content: center;
-  gap: 0.4rem;
-  font-size: 0.7rem;
+  gap: 0.28rem;
+  font-size: 0.57rem;
   font-weight: 600;
   color: rgba(255, 255, 255, 0.9);
-  padding: 0.35rem 0.9rem;
+  padding: 0.24rem 0.72rem;
   border-radius: 99px;
   background: rgba(255, 255, 255, 0.14);
   border: 1px solid rgba(255, 255, 255, 0.22);
@@ -1608,7 +1401,11 @@
 
   &:hover {
     background: rgba(255, 255, 255, 0.24);
-    transform: translateY(-2px);
+    transform: translateY(-1px);
+  }
+
+  i {
+    font-size: 0.68rem;
   }
 }
 
@@ -1616,220 +1413,92 @@
 // ADVISOR COLOR THEMES
 // ============================================
 
-// 1. Gold Theme: Nguyễn Khắc Minh Trí
+// ADVISOR COLOR THEMES — only hover accent on front, back is unified
 .advisor-card--gold {
-  .advisor-card__top-icon {
-    color: #d97706;
-    background: rgba(254, 243, 199, 0.95);
-  }
-  .advisor-card__role-pill {
-    background: linear-gradient(135deg, #f59e0b 0%, #d97706 100%);
-    color: #ffffff;
-  }
-  .advisor-card__name {
-    color: #78350f;
-  }
-  .advisor-card__subrole {
-    color: #b45309;
-  }
-  .advisor-card__name-accent {
-    background: #f59e0b;
-  }
-  .advisor-card__skill-pill {
-    background: #fef3c7;
-    color: #92400e;
-    i { color: #d97706; }
+  &:hover .advisor-card__front {
+    border-color: rgba(245, 158, 11, 0.5);
+    box-shadow: 0 20px 48px rgba(80, 50, 10, 0.4);
   }
   .advisor-card__back {
-    background: radial-gradient(circle at 50% 10%, rgba(217, 119, 6, 0.38) 0%, #1e170c 65%, #120e07 100%);
-    border: 1.5px solid rgba(245, 158, 11, 0.4);
-    box-shadow: 0 16px 36px rgba(80, 50, 10, 0.35);
-  }
-  .advisor-card__back-role {
-    border-color: rgba(251, 191, 36, 0.45);
-    background: rgba(66, 44, 15, 0.7);
-    color: #fef08a;
+    background: #0e1117;
+    border: 1.5px solid rgba(255, 255, 255, 0.1);
+    box-shadow: 0 16px 36px rgba(0, 0, 0, 0.4);
   }
 }
 
-// 2. Emerald Theme: ThS. LIANG GUEI JIA
+.advisor-card--orange {
+  &:hover .advisor-card__front {
+    border-color: rgba(249, 115, 22, 0.5);
+    box-shadow: 0 20px 48px rgba(124, 45, 18, 0.4);
+  }
+  .advisor-card__back {
+    background: #0e1117;
+    border: 1.5px solid rgba(255, 255, 255, 0.1);
+    box-shadow: 0 16px 36px rgba(0, 0, 0, 0.4);
+  }
+}
+
 .advisor-card--emerald {
-  .advisor-card__top-icon {
-    color: #059669;
-    background: rgba(209, 250, 229, 0.95);
-  }
-  .advisor-card__role-pill {
-    background: linear-gradient(135deg, #10b981 0%, #059669 100%);
-    color: #ffffff;
-  }
-  .advisor-card__name {
-    color: #064e3b;
-  }
-  .advisor-card__subrole {
-    color: #047857;
-  }
-  .advisor-card__name-accent {
-    background: #10b981;
-  }
-  .advisor-card__skill-pill {
-    background: #d1fae5;
-    color: #065f46;
-    i { color: #059669; }
+  &:hover .advisor-card__front {
+    border-color: rgba(16, 185, 129, 0.5);
+    box-shadow: 0 20px 48px rgba(10, 60, 40, 0.4);
   }
   .advisor-card__back {
-    background: radial-gradient(circle at 50% 10%, rgba(16, 185, 129, 0.38) 0%, #0d1a14 65%, #08110d 100%);
-    border: 1.5px solid rgba(52, 211, 153, 0.4);
-    box-shadow: 0 16px 36px rgba(10, 60, 40, 0.35);
-  }
-  .advisor-card__back-role {
-    border-color: rgba(74, 222, 128, 0.45);
-    background: rgba(14, 56, 38, 0.7);
-    color: #bbf7d0;
+    background: #0e1117;
+    border: 1.5px solid rgba(255, 255, 255, 0.1);
+    box-shadow: 0 16px 36px rgba(0, 0, 0, 0.4);
   }
 }
 
-// 3. Blue Theme: ThS. NGUYỄN HUỲNH THÔNG
 .advisor-card--blue {
-  .advisor-card__top-icon {
-    color: #2563eb;
-    background: rgba(219, 234, 254, 0.95);
-  }
-  .advisor-card__role-pill {
-    background: linear-gradient(135deg, #3b82f6 0%, #1d4ed8 100%);
-    color: #ffffff;
-  }
-  .advisor-card__name {
-    color: #1e3a8a;
-  }
-  .advisor-card__subrole {
-    color: #1d4ed8;
-  }
-  .advisor-card__name-accent {
-    background: #3b82f6;
-  }
-  .advisor-card__skill-pill {
-    background: #dbeafe;
-    color: #1e40af;
-    i { color: #2563eb; }
+  &:hover .advisor-card__front {
+    border-color: rgba(59, 130, 246, 0.5);
+    box-shadow: 0 20px 48px rgba(15, 40, 80, 0.4);
   }
   .advisor-card__back {
-    background: radial-gradient(circle at 50% 10%, rgba(37, 99, 235, 0.38) 0%, #0f1626 65%, #0a0e19 100%);
-    border: 1.5px solid rgba(96, 165, 250, 0.4);
-    box-shadow: 0 16px 36px rgba(15, 40, 80, 0.35);
-  }
-  .advisor-card__back-role {
-    border-color: rgba(96, 165, 250, 0.45);
-    background: rgba(18, 45, 90, 0.7);
-    color: #bfdbfe;
+    background: #0e1117;
+    border: 1.5px solid rgba(255, 255, 255, 0.1);
+    box-shadow: 0 16px 36px rgba(0, 0, 0, 0.4);
   }
 }
 
-// 4. Teal Theme: ThS. PHẠM ĐÌNH TÀI
 .advisor-card--teal {
-  .advisor-card__top-icon {
-    color: #0d9488;
-    background: rgba(204, 251, 241, 0.95);
-  }
-  .advisor-card__role-pill {
-    background: linear-gradient(135deg, #14b8a6 0%, #0f766e 100%);
-    color: #ffffff;
-  }
-  .advisor-card__name {
-    color: #134e4a;
-  }
-  .advisor-card__subrole {
-    color: #0f766e;
-  }
-  .advisor-card__name-accent {
-    background: #14b8a6;
-  }
-  .advisor-card__skill-pill {
-    background: #ccfbf1;
-    color: #115e59;
-    i { color: #0d9488; }
+  &:hover .advisor-card__front {
+    border-color: rgba(20, 184, 166, 0.5);
+    box-shadow: 0 20px 48px rgba(10, 50, 50, 0.4);
   }
   .advisor-card__back {
-    background: radial-gradient(circle at 50% 10%, rgba(20, 184, 166, 0.38) 0%, #0c1817 65%, #081010 100%);
-    border: 1.5px solid rgba(45, 212, 191, 0.4);
-    box-shadow: 0 16px 36px rgba(10, 50, 50, 0.35);
-  }
-  .advisor-card__back-role {
-    border-color: rgba(45, 212, 191, 0.45);
-    background: rgba(15, 55, 50, 0.7);
-    color: #99f6e4;
+    background: #0e1117;
+    border: 1.5px solid rgba(255, 255, 255, 0.1);
+    box-shadow: 0 16px 36px rgba(0, 0, 0, 0.4);
   }
 }
 
-// 5. Purple Theme: TS. HOÀNG THỊNH NHÂN
 .advisor-card--purple {
-  .advisor-card__top-icon {
-    color: #7c3aed;
-    background: rgba(237, 233, 254, 0.95);
-  }
-  .advisor-card__role-pill {
-    background: linear-gradient(135deg, #8b5cf6 0%, #6d28d9 100%);
-    color: #ffffff;
-  }
-  .advisor-card__name {
-    color: #4c1d95;
-  }
-  .advisor-card__subrole {
-    color: #6d28d9;
-  }
-  .advisor-card__name-accent {
-    background: #8b5cf6;
-  }
-  .advisor-card__skill-pill {
-    background: #ede9fe;
-    color: #5b21b6;
-    i { color: #7c3aed; }
+  &:hover .advisor-card__front {
+    border-color: rgba(139, 92, 246, 0.5);
+    box-shadow: 0 20px 48px rgba(45, 25, 80, 0.4);
   }
   .advisor-card__back {
-    background: radial-gradient(circle at 50% 10%, rgba(139, 92, 246, 0.38) 0%, #161024 65%, #0f0b18 100%);
-    border: 1.5px solid rgba(167, 139, 250, 0.4);
-    box-shadow: 0 16px 36px rgba(45, 25, 80, 0.35);
-  }
-  .advisor-card__back-role {
-    border-color: rgba(196, 181, 253, 0.45);
-    background: rgba(43, 29, 74, 0.7);
-    color: #ddd6fe;
+    background: #0e1117;
+    border: 1.5px solid rgba(255, 255, 255, 0.1);
+    box-shadow: 0 16px 36px rgba(0, 0, 0, 0.4);
   }
 }
 
 // Section Divider
 .team-section-divider {
   width: 100%;
-  max-width: 1100px;
+  max-width: 960px;
   display: flex;
   align-items: center;
   justify-content: center;
-  gap: 1.25rem;
-  margin: 2.2rem 0 1rem;
+  margin: 3.2rem auto 2.2rem;
 
   &__line {
     flex: 1;
     height: 1px;
-    background: linear-gradient(90deg, transparent, rgba(18, 132, 91, 0.25), transparent);
-  }
-
-  &__chip {
-    display: inline-flex;
-    align-items: center;
-    gap: 0.5rem;
-    padding: 0.4rem 1.15rem;
-    border-radius: 99px;
-    background: rgba(240, 252, 246, 0.95);
-    border: 1px solid rgba(18, 132, 91, 0.2);
-    color: #166534;
-    font-size: 0.7rem;
-    font-weight: 800;
-    letter-spacing: 1.2px;
-    box-shadow: 0 2px 10px rgba(0, 0, 0, 0.04);
-
-    i {
-      font-size: 0.9rem;
-      color: #15803d;
-    }
+    background: linear-gradient(90deg, transparent, rgba(18, 132, 91, 0.22), transparent);
   }
 }
 
@@ -1838,13 +1507,25 @@
   background: #f59e0b !important;
   box-shadow: 0 0 10px rgba(245, 158, 11, 0.5);
 }
+.team-showcase__dot--orange.is-active {
+  background: #f97316 !important;
+  box-shadow: 0 0 10px rgba(249, 115, 22, 0.5);
+}
 .team-showcase__dot--emerald.is-active {
   background: #10b981 !important;
   box-shadow: 0 0 10px rgba(16, 185, 129, 0.5);
 }
+.team-showcase__dot--blue.is-active {
+  background: #3b82f6 !important;
+  box-shadow: 0 0 10px rgba(59, 130, 246, 0.5);
+}
 .team-showcase__dot--teal.is-active {
   background: #14b8a6 !important;
   box-shadow: 0 0 10px rgba(20, 184, 166, 0.5);
+}
+.team-showcase__dot--purple.is-active {
+  background: #8b5cf6 !important;
+  box-shadow: 0 0 10px rgba(139, 92, 246, 0.5);
 }
 
 .carousel-3d {
@@ -2107,19 +1788,20 @@
 
 @media (max-width: 600px) {
   .team-showcase {
-    padding: 3.5rem 1rem;
+    padding: 2.8rem 0.5rem 1.8rem;
   }
 
   .team-showcase__container {
-    gap: 2rem;
+    gap: 0.75rem;
   }
 
   .team-showcase__title {
-    font-size: 2rem;
+    font-size: clamp(1.22rem, 5.2vw, 1.45rem);
   }
 
   .team-showcase__desc {
-    font-size: 0.9rem;
+    font-size: 0.76rem;
+    line-height: 1.45;
   }
 
   .carousel-3d {
@@ -2317,14 +1999,63 @@
 }
 
 .team-card__role-pill {
-  border: 1px solid rgba(205, 255, 241, 0.55);
-  background: rgba(7, 33, 28, 0.76) !important;
-  color: #f2fffb !important;
+  border: 1px solid rgba(205, 255, 241, 0.4);
+  background: rgba(10, 30, 24, 0.8) !important;
+  color: #e2fff7 !important;
   backdrop-filter: blur(10px);
 }
 
+.team-card--green .team-card__role-pill {
+  background: rgba(14, 56, 38, 0.85) !important;
+  border-color: rgba(79, 210, 160, 0.5);
+  color: #d1fae5 !important;
+}
+
+.team-card--blue .team-card__role-pill {
+  background: rgba(14, 44, 68, 0.85) !important;
+  border-color: rgba(56, 189, 248, 0.5);
+  color: #e0f2fe !important;
+}
+
+.team-card--purple .team-card__role-pill {
+  background: rgba(48, 20, 74, 0.85) !important;
+  border-color: rgba(167, 139, 250, 0.5);
+  color: #ede9fe !important;
+}
+
+.team-card--orange .team-card__role-pill {
+  background: rgba(64, 38, 12, 0.85) !important;
+  border-color: rgba(245, 158, 11, 0.5);
+  color: #fef3c7 !important;
+}
+
+.team-card--green:hover .team-card__front {
+  border-color: rgba(46, 204, 113, 0.55);
+  box-shadow: 0 20px 48px rgba(13, 64, 40, 0.45);
+}
+
+.team-card--blue:hover .team-card__front {
+  border-color: rgba(56, 189, 248, 0.55);
+  box-shadow: 0 20px 48px rgba(12, 53, 79, 0.45);
+}
+
+.team-card--purple:hover .team-card__front {
+  border-color: rgba(167, 139, 250, 0.55);
+  box-shadow: 0 20px 48px rgba(50, 20, 80, 0.45);
+}
+
+.team-card--orange:hover .team-card__front {
+  border-color: rgba(245, 158, 11, 0.55);
+  box-shadow: 0 20px 48px rgba(70, 40, 10, 0.45);
+}
+
+.team-card__front-overlay .team-card__name {
+  color: #ffffff !important;
+  text-shadow: 0 2px 12px rgba(0, 0, 0, 0.85);
+}
+
 .team-card__name {
-  color: #14583c !important;
+  color: #ffffff !important;
 }
 
 .team-card__name-accent {

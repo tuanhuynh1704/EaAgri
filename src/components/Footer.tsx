@@ -67,7 +67,7 @@ export default function Footer() {
               </a>
             </li>
             <li>
-              <a href="#" onClick={(e) => { e.preventDefault(); navigate("/architecture"); }}>
+              <a href="#" onClick={(e) => { e.preventDefault(); navigate("/kien-truc"); }}>
                 <i className="ri-node-tree"></i> <span>Kiến trúc hệ thống</span>
               </a>
             </li>

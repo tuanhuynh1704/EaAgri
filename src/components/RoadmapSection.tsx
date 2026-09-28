@@ -1,4 +1,4 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef } from "react";
 import { supabase } from "../utils/supabase/client";
 
 interface PhaseItem {
@@ -15,6 +15,27 @@ export default function RoadmapSection() {
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [isSuccess, setIsSuccess] = useState(false);
   const [errorMessage, setErrorMessage] = useState("");
+  const [activePhaseIndex, setActivePhaseIndex] = useState(0);
+  const timelineScrollRef = useRef<HTMLDivElement>(null);
+
+  const handleTimelineScroll = () => {
+    if (!timelineScrollRef.current) return;
+    const { scrollLeft, scrollWidth, clientWidth } = timelineScrollRef.current;
+    const maxScroll = scrollWidth - clientWidth;
+    if (maxScroll <= 0) return;
+    const ratio = scrollLeft / maxScroll;
+    const newIdx = Math.min(Math.round(ratio * 3), 3);
+    setActivePhaseIndex(newIdx);
+  };
+
+  const scrollToPhase = (idx: number) => {
+    if (!timelineScrollRef.current) return;
+    const items = timelineScrollRef.current.children;
+    const target = items[idx + 1] as HTMLElement;
+    if (target) {
+      target.scrollIntoView({ behavior: "smooth", block: "nearest", inline: "center" });
+    }
+  };
 
   const [formData, setFormData] = useState({
     fullName: "",
@@ -185,7 +206,11 @@ export default function RoadmapSection() {
             <h2 className="roadmap__title">Lộ Trình Phát Triển</h2>
           </div>
 
-          <div className="roadmap__timeline">
+          <div
+            className="roadmap__timeline"
+            ref={timelineScrollRef}
+            onScroll={handleTimelineScroll}
+          >
             <div className="roadmap__timeline-bar"></div>
             
             {phases.map((phase, idx) => (
@@ -206,6 +231,27 @@ export default function RoadmapSection() {
                 </div>
               </div>
             ))}
+          </div>
+
+          {/* Mobile Step Indicators & Swipe Cue */}
+          <div className="roadmap__mobile-nav">
+            <div className="roadmap__mobile-steps">
+              {phases.map((phase, idx) => (
+                <button
+                  key={idx}
+                  type="button"
+                  className={`roadmap__mobile-step ${activePhaseIndex === idx ? "active" : ""}`}
+                  onClick={() => scrollToPhase(idx)}
+                  aria-label={`Đi tới ${phase.title}`}
+                >
+                  <span className="step-num">{idx + 1}</span>
+                  <span className="step-label">{phase.time}</span>
+                </button>
+              ))}
+            </div>
+            <div className="roadmap__mobile-hint">
+              <i className="ri-arrow-left-right-line"></i> Vuốt ngang để xem 4 giai đoạn
+            </div>
           </div>
         </div>
       </div>
