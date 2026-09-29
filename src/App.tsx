@@ -11,6 +11,7 @@ import VoteAnnouncementBar from "./components/VoteAnnouncementBar";
 import AppStoreNoticeModal from "./components/AppStoreNoticeModal";
 import PromoVideoModal from "./components/PromoVideoModal";
 import { AuthProvider } from "./context/AuthContext";
+import { VoteProvider } from "./context/VoteContext";
 import { usePauseOffscreenAnimations } from "./hooks/usePauseOffscreenAnimations";
 import { recordVisitorHit } from "./services/visitorTracker";
 
@@ -52,16 +53,18 @@ function App() {
 
   return (
     <AuthProvider>
-      {!isAuthPage && !isAdminPage && <VoteAnnouncementBar />}
-      {!isAuthPage && <Navbar />}
-      <Suspense fallback={<RouteFallback />}>
-        <Outlet />
-      </Suspense>
-      {!isAuthPage && !isAdminPage && <Footer />}
-      {!isAuthPage && !isAdminPage && <FloatingContact />}
-      {!isAuthPage && !isAdminPage && <FloatingVoteWidget />}
-      <AppStoreNoticeModal />
-      <PromoVideoModal />
+      <VoteProvider>
+        {!isAuthPage && !isAdminPage && <VoteAnnouncementBar />}
+        {!isAuthPage && <Navbar />}
+        <Suspense fallback={<RouteFallback />}>
+          <Outlet />
+        </Suspense>
+        {!isAuthPage && !isAdminPage && <Footer />}
+        {!isAuthPage && !isAdminPage && <FloatingContact />}
+        {!isAuthPage && !isAdminPage && <FloatingVoteWidget />}
+        <AppStoreNoticeModal />
+        <PromoVideoModal />
+      </VoteProvider>
     </AuthProvider>
   );
 }

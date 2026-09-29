@@ -1,9 +1,11 @@
 import { useState, useEffect } from "react";
 import { NTTU_VOTE_CONFIG } from "../data/voteConfig";
+import { useVoteStats } from "../context/VoteContext";
 
 const SESSION_STORAGE_KEY = "eaagri_vote_banner_hidden";
 
 export default function VoteAnnouncementBar() {
+  const { formattedVotes, isPulsing } = useVoteStats();
   const [isVisible, setIsVisible] = useState(() => {
     if (typeof window === "undefined") return false;
     try {
@@ -51,10 +53,17 @@ export default function VoteAnnouncementBar() {
         <div className="vote-announcement-bar__content">
           <i className="ri-trophy-fill vote-trophy-icon" />
           <span className="vote-announcement-bar__text vote-announcement-bar__text--desktop">
-            Tiếp sức dự án <strong>EaAgri</strong> tại <strong>NTTU Startup 2026</strong> • Đã đạt <span className="vote-highlight">{NTTU_VOTE_CONFIG.currentVotes} vote</span> • Cùng đồng hành nhé!
+            Tiếp sức dự án <strong>EaAgri</strong> tại <strong>NTTU Startup 2026</strong> • Đã đạt{" "}
+            <span className={`vote-highlight ${isPulsing ? "vote-highlight--pulse" : ""}`}>
+              {formattedVotes} vote
+            </span>{" "}
+            • Cùng đồng hành nhé!
           </span>
           <span className="vote-announcement-bar__text vote-announcement-bar__text--mobile">
-            Tiếp sức <strong>EaAgri</strong> • <span className="vote-highlight">{NTTU_VOTE_CONFIG.currentVotes} vote</span>
+            Tiếp sức <strong>EaAgri</strong> •{" "}
+            <span className={`vote-highlight ${isPulsing ? "vote-highlight--pulse" : ""}`}>
+              {formattedVotes} vote
+            </span>
           </span>
         </div>
 

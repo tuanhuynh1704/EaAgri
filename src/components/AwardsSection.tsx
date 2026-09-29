@@ -2,6 +2,7 @@ import { useState, useEffect, useRef, useCallback } from "react";
 import { createPortal } from "react-dom";
 import { Link } from "react-router-dom";
 import { NTTU_VOTE_CONFIG } from "../data/voteConfig";
+import { useVoteStats } from "../context/VoteContext";
 
 interface AwardImage {
   url: string;
@@ -163,6 +164,7 @@ const AUTO_SWITCH_INTERVAL = 8000; // 8 seconds per tab
 const SUB_IMAGE_INTERVAL = 3800; // 3.8 seconds per sub-image
 
 export default function AwardsSection() {
+  const { formattedVotes, rank } = useVoteStats();
   const [activeTabIdx, setActiveTabIdx] = useState(0);
   const [activeImgIdx, setActiveImgIdx] = useState(0);
   const [isPaused, setIsPaused] = useState(false);
@@ -595,7 +597,7 @@ export default function AwardsSection() {
                     Tiếp Sức Cho Dự Án EaAgri Tại NTTU Startup 2026
                   </h4>
                   <p className="awards-section__vote-desc">
-                    Dự án đã đạt <strong>{NTTU_VOTE_CONFIG.currentVotes}</strong> lượt vote! Chỉ mất 5 giây với 1 chạm để giúp đưa công nghệ AI &amp; IoT hỗ trợ nông dân sầu riêng vươn xa.
+                    Dự án đã đạt <strong>{formattedVotes}</strong> lượt vote{rank ? ` (Top ${rank})` : ""}! Chỉ mất 5 giây với 1 chạm để giúp đưa công nghệ AI &amp; IoT hỗ trợ nông dân sầu riêng vươn xa.
                   </p>
                 </div>
                 <a
