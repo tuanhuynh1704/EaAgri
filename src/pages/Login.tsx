@@ -74,10 +74,11 @@ export default function Login() {
     if (loginAdminEnv && loginAdminEnv(email.trim(), password)) {
       setAlert({
         type: "success",
-        message: "Đăng nhập Quản Trị Viên thành công! Đang chuyển hướng..."
+        message: "Đăng nhập Quản Trị Viên thành công! Đang chuyển đến trang thống kê truy cập..."
       });
       setTimeout(() => {
-        navigate(from, { replace: true });
+        const target = from === "/" ? "/admin/traffic" : from;
+        navigate(target, { replace: true });
       }, 500);
       setIsLoading(false);
       return;

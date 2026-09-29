@@ -1,6 +1,7 @@
 import { useState, useEffect, useRef, useCallback } from "react";
 import { createPortal } from "react-dom";
 import { Link } from "react-router-dom";
+import { NTTU_VOTE_CONFIG } from "../data/voteConfig";
 
 interface AwardImage {
   url: string;
@@ -580,6 +581,35 @@ export default function AwardsSection() {
                   </a>
                 </div>
               </aside>
+            )}
+
+            {currentAward.id === "startup-contest" && (
+              <div className="awards-section__vote-card" data-aos="zoom-in" data-aos-delay="150">
+                <div className="awards-section__vote-glow" aria-hidden="true" />
+                <div className="awards-section__vote-content">
+                  <div className="awards-section__vote-badge">
+                    <span className="awards-section__vote-dot" />
+                    <span>CỔNG BÌNH CHỌN CỘNG ĐỒNG ĐANG MỞ</span>
+                  </div>
+                  <h4 className="awards-section__vote-title">
+                    Tiếp Sức Cho Dự Án EaAgri Tại NTTU Startup 2026
+                  </h4>
+                  <p className="awards-section__vote-desc">
+                    Dự án đã đạt <strong>{NTTU_VOTE_CONFIG.currentVotes}</strong> lượt vote! Chỉ mất 5 giây với 1 chạm để giúp đưa công nghệ AI &amp; IoT hỗ trợ nông dân sầu riêng vươn xa.
+                  </p>
+                </div>
+                <a
+                  href={NTTU_VOTE_CONFIG.url}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="awards-section__vote-btn"
+                  title="Bình chọn cho EaAgri trên cổng NIIC"
+                >
+                  <i className="ri-heart-pulse-fill" />
+                  <span>Bình chọn ngay</span>
+                  <i className="ri-arrow-right-line" />
+                </a>
+              </div>
             )}
 
             {/* Staggered Highlight Point Cards */}

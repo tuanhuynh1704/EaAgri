@@ -239,6 +239,18 @@ const Navbar = () => {
                           className="nav__user-dropdown-item"
                           onClick={() => {
                             setIsUserMenuOpen(false);
+                            navigate("/admin/traffic");
+                          }}
+                        >
+                          <i className="ri-radar-line" />
+                          <span>Thống kê IP & Truy cập</span>
+                        </button>
+
+                        <button
+                          type="button"
+                          className="nav__user-dropdown-item"
+                          onClick={() => {
+                            setIsUserMenuOpen(false);
                             navigate("/admin/cooperation");
                           }}
                         >
@@ -452,6 +464,17 @@ const Navbar = () => {
         <div className="mobile-drawer__admin-section">
           <span className="mobile-drawer__section-title">QUẢN TRỊ VIÊN</span>
           <div className="mobile-drawer__admin-grid">
+            <button
+              type="button"
+              className="mobile-drawer__admin-btn"
+              onClick={() => {
+                setIsMobileMenuOpen(false);
+                navigate("/admin/traffic");
+              }}
+            >
+              <i className="ri-radar-line" />
+              <span>Lượt truy cập & IP</span>
+            </button>
             <button
               type="button"
               className="mobile-drawer__admin-btn"

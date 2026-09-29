@@ -6,10 +6,13 @@ import { Outlet, useLocation } from "react-router-dom";
 import Navbar from "./components/Navbar";
 import Footer from "./components/Footer";
 import FloatingContact from "./components/FloatingContact";
+import FloatingVoteWidget from "./components/FloatingVoteWidget";
+import VoteAnnouncementBar from "./components/VoteAnnouncementBar";
 import AppStoreNoticeModal from "./components/AppStoreNoticeModal";
 import PromoVideoModal from "./components/PromoVideoModal";
 import { AuthProvider } from "./context/AuthContext";
 import { usePauseOffscreenAnimations } from "./hooks/usePauseOffscreenAnimations";
+import { recordVisitorHit } from "./services/visitorTracker";
 
 function RouteFallback() {
   return (
@@ -22,6 +25,7 @@ function RouteFallback() {
 function App() {
   const { pathname } = useLocation();
   const isAuthPage = pathname === "/login" || pathname === "/register";
+  const isAdminPage = pathname.startsWith("/admin");
 
   usePauseOffscreenAnimations();
 
@@ -30,7 +34,11 @@ function App() {
       window.history.scrollRestoration = 'manual';
     }
     window.scrollTo(0, 0);
-  }, [pathname]);
+    // Track visitor hit for this machine / IP (skip tracking admin dashboard itself)
+    if (!isAdminPage) {
+      recordVisitorHit(pathname);
+    }
+  }, [pathname, isAdminPage]);
 
   useEffect(() => {
     AOS.init({
@@ -44,12 +52,14 @@ function App() {
 
   return (
     <AuthProvider>
+      {!isAuthPage && !isAdminPage && <VoteAnnouncementBar />}
       {!isAuthPage && <Navbar />}
       <Suspense fallback={<RouteFallback />}>
         <Outlet />
       </Suspense>
-      {!isAuthPage && <Footer />}
-      {!isAuthPage && <FloatingContact />}
+      {!isAuthPage && !isAdminPage && <Footer />}
+      {!isAuthPage && !isAdminPage && <FloatingContact />}
+      {!isAuthPage && !isAdminPage && <FloatingVoteWidget />}
       <AppStoreNoticeModal />
       <PromoVideoModal />
     </AuthProvider>

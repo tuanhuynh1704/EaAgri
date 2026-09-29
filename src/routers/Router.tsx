@@ -16,6 +16,7 @@ const Register = lazy(() => import("../pages/Register"));
 const AccountManagement = lazy(() => import("../pages/AccountManagement"));
 const ManageNews = lazy(() => import("../pages/ManageNews"));
 const ManageCooperation = lazy(() => import("../pages/ManageCooperation"));
+const ManageTraffic = lazy(() => import("../pages/ManageTraffic"));
 
 export const router = createBrowserRouter([
   {
@@ -50,6 +51,10 @@ export const router = createBrowserRouter([
       { path: "/admin/tintuc", element: <ManageNews /> },
       { path: "/admin/news", element: <Navigate to="/admin/tintuc" replace /> },
       { path: "/admin/cooperation", element: <ManageCooperation /> },
+      { path: "/admin/traffic", element: <ManageTraffic /> },
+      { path: "/admin/visitors", element: <Navigate to="/admin/traffic" replace /> },
+      { path: "/admin/analytics", element: <Navigate to="/admin/traffic" replace /> },
+      { path: "/admin/ips", element: <Navigate to="/admin/traffic" replace /> },
     ]
   },
 ]);
