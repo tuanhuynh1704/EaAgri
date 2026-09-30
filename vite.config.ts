@@ -1,5 +1,11 @@
 import { defineConfig } from 'vite'
 import react from '@vitejs/plugin-react'
+import fs from 'fs'
+import path from 'path'
+import { fileURLToPath } from 'url'
+
+const __filename = fileURLToPath(import.meta.url)
+const __dirname = path.dirname(__filename)
 
 import dotenv from 'dotenv'
 dotenv.config()
@@ -205,6 +211,161 @@ function customVotingApiPlugin() {
 }
 
 // https://vite.dev/config/
+
+function visitorTrackingApiPlugin() {
+  const dataFilePath = path.resolve(__dirname, 'src/data/visitor_logs.json')
+
+  const readLogs = (): any[] => {
+    try {
+      if (fs.existsSync(dataFilePath)) {
+        const fileContent = fs.readFileSync(dataFilePath, 'utf-8')
+        return JSON.parse(fileContent) || []
+      }
+    } catch {}
+    return []
+  }
+
+  const writeLogs = (logs: any[]) => {
+    try {
+      const dir = path.dirname(dataFilePath)
+      if (!fs.existsSync(dir)) fs.mkdirSync(dir, { recursive: true })
+      fs.writeFileSync(dataFilePath, JSON.stringify(logs, null, 2), 'utf-8')
+    } catch {}
+  }
+
+  return {
+    name: 'visitor-tracking-api-plugin',
+    configureServer(server: any) {
+      server.middlewares.use('/api/visitor-track', async (req: any, res: any, next: any) => {
+        res.setHeader('Access-Control-Allow-Origin', '*')
+        res.setHeader('Access-Control-Allow-Methods', 'GET, POST, DELETE, OPTIONS')
+        res.setHeader('Access-Control-Allow-Headers', 'Content-Type, Authorization')
+
+        if (req.method === 'OPTIONS') {
+          res.statusCode = 200
+          res.end()
+          return
+        }
+
+        // GET: Return all visitor logs
+        if (req.method === 'GET') {
+          const logs = readLogs()
+          res.statusCode = 200
+          res.setHeader('Content-Type', 'application/json; charset=utf-8')
+          res.setHeader('Cache-Control', 'no-store, no-cache, must-revalidate')
+          res.end(JSON.stringify(logs))
+          return
+        }
+
+        // DELETE: Clear logs
+        if (req.method === 'DELETE') {
+          writeLogs([])
+          server.ws.send({ type: 'custom', event: 'eaagri:visitor-updated', data: [] })
+          res.statusCode = 200
+          res.setHeader('Content-Type', 'application/json; charset=utf-8')
+          res.end(JSON.stringify({ success: true, count: 0 }))
+          return
+        }
+
+        // POST: Record visitor hit (enter/leave/visit)
+        if (req.method === 'POST') {
+          let body = ''
+          req.on('data', (chunk: any) => {
+            body += chunk
+          })
+          req.on('end', () => {
+            try {
+              const data = JSON.parse(body || '{}')
+              let logs = readLogs()
+
+              const socketIp =
+                req.headers['x-forwarded-for']?.toString().split(',')[0].trim() ||
+                req.socket?.remoteAddress ||
+                '127.0.0.1'
+
+              const cleanSocketIp = socketIp.replace(/^.*:/, '')
+
+              const effectiveIp =
+                data.ip_address && data.ip_address !== '127.0.0.1' && !data.ip_address.startsWith('192.168.')
+                  ? data.ip_address
+                  : (cleanSocketIp || data.ip_address || '116.111.184.173')
+
+              const nowIso = new Date().toISOString()
+              const deviceId = data.device_id || `dev_${Date.now()}`
+
+              // Find existing by device_id or IP address
+              const existingIdx = logs.findIndex(
+                (item: any) => item.device_id === deviceId || item.ip_address === effectiveIp
+              )
+
+              if (existingIdx >= 0) {
+                const existing = logs[existingIdx]
+                logs[existingIdx] = {
+                  ...existing,
+                  device_id: deviceId,
+                  ip_address: effectiveIp,
+                  city: data.city || existing.city || 'TP. Hồ Chí Minh',
+                  region: data.region || existing.region || 'Việt Nam',
+                  country: data.country || existing.country || 'Việt Nam',
+                  device_type: data.device_type || existing.device_type,
+                  os: data.os || existing.os,
+                  browser: data.browser || existing.browser,
+                  screen_resolution: data.screen_resolution || existing.screen_resolution,
+                  visit_count: (existing.visit_count || 1) + 1,
+                  last_path: data.last_path || existing.last_path || '/',
+                  is_online: true,
+                  last_visit: nowIso,
+                }
+              } else {
+                const newRecord = {
+                  id: `log_${Date.now()}`,
+                  device_id: deviceId,
+                  ip_address: effectiveIp,
+                  city: data.city || 'TP. Hồ Chí Minh',
+                  region: data.region || 'Việt Nam',
+                  country: data.country || 'Việt Nam',
+                  device_type: data.device_type || 'Desktop',
+                  os: data.os || 'Windows 11 / 10',
+                  browser: data.browser || 'Chrome',
+                  screen_resolution: data.screen_resolution || '1920x1080',
+                  visit_count: 1,
+                  last_path: data.last_path || '/',
+                  referrer: data.referrer || 'Trực tiếp (Direct)',
+                  is_online: true,
+                  first_visit: nowIso,
+                  last_visit: nowIso,
+                }
+                logs.unshift(newRecord)
+              }
+
+              writeLogs(logs)
+
+              // Broadcast update to all open dashboards in realtime
+              server.ws.send({
+                type: 'custom',
+                event: 'eaagri:visitor-updated',
+                data: logs,
+              })
+
+              res.statusCode = 200
+              res.setHeader('Content-Type', 'application/json; charset=utf-8')
+              res.end(JSON.stringify({ success: true, count: logs.length, logs }))
+            } catch (err: any) {
+              res.statusCode = 400
+              res.setHeader('Content-Type', 'application/json; charset=utf-8')
+              res.end(JSON.stringify({ success: false, error: err.message }))
+            }
+          })
+          return
+        }
+
+        next()
+      })
+    },
+  }
+}
+
+
 export default defineConfig({
   define: {
     // Changes on every push/deploy; AuthContext signs everyone out when it changes
@@ -228,6 +389,7 @@ export default defineConfig({
   },
   plugins: [
     customVotingApiPlugin(),
+    visitorTrackingApiPlugin(),
     react({
       babel: {
         plugins: [['babel-plugin-react-compiler']],

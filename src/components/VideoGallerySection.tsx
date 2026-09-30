@@ -50,18 +50,44 @@ export default function VideoGallerySection() {
   ];
 
   useEffect(() => {
-    if (activeVideo) {
-      const originalBodyOverflow = document.body.style.overflow;
-      const originalHtmlOverflow = document.documentElement.style.overflow;
+    if (!activeVideo) return;
 
-      document.body.style.overflow = "hidden";
-      document.documentElement.style.overflow = "hidden";
+    const originalBodyOverflow = document.body.style.overflow;
+    const originalHtmlOverflow = document.documentElement.style.overflow;
+    const origBodyTouch = document.body.style.touchAction;
+    const origHtmlTouch = document.documentElement.style.touchAction;
 
-      return () => {
-        document.body.style.overflow = originalBodyOverflow;
-        document.documentElement.style.overflow = originalHtmlOverflow;
-      };
-    }
+    document.body.style.overflow = "hidden";
+    document.documentElement.style.overflow = "hidden";
+    document.body.style.touchAction = "none";
+    document.documentElement.style.touchAction = "none";
+
+    document.body.classList.add("modal-scroll-lock");
+    document.documentElement.classList.add("modal-scroll-lock");
+
+    const blockScroll = (e: WheelEvent | TouchEvent) => {
+      const target = e.target as HTMLElement | null;
+      if (target && (target.tagName === "IFRAME" || target.closest(".video__modal-content"))) {
+        return;
+      }
+      e.preventDefault();
+    };
+
+    window.addEventListener("wheel", blockScroll, { passive: false });
+    window.addEventListener("touchmove", blockScroll, { passive: false });
+
+    return () => {
+      document.body.style.overflow = originalBodyOverflow;
+      document.documentElement.style.overflow = originalHtmlOverflow;
+      document.body.style.touchAction = origBodyTouch;
+      document.documentElement.style.touchAction = origHtmlTouch;
+
+      document.body.classList.remove("modal-scroll-lock");
+      document.documentElement.classList.remove("modal-scroll-lock");
+
+      window.removeEventListener("wheel", blockScroll);
+      window.removeEventListener("touchmove", blockScroll);
+    };
   }, [activeVideo]);
 
   return (
@@ -78,8 +104,9 @@ export default function VideoGallerySection() {
         </p>
       </div>
 
-      {/* Featured Spotlight Promo Video Card (Adaptive Web vs Phone) */}
-      <div className="video-gallery__spotlight" data-aos="zoom-in" data-aos-delay="100">
+      {/* Featured Spotlight Promo Video (Side-by-Side: Video bên trái • Chữ bên phải, Không khung hộp) */}
+      <div className="video-gallery__spotlight video-gallery__spotlight--split" data-aos="fade-up" data-aos-delay="100">
+        {/* Cột Trái: Video Trailer */}
         <div 
           className={`video-gallery__spotlight-media video-gallery__spotlight-media--${promoMode}`}
           onClick={() => triggerPromoVideo(promoMode)}
@@ -89,7 +116,7 @@ export default function VideoGallerySection() {
           onKeyDown={(e) => { if (e.key === "Enter" || e.key === " ") triggerPromoVideo(promoMode); }}
         >
           <picture className="video-gallery__spotlight-picture">
-            <source media="(max-width: 768px)" srcSet="/Video/promo_9x16_poster.webp" />
+            <source media="(max-width: 768px)" srcSet="/Video/promo_16x9_poster.webp" />
             <img 
               src={posterSrc} 
               alt="Trailer giới thiệu EaAgri 45 giây"
@@ -105,20 +132,21 @@ export default function VideoGallerySection() {
             <div className="spotlight-play-btn">
               <i className="ri-play-fill" />
             </div>
-            <span className="spotlight-play-label">Xem Teaser (45s)</span>
+            <span className="spotlight-play-label">Bấm xem teaser (45s)</span>
           </div>
 
           <span className="video-gallery__spotlight-badge">
             <span className="spotlight-badge-dot" />
-            {badgeText}
+            {isMobile ? "TRAILER • 45s" : badgeText}
           </span>
           <span className="video-gallery__spotlight-duration">0:45</span>
         </div>
 
-        <div className="video-gallery__spotlight-content">
+        {/* Cột Phải: Thông tin cô đọng, súc tích */}
+        <div className="video-gallery__spotlight-info">
           <div className="spotlight-header-meta">
             <span className="spotlight-chip">
-              <i className="ri-sparkling-fill" /> TIÊU ĐIỂM TRUYỀN THÔNG
+              <i className="ri-sparkling-fill" /> TIÊU ĐIỂM DỰ ÁN
             </span>
             <span className="spotlight-hd-tag">
               {isMobile ? "CHUẨN MOBILE • 9:16" : "FULL HD • 60FPS"}
@@ -126,14 +154,29 @@ export default function VideoGallerySection() {
           </div>
 
           <h3 className="spotlight-title">
-            EaAgri — Khát Vọng Số Hóa Nông Nghiệp Tây Nguyên
+            Khát Vọng Số Hóa Nông Nghiệp Tây Nguyên
           </h3>
 
           <p className="spotlight-desc">
-            Trải nghiệm giải pháp trợ lý cây sầu riêng ứng dụng AI Dual-Brain kết hợp YOLOv9 nhận diện sâu bệnh và mạng lưới trạm quan trắc IoT vi khí hậu độc quyền.
+            Trải nghiệm trợ lý cây sầu riêng ứng dụng AI Dual-Brain và trạm quan trắc IoT vi khí hậu độc quyền.
           </p>
 
-          <div className="spotlight-actions">
+          <div className="spotlight-highlights-list">
+            <div className="spotlight-highlight-item">
+              <i className="ri-checkbox-circle-fill text-green" />
+              <span>Chuẩn hóa quy trình canh tác VietGAP số</span>
+            </div>
+            <div className="spotlight-highlight-item">
+              <i className="ri-checkbox-circle-fill text-green" />
+              <span>AI YOLOv9 chẩn đoán bệnh lá tức thì</span>
+            </div>
+            <div className="spotlight-highlight-item">
+              <i className="ri-checkbox-circle-fill text-green" />
+              <span>IoT giám sát thổ nhưỡng & tưới 3 lớp</span>
+            </div>
+          </div>
+
+          <div className="spotlight-action-row">
             <button 
               type="button"
               className="spotlight-btn spotlight-btn--primary"

@@ -26,6 +26,14 @@ body {
   color: $text-dark;
 }
 
+html.modal-scroll-lock,
+body.modal-scroll-lock {
+  overflow: hidden !important;
+  height: 100% !important;
+  touch-action: none !important;
+  overscroll-behavior: contain !important;
+}
+
 #root {
   min-height: 100vh;
   background-color: transparent;

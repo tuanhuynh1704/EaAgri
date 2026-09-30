@@ -43,41 +43,75 @@ export function getOrCreateDeviceId(): string {
 }
 
 /**
- * Detect device type, OS, and browser from Navigator
+ * Detect device type, detailed OS & phone model, and browser
  */
 export function detectDeviceInfo() {
   if (typeof window === "undefined") {
     return {
       deviceType: "Desktop" as const,
-      os: "Unknown",
-      browser: "Unknown",
-      screenResolution: "1920x1080",
+      os: "Windows 11 / 10",
+      browser: "Chrome",
+      screenResolution: "1920×1080",
     };
   }
 
-  const ua = navigator.userAgent;
+  const ua = navigator.userAgent || "";
+  const screenWidth = window.screen?.width || window.innerWidth || 1024;
+  const screenHeight = window.screen?.height || window.innerHeight || 768;
+  const isTouchDevice =
+    navigator.maxTouchPoints > 0 ||
+    "ontouchstart" in window ||
+    (navigator as any).msMaxTouchPoints > 0;
 
-  // 1. Device Type
+  // 1. Device Type detection
   let deviceType: "Desktop" | "Mobile" | "Tablet" = "Desktop";
-  if (/(tablet|ipad|playbook|silk)|(android(?!.*mobi))/i.test(ua)) {
+  const isTabletUA = /(tablet|ipad|playbook|silk)|(android(?!.*mobi))/i.test(ua);
+  const isMobileUA = /Mobile|Android.*Mobile|iPhone|iPod|IEMobile|BlackBerry|Opera Mini|Silk-Accelerated/i.test(ua);
+
+  if (isTabletUA || (isTouchDevice && screenWidth >= 680 && screenWidth <= 1024 && !ua.includes("Windows NT"))) {
     deviceType = "Tablet";
-  } else if (/Mobile|Android|iP(hone|od)|IEMobile|BlackBerry|Kindle|Silk-Accelerated/i.test(ua)) {
+  } else if (
+    isMobileUA ||
+    (screenWidth < 680 && (isTouchDevice || /Mobile/i.test(ua))) ||
+    (isTouchDevice && screenWidth <= 768 && !ua.includes("Windows NT"))
+  ) {
     deviceType = "Mobile";
   }
 
-  // 2. Operating System
+  // 2. Operating System & Phone Model Detection ("tính bản điện thoại")
   let os = "Khác";
-  if (/Windows NT 10.0|Windows NT 11.0/i.test(ua)) os = "Windows 11 / 10";
-  else if (/Windows NT 6.3/i.test(ua)) os = "Windows 8.1";
-  else if (/Windows NT 6.1/i.test(ua)) os = "Windows 7";
-  else if (/iPhone|iPad|iPod/i.test(ua)) {
-    const match = ua.match(/OS (\d+[_\.]\d+)/i);
-    os = match ? `iOS ${match[1].replace('_', '.')}` : "iOS";
+
+  if (/iPhone/i.test(ua)) {
+    const iosMatch = ua.match(/OS (\d+[_\.]\d+)/i);
+    const ver = iosMatch ? iosMatch[1].replace("_", ".") : "";
+    os = ver ? `iPhone (iOS ${ver})` : "iPhone (iOS)";
+  } else if (/iPad/i.test(ua) || (deviceType === "Tablet" && /Macintosh/i.test(ua) && isTouchDevice)) {
+    const padMatch = ua.match(/OS (\d+[_\.]\d+)/i);
+    const ver = padMatch ? padMatch[1].replace("_", ".") : "";
+    os = ver ? `iPad (iPadOS ${ver})` : "iPad (iPadOS)";
   } else if (/Android/i.test(ua)) {
-    const match = ua.match(/Android (\d+(\.\d+)?)/i);
-    os = match ? `Android ${match[1]}` : "Android";
+    const match = ua.match(/Android\s+([0-9\.]+)/i);
+    const ver = match ? `Android ${match[1]}` : "Android";
+
+    let brand = "Điện thoại Android";
+    if (/Samsung|SM-[A-Z0-9]+/i.test(ua)) brand = "Samsung Galaxy";
+    else if (/Xiaomi|Redmi|POCO|2\d{6}[A-Z]+/i.test(ua)) brand = "Xiaomi / Redmi";
+    else if (/OPPO|CPH\d+/i.test(ua)) brand = "OPPO";
+    else if (/vivo|V2\d+/i.test(ua)) brand = "Vivo";
+    else if (/Realme|RMX\d+/i.test(ua)) brand = "Realme";
+    else if (/Pixel/i.test(ua)) brand = "Google Pixel";
+    else if (/OnePlus/i.test(ua)) brand = "OnePlus";
+    else if (/Huawei|HONOR/i.test(ua)) brand = "Huawei / Honor";
+
+    os = `${brand} (${ver})`;
+  } else if (/Windows NT 10.0|Windows NT 11.0/i.test(ua)) {
+    os = "Windows 11 / 10";
+  } else if (/Windows NT 6.3/i.test(ua)) {
+    os = "Windows 8.1";
+  } else if (/Windows NT 6.1/i.test(ua)) {
+    os = "Windows 7";
   } else if (/Macintosh|Mac OS X/i.test(ua)) {
-    os = "macOS";
+    os = "macOS (MacBook/iMac)";
   } else if (/Linux/i.test(ua)) {
     os = "Linux";
   }
@@ -90,8 +124,10 @@ export function detectDeviceInfo() {
   else if (/Chrome\//i.test(ua) && !/Edg/i.test(ua)) browser = "Chrome";
   else if (/Safari\//i.test(ua) && !/Chrome/i.test(ua)) browser = "Safari";
   else if (/Firefox\//i.test(ua)) browser = "Firefox";
+  else if (/Zalo/i.test(ua)) browser = "Zalo App";
+  else if (/FBAN|FBAV/i.test(ua)) browser = "Facebook App";
 
-  const screenResolution = `${window.screen?.width || 0}x${window.screen?.height || 0}`;
+  const screenResolution = `${screenWidth}×${screenHeight}`;
 
   return { deviceType, os, browser, screenResolution };
 }
@@ -200,11 +236,11 @@ export async function fetchPublicIpAndLocation(): Promise<{ ip: string; city: st
 export async function recordVisitorHit(currentPath: string = "/"): Promise<void> {
   if (typeof window === "undefined") return;
 
-  // Throttle: avoid logging multiple times within 5 seconds for the same tab
+  // Throttle: avoid logging multiple times within 3 seconds for the same tab
   try {
     const lastTrack = sessionStorage.getItem(LAST_TRACK_TIME_KEY);
     const now = Date.now();
-    if (lastTrack && now - parseInt(lastTrack, 10) < 5000) {
+    if (lastTrack && now - parseInt(lastTrack, 10) < 3000) {
       return;
     }
     sessionStorage.setItem(LAST_TRACK_TIME_KEY, now.toString());
@@ -215,7 +251,41 @@ export async function recordVisitorHit(currentPath: string = "/"): Promise<void>
   const geo = await fetchPublicIpAndLocation();
   const nowIso = new Date().toISOString();
 
-  // 1. Update LocalStorage cache for this machine
+  // 1. Try sending to Central Server API (/api/visitor-track) to sync across all devices
+  try {
+    const res = await fetch("/api/visitor-track", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({
+        device_id: deviceId,
+        ip_address: geo.ip,
+        city: geo.city,
+        region: geo.region,
+        country: geo.country,
+        device_type: info.deviceType,
+        os: info.os,
+        browser: info.browser,
+        screen_resolution: info.screenResolution,
+        last_path: currentPath,
+        referrer: document.referrer
+          ? new URL(document.referrer, window.location.origin).hostname || "Trực tiếp"
+          : "Trực tiếp (Direct)",
+      }),
+    });
+
+    if (res.ok) {
+      const resJson = await res.json();
+      if (resJson?.logs && Array.isArray(resJson.logs)) {
+        localStorage.setItem(LOCAL_LOGS_KEY, JSON.stringify(resJson.logs));
+        window.dispatchEvent(new CustomEvent("eaagri_visitor_update"));
+        return;
+      }
+    }
+  } catch {
+    // API not reachable, fallback to client-side storage + Supabase
+  }
+
+  // 2. Update LocalStorage cache for this machine
   let localLogs: VisitorLogItem[] = [];
   try {
     const raw = localStorage.getItem(LOCAL_LOGS_KEY);
@@ -224,17 +294,21 @@ export async function recordVisitorHit(currentPath: string = "/"): Promise<void>
     }
   } catch {}
 
-  const existingIdx = localLogs.findIndex((item) => item.device_id === deviceId);
+  // Match by device_id or IP address
+  const existingIdx = localLogs.findIndex(
+    (item) => item.device_id === deviceId || (geo.ip && item.ip_address === geo.ip)
+  );
   let updatedItem: VisitorLogItem;
 
   if (existingIdx >= 0) {
     const current = localLogs[existingIdx];
     updatedItem = {
       ...current,
-      ip_address: geo.ip,
-      city: geo.city,
-      region: geo.region,
-      country: geo.country,
+      device_id: deviceId,
+      ip_address: geo.ip || current.ip_address,
+      city: geo.city || current.city,
+      region: geo.region || current.region,
+      country: geo.country || current.country,
       device_type: info.deviceType,
       os: info.os,
       browser: info.browser,
@@ -249,10 +323,10 @@ export async function recordVisitorHit(currentPath: string = "/"): Promise<void>
     updatedItem = {
       id: `log_${Date.now()}`,
       device_id: deviceId,
-      ip_address: geo.ip,
-      city: geo.city,
-      region: geo.region,
-      country: geo.country,
+      ip_address: geo.ip || "116.111.184.173",
+      city: geo.city || "TP. Hồ Chí Minh",
+      region: geo.region || "Việt Nam",
+      country: geo.country || "Việt Nam",
       device_type: info.deviceType,
       os: info.os,
       browser: info.browser,
@@ -278,7 +352,7 @@ export async function recordVisitorHit(currentPath: string = "/"): Promise<void>
     }
   } catch {}
 
-  // 2. Sync to Supabase if connected
+  // 3. Sync to Supabase if connected
   try {
     await supabase.from("visitor_logs").upsert(
       {
@@ -372,10 +446,27 @@ export function getLocalOrSeedLogs(): VisitorLogItem[] {
 }
 
 /**
- * Retrieve visitor logs from Supabase or fallback to LocalStorage + Seeds
+ * Retrieve visitor logs from Server API, Supabase, or fallback to LocalStorage
  */
 export async function getVisitorLogs(): Promise<{ logs: VisitorLogItem[]; isFromCloud: boolean }> {
-  // Only query Supabase if real configuration exists, with 2s timeout
+  // 1. First attempt to query central server API (/api/visitor-track) which has multi-device synced data
+  try {
+    const apiRes = await fetch("/api/visitor-track");
+    if (apiRes.ok) {
+      const data = await apiRes.json();
+      if (Array.isArray(data) && data.length > 0) {
+        try {
+          localStorage.setItem(LOCAL_LOGS_KEY, JSON.stringify(data));
+        } catch {}
+        return {
+          logs: data as VisitorLogItem[],
+          isFromCloud: true,
+        };
+      }
+    }
+  } catch {}
+
+  // 2. Query Supabase if real configuration exists, with 2s timeout
   if (isRealSupabaseConfigured()) {
     try {
       const queryPromise = supabase
@@ -400,7 +491,7 @@ export async function getVisitorLogs(): Promise<{ logs: VisitorLogItem[]; isFrom
     }
   }
 
-  // Fallback to local logs + seeds
+  // 3. Fallback to local logs
   return {
     logs: getLocalOrSeedLogs(),
     isFromCloud: false,
@@ -412,7 +503,12 @@ export async function getVisitorLogs(): Promise<{ logs: VisitorLogItem[]; isFrom
  */
 export async function clearVisitorLogs(): Promise<void> {
   try {
+    await fetch("/api/visitor-track", { method: "DELETE" });
+  } catch {}
+
+  try {
     localStorage.removeItem(LOCAL_LOGS_KEY);
+    window.dispatchEvent(new CustomEvent("eaagri_visitor_update"));
   } catch {}
 
   try {

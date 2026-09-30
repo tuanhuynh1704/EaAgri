@@ -297,6 +297,8 @@
   padding: 2rem;
   backdrop-filter: blur(5px);
   animation: fadeIn 0.3s ease;
+  overscroll-behavior: contain;
+  touch-action: none;
 }
 
 .video__modal-content {
