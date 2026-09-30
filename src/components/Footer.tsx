@@ -46,9 +46,9 @@ export default function Footer() {
           </p>
 
           <div className="footer__contact-list">
-            <a href="mailto:eaagri@eaagri.vn" className="footer__contact-chip" title="Gửi email liên hệ">
+            <a href="mailto:info@eaagri.vn" className="footer__contact-chip" title="Gửi email liên hệ">
               <i className="ri-mail-send-line"></i>
-              <span>eaagri@eaagri.vn</span>
+              <span>info@eaagri.vn</span>
             </a>
             <div className="footer__contact-chip footer__contact-chip--location">
               <i className="ri-map-pin-2-line"></i>

@@ -471,8 +471,8 @@ export default function RoadmapSection() {
                     
                     <div className="coop-modal__direct-contact">
                       <span>Hoặc liên hệ trực tiếp:</span>
-                      <a href="mailto:eaagri@eaagri.vn" className="coop-modal__contact-link">
-                        <i className="ri-mail-send-line"></i> eaagri@eaagri.vn
+                      <a href="mailto:info@eaagri.vn" className="coop-modal__contact-link">
+                        <i className="ri-mail-send-line"></i> info@eaagri.vn
                       </a>
                     </div>
                   </div>
