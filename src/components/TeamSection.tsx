@@ -11,7 +11,6 @@ const appScreenshots = [
   "/image-banner/8.jpg",
   "/image-banner/9.jpg",
   "/image-banner/10.jpg",
-  "/image-banner/11.jpg",
 ];
 
 const appSlideContent = [
