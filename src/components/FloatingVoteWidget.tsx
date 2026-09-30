@@ -1,7 +1,9 @@
 import { useState, useEffect } from "react";
 import { NTTU_VOTE_CONFIG } from "../data/voteConfig";
+import { useVoteStats } from "../context/VoteContext";
 
 export default function FloatingVoteWidget() {
+  const { formattedVotes, rank, isPulsing } = useVoteStats();
   const [isReady, setIsReady] = useState(false);
   const [isDismissed, setIsDismissed] = useState(false);
 
@@ -32,12 +34,16 @@ export default function FloatingVoteWidget() {
         <span className="floating-vote-badge__pulse" aria-hidden="true" />
         <span className="floating-vote-badge__live-dot" aria-hidden="true" />
         <i className="ri-trophy-fill floating-vote-badge__icon" />
-        <span className="floating-vote-badge__votes">{NTTU_VOTE_CONFIG.currentVotes}</span>
+        <span className={`floating-vote-badge__votes ${isPulsing ? "badge-votes--pulse" : ""}`}>
+          {formattedVotes}
+        </span>
 
         {/* Hover Tooltip Callout */}
         <div className="floating-vote-badge__tooltip">
           <span className="tooltip-title">🏆 NTTU Startup 2026</span>
-          <span className="tooltip-sub">Đã đạt <strong>{NTTU_VOTE_CONFIG.currentVotes}</strong> vote • Bấm tiếp sức ngay! ➔</span>
+          <span className="tooltip-sub">
+            Đã đạt <strong>{formattedVotes}</strong> vote{rank ? ` (Top ${rank})` : ""} • Bấm tiếp sức ngay! ➔
+          </span>
         </div>
       </a>
 

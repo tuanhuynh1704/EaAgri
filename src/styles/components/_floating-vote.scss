@@ -101,8 +101,18 @@
     padding: 0.1rem 0.38rem;
     border-radius: 999px;
     border: 0.8px solid rgba(254, 240, 138, 0.6);
-    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.35);
+    &.badge-votes--pulse {
+      animation: voteBadgeJump 0.5s ease-in-out infinite alternate;
+      background: linear-gradient(135deg, #10b981, #059669) !important;
+      border-color: #a7f3d0 !important;
+      box-shadow: 0 0 10px rgba(16, 185, 129, 0.9) !important;
+    }
   }
+
+@keyframes voteBadgeJump {
+  0% { transform: scale(1); }
+  100% { transform: scale(1.22); }
+}
 
   // Floating Tooltip Callout on Desktop
   &__tooltip {
