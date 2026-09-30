@@ -3,12 +3,12 @@
 .logo-marquee {
   position: relative;
   overflow: hidden;
-  min-height: 330px;
-  padding: 3rem 0 3.5rem;
+  min-height: 280px;
+  padding: 3rem 0 3.2rem;
   background:
-    radial-gradient(circle at 50% 0%, rgba(76, 201, 148, 0.11), transparent 42%),
-    linear-gradient(180deg, #f8fcf9 0%, #fff 100%);
-  border-block: 1px solid rgba(37, 148, 100, 0.1);
+    radial-gradient(circle at 50% 0%, rgba(76, 201, 148, 0.08), transparent 45%),
+    linear-gradient(180deg, #f8fbf9 0%, #ffffff 100%);
+  border-block: 1px solid rgba(37, 148, 100, 0.08);
 }
 
 .logo-marquee__heading {
@@ -48,20 +48,14 @@
 
 .logo-marquee__viewport {
   position: relative;
-  overflow: hidden;
   width: 100%;
-  padding: 0.4rem 0 1rem;
+  overflow: hidden;
+  padding: 0.5rem 0 1rem;
   -webkit-mask-image: linear-gradient(90deg, transparent 0%, #000 7%, #000 93%, transparent 100%);
   mask-image: linear-gradient(90deg, transparent 0%, #000 7%, #000 93%, transparent 100%);
-  touch-action: pan-y;
-  user-select: none;
-  -webkit-user-select: none;
 
-  // Chỉ tạm dừng khi di chuột trên thiết bị có chuột (desktop). Tránh iPad/iPhone bị dừng vĩnh viễn khi chạm màn hình (sticky hover)
-  @media (hover: hover) and (pointer: fine) {
-    &:hover .logo-marquee__track {
-      animation-play-state: paused;
-    }
+  &:hover .logo-marquee__track {
+    animation-play-state: paused;
   }
 }
 
@@ -73,66 +67,68 @@
   -webkit-transform: translate3d(0, 0, 0);
   backface-visibility: hidden;
   -webkit-backface-visibility: hidden;
-  animation: logoMarqueeMove 85s linear infinite;
+  animation: logoMarqueeMove 52s linear infinite;
 }
 
 .logo-marquee__group {
   display: flex;
   align-items: center;
-  gap: clamp(1rem, 2vw, 2rem);
-  padding-right: clamp(1rem, 2vw, 2rem);
+  gap: 3.75rem;
+  padding-right: 3.75rem;
   flex-shrink: 0;
 }
 
+// Bỏ hộp (no box/cards) - Logo kích thước phóng to rõ nét, khoảng cách thoáng đãng, hover/touch hiện màu
 .logo-marquee__item {
   position: relative;
   flex: 0 0 auto;
-  width: clamp(150px, 13vw, 210px);
-  height: 92px;
-  padding: 1rem 1.35rem;
-  overflow: hidden;
-  border: 1px solid rgba(24, 116, 78, 0.1);
-  border-radius: 20px;
-  background: rgba(255, 255, 255, 0.9);
-  box-shadow: 0 12px 30px rgba(22, 77, 54, 0.07);
-  transition: transform 0.3s ease, box-shadow 0.3s ease, border-color 0.3s ease;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  height: 66px;
+  padding: 0.25rem 0.5rem;
+  background: transparent;
+  border: none;
+  border-radius: 0;
+  box-shadow: none;
+  cursor: pointer;
+  outline: none;
+  transition: transform 0.35s cubic-bezier(0.16, 1, 0.3, 1);
+  -webkit-tap-highlight-color: transparent;
+
+  // Hiệu ứng rê chuột (Desktop) & chạm (Mobile / Touch)
+  &:hover,
+  &:active,
+  &:focus-visible,
+  &.is-active {
+    .logo-marquee__media img {
+      filter: grayscale(0%) opacity(1) !important;
+      transform: scale(1.1) !important;
+    }
+  }
 }
 
 .logo-marquee__media {
   position: relative;
-  display: block;
-  width: 100%;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
   height: 100%;
-  overflow: hidden;
 
   img {
-    position: absolute;
-    inset: 0;
-    display: block;
-    width: 100%;
-    height: 100%;
-    max-width: none;
+    height: 58px;
+    width: auto;
+    max-width: 165px;
     object-fit: contain;
-    filter: saturate(0.78) opacity(0.76);
-    transition: filter 0.3s ease, transform 0.3s ease;
+    // Mặc định không màu (monochrome/grayscale), độ mờ nhẹ
+    filter: grayscale(100%) opacity(0.48);
+    mix-blend-mode: multiply;
+    transition: filter 0.35s cubic-bezier(0.16, 1, 0.3, 1),
+                opacity 0.35s cubic-bezier(0.16, 1, 0.3, 1),
+                transform 0.35s cubic-bezier(0.16, 1, 0.3, 1);
     pointer-events: none;
     -webkit-user-drag: none;
     user-select: none;
-  }
-}
-
-@media (hover: hover) and (pointer: fine) {
-  .logo-marquee__item {
-    &:hover {
-      transform: translateY(-6px) scale(1.025);
-      border-color: rgba(21, 153, 98, 0.3);
-      box-shadow: 0 17px 38px rgba(22, 99, 67, 0.14);
-
-      .logo-marquee__media img {
-        filter: saturate(1) opacity(1);
-        transform: scale(1.04);
-      }
-    }
   }
 }
 
@@ -180,20 +176,22 @@
   }
 
   .logo-marquee__group {
-    gap: 1rem;
-    padding-right: 1rem;
+    gap: 2.85rem;
+    padding-right: 2.85rem;
   }
 
   .logo-marquee__item {
-    width: 132px;
-    height: 68px;
-    border-radius: 14px;
-    padding: 0.65rem 0.95rem;
-    box-shadow: 0 8px 20px rgba(22, 77, 54, 0.05);
+    height: 56px;
+    padding: 0.2rem 0.35rem;
+  }
+
+  .logo-marquee__media img {
+    height: 48px;
+    max-width: 135px;
   }
 
   .logo-marquee__track {
-    animation-duration: 60s;
+    animation-duration: 48s;
   }
 }
 
@@ -235,44 +233,48 @@
 
   .logo-marquee__viewport {
     padding: 0.2rem 0 0.4rem;
-    -webkit-mask-image: linear-gradient(90deg, transparent 0%, #000 5%, #000 95%, transparent 100%);
-    mask-image: linear-gradient(90deg, transparent 0%, #000 5%, #000 95%, transparent 100%);
+    -webkit-mask-image: linear-gradient(90deg, transparent 0%, #000 6%, #000 94%, transparent 100%);
+    mask-image: linear-gradient(90deg, transparent 0%, #000 6%, #000 94%, transparent 100%);
   }
 
   .logo-marquee__group {
-    gap: 0.75rem;
-    padding-right: 0.75rem;
+    gap: 2.1rem;
+    padding-right: 2.1rem;
   }
 
   .logo-marquee__item {
-    width: 112px;
-    height: 56px;
-    border-radius: 12px;
-    padding: 0.45rem 0.75rem;
-    box-shadow: 0 6px 16px rgba(22, 77, 54, 0.04);
+    height: 48px;
+    padding: 0.15rem 0.25rem;
+  }
+
+  .logo-marquee__media img {
+    height: 40px;
+    max-width: 110px;
   }
 
   .logo-marquee__track {
-    animation-duration: 48s;
+    animation-duration: 42s;
   }
 }
 
 @media (max-width: 420px) {
-  .logo-marquee__item {
-    width: 104px;
-    height: 52px;
-    padding: 0.4rem 0.65rem;
+  .logo-marquee__group {
+    gap: 1.65rem;
+    padding-right: 1.65rem;
   }
 
-  .logo-marquee__group {
-    gap: 0.6rem;
-    padding-right: 0.6rem;
+  .logo-marquee__item {
+    height: 42px;
+    padding: 0.1rem 0.2rem;
+  }
+
+  .logo-marquee__media img {
+    height: 34px;
+    max-width: 95px;
   }
 }
 
-// 2K/4K và trường hợp trình duyệt đang zoom-out: các giới hạn px/rem
-// thông thường khiến cả section trông như bị scale xuống. Ở viewport lớn,
-// giữ tỷ lệ bằng đơn vị viewport để logo và tiêu đề vẫn dễ đọc.
+// 2K/4K màn hình siêu rộng
 @media (min-width: 2400px) {
   .logo-marquee {
     min-height: 20vw;
@@ -311,15 +313,16 @@
   }
 
   .logo-marquee__item {
-    width: 13vw;
-    height: 6vw;
-    padding: 1vw 1.35vw;
-    border-radius: 1.05vw;
-    box-shadow: 0 0.65vw 1.6vw rgba(22, 77, 54, 0.07);
+    height: 3.5vw;
+    padding: 0.2vw 0.4vw;
+  }
+
+  .logo-marquee__media img {
+    height: 3vw;
+    max-width: 9vw;
   }
 }
 
-// Không pause khi có reduced-motion (tránh trường hợp iPad bật Tiết kiệm pin hoặc Giảm chuyển động làm đứng hình logo bị cắt xén), mà cho chạy chậm nhẹ nhàng
 @media (prefers-reduced-motion: reduce) {
   .logo-marquee__track {
     animation-duration: 100s;

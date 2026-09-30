@@ -47,15 +47,47 @@ export default function PromoVideoModal() {
     return () => window.removeEventListener("resize", handleResize);
   }, [isOpen]);
 
-  // Lock background scroll when open
+  // Lock background scroll when open (prevents wheel/touch scrolling on desktop and mobile)
   useEffect(() => {
-    if (isOpen) {
-      const origOverflow = document.body.style.overflow;
-      document.body.style.overflow = "hidden";
-      return () => {
-        document.body.style.overflow = origOverflow;
-      };
-    }
+    if (!isOpen) return;
+
+    const origBodyOverflow = document.body.style.overflow;
+    const origHtmlOverflow = document.documentElement.style.overflow;
+    const origBodyTouch = document.body.style.touchAction;
+    const origHtmlTouch = document.documentElement.style.touchAction;
+
+    document.body.style.overflow = "hidden";
+    document.documentElement.style.overflow = "hidden";
+    document.body.style.touchAction = "none";
+    document.documentElement.style.touchAction = "none";
+
+    document.body.classList.add("modal-scroll-lock");
+    document.documentElement.classList.add("modal-scroll-lock");
+
+    const blockScroll = (e: WheelEvent | TouchEvent) => {
+      const target = e.target as HTMLElement | null;
+      // Allow user to interact with the native video player element (scrubber/volume/fullscreen)
+      if (target && (target.tagName === "VIDEO" || target.closest("video"))) {
+        return;
+      }
+      e.preventDefault();
+    };
+
+    window.addEventListener("wheel", blockScroll, { passive: false });
+    window.addEventListener("touchmove", blockScroll, { passive: false });
+
+    return () => {
+      document.body.style.overflow = origBodyOverflow;
+      document.documentElement.style.overflow = origHtmlOverflow;
+      document.body.style.touchAction = origBodyTouch;
+      document.documentElement.style.touchAction = origHtmlTouch;
+
+      document.body.classList.remove("modal-scroll-lock");
+      document.documentElement.classList.remove("modal-scroll-lock");
+
+      window.removeEventListener("wheel", blockScroll);
+      window.removeEventListener("touchmove", blockScroll);
+    };
   }, [isOpen]);
 
   // Handle ESC key press
@@ -68,8 +100,6 @@ export default function PromoVideoModal() {
     window.addEventListener("keydown", handleKeyDown);
     return () => window.removeEventListener("keydown", handleKeyDown);
   }, [isOpen]);
-
-
 
   if (!isOpen) return null;
 
@@ -87,6 +117,13 @@ export default function PromoVideoModal() {
     <div
       className="promo-video-backdrop"
       onClick={() => setIsOpen(false)}
+      onWheel={(e) => e.stopPropagation()}
+      onTouchMove={(e) => {
+        const target = e.target as HTMLElement | null;
+        if (!target || (target.tagName !== "VIDEO" && !target.closest("video"))) {
+          e.stopPropagation();
+        }
+      }}
       role="dialog"
       aria-modal="true"
       aria-labelledby="promo-video-modal-title"

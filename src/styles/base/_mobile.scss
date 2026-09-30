@@ -1854,29 +1854,136 @@
   }
   .video-gallery__spotlight {
     grid-template-columns: 1fr !important;
-    gap: 0.9rem !important;
-    padding: 0.85rem !important;
-    border-radius: 16px !important;
-    margin-bottom: 1.2rem !important;
+    gap: 1rem !important;
+    padding: 0 !important;
+    background: transparent !important;
+    border: none !important;
+    box-shadow: none !important;
+    margin-bottom: 2rem !important;
   }
   .video-gallery__spotlight-media,
   .video-gallery__spotlight-media--9x16 {
-    max-width: 220px !important;
-    margin: 0 auto !important;
-    aspect-ratio: 9 / 16 !important;
+    width: 100% !important;
+    max-width: 100% !important;
+    aspect-ratio: 16 / 9 !important;
     border-radius: 18px !important;
-    border: 1.5px solid rgba(16, 185, 129, 0.45) !important;
-    box-shadow: 0 10px 25px rgba(0, 0, 0, 0.35) !important;
+    border: 1px solid rgba(16, 185, 129, 0.35) !important;
+    box-shadow: 0 10px 28px -6px rgba(6, 78, 59, 0.22) !important;
+    margin: 0 !important;
   }
-  .video-gallery__spotlight-badge { top: 0.55rem !important; left: 0.55rem !important; font-size: 0.62rem !important; padding: 0.2rem 0.5rem !important; }
-  .video-gallery__spotlight-duration { bottom: 0.55rem !important; right: 0.55rem !important; font-size: 0.64rem !important; padding: 0.15rem 0.4rem !important; }
-  .spotlight-play-btn { width: 48px !important; height: 48px !important; font-size: 1.4rem !important; }
-  .spotlight-play-pulse { width: 56px !important; height: 56px !important; }
-  .spotlight-play-label { font-size: 0.72rem !important; }
-  .spotlight-title { font-size: 0.98rem !important; line-height: 1.35 !important; }
-  .spotlight-desc { font-size: 0.72rem !important; line-height: 1.45 !important; display: -webkit-box !important; -webkit-line-clamp: 3 !important; -webkit-box-orient: vertical !important; overflow: hidden !important; }
-  .spotlight-actions { display: flex !important; width: 100% !important; margin-top: 0.25rem !important; }
-  .spotlight-btn { width: 100% !important; padding: 0.55rem 0.75rem !important; font-size: 0.76rem !important; justify-content: center !important; border-radius: 11px !important; }
+  .video-gallery__spotlight-badge { 
+    top: 0.65rem !important; 
+    left: 0.65rem !important; 
+    font-size: 0.66rem !important; 
+    padding: 0.22rem 0.6rem !important; 
+    background: rgba(6, 78, 59, 0.88) !important;
+    backdrop-filter: blur(8px) !important;
+  }
+  .video-gallery__spotlight-duration { 
+    bottom: 0.65rem !important; 
+    right: 0.65rem !important; 
+    font-size: 0.68rem !important; 
+    padding: 0.2rem 0.48rem !important; 
+  }
+  .spotlight-play-btn { 
+    width: 52px !important; 
+    height: 52px !important; 
+    font-size: 1.55rem !important; 
+    background: rgba(255, 255, 255, 0.28) !important;
+  }
+  .spotlight-play-pulse { 
+    width: 62px !important; 
+    height: 62px !important; 
+  }
+  .spotlight-play-label { 
+    font-size: 0.76rem !important; 
+    font-weight: 700 !important;
+  }
+
+  /* Glassmorphism Card cao cấp cho phần thông tin */
+  .video-gallery__spotlight-info {
+    width: 100% !important;
+    box-sizing: border-box !important;
+    background: rgba(255, 255, 255, 0.92) !important;
+    backdrop-filter: blur(16px) !important;
+    -webkit-backdrop-filter: blur(16px) !important;
+    border: 1px solid rgba(16, 185, 129, 0.2) !important;
+    border-radius: 20px !important;
+    padding: 1.25rem 1.15rem !important;
+    box-shadow: 0 10px 30px -8px rgba(6, 78, 59, 0.08), 0 2px 6px rgba(0, 0, 0, 0.03) !important;
+    gap: 0.85rem !important;
+    text-align: left !important;
+    align-items: flex-start !important;
+  }
+  .spotlight-header-meta {
+    gap: 0.5rem !important;
+    margin-bottom: 0.1rem !important;
+  }
+  .spotlight-chip {
+    font-size: 0.68rem !important;
+    padding: 0.22rem 0.65rem !important;
+  }
+  .spotlight-hd-tag {
+    font-size: 0.65rem !important;
+    padding: 0.22rem 0.5rem !important;
+  }
+  .spotlight-title { 
+    font-size: 1.12rem !important; 
+    line-height: 1.35 !important; 
+    font-weight: 800 !important;
+    color: #0b3d2c !important;
+    margin: 0 !important;
+  }
+  .spotlight-desc { 
+    font-size: 0.82rem !important; 
+    line-height: 1.5 !important; 
+    color: #446154 !important;
+    margin: 0 !important;
+    display: block !important;
+  }
+  .spotlight-highlights-list {
+    display: flex !important;
+    flex-direction: column !important;
+    gap: 0.5rem !important;
+    width: 100% !important;
+    margin: 0.15rem 0 0.35rem !important;
+  }
+  .spotlight-highlight-item {
+    display: flex !important;
+    align-items: center !important;
+    gap: 0.55rem !important;
+    background: rgba(240, 253, 244, 0.8) !important;
+    border: 1px solid rgba(16, 185, 129, 0.16) !important;
+    border-radius: 10px !important;
+    padding: 0.5rem 0.75rem !important;
+    font-size: 0.8rem !important;
+    font-weight: 600 !important;
+    color: #143e2b !important;
+
+    i {
+      font-size: 1rem !important;
+      color: #10b981 !important;
+      flex-shrink: 0 !important;
+    }
+  }
+  .spotlight-action-row {
+    margin-top: 0.25rem !important;
+    width: 100% !important;
+  }
+  .spotlight-btn--primary { 
+    width: 100% !important; 
+    display: flex !important;
+    justify-content: center !important; 
+    align-items: center !important;
+    gap: 0.5rem !important;
+    padding: 0.75rem 1rem !important; 
+    font-size: 0.88rem !important; 
+    font-weight: 750 !important;
+    border-radius: 12px !important; 
+    background: linear-gradient(135deg, #10b981, #059669) !important;
+    color: #ffffff !important;
+    box-shadow: 0 8px 20px rgba(16, 185, 129, 0.35) !important;
+  }
   .video-gallery__divider { margin: 1rem 0 1.25rem !important; }
   .video-gallery__divider span { font-size: 0.64rem !important; padding: 0.25rem 0.65rem !important; }
   .video-gallery__grid {

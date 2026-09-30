@@ -60,6 +60,15 @@ export default function ManageTraffic() {
       loadData();
     }, 3000);
 
+    // 5. Listen to Vite WebSocket for instant 0ms realtime updates
+    if (import.meta.hot) {
+      import.meta.hot.on("eaagri:visitor-updated", (data: any) => {
+        if (Array.isArray(data)) {
+          setLogs(data);
+        }
+      });
+    }
+
     return () => {
       if (bc) bc.close();
       window.removeEventListener("eaagri_visitor_update", handleVisitorUpdate);
@@ -156,13 +165,15 @@ export default function ManageTraffic() {
     };
   }, [logs]);
 
-  // Filtered devices list for recent activity (NO IP)
+  // Filtered devices list for recent activity (supports search by IP, OS, Browser, Device Type, Path)
   const filteredLogs = useMemo(() => {
     return logs.filter((log) => {
       const matchDevice = deviceFilter === "All" || log.device_type === deviceFilter;
       const q = searchQuery.trim().toLowerCase();
       const matchSearch =
         !q ||
+        (log.ip_address && log.ip_address.toLowerCase().includes(q)) ||
+        (log.city && log.city.toLowerCase().includes(q)) ||
         log.os.toLowerCase().includes(q) ||
         log.browser.toLowerCase().includes(q) ||
         log.device_type.toLowerCase().includes(q) ||
@@ -485,13 +496,14 @@ export default function ManageTraffic() {
         </div>
 
         {/* 📋 DANH SÁCH THIẾT BỊ GẦN ĐÂY (HOÀN TOÀN KHÔNG HIỆN IP) */}
+        {/* 📋 DANH SÁCH THIẾT BỊ & IP ĐÃ GHÉ THĂM */}
         <div className="recent-devices-card">
           <div className="recent-devices-card__header">
             <div className="header-title-box">
               <i className="ri-history-line text-green" />
               <div>
-                <h3>Danh Sách Thiết Bị Đã Ghé Thăm</h3>
-                <p>Theo dõi số lượt xem trang và thời gian hoạt động của từng máy (Bảo mật quyền riêng tư: Không lưu/hiện IP).</p>
+                <h3>Danh Sách Thiết Bị & IP Đã Ghé Thăm</h3>
+                <p>Theo dõi địa chỉ IP, thiết bị, số lượt xem và thời gian hoạt động của từng máy.</p>
               </div>
             </div>
 
@@ -528,12 +540,12 @@ export default function ManageTraffic() {
             </div>
           </div>
 
-          {/* Search box without IP */}
+          {/* Search box with IP search */}
           <div className="devices-search-box">
             <i className="ri-search-line search-icon" />
             <input
               type="text"
-              placeholder="Tìm kiếm theo thiết bị (Windows, iPhone...), trình duyệt, trang xem..."
+              placeholder="Tìm kiếm theo địa chỉ IP (116.111...), thiết bị (iPhone, Windows...), trình duyệt, trang xem..."
               value={searchQuery}
               onChange={(e) => setSearchQuery(e.target.value)}
             />
@@ -544,14 +556,15 @@ export default function ManageTraffic() {
             )}
           </div>
 
-          {/* Devices List Table (NO IP COLUMN) */}
+          {/* Devices List Table (WITH IP & LOCATION) */}
           <div className="recent-devices-table-wrap">
             <table className="recent-devices-table">
               <thead>
                 <tr>
                   <th>THIẾT BỊ & HỆ ĐIỀU HÀNH</th>
+                  <th>ĐỊA CHỈ IP & VỊ TRÍ</th>
                   <th>TRÌNH DUYỆT</th>
-                  <th>SỐ LƯỢT XEM CỦA MÁY</th>
+                  <th>SỐ LƯỢT XEM CỦA IP</th>
                   <th>TRANG XEM GẦN NHẤT</th>
                   <th>THỜI GIAN TRUY CẬP</th>
                   <th>TRẠNG THÁI</th>
@@ -560,7 +573,7 @@ export default function ManageTraffic() {
               <tbody>
                 {filteredLogs.length === 0 ? (
                   <tr>
-                    <td colSpan={6} className="empty-state">
+                    <td colSpan={7} className="empty-state">
                       <i className="ri-inbox-line" />
                       <span>Không tìm thấy thiết bị nào phù hợp bộ lọc</span>
                     </td>
@@ -583,6 +596,31 @@ export default function ManageTraffic() {
                                 {item.device_type} • Màn hình {item.screen_resolution}
                               </span>
                             </div>
+                          </div>
+                        </td>
+
+                        <td>
+                          <div className="ip-cell">
+                            <span className="ip-cell__address">
+                              <i className="ri-global-line text-green" />
+                              <code>{item.ip_address || "127.0.0.1"}</code>
+                              <button
+                                type="button"
+                                className="copy-ip-btn"
+                                onClick={(e) => {
+                                  e.stopPropagation();
+                                  navigator.clipboard?.writeText(item.ip_address || "127.0.0.1");
+                                  alert(`Đã sao chép IP: ${item.ip_address || "127.0.0.1"}`);
+                                }}
+                                title="Sao chép IP"
+                              >
+                                <i className="ri-file-copy-line" />
+                              </button>
+                            </span>
+                            <span className="ip-cell__location">
+                              <i className="ri-map-pin-2-fill" />
+                              {item.city ? `${item.city}, ${item.country || "VN"}` : (item.region || "Việt Nam")}
+                            </span>
                           </div>
                         </td>
 

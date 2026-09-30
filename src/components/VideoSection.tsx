@@ -30,18 +30,44 @@ const VideoSection = ({
     : "";
 
   useEffect(() => {
-    if (isModalOpen) {
-      const originalBodyOverflow = document.body.style.overflow;
-      const originalHtmlOverflow = document.documentElement.style.overflow;
+    if (!isModalOpen) return;
 
-      document.body.style.overflow = "hidden";
-      document.documentElement.style.overflow = "hidden";
+    const originalBodyOverflow = document.body.style.overflow;
+    const originalHtmlOverflow = document.documentElement.style.overflow;
+    const origBodyTouch = document.body.style.touchAction;
+    const origHtmlTouch = document.documentElement.style.touchAction;
 
-      return () => {
-        document.body.style.overflow = originalBodyOverflow;
-        document.documentElement.style.overflow = originalHtmlOverflow;
-      };
-    }
+    document.body.style.overflow = "hidden";
+    document.documentElement.style.overflow = "hidden";
+    document.body.style.touchAction = "none";
+    document.documentElement.style.touchAction = "none";
+
+    document.body.classList.add("modal-scroll-lock");
+    document.documentElement.classList.add("modal-scroll-lock");
+
+    const blockScroll = (e: WheelEvent | TouchEvent) => {
+      const target = e.target as HTMLElement | null;
+      if (target && (target.tagName === "IFRAME" || target.closest(".video__modal-content"))) {
+        return;
+      }
+      e.preventDefault();
+    };
+
+    window.addEventListener("wheel", blockScroll, { passive: false });
+    window.addEventListener("touchmove", blockScroll, { passive: false });
+
+    return () => {
+      document.body.style.overflow = originalBodyOverflow;
+      document.documentElement.style.overflow = originalHtmlOverflow;
+      document.body.style.touchAction = origBodyTouch;
+      document.documentElement.style.touchAction = origHtmlTouch;
+
+      document.body.classList.remove("modal-scroll-lock");
+      document.documentElement.classList.remove("modal-scroll-lock");
+
+      window.removeEventListener("wheel", blockScroll);
+      window.removeEventListener("touchmove", blockScroll);
+    };
   }, [isModalOpen]);
 
   return (

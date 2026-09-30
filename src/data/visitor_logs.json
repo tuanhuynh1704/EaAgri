@@ -1,0 +1,38 @@
+[
+  {
+    "id": "log_1790754668998",
+    "device_id": "dev_test_phone_01",
+    "ip_address": "42.112.98.45",
+    "city": "TP. Hồ Chí Minh",
+    "region": "Đông Nam Bộ",
+    "country": "Việt Nam",
+    "device_type": "Mobile",
+    "os": "iPhone (iOS 17.5)",
+    "browser": "Safari",
+    "screen_resolution": "393×852",
+    "visit_count": 2,
+    "last_path": "/tin-tuc",
+    "referrer": "Trực tiếp (Direct)",
+    "is_online": true,
+    "first_visit": "2026-09-30T07:51:08.998Z",
+    "last_visit": "2026-09-30T07:51:29.496Z"
+  },
+  {
+    "id": "log_init_01",
+    "device_id": "dev_pc_owner",
+    "ip_address": "116.111.184.173",
+    "city": "TP. Hồ Chí Minh",
+    "region": "Đông Nam Bộ",
+    "country": "Việt Nam",
+    "device_type": "Desktop",
+    "os": "Windows 11 / 10",
+    "browser": "Microsoft Edge",
+    "screen_resolution": "1536×864",
+    "visit_count": 31,
+    "last_path": "/",
+    "referrer": "Trực tiếp (Direct)",
+    "is_online": true,
+    "first_visit": "2026-09-30T06:00:00.000Z",
+    "last_visit": "2026-09-30T07:40:00.000Z"
+  }
+]
