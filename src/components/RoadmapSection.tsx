@@ -186,7 +186,7 @@ export default function RoadmapSection() {
               <h3>Đồng Hành Cùng Nhà Nông</h3>
               <p>Hợp tác phát triển nông nghiệp số bền vững, gia tăng giá trị chuỗi sầu riêng Tây Nguyên.</p>
             </div>
-            <button 
+            <button
               type="button"
               onClick={handleOpenModal}
               className="btn roadmap__cta-btn"
@@ -212,10 +212,10 @@ export default function RoadmapSection() {
             onScroll={handleTimelineScroll}
           >
             <div className="roadmap__timeline-bar"></div>
-            
+
             {phases.map((phase, idx) => (
-              <div 
-                key={idx} 
+              <div
+                key={idx}
                 className={`roadmap__timeline-item roadmap__timeline-item--${phase.status}`}
               >
                 <div className="roadmap__timeline-icon">
@@ -259,8 +259,8 @@ export default function RoadmapSection() {
       {/* Cooperation Contact Modal */}
       {isModalOpen && (
         <div className="coop-modal__backdrop" onClick={handleCloseModal}>
-          <div 
-            className="coop-modal__dialog" 
+          <div
+            className="coop-modal__dialog"
             onClick={(e) => e.stopPropagation()}
             role="dialog"
             aria-modal="true"
@@ -279,9 +279,9 @@ export default function RoadmapSection() {
                   Cùng EaAgri kiến tạo chuỗi giá trị nông nghiệp thông minh & bền vững.
                 </p>
               </div>
-              <button 
-                type="button" 
-                className="coop-modal__close-btn" 
+              <button
+                type="button"
+                className="coop-modal__close-btn"
                 onClick={handleCloseModal}
                 aria-label="Đóng biểu mẫu"
               >
@@ -302,14 +302,14 @@ export default function RoadmapSection() {
                   </p>
 
                   <div className="coop-modal__success-actions">
-                    <button 
-                      type="button" 
+                    <button
+                      type="button"
                       className="btn btn--primary coop-modal__btn-done"
                       onClick={handleCloseModal}
                     >
                       <i className="ri-check-line"></i> Hoàn Tất
                     </button>
-                    <a 
+                    <a
                       href="https://www.facebook.com/profile.php?id=61577351045350"
                       target="_blank"
                       rel="noopener noreferrer"
@@ -468,7 +468,7 @@ export default function RoadmapSection() {
                         </>
                       )}
                     </button>
-                    
+
                     <div className="coop-modal__direct-contact">
                       <span>Hoặc liên hệ trực tiếp:</span>
                       <a href="mailto:info@eaagri.vn" className="coop-modal__contact-link">

@@ -145,7 +145,7 @@ export default function Footer() {
           <p className="footer__download-desc">
             Quản lý và giám sát vườn sầu riêng của bạn mọi lúc, mọi nơi trực tiếp trên smartphone.
           </p>
-          
+
           <div className="footer__download-row">
             <a
               href="#app-store"
@@ -162,11 +162,11 @@ export default function Footer() {
                 alt="Tải trên App Store"
               />
             </a>
-            <a 
-              href="https://play.google.com/store/apps/details?id=com.eaagri.app&hl=vi" 
-              target="_blank" 
-              rel="noopener noreferrer" 
-              className="footer__download-btn" 
+            <a
+              href="https://play.google.com/store/apps/details?id=com.eaagri.app&hl=vi"
+              target="_blank"
+              rel="noopener noreferrer"
+              className="footer__download-btn"
               aria-label="Google Play"
             >
               <img loading="lazy" decoding="async"
