@@ -417,8 +417,11 @@
     box-shadow: 0 35px 80px -15px rgba(6, 78, 59, 0.28), 0 0 50px rgba(16, 185, 129, 0.2);
   }
 
-  @media (max-width: $mobile) {
-    border-radius: 16px;
+  @media (max-width: $tablet) {
+    aspect-ratio: 9 / 16;
+    max-width: 360px;
+    margin: 0 auto;
+    border-radius: 22px;
   }
 }
 

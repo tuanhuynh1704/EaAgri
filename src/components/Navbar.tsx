@@ -187,6 +187,17 @@ const Navbar = () => {
             <span className="nav__link-text">Tin tức</span>
           </a>
 
+          <a
+            href="https://crm.eaagri.vn/"
+            target="_blank"
+            rel="noopener noreferrer"
+            className="nav__link nav__link--crm"
+            title="Nền tảng Quản trị & Bán hàng EaAgri CRM (crm.eaagri.vn)"
+          >
+            <i className="ri-building-4-line nav__link-icon"></i>
+            <span className="nav__link-text">Hệ thống CRM</span>
+            <i className="ri-arrow-right-up-line nav__link-ext"></i>
+          </a>
         </div>
 
         <div className="nav__actions">
@@ -455,6 +466,25 @@ const Navbar = () => {
             <span className="mobile-drawer__nav-desc">Kỹ thuật & chuyển giao công nghệ</span>
           </div>
           <i className="ri-arrow-right-s-line mobile-drawer__nav-chevron" />
+        </a>
+
+        <a
+          href="https://crm.eaagri.vn/"
+          target="_blank"
+          rel="noopener noreferrer"
+          className="mobile-drawer__nav-item mobile-drawer__nav-item--crm"
+          onClick={() => setIsMobileMenuOpen(false)}
+        >
+          <div className="mobile-drawer__nav-icon-box mobile-drawer__nav-icon-box--crm">
+            <i className="ri-building-4-line" />
+          </div>
+          <div className="mobile-drawer__nav-text">
+            <span className="mobile-drawer__nav-title">
+              Hệ thống CRM <i className="ri-arrow-right-up-line" style={{ fontSize: "0.8rem", opacity: 0.7 }} />
+            </span>
+            <span className="mobile-drawer__nav-desc">Quản trị đại lý VTNN &amp; POS bán hàng</span>
+          </div>
+          <i className="ri-arrow-right-up-line mobile-drawer__nav-chevron" />
         </a>
 
       </div>

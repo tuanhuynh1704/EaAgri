@@ -9,7 +9,9 @@ export interface PromoVideoDetail {
 
 export function triggerPromoVideo(mode?: "16x9" | "9x16") {
   const isMobile =
-    typeof window !== "undefined" ? window.innerWidth <= 768 : false;
+    typeof window !== "undefined"
+      ? Boolean(window.matchMedia?.("(max-width: 768px)")?.matches || window.innerWidth <= 768)
+      : false;
   const targetMode = mode || (isMobile ? "9x16" : "16x9");
   window.dispatchEvent(
     new CustomEvent<PromoVideoDetail>(PROMO_VIDEO_EVENT, { detail: { mode: targetMode } })
@@ -18,15 +20,18 @@ export function triggerPromoVideo(mode?: "16x9" | "9x16") {
 
 export default function PromoVideoModal() {
   const [isOpen, setIsOpen] = useState(false);
-  const [mode, setMode] = useState<"16x9" | "9x16">(() =>
-    typeof window !== "undefined" && window.innerWidth <= 768 ? "9x16" : "16x9"
-  );
+  const [mode, setMode] = useState<"16x9" | "9x16">(() => {
+    if (typeof window === "undefined") return "16x9";
+    return (window.matchMedia?.("(max-width: 768px)")?.matches || window.innerWidth <= 768) ? "9x16" : "16x9";
+  });
   const videoRef = useRef<HTMLVideoElement | null>(null);
 
   useEffect(() => {
     const handleOpen = (e: Event) => {
       const customEvent = e as CustomEvent<PromoVideoDetail>;
-      const isMobile = window.innerWidth <= 768;
+      const isMobile = Boolean(
+        window.matchMedia?.("(max-width: 768px)")?.matches || window.innerWidth <= 768
+      );
       const preferredMode =
         customEvent.detail?.mode || (isMobile ? "9x16" : "16x9");
       setMode(preferredMode);
@@ -41,7 +46,10 @@ export default function PromoVideoModal() {
   useEffect(() => {
     if (!isOpen) return;
     const handleResize = () => {
-      setMode(window.innerWidth <= 768 ? "9x16" : "16x9");
+      const isMobile = Boolean(
+        window.matchMedia?.("(max-width: 768px)")?.matches || window.innerWidth <= 768
+      );
+      setMode(isMobile ? "9x16" : "16x9");
     };
     window.addEventListener("resize", handleResize);
     return () => window.removeEventListener("resize", handleResize);

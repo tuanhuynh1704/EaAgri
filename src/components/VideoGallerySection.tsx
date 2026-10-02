@@ -16,16 +16,36 @@ interface VideoItem {
 
 export default function VideoGallerySection() {
   const [activeVideo, setActiveVideo] = useState<VideoItem | null>(null);
-  const [isMobile, setIsMobile] = useState(() =>
-    typeof window !== "undefined" ? window.innerWidth <= 768 : false
-  );
+  const [isMobile, setIsMobile] = useState(() => {
+    if (typeof window === "undefined") return false;
+    return Boolean(
+      window.matchMedia?.("(max-width: 768px)")?.matches ||
+      window.innerWidth <= 768
+    );
+  });
 
   useEffect(() => {
-    const handleResize = () => {
-      setIsMobile(window.innerWidth <= 768);
+    const mql = window.matchMedia?.("(max-width: 768px)");
+    const checkMobile = () => {
+      setIsMobile(Boolean(mql?.matches || window.innerWidth <= 768));
     };
-    window.addEventListener("resize", handleResize);
-    return () => window.removeEventListener("resize", handleResize);
+
+    checkMobile();
+    if (mql?.addEventListener) {
+      mql.addEventListener("change", checkMobile);
+    } else if (mql?.addListener) {
+      mql.addListener(checkMobile);
+    }
+    window.addEventListener("resize", checkMobile);
+
+    return () => {
+      if (mql?.removeEventListener) {
+        mql.removeEventListener("change", checkMobile);
+      } else if (mql?.removeListener) {
+        mql.removeListener(checkMobile);
+      }
+      window.removeEventListener("resize", checkMobile);
+    };
   }, []);
 
   const promoMode = isMobile ? "9x16" : "16x9";

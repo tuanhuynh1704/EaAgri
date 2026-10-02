@@ -93,6 +93,17 @@ export default function Footer() {
                 <i className="ri-trophy-line"></i> <span>Phòng truyền thống & Giải thưởng</span>
               </a>
             </li>
+            <li>
+              <a
+                href="https://crm.eaagri.vn/"
+                target="_blank"
+                rel="noopener noreferrer"
+                title="Hệ sinh thái EaAgri CRM cho Đại lý VTNN (crm.eaagri.vn)"
+              >
+                <i className="ri-building-4-line"></i> <span>Hệ thống CRM (crm.eaagri.vn)</span>
+                <i className="ri-arrow-right-up-line" style={{ fontSize: "0.75rem", marginLeft: "4px", opacity: 0.7 }}></i>
+              </a>
+            </li>
           </ul>
         </div>
 
@@ -200,6 +211,15 @@ export default function Footer() {
               }}
             >
               Chính sách bảo mật
+            </a>
+            <span className="footer__bar-divider"></span>
+            <a
+              href="https://crm.eaagri.vn/"
+              target="_blank"
+              rel="noopener noreferrer"
+              title="Cổng Quản trị & Bán hàng EaAgri CRM"
+            >
+              Cổng EaAgri CRM
             </a>
             <span className="footer__bar-divider"></span>
             <a href="#">Quy chuẩn VietGAP</a>

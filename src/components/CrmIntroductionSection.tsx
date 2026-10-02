@@ -129,6 +129,21 @@ export default function CrmIntroductionSection() {
               giữa đại lý và bà con <span className="text-bold-accent">Nông hộ</span> qua ứng dụng di động.
             </div>
           </div>
+
+          {/* Header Action Portal Button */}
+          <div className="crm__header-action" data-aos="fade-up" data-aos-delay="120">
+            <a
+              href="https://crm.eaagri.vn/"
+              target="_blank"
+              rel="noopener noreferrer"
+              className="crm__portal-btn"
+              title="Truy cập nền tảng EaAgri CRM (crm.eaagri.vn)"
+            >
+              <i className="ri-external-link-line"></i>
+              <span>Truy Cập Nền Tảng EaAgri CRM</span>
+              <span className="crm__portal-badge">crm.eaagri.vn</span>
+            </a>
+          </div>
         </div>
 
         {/* 3 PROBLEM-SOLVER PILLARS */}
@@ -301,6 +316,18 @@ export default function CrmIntroductionSection() {
                     <i className="ri-check-line"></i> Giám sát hệ thống &amp; tra cứu Audit Logs an ninh
                   </li>
                 </ul>
+                <div className="role-card__action">
+                  <a
+                    href="https://crm.eaagri.vn/"
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="role-card__link"
+                    title="Truy cập cổng Super Admin trên crm.eaagri.vn"
+                  >
+                    <span>Cổng Quản Trị Hệ Thống</span>
+                    <i className="ri-arrow-right-up-line"></i>
+                  </a>
+                </div>
               </div>
 
               {/* Role 2: Đại lý Agency */}
@@ -326,6 +353,18 @@ export default function CrmIntroductionSection() {
                     <strong>Nhân viên (AGENT):</strong>
                     <span>Tiếp nhận ca hỗ trợ, tạo đơn POS tại quầy, đóng gói &amp; nhắc việc chăm sóc.</span>
                   </div>
+                </div>
+                <div className="role-card__action">
+                  <a
+                    href="https://crm.eaagri.vn/"
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="role-card__link"
+                    title="Truy cập cổng Đại lý trên crm.eaagri.vn"
+                  >
+                    <span>Cổng Đăng Nhập Đại Lý</span>
+                    <i className="ri-arrow-right-up-line"></i>
+                  </a>
                 </div>
               </div>
 
@@ -432,6 +471,32 @@ export default function CrmIntroductionSection() {
             </div>
           </div>
         )}
+
+        {/* CRM BOTTOM CTA BANNER */}
+        <div className="crm__cta-banner" data-aos="fade-up">
+          <div className="crm__cta-content">
+            <div className="crm__cta-badge">
+              <span className="cta-dot"></span> ĐÃ TRIỂN KHAI THỰC TẾ
+            </div>
+            <h3 className="crm__cta-title">Sẵn sàng trải nghiệm EaAgri CRM cho đại lý của bạn?</h3>
+            <p className="crm__cta-desc">
+              Hệ thống CRM &amp; POS đa thuê: Sổ cái công nợ bất biến, bán lẻ tại quầy siêu tốc và kết nối đồng bộ hai chiều với hàng nghìn nông hộ.
+            </p>
+          </div>
+          <div className="crm__cta-action">
+            <a
+              href="https://crm.eaagri.vn/"
+              target="_blank"
+              rel="noopener noreferrer"
+              className="crm__cta-btn"
+              title="Truy cập trực tiếp https://crm.eaagri.vn/"
+            >
+              <span>Vào Cổng EaAgri CRM</span>
+              <i className="ri-arrow-right-up-line"></i>
+            </a>
+            <span className="crm__cta-url">https://crm.eaagri.vn</span>
+          </div>
+        </div>
       </div>
     </section>
   );

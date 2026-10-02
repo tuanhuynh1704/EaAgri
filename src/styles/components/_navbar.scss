@@ -179,6 +179,36 @@ nav.navbar-container.is-hidden {
     }
   }
 
+  // CRM link highlight
+  &--crm {
+    color: #065f46;
+    background: rgba(16, 185, 129, 0.08);
+    border-color: rgba(16, 185, 129, 0.2);
+
+    .nav__link-icon {
+      color: #059669;
+    }
+
+    .nav__link-ext {
+      font-size: 0.8rem;
+      color: #059669;
+      margin-left: -2px;
+      opacity: 0.8;
+      transition: transform 0.25s ease, opacity 0.25s ease;
+    }
+
+    &:hover {
+      background: linear-gradient(135deg, rgba(236, 253, 245, 0.95), rgba(209, 250, 229, 0.85));
+      border-color: rgba(16, 185, 129, 0.4);
+      color: #047857;
+
+      .nav__link-ext {
+        transform: translate(2px, -2px);
+        opacity: 1;
+      }
+    }
+  }
+
   @media (max-width: $mobile) {
     min-height: 36px;
     padding: 0.35rem 0.6rem;
