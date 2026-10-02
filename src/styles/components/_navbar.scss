@@ -30,16 +30,6 @@ nav.navbar-container {
   }
 }
 
-// Hide on deep scroll down, reveal on scroll up
-nav.navbar-container.is-hidden {
-  transform: translateY(calc(-100% - 2.5rem));
-  opacity: 0;
-
-  .nav__logo,
-  .nav__right-capsule {
-    pointer-events: none;
-  }
-}
 
 @media (prefers-reduced-motion: reduce) {
   nav.navbar-container {

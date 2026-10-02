@@ -7,10 +7,8 @@ const Navbar = () => {
   const { pathname } = useLocation();
   const { user, profile, signOut } = useAuth();
   const [isScrolled, setIsScrolled] = useState(false);
-  const [isHidden, setIsHidden] = useState(false);
   const [isUserMenuOpen, setIsUserMenuOpen] = useState(false);
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
-  const lastScrollY = useRef(0);
   const userMenuRef = useRef<HTMLDivElement>(null);
   const isHomePage = pathname === "/";
   const useCapsuleStyle = !isHomePage || isScrolled;
@@ -30,23 +28,10 @@ const Navbar = () => {
   useEffect(() => {
     const handleScroll = () => {
       const currentY = Math.max(window.scrollY, 0);
-      setIsScrolled(currentY > 80);
-
-      if (currentY <= 120) {
-        setIsHidden(false);
-      } else if (Math.abs(currentY - lastScrollY.current) > 8) {
-        setIsHidden(currentY > lastScrollY.current);
-      }
-
-      lastScrollY.current = currentY;
+      setIsScrolled(currentY > 50);
     };
 
-    const handlePointerMove = (event: PointerEvent) => {
-      if (event.clientY <= 72) setIsHidden(false);
-    };
-
-    // Passive + one update per animation frame: scroll events can fire far more often
-    // than the screen refreshes, and a non-passive listener can delay scrolling itself.
+    // Passive + one update per animation frame for smooth 60/120fps scrolling
     let scrollFrame = 0;
     const onScroll = () => {
       if (scrollFrame) return;
@@ -57,18 +42,14 @@ const Navbar = () => {
     };
 
     window.addEventListener("scroll", onScroll, { passive: true });
-    window.addEventListener("pointermove", handlePointerMove, { passive: true });
     handleScroll(); // Initial check
     return () => {
       cancelAnimationFrame(scrollFrame);
       window.removeEventListener("scroll", onScroll);
-      window.removeEventListener("pointermove", handlePointerMove);
     };
   }, []);
 
   useEffect(() => {
-    setIsHidden(false);
-    lastScrollY.current = window.scrollY;
     setIsUserMenuOpen(false); // Close user menu on route navigation
     setIsMobileMenuOpen(false); // Close mobile drawer on route navigation
   }, [pathname]);
@@ -125,10 +106,8 @@ const Navbar = () => {
   return (
     <>
       <nav
-      className={`navbar-container ${useCapsuleStyle ? "is-scrolled" : ""} ${!isHomePage ? "is-inner-page" : ""} ${isHidden ? "is-hidden" : ""}`}
-      data-aos="fade-down"
-      onFocusCapture={() => setIsHidden(false)}
-    >
+        className={`navbar-container ${useCapsuleStyle ? "is-scrolled" : ""} ${!isHomePage ? "is-inner-page" : ""}`}
+      >
       <div className="nav__logo" onClick={handleHome} title="EaAgri - Về đầu trang">
         <img
           src="/logo_banner.jpg"
