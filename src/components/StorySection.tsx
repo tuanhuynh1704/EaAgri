@@ -60,7 +60,7 @@ const StorySection = ({
               <i className="ri-arrow-left-s-line"></i>
             </button>
             
-            <img src={images[currentIndex]} alt={`${imageAlt} ${currentIndex + 1}`} />
+            <img loading="lazy" decoding="async" src={images[currentIndex]} alt={`${imageAlt} ${currentIndex + 1}`} />
             
             <button className="story__slider-btn story__slider-btn--next" onClick={handleNext} aria-label="Next image">
               <i className="ri-arrow-right-s-line"></i>
@@ -78,7 +78,7 @@ const StorySection = ({
             </div>
           </div>
         ) : (
-          <img src={images[0]} alt={imageAlt} />
+          <img loading="lazy" decoding="async" src={images[0]} alt={imageAlt} />
         )}
       </div>
 

@@ -1,24 +1,19 @@
-import { useMemo, useState, useEffect, type CSSProperties, type MouseEvent } from "react";
+import { lazy, Suspense, useMemo, useRef, useState, useEffect, type CSSProperties, type MouseEvent } from "react";
 
-interface Hotspot {
-  id: string;
-  label: string;
-  icon: string;
-  category: string;
-  metric: string;
-  left: string;
-  top: string;
-}
+// three.js (~600 KB) chunk preloads in parallel without blocking initial paint
+const EaAgriDurianPromise = import("./eaagri-3d/EaAgriDurian");
+const EaAgriDurian = lazy(() => EaAgriDurianPromise);
+import { triggerAppStoreNotice } from "./AppStoreNoticeModal";
+import { triggerPromoVideo } from "./PromoVideoModal";
 
 const ROTATING_HIGHLIGHTS = [
-  { text: "thông minh", tag: "AI • IoT • DATA" },
-  { text: "tích hợp AI & IoT", tag: "REALTIME SENSOR" },
-  { text: "chuẩn dữ liệu số", tag: "BIG DATA INSIGHT" },
-  { text: "bền vững Tây Nguyên", tag: "GREEN AGRI 2026" },
+  { text: "thông minh", tag: "AI • IOT" },
+  { text: "sạch sâu bệnh", tag: "YOLOv9 DETECT" },
+  { text: "chuẩn VietGAP", tag: "VIETGAP 2026" },
+  { text: "tối ưu năng suất", tag: "HIGH YIELD" },
 ];
 
 const Hero = () => {
-  const [activeHotspot, setActiveHotspot] = useState<string | null>(null);
   const [highlightIndex, setHighlightIndex] = useState(0);
 
   useEffect(() => {
@@ -29,7 +24,7 @@ const Hero = () => {
   }, []);
 
   const fallingLeaves = useMemo(() => (
-    Array.from({ length: 16 }, (_, index) => {
+    Array.from({ length: 8 }, (_, index) => {
       const depth = Math.random();
       const size = 18 + depth * 38;
       const rotationDirection = Math.random() > 0.5 ? 1 : -1;
@@ -66,63 +61,6 @@ const Hero = () => {
     }))
   ), []);
 
-  const hotspots: Hotspot[] = [
-    {
-      id: "map",
-      label: "Bản đồ số vườn",
-      icon: "ri-map-pin-2-fill",
-      category: "Bản Đồ Số Lô Vườn",
-      metric: "Lô A2 • 120 cây đang nuôi trái (64% diện tích)",
-      left: "24%",
-      top: "39%",
-    },
-    {
-      id: "chart",
-      label: "Dữ liệu thời gian thực",
-      icon: "ri-line-chart-fill",
-      category: "Cảm Biến Đất & Khí Hậu",
-      metric: "Độ ẩm 68% • Nhiệt độ 28°C • pH 6.2 (Tối ưu)",
-      left: "24%",
-      top: "53%",
-    },
-    {
-      id: "weather",
-      label: "Dự báo thời tiết",
-      icon: "ri-sun-cloudy-fill",
-      category: "Trạm Quan Trắc Vi Khí Hậu",
-      metric: "28°C • Nắng 12.5k Lux • Độ ẩm 70%",
-      left: "87%",
-      top: "39%",
-    },
-    {
-      id: "growth",
-      label: "Mô hình tăng trưởng",
-      icon: "ri-plant-fill",
-      category: "Chỉ Số Sinh Học AI",
-      metric: "Tăng trưởng: +15% • Sạch bệnh 100%",
-      left: "74%",
-      top: "55%",
-    },
-    {
-      id: "durian",
-      label: "Quả sầu riêng",
-      icon: "ri-award-fill",
-      category: "Sầu Riêng Ri6 Thượng Hạng",
-      metric: "Chuẩn Loại 1 • Brix 18.5° • Cơm sáp hạt lép",
-      left: "51%",
-      top: "40%",
-    },
-    {
-      id: "pump",
-      label: "Trạm máy bơm IoT",
-      icon: "ri-water-flash-fill",
-      category: "Tưới Tiêu Tự Động",
-      metric: "Van tưới nhỏ giọt • Đang cấp ẩm tự động",
-      left: "64%",
-      top: "66%",
-    },
-  ];
-
   const scrollToNextSection = () => {
     const nextSection = document.getElementById('section-team');
     if (nextSection) {
@@ -130,82 +68,42 @@ const Hero = () => {
     }
   };
 
-  const handleVisualPointerMove = (event: MouseEvent<HTMLDivElement>) => {
-    const bounds = event.currentTarget.getBoundingClientRect();
-    const x = (event.clientX - bounds.left) / bounds.width - 0.5;
-    const y = (event.clientY - bounds.top) / bounds.height - 0.5;
-    event.currentTarget.style.setProperty("--parallax-x", `${x * 14}px`);
-    event.currentTarget.style.setProperty("--parallax-y", `${y * 10}px`);
-    event.currentTarget.style.setProperty("--parallax-node-x", `${x * -7}px`);
-    event.currentTarget.style.setProperty("--parallax-node-y", `${y * -5}px`);
-    event.currentTarget.style.setProperty("--visual-tilt-x", `${y * -3.2}deg`);
-    event.currentTarget.style.setProperty("--visual-tilt-y", `${x * 4.2}deg`);
-    event.currentTarget.style.setProperty("--visual-light-x", `${(x + 0.5) * 100}%`);
-    event.currentTarget.style.setProperty("--visual-light-y", `${(y + 0.5) * 100}%`);
-  };
-
-  const resetVisualParallax = (event: MouseEvent<HTMLDivElement>) => {
-    event.currentTarget.style.setProperty("--parallax-x", "0px");
-    event.currentTarget.style.setProperty("--parallax-y", "0px");
-    event.currentTarget.style.setProperty("--parallax-node-x", "0px");
-    event.currentTarget.style.setProperty("--parallax-node-y", "0px");
-    event.currentTarget.style.setProperty("--visual-tilt-x", "0deg");
-    event.currentTarget.style.setProperty("--visual-tilt-y", "0deg");
-  };
+  // mousemove can fire 100+ times/s; each write restyles the whole hero. Coalesce to
+  // at most one layout read + style write per animation frame.
+  const pointerFrame = useRef(0);
+  const lastPointer = useRef({ x: 0, y: 0, hero: null as HTMLElement | null });
 
   const handleHeroPointerMove = (event: MouseEvent<HTMLElement>) => {
-    const hero = event.currentTarget;
-    const bounds = hero.getBoundingClientRect();
-    const xRatio = (event.clientX - bounds.left) / bounds.width;
-    const yRatio = (event.clientY - bounds.top) / bounds.height;
+    lastPointer.current = { x: event.clientX, y: event.clientY, hero: event.currentTarget };
+    if (pointerFrame.current) return;
+    pointerFrame.current = requestAnimationFrame(() => {
+      pointerFrame.current = 0;
+      const { x, y, hero } = lastPointer.current;
+      if (!hero) return;
+      const bounds = hero.getBoundingClientRect();
+      const xRatio = (x - bounds.left) / bounds.width;
+      const yRatio = (y - bounds.top) / bounds.height;
 
-    hero.style.setProperty("--hero-pointer-x", `${xRatio * 100}%`);
-    hero.style.setProperty("--hero-pointer-y", `${yRatio * 100}%`);
-    hero.style.setProperty("--content-shift-x", `${(xRatio - 0.5) * 5}px`);
-    hero.style.setProperty("--content-shift-y", `${(yRatio - 0.5) * 3}px`);
-
-    hero.querySelectorAll<HTMLElement>(".floating-leaf").forEach((leaf) => {
-      const leafBounds = leaf.getBoundingClientRect();
-      const centerX = leafBounds.left + leafBounds.width / 2;
-      const centerY = leafBounds.top + leafBounds.height / 2;
-      const dx = centerX - event.clientX;
-      const dy = centerY - event.clientY;
-      const distance = Math.hypot(dx, dy);
-      const radius = 190;
-
-      if (distance < radius) {
-        const force = (radius - distance) / radius;
-        const safeDistance = Math.max(distance, 1);
-        leaf.style.setProperty("--leaf-repel-x", `${(dx / safeDistance) * force * 108}px`);
-        leaf.style.setProperty("--leaf-repel-y", `${(dy / safeDistance) * force * 78}px`);
-        leaf.style.setProperty("--leaf-repel-rotate", `${(dx >= 0 ? 1 : -1) * force * 96}deg`);
-        leaf.style.setProperty("--leaf-repel-scale", `${1 + force * 0.32}`);
-        leaf.classList.add("is-repelled");
-      } else {
-        leaf.style.setProperty("--leaf-repel-x", "0px");
-        leaf.style.setProperty("--leaf-repel-y", "0px");
-        leaf.style.setProperty("--leaf-repel-rotate", "0deg");
-        leaf.style.setProperty("--leaf-repel-scale", "1");
-        leaf.classList.remove("is-repelled");
-      }
+      hero.style.setProperty("--hero-pointer-x", `${xRatio * 100}%`);
+      hero.style.setProperty("--hero-pointer-y", `${yRatio * 100}%`);
+      hero.style.setProperty("--content-shift-x", `${(xRatio - 0.5) * 5}px`);
+      hero.style.setProperty("--content-shift-y", `${(yRatio - 0.5) * 3}px`);
     });
   };
 
   const resetHeroPointer = (event: MouseEvent<HTMLElement>) => {
+    cancelAnimationFrame(pointerFrame.current);
+    pointerFrame.current = 0;
     event.currentTarget.style.setProperty("--content-shift-x", "0px");
     event.currentTarget.style.setProperty("--content-shift-y", "0px");
-    event.currentTarget.querySelectorAll<HTMLElement>(".floating-leaf").forEach((leaf) => {
-      leaf.style.setProperty("--leaf-repel-x", "0px");
-      leaf.style.setProperty("--leaf-repel-y", "0px");
-      leaf.style.setProperty("--leaf-repel-rotate", "0deg");
-      leaf.style.setProperty("--leaf-repel-scale", "1");
-      leaf.classList.remove("is-repelled");
-    });
   };
+
+  useEffect(() => () => cancelAnimationFrame(pointerFrame.current), []);
 
   return (
     <header
       className="hero-section fullpage-slide"
+      data-pause-offscreen
       onMouseMove={handleHeroPointerMove}
       onMouseLeave={resetHeroPointer}
     >
@@ -226,14 +124,6 @@ const Hero = () => {
           <span className="wind-seed wind-seed--3"></span>
         </div>
 
-        {/* A distant flock crosses the open sky occasionally */}
-        <div className="hero-bird-sky" aria-hidden="true">
-          {[1, 2, 3, 4, 5].map((bird) => (
-            <span className={`bird-flight bird-flight--${bird}`} key={bird}>
-              <i className="sky-bird"><b></b><em></em></i>
-            </span>
-          ))}
-        </div>
         
         {/* Dynamic Sunlight Illumination & Rays Effect */}
         <div className="hero-sun-illumination">
@@ -247,7 +137,7 @@ const Hero = () => {
           {fallingLeaves.map((leaf) => (
             <span className="floating-leaf" style={leaf.style} key={leaf.id}>
               <span className="floating-leaf-reactor">
-                <img src="/assets/floating-leaf.png" alt="" className="floating-leaf-img" />
+                <img src="/assets/floating-leaf.webp" alt="" className="floating-leaf-img" />
               </span>
             </span>
           ))}
@@ -255,23 +145,34 @@ const Hero = () => {
       </div>
 
       <div className="hero-grid-layout section__container">
-        {/* LEFT COLUMN: Grand 3D Tree Visual with Interactive Beacons */}
+        {/* LEFT COLUMN: Grand 3D Tree Visual with Interactive 3D Model */}
         <div
           className="hero__visual"
           data-aos="zoom-in"
           data-aos-delay="100"
-          onMouseMove={handleVisualPointerMove}
-          onMouseLeave={resetVisualParallax}
         >
-          <div className="image-wrapper-container">
+          <div className="image-wrapper-container hero-3d-wrapper">
             <span className="hero-visual-depth-glow" aria-hidden="true"></span>
             
-            {/* The main tree and farmer image (Enlarged) */}
-            <img
-              src="/Cây 1.png"
-              alt="Hệ sinh thái sầu riêng thông minh Ea Agri"
-              className="main-hero-image"
-            />
+            {/* The 3D Tree, IoT devices and Farmer interactive model */}
+            <Suspense
+              fallback={
+                <div
+                  className="hero-3d-placeholder"
+                  aria-hidden="true"
+                />
+              }
+            >
+              <EaAgriDurian
+                assetBaseUrl="/eaagri-3d/assets/"
+                posterUrl={null}
+                quality="auto"
+                showCards={true}
+                showHotspots={true}
+                showFarmer={true}
+                lazy={false}
+              />
+            </Suspense>
 
             {/* Glowing Sunlight Sparkles & Pollen Bokeh */}
             <div className="hero-sparkles-layer" aria-hidden="true">
@@ -279,64 +180,58 @@ const Hero = () => {
                 <span className="sun-sparkle" style={sp.style} key={sp.id}></span>
               ))}
             </div>
-
-            {/* Wifi Telemetry Pulse Waves from Farmer's Tablet */}
-            <div className="farmer-tablet-wifi-aura" aria-hidden="true">
-              <span className="wifi-center-dot"></span>
-              <span className="wifi-ring wifi-ring--1"></span>
-              <span className="wifi-ring wifi-ring--2"></span>
-              <span className="wifi-ring wifi-ring--3"></span>
-            </div>
-
-            {/* Wireless Telemetry Pulse from Solar Sensor Pole */}
-            <div className="solar-sensor-telemetry-aura" aria-hidden="true">
-              <span className="sensor-center-dot"></span>
-              <span className="telemetry-ring telemetry-ring--1"></span>
-              <span className="telemetry-ring telemetry-ring--2"></span>
-            </div>
-
-            {/* Animated Circuit Data Flow Nodes */}
-            <div className="iot-data-layer" aria-hidden="true">
-              {[0, 1, 2, 3, 4].map((node) => (
-                <span className={`iot-data-node iot-data-node--${node + 1}`} key={node}></span>
-              ))}
-            </div>
-
-            {/* Interactive Screen & IoT Hotspots with Live Tooltips */}
-            <div className="hero-interactive-hotspots">
-              {hotspots.map((hs) => (
-                <div
-                  key={hs.id}
-                  className={`hero-hotspot-pin ${activeHotspot === hs.id ? "is-active" : ""}`}
-                  style={{ left: hs.left, top: hs.top }}
-                  onMouseEnter={() => setActiveHotspot(hs.id)}
-                  onMouseLeave={() => setActiveHotspot(null)}
-                  onClick={() => setActiveHotspot(activeHotspot === hs.id ? null : hs.id)}
-                >
-                  <button
-                    type="button"
-                    className="hotspot-trigger-beacon"
-                    aria-label={hs.label}
-                  >
-                    <span className="beacon-outer-radar"></span>
-                    <span className="beacon-inner-pulse"></span>
-                    <span className="beacon-dot">
-                      <i className={hs.icon}></i>
-                    </span>
-                  </button>
-
-                  {/* High-Tech Frosted Live Tooltip Popover */}
-                  <div className="hotspot-tooltip-popover">
-                    <div className="tooltip-header">
-                      <i className={hs.icon}></i>
-                      <span className="tooltip-cat">{hs.category}</span>
-                    </div>
-                    <div className="tooltip-metric">{hs.metric}</div>
-                  </div>
-                </div>
-              ))}
-            </div>
           </div>
+        </div>
+
+        {/* MOBILE ONLY: App Store & Google Play placed directly below 3D Tree */}
+        <div className="hero-download-links hero-download-links--mobile">
+          <a
+            href="#app-store"
+            className="download-btn"
+            onClick={(e) => {
+              e.preventDefault();
+              triggerAppStoreNotice();
+            }}
+            title="Tải về trên App Store (iOS)"
+          >
+            <span className="download-btn__icon apple-store-icon">
+              <i className="ri-apple-fill"></i>
+            </span>
+            <div className="download-btn__text">
+              <span className="download-btn__lbl">Tải về trên</span>
+              <span className="download-btn__store">App Store</span>
+            </div>
+          </a>
+
+          <a 
+            href="https://play.google.com/store/apps/details?id=com.eaagri.app&hl=vi" 
+            target="_blank" 
+            rel="noopener noreferrer" 
+            className="download-btn"
+          >
+            <span className="download-btn__icon google-play-icon">
+              <i className="ri-google-play-fill"></i>
+            </span>
+            <div className="download-btn__text">
+              <span className="download-btn__lbl">Tải về trên</span>
+              <span className="download-btn__store">Google Play</span>
+            </div>
+          </a>
+
+          <button
+            type="button"
+            className="download-btn download-btn--promo"
+            onClick={() => triggerPromoVideo()}
+            title="Xem video giới thiệu EaAgri 45 giây"
+          >
+            <span className="download-btn__icon promo-video-icon">
+              <i className="ri-play-circle-fill"></i>
+            </span>
+            <div className="download-btn__text">
+              <span className="download-btn__lbl">Teaser 45s</span>
+              <span className="download-btn__store">Xem Video</span>
+            </div>
+          </button>
         </div>
 
         {/* RIGHT COLUMN: Heading, Subtext, App links, Key Stats & Social Proof */}
@@ -348,8 +243,11 @@ const Hero = () => {
               <span className="hero-badge__pulse-dot" />
             </span>
             <span className="hero-badge__icon"><i className="ri-leaf-fill"></i></span>
-            <span className="hero-badge__text">NỀN TẢNG NÔNG NGHIỆP SỐ</span>
-            <span className="hero-badge__live-chip">LIVE AI</span>
+            <span className="hero-badge__text">TRỢ LÝ CÂY SẦU RIÊNG</span>
+            <span className="hero-badge__live-chip">
+              <span className="hero-badge__live-dot" aria-hidden="true" />
+              LIVE AI
+            </span>
           </div>
 
           <h1 className="hero-title">
@@ -357,7 +255,7 @@ const Hero = () => {
               Ea Agri
               <span className="text-ea-agri__light-beam" aria-hidden="true" />
             </span>
-            <span className="text-sub text-gray">Hệ sinh thái nông nghiệp</span>
+            <span className="text-sub text-gray">Trợ lý cây sầu riêng</span>
             <span className="text-sub text-sub--accent">
               <span className="rotating-word-box">
                 <span key={highlightIndex} className="rotating-word-item">
@@ -372,12 +270,24 @@ const Hero = () => {
 
           <p className="hero-description">
             <span className="hero-description__energy-bar" aria-hidden="true" />
-            Giải pháp tối ưu hóa chuỗi giá trị <strong className="hero-highlight">sầu riêng tại Tây Nguyên</strong>.
-            Tích hợp <strong className="hero-highlight">AI đa phương thức</strong>, <strong className="hero-highlight">IoT</strong>, <strong className="hero-highlight">dữ liệu lớn</strong> và mô hình kinh tế chia sẻ.
+            <span className="hero-description__full">
+              Ứng dụng AI & IoT theo dõi sức khỏe, chẩn đoán sâu bệnh và tối ưu năng suất cho <strong className="hero-highlight">cây sầu riêng</strong>.
+            </span>
+            <span className="hero-description__mobile">
+              Ứng dụng AI & IoT theo dõi sức khỏe, chẩn đoán sâu bệnh & tối ưu năng suất sầu riêng.
+            </span>
           </p>
 
-          <div className="hero-download-links">
-            <a href="#" className="download-btn">
+          <div className="hero-download-links hero-download-links--desktop">
+            <a
+              href="#app-store"
+              className="download-btn"
+              onClick={(e) => {
+                e.preventDefault();
+                triggerAppStoreNotice();
+              }}
+              title="Tải về trên App Store (iOS)"
+            >
               <span className="download-btn__icon apple-store-icon">
                 <i className="ri-apple-fill"></i>
               </span>
@@ -401,6 +311,21 @@ const Hero = () => {
                 <span className="download-btn__store">Google Play</span>
               </div>
             </a>
+
+            <button
+              type="button"
+              className="download-btn download-btn--promo"
+              onClick={() => triggerPromoVideo()}
+              title="Xem video giới thiệu EaAgri 45 giây"
+            >
+              <span className="download-btn__icon promo-video-icon">
+                <i className="ri-play-circle-fill"></i>
+              </span>
+              <div className="download-btn__text">
+                <span className="download-btn__lbl">Teaser 45s</span>
+                <span className="download-btn__store">Xem Video</span>
+              </div>
+            </button>
           </div>
         </div>
       </div>

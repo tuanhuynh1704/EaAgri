@@ -3,7 +3,7 @@ import { Link } from "react-router-dom";
 import { useSEO } from "../hooks/useSEO";
 import { supabase } from "../utils/supabase/client";
 import { useAuth } from "../context/AuthContext";
-import { cleanContent } from "../utils/cleanContent";
+import { cleanContent, extractSummaryAndBody } from "../utils/cleanContent";
 import { parseImageUrlAndPosition } from "../utils/imageUtils";
 
 interface NewsItem {
@@ -29,13 +29,13 @@ export default function NewsList() {
       "Cập nhật tin tức thị trường giá sầu riêng, kỹ thuật canh tác VietGAP, cảnh báo sâu bệnh và dự báo thời tiết nông nghiệp mới nhất từ EaAgri.",
     keywords:
       "tin tức nông nghiệp, giá sầu riêng hôm nay, kỹ thuật sầu riêng VietGAP, cảnh báo sâu bệnh Đắk Lắk, bản tin EaAgri",
-    canonicalUrl: "https://www.eaagri.vn/news",
+    canonicalUrl: "https://www.eaagri.vn/tintuc",
     structuredData: {
       "@context": "https://schema.org",
       "@type": "CollectionPage",
       "name": "Bản Tin & Kiến Thức Nông Nghiệp EaAgri",
       "description": "Kho dữ liệu tin tức, giá cả thị trường và cẩm nang kỹ thuật canh tác nông nghiệp số.",
-      "url": "https://www.eaagri.vn/news"
+      "url": "https://www.eaagri.vn/tintuc"
     }
   });
 
@@ -132,6 +132,9 @@ export default function NewsList() {
 
         {/* Header */}
         <div className="news-list__header" data-aos="fade-up">
+          <span className="news-list__meta-badge">
+            <i className="ri-newspaper-line"></i> TIN TỨC &amp; BẢN TIN EAAGRI
+          </span>
           <h1>Bản Tin Nông Nghiệp</h1>
           <p>Cập nhật kỹ thuật canh tác, thông tin thị trường và thời tiết mới nhất</p>
         </div>
@@ -165,31 +168,6 @@ export default function NewsList() {
 
         </div>
 
-        <article className="news-list__institutional-feature" data-aos="fade-up" data-aos-delay="140">
-          <a
-            href="https://cntt.ntt.edu.vn/nghien-cuu-khoa-hoc/phat-trien-san-pham/ea-agri-xuat-sac-gianh-giai-nhat-vong-ban-ket-nttu-innovation-startup-challenge-2026-bang-cong-nghe-nong-nghiep-va-cong-nghe-thuc-pham/"
-            target="_blank"
-            rel="noopener noreferrer"
-            className="news-list__institutional-image"
-          >
-            <img src="/Khởi nghiệp 3.jpg" alt="Ea Agri đạt Giải Nhất Vòng Bán kết Bảng 1C" />
-            <span><i className="ri-verified-badge-fill" /> Tin từ nhà trường</span>
-          </a>
-          <div className="news-list__institutional-content">
-            <small>KHOA CNTT · ĐẠI HỌC NGUYỄN TẤT THÀNH</small>
-            <h2>Ea Agri giành Giải Nhất Vòng Bán kết NTTU Innovation Startup Challenge 2026</h2>
-            <p>Đội thi Ea Agri, mã số NTT-144, được nhà trường ghi nhận tại Bảng 1C — Công nghệ Nông nghiệp và Công nghệ Thực phẩm.</p>
-            <div className="news-list__institutional-actions">
-              <a href="https://cntt.ntt.edu.vn/nghien-cuu-khoa-hoc/phat-trien-san-pham/ea-agri-xuat-sac-gianh-giai-nhat-vong-ban-ket-nttu-innovation-startup-challenge-2026-bang-cong-nghe-nong-nghiep-va-cong-nghe-thuc-pham/" target="_blank" rel="noopener noreferrer">
-                Đọc bài chính thức <i className="ri-arrow-right-up-line" />
-              </a>
-              <a href="https://www.facebook.com/share/p/1CA44S7p5M/" target="_blank" rel="noopener noreferrer" className="is-facebook">
-                <i className="ri-facebook-circle-fill" /> Facebook
-              </a>
-            </div>
-          </div>
-        </article>
-
         {/* News Grid */}
         {loading ? (
           <div className="news-list__loading">
@@ -204,74 +182,84 @@ export default function NewsList() {
           </div>
         ) : (
           <div className="news-list__grid">
-            {filteredNews.map((item, index) => (
-              <article
-                key={item.id}
-                className="news-list__card"
-                data-aos="fade-up"
-                data-aos-delay={index * 50}
-              >
-                {/* Card Image */}
-                <Link to={`/news/${item.id}`} className="news-list__card-image-wrapper">
-                  {item.image_url ? (
-                    <img 
-                      src={parseImageUrlAndPosition(item.image_url).url!} 
-                      alt={cleanContent(item.title)} 
-                      style={{ objectPosition: `${parseImageUrlAndPosition(item.image_url).posX}% ${parseImageUrlAndPosition(item.image_url).posY}%` }} 
-                    />
-                  ) : (
-                    <div className="placeholder">
-                      <i className="ri-image-line"></i>
-                      <span>EaAgri News</span>
-                    </div>
-                  )}
-                  <span className="news-list__card-badge">{item.category}</span>
-                </Link>
+            {filteredNews.map((item, index) => {
+              const { summary, body } = extractSummaryAndBody(item.content);
+              const snippetText = summary || stripHtml(body);
+              const parsedImg = parseImageUrlAndPosition(item.image_url);
 
-                {/* Card Content */}
-                <div className="news-list__card-content">
-                  {/* Meta data */}
-                  <div className="news-list__card-meta">
-                    <span>
-                      <i className="ri-user-3-line"></i> {item.author}
-                    </span>
-                    <span>
-                      <i className="ri-calendar-line"></i> {formatDate(item.created_at)}
-                    </span>
-                  </div>
-
-                  {/* Title */}
-                  <Link to={`/news/${item.id}`} style={{ textDecoration: "none" }}>
-                    <h2 className="news-list__card-title">{cleanContent(item.title)}</h2>
+              return (
+                <article
+                  key={item.id}
+                  className="news-list__card"
+                  data-aos="fade-up"
+                  data-aos-delay={index * 50}
+                >
+                  {/* Card Image */}
+                  <Link to={`/tintuc/${item.id}`} className="news-list__card-image-wrapper">
+                    {parsedImg.url ? (
+                      <img loading="lazy" decoding="async" 
+                        src={parsedImg.url} 
+                        alt={cleanContent(item.title)} 
+                        style={{ objectPosition: `${parsedImg.posX}% ${parsedImg.posY}%` }} 
+                      />
+                    ) : (
+                      <div className="placeholder">
+                        <i className="ri-image-line"></i>
+                        <span>Bản tin EaAgri</span>
+                      </div>
+                    )}
+                    <span className="news-list__card-badge">{item.category}</span>
                   </Link>
 
-                  {/* Snippet */}
-                  <p className="news-list__card-snippet">{stripHtml(item.content)}</p>
+                  {/* Card Content */}
+                  <div className="news-list__card-content">
+                    {/* Newspaper / Source Badge */}
+                    {item.author && (
+                      <div className="news-list__card-source">
+                        <i className="ri-newspaper-line"></i>
+                        <span>{item.author}</span>
+                      </div>
+                    )}
 
-                  {/* Card Footer Actions */}
-                  <div className="news-list__card-footer">
-                    <Link
-                      to={`/news/${item.id}`}
-                      className="news-list__read-more"
-                    >
-                      <span>Xem tiếp</span>
-                      <i className="ri-arrow-right-line"></i>
+                    {/* Title */}
+                    <Link to={`/tintuc/${item.id}`} style={{ textDecoration: "none" }}>
+                      <h2 className="news-list__card-title">{cleanContent(item.title)}</h2>
                     </Link>
 
-                    {isSA && (
-                      <button
-                        onClick={(e) => handleDelete(item.id, cleanContent(item.title), e)}
-                        className="news-list__delete-btn"
-                        title="Xóa bài viết"
-                      >
-                        <i className="ri-delete-bin-line"></i>
-                        <span>Xóa</span>
-                      </button>
-                    )}
+                    {/* Snippet / Ghi chú */}
+                    <p className="news-list__card-snippet">{snippetText}</p>
+
+                    {/* Card Footer Actions */}
+                    <div className="news-list__card-footer">
+                      <span className="news-list__card-date">
+                        <i className="ri-calendar-line"></i> {formatDate(item.created_at)}
+                      </span>
+
+                      <div style={{ display: "flex", alignItems: "center", gap: "0.75rem" }}>
+                        <Link
+                          to={`/tintuc/${item.id}`}
+                          className="news-list__read-more"
+                        >
+                          <span>Xem tiếp</span>
+                          <i className="ri-arrow-right-line"></i>
+                        </Link>
+
+                        {isSA && (
+                          <button
+                            onClick={(e) => handleDelete(item.id, cleanContent(item.title), e)}
+                            className="news-list__delete-btn"
+                            title="Xóa bài viết"
+                          >
+                            <i className="ri-delete-bin-line"></i>
+                            <span>Xóa</span>
+                          </button>
+                        )}
+                      </div>
+                    </div>
                   </div>
-                </div>
-              </article>
-            ))}
+                </article>
+              );
+            })}
           </div>
         )}
 

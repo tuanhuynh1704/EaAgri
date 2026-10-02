@@ -338,7 +338,7 @@ export default function AIChat() {
         <div className="ai-chat__header">
           <div className="ai-chat__ai-info">
             <div className="ai-avatar">
-              <img src="/logo_new.jpg" alt="EaAgri AI" style={{ width: '100%', height: '100%', objectFit: 'cover', borderRadius: '50%' }} />
+              <img loading="lazy" decoding="async" src="/logo_new.jpg" alt="EaAgri AI" style={{ width: '100%', height: '100%', objectFit: 'cover', borderRadius: '50%' }} />
             </div>
             <div className="ai-details">
               <h3>Chuyên gia AI Nông nghiệp</h3>
@@ -411,7 +411,7 @@ export default function AIChat() {
                       {msg.role === 'user' ? (
                         <i className="ri-user-smile-line"></i>
                       ) : (
-                        <img src="/logo_new.jpg" alt="EaAgri AI" style={{ width: '100%', height: '100%', objectFit: 'cover', borderRadius: '50%' }} />
+                        <img loading="lazy" decoding="async" src="/logo_new.jpg" alt="EaAgri AI" style={{ width: '100%', height: '100%', objectFit: 'cover', borderRadius: '50%' }} />
                       )}
                     </div>
                     <div className="message__content-wrapper">

@@ -1,10 +1,10 @@
 import { useEffect, useState } from "react";
-import { useParams, useNavigate, Link } from "react-router-dom";
+import { useParams, useNavigate, Link, useLocation, Navigate } from "react-router-dom";
 import { useSEO } from "../hooks/useSEO";
 import { supabase } from "../utils/supabase/client";
 import { useAuth } from "../context/AuthContext";
 import "react-quill-new/dist/quill.snow.css";
-import { cleanContent } from "../utils/cleanContent";
+import { cleanContent, extractSummaryAndBody } from "../utils/cleanContent";
 import { parseImageUrlAndPosition } from "../utils/imageUtils";
 
 interface NewsItem {
@@ -20,6 +20,7 @@ interface NewsItem {
 export default function NewsDetail() {
   const { id } = useParams<{ id: string }>();
   const navigate = useNavigate();
+  const location = useLocation();
   const { profile } = useAuth();
   const [article, setArticle] = useState<NewsItem | null>(null);
   const [loading, setLoading] = useState(true);
@@ -29,12 +30,16 @@ export default function NewsDetail() {
   const isSA = profile?.role === "SA";
 
   const { url: imageUrl } = article ? parseImageUrlAndPosition(article.image_url) : { url: null };
-  const articleSnippet = article
-    ? (new DOMParser().parseFromString(cleanContent(article.content), "text/html").body.textContent || "")
+  const { summary: articleSummary, body: articleBody } = article
+    ? extractSummaryAndBody(article.content)
+    : { summary: "", body: "" };
+
+  const articleSnippet = articleSummary || (article
+    ? (new DOMParser().parseFromString(cleanContent(articleBody), "text/html").body.textContent || "")
         .replace(/\s+/g, " ")
         .trim()
         .slice(0, 160)
-    : "";
+    : "");
 
   useSEO({
     title: article ? article.title : "Chi Tiết Bản Tin",
@@ -44,7 +49,7 @@ export default function NewsDetail() {
     ogDescription: articleSnippet || undefined,
     ogImage: imageUrl || undefined,
     ogType: "article",
-    canonicalUrl: id ? `https://www.eaagri.vn/news/${id}` : undefined,
+    canonicalUrl: id ? `https://www.eaagri.vn/tintuc/${id}` : undefined,
     structuredData: article
       ? {
           "@context": "https://schema.org",
@@ -56,7 +61,7 @@ export default function NewsDetail() {
           "dateModified": article.created_at,
           "author": {
             "@type": "Person",
-            "name": article.author || "EaAgri Editor"
+            "name": article.author || "Ban biên tập EaAgri"
           },
           "publisher": {
             "@type": "Organization",
@@ -68,7 +73,7 @@ export default function NewsDetail() {
           },
           "mainEntityOfPage": {
             "@type": "WebPage",
-            "@id": `https://www.eaagri.vn/news/${id}`
+            "@id": `https://www.eaagri.vn/tintuc/${id}`
           }
         }
       : undefined
@@ -128,7 +133,7 @@ export default function NewsDetail() {
       if (deleteError) throw deleteError;
 
       alert("Xóa bài viết thành công!");
-      navigate("/news");
+      navigate("/tintuc");
     } catch (err: any) {
       console.error("Error deleting article:", err);
       alert("Đã xảy ra lỗi khi xóa bài viết: " + (err.message || "Lỗi không xác định"));
@@ -148,6 +153,11 @@ export default function NewsDetail() {
     return new Date(dateString).toLocaleDateString("vi-VN", options);
   };
 
+  // Legacy /news/:id route -> redirect to /tintuc/:id
+  if (id && location.pathname.startsWith("/news/")) {
+    return <Navigate to={`/tintuc/${id}`} replace />;
+  }
+
   if (loading) {
     return (
       <section className="news-detail">
@@ -166,7 +176,7 @@ export default function NewsDetail() {
           <i className="ri-error-warning-line error-icon"></i>
           <h2>Đã xảy ra lỗi</h2>
           <p>{error || "Không tìm thấy bài viết."}</p>
-          <Link to="/news" className="btn btn-secondary">
+          <Link to="/tintuc" className="btn btn-secondary">
             <i className="ri-arrow-left-line"></i> Quay lại Bản Tin
           </Link>
         </div>
@@ -180,7 +190,7 @@ export default function NewsDetail() {
         
         {/* Navigation Breadcrumb / Back button */}
         <div className="news-detail__actions">
-          <Link to="/news" className="news-detail__back-link">
+          <Link to="/tintuc" className="news-detail__back-link">
             <i className="ri-arrow-left-line"></i>
             <span>Quay lại Bản Tin</span>
           </Link>
@@ -220,20 +230,33 @@ export default function NewsDetail() {
             <h1 className="news-detail__title">{cleanContent(article.title)}</h1>
 
             <div className="news-detail__meta">
-              <div className="news-detail__meta-item">
-                <i className="ri-user-3-line"></i>
-                <span>Tác giả: <strong>{article.author}</strong></span>
-              </div>
+              {article.author && article.author !== "EaAgri" && (
+                <div className="news-detail__meta-item news-detail__meta-item--source">
+                  <i className="ri-newspaper-fill"></i>
+                  <span>Nguồn: <strong>{article.author}</strong></span>
+                </div>
+              )}
               <div className="news-detail__meta-item">
                 <i className="ri-calendar-line"></i>
                 <span>Ngày đăng: <strong>{formatDate(article.created_at)}</strong></span>
               </div>
             </div>
 
+            {/* Ghi chú / Tóm tắt Box */}
+            {articleSummary && (
+              <div className="news-detail__summary-box">
+                <div className="news-detail__summary-header">
+                  <i className="ri-sticky-note-line"></i>
+                  <span>Ghi chú / Tóm tắt</span>
+                </div>
+                <p className="news-detail__summary-text">{articleSummary}</p>
+              </div>
+            )}
+
             {/* Main Content */}
             <div 
               className="news-detail__content ql-editor"
-              dangerouslySetInnerHTML={{ __html: cleanContent(article.content) }}
+              dangerouslySetInnerHTML={{ __html: cleanContent(articleBody) }}
             />
 
           </div>

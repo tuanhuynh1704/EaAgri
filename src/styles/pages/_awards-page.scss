@@ -1,0 +1,1647 @@
+@use "../abstracts/variables" as *;
+
+// =============================================================================
+// PRISTINE LUXURY LIGHT THEME (PURE WHITE, SPRING EMERALD & WARM GOLD)
+// =============================================================================
+
+.awards-page {
+  position: relative;
+  overflow: hidden;
+  background: #ffffff;
+  color: $text-dark;
+  min-height: 100vh;
+  padding-bottom: 2.5rem;
+
+  // Delicate Ambient Mint & Gold Light Washes in Background
+  &::before,
+  &::after {
+    content: '';
+    position: absolute;
+    border-radius: 50%;
+    pointer-events: none;
+    z-index: 0;
+  }
+
+  &::before {
+    top: 5%;
+    left: -120px;
+    width: 650px;
+    height: 650px;
+    background: radial-gradient(circle, rgba(129, 199, 132, 0.12) 0%, transparent 70%);
+    filter: blur(100px);
+  }
+
+  &::after {
+    top: 35%;
+    right: -120px;
+    width: 700px;
+    height: 700px;
+    background: radial-gradient(circle, rgba(254, 240, 138, 0.14) 0%, transparent 70%);
+    filter: blur(110px);
+  }
+}
+
+// ==========================================
+// 1. PANORAMIC SMART FARM HERO (EXACT MOCKUP DESIGN)
+// ==========================================
+.awards-hero {
+  position: relative;
+  background: url("/assets/awards-hero-landscape.webp") right center / cover no-repeat;
+  color: $text-dark;
+  overflow: hidden;
+  min-height: 480px;
+  display: flex;
+  align-items: center;
+
+  // Seamless gradient wash ensuring 100% text readability on left
+  &__bg-overlay {
+    position: absolute;
+    inset: 0;
+    background: linear-gradient(
+      90deg,
+      #ffffff 0%,
+      rgba(255, 255, 255, 0.96) 36%,
+      rgba(255, 255, 255, 0.6) 62%,
+      rgba(255, 255, 255, 0.15) 82%,
+      transparent 100%
+    );
+    pointer-events: none;
+    z-index: 1;
+
+    @media (max-width: $tablet) {
+      background: rgba(255, 255, 255, 0.9);
+    }
+  }
+
+  &__container {
+    position: relative;
+    z-index: 2;
+    display: flex;
+    justify-content: flex-start;
+    align-items: center;
+    width: 100%;
+    max-width: 1200px;
+    padding-top: calc(clamp(6.8rem, 10vw, 8.8rem) + env(safe-area-inset-top, 0px));
+    padding-bottom: 5.5rem;
+
+    @media (max-width: $tablet) {
+      padding-top: calc(6.6rem + env(safe-area-inset-top, 0px));
+      padding-bottom: 4rem;
+    }
+
+    @media (max-width: $mobile) {
+      padding-top: calc(6.2rem + env(safe-area-inset-top, 0px));
+      padding-bottom: 3.2rem;
+    }
+  }
+
+  &__content-col {
+    max-width: 620px;
+    text-align: left;
+  }
+
+  &__laurel-badge {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.5rem;
+    padding: 0.38rem 1rem;
+    border-radius: 999px;
+    background: rgba(236, 253, 245, 0.95);
+    border: 1px solid rgba(74, 222, 128, 0.6);
+    box-shadow: 0 2px 10px rgba(16, 185, 129, 0.1);
+    margin-bottom: 1.15rem;
+
+    .badge-medal-icon {
+      font-size: 1rem;
+    }
+
+    span {
+      font-size: 0.74rem;
+      font-weight: 800;
+      letter-spacing: 0.6px;
+      color: #166534;
+    }
+  }
+
+  &__headline {
+    font-size: clamp(2.1rem, 3.8vw, 3.2rem);
+    font-weight: 900;
+    line-height: 1.18;
+    color: #0f172a;
+    margin: 0 0 1rem;
+    letter-spacing: -0.5px;
+
+    .awards-hero__headline-primary {
+      display: block;
+    }
+
+    .green-accent-text {
+      color: #16a34a;
+      display: inline-block;
+    }
+  }
+
+  &__lead {
+    font-size: clamp(0.92rem, 1.4vw, 1.05rem);
+    line-height: 1.65;
+    color: #334155;
+    margin: 0 0 1.8rem;
+  }
+
+  &__actions {
+    display: flex;
+    align-items: center;
+    gap: 0.85rem;
+    flex-wrap: wrap;
+
+    .awards-hero-btn {
+      display: inline-flex;
+      align-items: center;
+      gap: 0.5rem;
+      padding: 0.65rem 1.45rem;
+      border-radius: 999px;
+      font-size: 0.88rem;
+      font-weight: 750;
+      text-decoration: none;
+      transition: all 0.25s ease;
+
+      &--primary {
+        background: #059669;
+        color: #ffffff;
+        box-shadow: 0 4px 14px rgba(5, 150, 105, 0.35);
+
+        &:hover {
+          background: #047857;
+          transform: translateY(-2px);
+          box-shadow: 0 6px 20px rgba(5, 150, 105, 0.45);
+        }
+      }
+
+      &--secondary {
+        background: rgba(255, 255, 255, 0.95);
+        border: 1.5px solid #10b981;
+        color: #065f46;
+        cursor: pointer;
+        outline: none;
+        box-shadow: 0 2px 8px rgba(0, 0, 0, 0.04);
+
+        i {
+          color: #059669;
+          font-size: 1.15rem;
+        }
+
+        &:hover {
+          background: #ffffff;
+          transform: translateY(-2px);
+          box-shadow: 0 4px 14px rgba(16, 185, 129, 0.2);
+        }
+      }
+    }
+  }
+}
+
+// ==========================================
+// 2. FLOATING 4-COLUMN HONORS PLAQUE (EXACT MOCKUP DESIGN)
+// ==========================================
+.awards-honors-section {
+  position: relative;
+  z-index: 10;
+  margin-top: -3.2rem;
+  margin-bottom: 0;
+
+  @media (max-width: $mobile) {
+    margin-top: -1.8rem;
+  }
+}
+
+.awards-honors-container {
+  max-width: 1140px;
+  padding-bottom: 0 !important;
+}
+
+.awards-honors-plaque {
+  background: #ffffff;
+  border-radius: 22px;
+  border: 1px solid rgba(0, 0, 0, 0.06);
+  box-shadow: 
+    0 16px 45px rgba(0, 0, 0, 0.08),
+    0 2px 6px rgba(0, 0, 0, 0.02);
+  padding: 1.5rem 2rem;
+  display: grid;
+  grid-template-columns: 1fr auto 1fr auto 1fr auto 1fr;
+  align-items: center;
+  gap: 1.25rem;
+
+  @media (max-width: 992px) {
+    grid-template-columns: repeat(2, 1fr);
+    gap: 1.5rem 1rem;
+    padding: 1.35rem 1.25rem;
+  }
+
+  // Phones: compact 2x2 grid instead of 4 tall rows
+  @media (max-width: $mobile) {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 1rem 0.75rem;
+    padding: 1rem;
+    border-radius: 18px;
+
+    // Extra .honor-plaque-col for specificity: the base rules come later in the file
+    .honor-plaque-col .honor-plaque-icon {
+      width: 34px;
+      height: 34px;
+      font-size: 1rem;
+      border-radius: 10px;
+      margin-bottom: 0.45rem;
+    }
+
+    .honor-plaque-col .honor-plaque-text {
+      strong {
+        font-size: 0.8rem;
+      }
+
+      span {
+        font-size: 0.68rem;
+      }
+    }
+  }
+}
+
+.honor-plaque-col {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  text-align: left;
+
+  .honor-plaque-icon {
+    width: 42px;
+    height: 42px;
+    border-radius: 12px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 1.25rem;
+    margin-bottom: 0.65rem;
+    flex-shrink: 0;
+
+    &--green {
+      background: #ecfdf5;
+      color: #10b981;
+    }
+
+    &--yellow {
+      background: #fef3c7;
+      color: #f59e0b;
+    }
+
+    &--blue {
+      background: #eff6ff;
+      color: #3b82f6;
+    }
+
+    &--purple {
+      background: #faf5ff;
+      color: #a855f7;
+    }
+  }
+
+  .honor-plaque-text {
+    strong {
+      display: block;
+      font-size: 0.92rem;
+      font-weight: 800;
+      color: #0f172a;
+      line-height: 1.25;
+      margin-bottom: 0.25rem;
+    }
+
+    span {
+      display: block;
+      font-size: 0.74rem;
+      color: #64748b;
+      line-height: 1.35;
+    }
+  }
+}
+
+.honor-plaque-divider {
+  width: 1px;
+  height: 50px;
+  background: #f1f5f9;
+  flex-shrink: 0;
+
+  @media (max-width: 992px) {
+    display: none;
+  }
+}
+
+// ==========================================
+// 3. AWARDS SHOWCASE STAGE (CLEAN WHITE BENTO CARDS)
+// ==========================================
+.awards-showcase-section {
+  position: relative;
+  z-index: 2;
+}
+
+// 3 cards per row on desktop, 2 on tablet, 1 on mobile. Rows are centered
+// so an incomplete last row (e.g. only 2 awards) still looks balanced.
+.awards-showcase-container {
+  --awards-gap: 1.75rem;
+  --awards-cols: 3;
+
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: var(--awards-gap);
+  max-width: 1160px;
+  padding-top: 2.5rem !important;
+
+  // Tablet and phone: one horizontal card per row (avoids an orphaned 2+1 layout)
+  @media (max-width: 992px) {
+    --awards-cols: 1;
+    --awards-gap: 1.1rem;
+  }
+
+  @media (max-width: $mobile) {
+    --awards-cols: 1;
+    --awards-gap: 1.25rem;
+    padding-top: 1.5rem !important;
+  }
+}
+
+// Section title above the award cards
+.awards-showcase-heading {
+  flex-basis: 100%;
+  text-align: center;
+  margin-bottom: 0.5rem;
+
+  &__kicker {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.4rem;
+    padding: 0.3rem 0.9rem;
+    border-radius: 999px;
+    background: #fefce8;
+    border: 1px solid #fef08a;
+    color: #a16207;
+    font-size: 0.72rem;
+    font-weight: 800;
+    letter-spacing: 0.8px;
+    text-transform: uppercase;
+
+    i {
+      color: #ca8a04;
+      font-size: 0.9rem;
+    }
+  }
+
+  h2 {
+    margin: 0.7rem 0 0.5rem;
+    font-size: clamp(1.6rem, 3.2vw, 2.4rem);
+    font-weight: 900;
+    line-height: 1.2;
+    letter-spacing: -0.4px;
+    color: #0f291e;
+
+    span {
+      color: #16a34a;
+    }
+  }
+
+  p {
+    max-width: 560px;
+    margin: 0 auto;
+    font-size: clamp(0.86rem, 1.3vw, 0.98rem);
+    line-height: 1.6;
+    color: #64748b;
+  }
+}
+
+.award-stage-card {
+  flex: 0 1 calc((100% - (var(--awards-cols) - 1) * var(--awards-gap)) / var(--awards-cols));
+  min-width: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+  background: #ffffff;
+  border-radius: 20px;
+  border: 1px solid rgba(22, 101, 52, 0.12);
+  padding: 0.85rem 0.85rem 1.25rem;
+  box-shadow:
+    0 10px 32px rgba(18, 60, 42, 0.05),
+    0 2px 6px rgba(0, 0, 0, 0.02);
+  transition: transform 0.3s ease, box-shadow 0.3s ease, border-color 0.3s ease;
+  overflow: hidden;
+  position: relative;
+  cursor: pointer;
+  outline: none;
+
+  // Category accent bar on top edge
+  &::before {
+    content: "";
+    position: absolute;
+    inset: 0 0 auto 0;
+    height: 4px;
+    background: linear-gradient(90deg, #16a34a, #4ade80 60%, #facc15);
+  }
+
+  &--startup::before {
+    background: linear-gradient(90deg, #ca8a04, #facc15 55%, #16a34a);
+  }
+
+  &:hover,
+  &:focus-visible {
+    box-shadow:
+      0 18px 45px rgba(18, 60, 42, 0.1),
+      0 4px 12px rgba(0, 0, 0, 0.03);
+    border-color: rgba(22, 101, 52, 0.22);
+    transform: translateY(-3px);
+
+    .award-photo-main {
+      transform: scale(1.04);
+    }
+
+    .award-title {
+      color: #15803d;
+    }
+  }
+
+  &:focus-visible {
+    border-color: #16a34a;
+  }
+
+  @media (max-width: $mobile) {
+    border-radius: 16px;
+  }
+
+  // Minimal tile text: kicker + title, footer pinned to the bottom
+  .award-stage-card__info {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    gap: 0.35rem;
+    padding: 0 0.4rem;
+  }
+
+  &:hover .award-card-arrow,
+  &:focus-visible .award-card-arrow {
+    background: #16a34a;
+    border-color: #16a34a;
+    color: #ffffff;
+    transform: rotate(45deg);
+  }
+
+  .award-title {
+    font-size: 1.1rem;
+    margin: 0;
+    transition: color 0.25s ease;
+  }
+}
+
+a.award-stage-card {
+  text-decoration: none;
+  color: inherit;
+}
+
+// Tablet + phone: horizontal list cards (photo left, text right) so 3+ awards stay scannable
+@media (max-width: 992px) {
+  .award-stage-card {
+    flex-direction: row;
+    align-items: stretch;
+    gap: 1.25rem;
+    padding: 0.75rem;
+
+    .award-stage-card__visual {
+      flex: 0 0 40%;
+      width: auto;
+    }
+
+    .award-photo-frame {
+      height: 100%;
+      padding: 0.3rem;
+      border-radius: 14px;
+    }
+
+    .award-photo-viewport {
+      height: 100%;
+      aspect-ratio: auto;
+      min-height: 190px;
+      border-radius: 10px;
+    }
+
+    .award-stage-card__info {
+      flex: 1 1 0;
+      min-width: 0;
+      justify-content: center;
+      padding: 0.5rem 0.4rem 0.3rem 0;
+      gap: 0.4rem;
+    }
+
+    .award-title {
+      font-size: 1.25rem;
+    }
+  }
+}
+
+@media (max-width: $mobile) {
+  .award-stage-card {
+    gap: 0.85rem;
+    padding: 0.6rem;
+
+    .award-stage-card__visual {
+      flex-basis: 38%;
+    }
+
+    .award-photo-frame {
+      padding: 0.25rem;
+      border-radius: 12px;
+    }
+
+    .award-photo-viewport {
+      min-height: 118px;
+      border-radius: 9px;
+    }
+
+    .award-stage-card__info {
+      justify-content: flex-start;
+      padding: 0.2rem 0.1rem 0.1rem 0;
+      gap: 0.25rem;
+    }
+
+    .award-card-kicker {
+      font-size: 0.64rem;
+
+      i {
+        font-size: 0.78rem;
+      }
+    }
+
+    .award-title {
+      font-size: 0.95rem;
+      line-height: 1.3;
+    }
+
+    .award-card-upcoming {
+      font-size: 0.64rem;
+      padding: 0.12rem 0.45rem;
+    }
+
+    .award-card-footer {
+      padding-top: 0.5rem;
+
+      > span:first-child {
+        font-size: 0.66rem;
+      }
+    }
+
+    .award-card-arrow {
+      width: 26px;
+      height: 26px;
+      font-size: 0.85rem;
+    }
+  }
+}
+
+.award-card-kicker {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.35rem;
+  font-size: 0.72rem;
+  font-weight: 800;
+  letter-spacing: 0.5px;
+  text-transform: uppercase;
+  color: #15803d;
+
+  i {
+    font-size: 0.9rem;
+    color: #ca8a04;
+  }
+
+  .award-stage-card--startup & {
+    color: #a16207;
+  }
+}
+
+// "Sự kiện sắp tới" strip under the award cards
+.awards-upcoming-event {
+  flex-basis: 100%;
+  margin-top: 0.75rem;
+  display: flex;
+  align-items: center;
+  gap: 1.1rem;
+  padding: 1.1rem 1.4rem;
+  border-radius: 20px;
+  background: linear-gradient(120deg, #fefce8 0%, #f0fdf4 60%, #ecfdf5 100%);
+  border: 1px solid rgba(202, 138, 4, 0.25);
+  box-shadow: 0 10px 30px rgba(18, 60, 42, 0.06);
+  text-decoration: none;
+  color: inherit;
+  transition: transform 0.3s ease, box-shadow 0.3s ease;
+
+  &:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 16px 40px rgba(18, 60, 42, 0.1);
+
+    .awards-upcoming-event__cta {
+      background: #15803d;
+      gap: 0.6rem;
+    }
+  }
+
+  &__icon {
+    flex-shrink: 0;
+    width: 48px;
+    height: 48px;
+    border-radius: 14px;
+    background: #ffffff;
+    border: 1px solid #fef08a;
+    color: #ca8a04;
+    font-size: 1.45rem;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    box-shadow: 0 4px 12px rgba(202, 138, 4, 0.14);
+  }
+
+  &__body {
+    flex: 1;
+    min-width: 0;
+    display: flex;
+    flex-direction: column;
+    gap: 0.15rem;
+
+    small {
+      font-size: 0.68rem;
+      font-weight: 850;
+      letter-spacing: 0.8px;
+      text-transform: uppercase;
+      color: #a16207;
+    }
+
+    strong {
+      font-size: 1rem;
+      font-weight: 800;
+      color: #0f291e;
+    }
+
+    span {
+      display: flex;
+      align-items: center;
+      flex-wrap: wrap;
+      gap: 0.3rem;
+      font-size: 0.8rem;
+      font-weight: 600;
+      color: #475569;
+
+      i {
+        color: #16a34a;
+
+        &:not(:first-child) {
+          margin-left: 0.6rem;
+        }
+      }
+    }
+  }
+
+  &__countdown {
+    flex-shrink: 0;
+    text-align: center;
+    padding: 0.45rem 0.9rem;
+    border-radius: 14px;
+    background: #ffffff;
+    border: 1px dashed #facc15;
+    font-size: 0.74rem;
+    font-weight: 700;
+    color: #a16207;
+    line-height: 1.2;
+
+    b {
+      display: block;
+      font-size: 1.35rem;
+      font-weight: 900;
+      color: #ca8a04;
+    }
+  }
+
+  &__cta {
+    flex-shrink: 0;
+    display: inline-flex;
+    align-items: center;
+    gap: 0.4rem;
+    padding: 0.6rem 1.15rem;
+    border-radius: 999px;
+    background: #16a34a;
+    color: #ffffff;
+    font-size: 0.82rem;
+    font-weight: 750;
+    box-shadow: 0 4px 12px rgba(22, 163, 74, 0.22);
+    transition: background 0.25s ease, gap 0.25s ease;
+  }
+
+  @media (max-width: 860px) {
+    flex-wrap: wrap;
+
+    &__body {
+      flex-basis: calc(100% - 48px - 1.1rem);
+    }
+
+    &__countdown {
+      order: 3;
+    }
+
+    &__cta {
+      order: 4;
+      margin-left: auto;
+    }
+  }
+
+  @media (max-width: $mobile) {
+    padding: 1rem;
+    gap: 0.8rem;
+    margin-top: 0.25rem;
+  }
+}
+
+// Next milestone chip (e.g. "Chung kết · 31/10")
+.award-card-upcoming {
+  align-self: flex-start;
+  display: inline-flex;
+  align-items: center;
+  gap: 0.3rem;
+  margin-top: 0.15rem;
+  padding: 0.2rem 0.6rem;
+  border-radius: 999px;
+  background: #fefce8;
+  border: 1px dashed #facc15;
+  font-size: 0.72rem;
+  font-weight: 750;
+  color: #a16207;
+
+  i {
+    font-size: 0.85rem;
+  }
+}
+
+.award-card-footer {
+  margin-top: auto;
+  padding-top: 0.85rem;
+  border-top: 1px solid #f1f5f9;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.75rem;
+
+  > span:first-child {
+    min-width: 0;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+    font-size: 0.76rem;
+    font-weight: 600;
+    color: #64748b;
+  }
+}
+
+.award-card-arrow {
+  flex-shrink: 0;
+  width: 32px;
+  height: 32px;
+  border-radius: 50%;
+  border: 1px solid #d1fae5;
+  background: #f0fdf4;
+  color: #16a34a;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 1rem;
+  transition: all 0.3s ease;
+}
+
+// ------------------------------------------
+// Left Visual Stage: Cover Photo
+// ------------------------------------------
+.award-stage-card__visual {
+  width: 100%;
+}
+
+.award-photo-frame {
+  position: relative;
+  background: linear-gradient(160deg, #fefce8 0%, #f0fdf4 100%);
+  border-radius: 16px;
+  padding: 0.45rem;
+  border: 1px solid rgba(202, 138, 4, 0.22);
+}
+
+// Blurred copy fills the frame so the full photo can be shown uncropped
+.award-photo-backdrop {
+  position: absolute;
+  inset: -20px;
+  width: calc(100% + 40px);
+  height: calc(100% + 40px);
+  object-fit: cover;
+  filter: blur(22px) brightness(0.7) saturate(1.2);
+  transform: scale(1.1);
+}
+
+.award-photo-viewport {
+  position: relative;
+  width: 100%;
+  aspect-ratio: 4 / 3;
+  border-radius: 12px;
+  overflow: hidden;
+  background: #0b1c12;
+  box-shadow: 0 6px 18px rgba(0, 0, 0, 0.12);
+
+  .award-photo-main {
+    position: relative;
+    width: 100%;
+    height: 100%;
+    object-fit: contain;
+    display: block;
+    transition: transform 0.35s ease;
+  }
+
+  @media (max-width: $mobile) {
+    border-radius: 8px;
+  }
+}
+
+// ------------------------------------------
+// Right Info Stage: Sleek Typography & Key Points
+// ------------------------------------------
+.award-stage-card__info {
+  display: flex;
+  flex-direction: column;
+}
+
+.award-header-pill-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.5rem;
+  margin-bottom: 0.45rem;
+  flex-wrap: wrap;
+}
+
+.award-laurel-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.4rem;
+  padding: 0.25rem 0.75rem;
+  border-radius: 999px;
+  background: #fefce8;
+  border: 1px solid #fef08a;
+  color: #854d0e;
+  font-size: 0.72rem;
+  font-weight: 800;
+  letter-spacing: 0.4px;
+
+  i {
+    color: #ca8a04;
+    font-size: 0.88rem;
+  }
+}
+
+.award-year-badge {
+  font-size: 0.74rem;
+  font-weight: 800;
+  color: #64748b;
+  background: #f1f5f9;
+  border: 1px solid #e2e8f0;
+  padding: 0.18rem 0.55rem;
+  border-radius: 6px;
+}
+
+.award-title {
+  font-size: clamp(1.22rem, 1.8vw, 1.48rem);
+  font-weight: 850;
+  color: #0f291e;
+  line-height: 1.3;
+  margin: 0 0 0.3rem;
+}
+
+.award-organizer-row {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.4rem;
+  font-size: 0.8rem;
+  color: #15803d;
+  margin-bottom: 0.65rem;
+  font-weight: 650;
+
+  i {
+    color: #16a34a;
+    font-size: 0.95rem;
+    flex-shrink: 0;
+  }
+}
+
+.award-lead-desc {
+  font-size: 0.87rem;
+  line-height: 1.58;
+  color: #475569;
+  margin: 0 0 0.85rem;
+}
+
+// Sleek Clean Highlights (Replaces bulky bloated card boxes)
+.award-highlights-clean {
+  list-style: none;
+  padding: 0;
+  margin: 0 0 0.95rem;
+  display: flex;
+  flex-direction: column;
+  gap: 0.45rem;
+
+  li {
+    display: flex;
+    align-items: flex-start;
+    gap: 0.5rem;
+    font-size: 0.83rem;
+    line-height: 1.5;
+    color: #475569;
+
+    i {
+      color: #16a34a;
+      font-size: 0.95rem;
+      margin-top: 2px;
+      flex-shrink: 0;
+    }
+
+    div {
+      strong {
+        color: #0f291e;
+        font-weight: 750;
+      }
+    }
+  }
+}
+
+// Verification Seal & Actions
+.award-verification-seal {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.75rem;
+  padding-top: 0.85rem;
+  border-top: 1px solid #f1f5f9;
+  flex-wrap: wrap;
+
+  .seal-badge {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.4rem;
+    font-size: 0.76rem;
+    font-weight: 650;
+    color: #64748b;
+
+    i {
+      font-size: 1.05rem;
+      color: #16a34a;
+    }
+  }
+
+  .seal-links {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+  }
+
+  .seal-btn {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.35rem;
+    padding: 0.38rem 0.95rem;
+    border-radius: 999px;
+    font-size: 0.76rem;
+    font-weight: 750;
+    text-decoration: none;
+    transition: all 0.2s ease;
+
+    &--article {
+      background: #16a34a;
+      color: #ffffff;
+      box-shadow: 0 2px 8px rgba(22, 163, 74, 0.2);
+
+      &:hover {
+        background: #15803d;
+        transform: translateY(-1px);
+        box-shadow: 0 4px 12px rgba(22, 163, 74, 0.3);
+      }
+    }
+
+    &--vote {
+      background: linear-gradient(135deg, #f59e0b, #d97706);
+      color: #ffffff;
+      box-shadow: 0 2px 10px rgba(245, 158, 11, 0.35);
+      border: 1px solid rgba(254, 240, 138, 0.4);
+
+      &:hover {
+        background: linear-gradient(135deg, #fbbf24, #f59e0b);
+        transform: translateY(-1px);
+        box-shadow: 0 4px 14px rgba(245, 158, 11, 0.5);
+        color: #ffffff;
+      }
+
+      i {
+        font-size: 0.88rem;
+      }
+    }
+
+    &--facebook {
+      background: #eff6ff;
+      border: 1px solid #bfdbfe;
+      color: #2563eb;
+      width: 30px;
+      height: 30px;
+      padding: 0;
+      justify-content: center;
+      font-size: 0.95rem;
+
+      &:hover {
+        background: #2563eb;
+        color: #ffffff;
+        transform: scale(1.05);
+      }
+    }
+  }
+
+  @media (max-width: $mobile) {
+    flex-direction: column;
+    align-items: flex-start;
+
+    .seal-links {
+      width: 100%;
+
+      .seal-btn--article {
+        flex: 1;
+        justify-content: center;
+      }
+    }
+  }
+}
+
+// ==========================================
+// 4. AWARD DETAIL PAGE (/giai-thuong/:id)
+// ==========================================
+.award-detail-page {
+  position: relative;
+  background: linear-gradient(180deg, #f6fbf7 0%, #ffffff 420px);
+  color: $text-dark;
+  min-height: 100vh;
+  padding-bottom: 5rem;
+
+  @media (max-width: $mobile) {
+    padding-bottom: 3.5rem;
+  }
+
+  // Detail card overlaps the bottom of the banner, like the honors plaque on /giai-thuong
+  &__container {
+    position: relative;
+    z-index: 3;
+    max-width: 1160px;
+    margin-top: -3.5rem;
+
+    @media (max-width: $mobile) {
+      margin-top: -2rem;
+    }
+  }
+
+  &__empty {
+    text-align: center;
+    margin-top: 0;
+    padding-top: calc(clamp(6.8rem, 10vw, 8.8rem) + 4rem) !important;
+    padding-bottom: 4rem !important;
+
+    h1 {
+      font-size: 1.5rem;
+      color: #0f291e;
+      margin-bottom: 1.25rem;
+    }
+  }
+}
+
+// Shorter variant of the /giai-thuong hero used on the detail page
+.awards-hero--compact {
+  min-height: 0;
+
+  .awards-hero__container {
+    padding-bottom: 5.5rem;
+
+    @media (max-width: $mobile) {
+      padding-bottom: 3.5rem;
+    }
+  }
+
+  .awards-hero__content-col {
+    max-width: 720px;
+  }
+
+  .awards-hero__laurel-badge {
+    margin-bottom: 0.9rem;
+
+    i {
+      color: #ca8a04;
+      font-size: 0.95rem;
+    }
+  }
+
+  .awards-hero__headline {
+    font-size: clamp(1.75rem, 3.4vw, 2.7rem);
+    margin-bottom: 0.7rem;
+  }
+}
+
+.award-detail-breadcrumb {
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 0.35rem;
+  margin-bottom: 1rem;
+  font-size: 0.82rem;
+  font-weight: 650;
+  color: #64748b;
+
+  a {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.35rem;
+    color: #15803d;
+    text-decoration: none;
+    transition: color 0.2s ease;
+
+    &:hover {
+      color: #0f291e;
+    }
+  }
+
+  > i {
+    font-size: 1rem;
+    color: #94a3b8;
+  }
+}
+
+.award-detail-organizer {
+  display: flex;
+  align-items: flex-start;
+  gap: 0.45rem;
+  margin: 0;
+  font-weight: 650;
+  color: #15803d;
+
+  i {
+    margin-top: 0.2em;
+    flex-shrink: 0;
+  }
+}
+
+.award-detail-back {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.4rem;
+  margin-bottom: 1.25rem;
+  font-size: 0.85rem;
+  font-weight: 700;
+  color: #15803d;
+  text-decoration: none;
+  transition: gap 0.2s ease, color 0.2s ease;
+
+  &:hover {
+    gap: 0.6rem;
+    color: #0f291e;
+  }
+}
+
+.award-detail-layout {
+  position: relative;
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
+  background: #ffffff;
+  border-radius: 24px;
+  border: 1px solid rgba(22, 101, 52, 0.12);
+  overflow: hidden;
+  box-shadow: 0 18px 50px rgba(18, 60, 42, 0.08);
+
+  &::before {
+    content: "";
+    position: absolute;
+    inset: 0 0 auto 0;
+    height: 4px;
+    z-index: 2;
+    background: linear-gradient(90deg, #16a34a, #4ade80 60%, #facc15);
+  }
+
+  .award-detail-page--startup &::before {
+    background: linear-gradient(90deg, #ca8a04, #facc15 55%, #16a34a);
+  }
+
+  &__media {
+    display: flex;
+    flex-direction: column;
+    padding: 1.25rem;
+    background: linear-gradient(160deg, #fefce8 0%, #f0fdf4 100%);
+  }
+
+  &__photo {
+    position: relative;
+    aspect-ratio: 4 / 3;
+    border-radius: 14px;
+    overflow: hidden;
+    background: #0b1c12;
+    box-shadow: 0 6px 18px rgba(0, 0, 0, 0.12);
+  }
+
+  &__photo-main {
+    position: relative;
+    width: 100%;
+    height: 100%;
+    object-fit: contain;
+    display: block;
+  }
+
+  &__thumbs {
+    display: flex;
+    gap: 0.5rem;
+    padding: 0.75rem 2px 4px;
+    // Scroll sideways instead of overflowing when there are many photos
+    overflow-x: auto;
+    scrollbar-width: none;
+
+    &::-webkit-scrollbar {
+      display: none;
+    }
+
+    .thumb-button {
+      flex-shrink: 0;
+      width: 72px;
+      height: 50px;
+
+      @media (max-width: $mobile) {
+        width: 58px;
+        height: 42px;
+      }
+      border-radius: 8px;
+      border: 1.5px solid #e2e8f0;
+      overflow: hidden;
+      padding: 0;
+      cursor: pointer;
+      background: #ffffff;
+      transition: all 0.2s ease;
+
+      img {
+        width: 100%;
+        height: 100%;
+        object-fit: cover;
+        display: block;
+      }
+
+      &:hover {
+        border-color: #16a34a;
+        transform: translateY(-1px);
+      }
+
+      &.is-active {
+        border-color: #16a34a;
+        box-shadow: 0 2px 8px rgba(22, 163, 74, 0.28);
+        transform: translateY(-1px);
+      }
+    }
+  }
+
+  &__caption {
+    padding-top: 0.85rem;
+
+    strong {
+      display: block;
+      font-size: 0.88rem;
+      font-weight: 800;
+      color: #854d0e;
+      margin-bottom: 0.2rem;
+    }
+
+    p {
+      font-size: 0.82rem;
+      line-height: 1.5;
+      color: #64748b;
+      margin: 0;
+    }
+  }
+
+  &__body {
+    padding: 2rem 2.25rem;
+
+    .award-title {
+      font-size: clamp(1.4rem, 2.4vw, 1.85rem);
+    }
+  }
+
+  @media (max-width: 860px) {
+    // minmax(0, …) so the thumbnail strip can't stretch the column past the screen
+    grid-template-columns: minmax(0, 1fr);
+
+    // Single column: a wider, shorter photo keeps the text within reach
+    &__photo {
+      aspect-ratio: 16 / 10;
+    }
+
+    &__body {
+      padding: 1.5rem 1.25rem 1.75rem;
+    }
+  }
+
+  @media (max-width: $mobile) {
+    border-radius: 18px;
+
+    &__media {
+      padding: 0.75rem;
+    }
+  }
+}
+
+// Photo slider controls on the detail page
+.award-detail-layout__photo {
+  .award-photo-backdrop,
+  .award-detail-layout__photo-main {
+    animation: awardPhotoFade 0.6s ease;
+  }
+}
+
+.award-detail-layout__nav {
+  position: absolute;
+  top: 50%;
+  z-index: 2;
+  width: 38px;
+  height: 38px;
+  margin-top: -19px;
+  border-radius: 50%;
+  border: 1px solid rgba(255, 255, 255, 0.35);
+  background: rgba(15, 41, 30, 0.55);
+  backdrop-filter: blur(6px);
+  -webkit-backdrop-filter: blur(6px);
+  color: #ffffff;
+  font-size: 1.4rem;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  opacity: 0;
+  transition: opacity 0.25s ease, background 0.25s ease;
+
+  &--prev {
+    left: 12px;
+  }
+
+  &--next {
+    right: 12px;
+  }
+
+  &:hover {
+    background: rgba(22, 163, 74, 0.9);
+  }
+
+  &:focus-visible {
+    opacity: 1;
+  }
+
+  .award-detail-layout__photo:hover & {
+    opacity: 1;
+  }
+
+  // No hover on touch screens: keep the arrows visible
+  @media (hover: none) {
+    opacity: 1;
+  }
+}
+
+.award-detail-layout__counter {
+  position: absolute;
+  right: 10px;
+  bottom: 10px;
+  z-index: 2;
+  padding: 0.2rem 0.6rem;
+  border-radius: 999px;
+  background: rgba(0, 0, 0, 0.6);
+  color: #ffffff;
+  font-size: 0.72rem;
+  font-weight: 700;
+  letter-spacing: 0.3px;
+}
+
+@keyframes awardPhotoFade {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}
+
+// "Hành trình" timeline
+.award-timeline {
+  list-style: none;
+  margin: 0 0 1.25rem;
+  padding: 0;
+
+  &__step {
+    position: relative;
+    display: flex;
+    gap: 0.8rem;
+    padding-bottom: 1rem;
+
+    // Connector line between dots
+    &:not(:last-child)::before {
+      content: "";
+      position: absolute;
+      left: 13px;
+      top: 28px;
+      bottom: 0;
+      width: 2px;
+      background: #bbf7d0;
+    }
+
+    &:last-child {
+      padding-bottom: 0;
+    }
+  }
+
+  &__dot {
+    flex-shrink: 0;
+    width: 28px;
+    height: 28px;
+    border-radius: 50%;
+    background: #16a34a;
+    color: #ffffff;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 0.95rem;
+    box-shadow: 0 0 0 4px #f0fdf4;
+  }
+
+  &__content {
+    display: flex;
+    flex-direction: column;
+    gap: 0.1rem;
+    padding-top: 0.2rem;
+
+    small {
+      font-size: 0.72rem;
+      font-weight: 750;
+      color: #15803d;
+    }
+
+    strong {
+      font-size: 0.88rem;
+      font-weight: 800;
+      color: #0f291e;
+    }
+
+    p {
+      margin: 0;
+      font-size: 0.8rem;
+      line-height: 1.5;
+      color: #64748b;
+    }
+  }
+
+  &__step.is-upcoming {
+    .award-timeline__dot {
+      background: #ffffff;
+      color: #ca8a04;
+      border: 2px dashed #facc15;
+      box-shadow: none;
+    }
+
+    small {
+      color: #a16207;
+    }
+  }
+}
+
+.award-detail-metrics {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 0.6rem;
+  margin-bottom: 1.4rem;
+
+  @media (max-width: $mobile) {
+    grid-template-columns: 1fr;
+  }
+}
+
+.award-detail-metric {
+  display: flex;
+  flex-direction: column;
+  gap: 0.15rem;
+  padding: 0.7rem 0.8rem;
+  border-radius: 12px;
+  background: #f0fdf4;
+  border: 1px solid #bbf7d0;
+
+  i {
+    font-size: 1rem;
+    color: #ca8a04;
+  }
+
+  span {
+    font-size: 0.7rem;
+    font-weight: 650;
+    color: #64748b;
+  }
+
+  strong {
+    font-size: 0.86rem;
+    font-weight: 800;
+    color: #166534;
+  }
+
+  // Phones: one compact row per metric (icon · label ··· value)
+  @media (max-width: $mobile) {
+    flex-direction: row;
+    align-items: center;
+    gap: 0.55rem;
+    padding: 0.55rem 0.75rem;
+
+    strong {
+      margin-left: auto;
+      text-align: right;
+    }
+  }
+}
+
+.award-detail-subheading {
+  display: block;
+  font-size: 0.78rem;
+  font-weight: 850;
+  letter-spacing: 0.6px;
+  text-transform: uppercase;
+  color: #0f291e;
+  margin: 0 0 0.7rem;
+}
+
+// "Giải thưởng khác" strip under the detail card
+.award-detail-others {
+  margin-top: 2.5rem;
+
+  &__list {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+    gap: 0.9rem;
+  }
+
+  &__item {
+    display: flex;
+    align-items: center;
+    gap: 0.9rem;
+    padding: 0.6rem 1rem 0.6rem 0.6rem;
+    border-radius: 16px;
+    background: #ffffff;
+    border: 1px solid rgba(22, 101, 52, 0.12);
+    text-decoration: none;
+    color: inherit;
+    transition: all 0.25s ease;
+
+    img {
+      width: 72px;
+      height: 54px;
+      border-radius: 10px;
+      object-fit: cover;
+      flex-shrink: 0;
+    }
+
+    div {
+      flex: 1;
+      min-width: 0;
+      display: flex;
+      flex-direction: column;
+      gap: 0.1rem;
+    }
+
+    small {
+      font-size: 0.68rem;
+      font-weight: 800;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+      color: #a16207;
+    }
+
+    strong {
+      font-size: 0.92rem;
+      font-weight: 800;
+      color: #0f291e;
+    }
+
+    > i {
+      color: #16a34a;
+      font-size: 1.1rem;
+      transition: transform 0.25s ease;
+    }
+
+    &:hover {
+      border-color: rgba(22, 101, 52, 0.3);
+      box-shadow: 0 10px 28px rgba(18, 60, 42, 0.08);
+
+      > i {
+        transform: translateX(3px);
+      }
+    }
+  }
+}

@@ -1,0 +1,147 @@
+{
+  "version": "2.0.0",
+  "generator": "EaAgri procedural mesh source",
+  "assets": [
+    {
+      "file": "eaagri-durian-high.glb",
+      "quality": "high",
+      "bytes": 11314956,
+      "triangles": 229864,
+      "vertices": 269306,
+      "meshes": 161,
+      "materials": 14,
+      "animations": [
+        {
+          "name": "Gentle_Breeze",
+          "duration": 8
+        }
+      ],
+      "hotspots": {
+        "overview": [
+          0.12,
+          3.22,
+          1.64
+        ],
+        "disease": [
+          0.08,
+          2.02,
+          0.51
+        ],
+        "soil": [
+          -1.86,
+          1.14,
+          1.51
+        ],
+        "weather": [
+          2.2,
+          2.15,
+          -0.32
+        ],
+        "irrigation": [
+          1.8,
+          0.73,
+          1.59
+        ],
+        "assistant": [
+          2.4,
+          1.72,
+          1.24
+        ]
+      }
+    },
+    {
+      "file": "eaagri-durian-mobile.glb",
+      "quality": "mobile",
+      "bytes": 4330664,
+      "triangles": 83276,
+      "vertices": 99761,
+      "meshes": 161,
+      "materials": 14,
+      "animations": [
+        {
+          "name": "Gentle_Breeze",
+          "duration": 8
+        }
+      ],
+      "hotspots": {
+        "overview": [
+          0.12,
+          3.22,
+          1.64
+        ],
+        "disease": [
+          0.08,
+          2.02,
+          0.51
+        ],
+        "soil": [
+          -1.86,
+          1.14,
+          1.51
+        ],
+        "weather": [
+          2.2,
+          2.15,
+          -0.32
+        ],
+        "irrigation": [
+          1.8,
+          0.73,
+          1.59
+        ],
+        "assistant": [
+          2.4,
+          1.72,
+          1.24
+        ]
+      }
+    },
+    {
+      "file": "durian-tree-only.glb",
+      "quality": "high",
+      "bytes": 9608152,
+      "triangles": 198292,
+      "vertices": 227757,
+      "meshes": 143,
+      "materials": 4,
+      "animations": [
+        {
+          "name": "Gentle_Breeze",
+          "duration": 8
+        }
+      ],
+      "hotspots": {
+        "overview": [
+          0.12,
+          3.22,
+          1.64
+        ],
+        "disease": [
+          0.08,
+          2.02,
+          0.51
+        ],
+        "soil": [
+          -1.86,
+          1.14,
+          1.51
+        ],
+        "weather": [
+          2.2,
+          2.15,
+          -0.32
+        ],
+        "irrigation": [
+          1.8,
+          0.73,
+          1.59
+        ],
+        "assistant": [
+          2.4,
+          1.72,
+          1.24
+        ]
+      }
+    }
+  ]
+}
