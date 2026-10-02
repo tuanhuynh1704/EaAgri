@@ -695,7 +695,18 @@
 
   .hero-badge {
     margin-bottom: 0.55rem;
-    padding: 0.32rem 0.72rem;
+    padding: 0.35rem 0.65rem;
+    gap: 0.45rem;
+
+    &__text {
+      font-size: 0.68rem;
+    }
+
+    &__live-chip {
+      font-size: 0.72rem;
+      padding: 0.22rem 0.65rem;
+      gap: 0.28rem;
+    }
   }
 
   .hero-title {

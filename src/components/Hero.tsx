@@ -244,7 +244,10 @@ const Hero = () => {
             </span>
             <span className="hero-badge__icon"><i className="ri-leaf-fill"></i></span>
             <span className="hero-badge__text">TRỢ LÝ CÂY SẦU RIÊNG</span>
-            <span className="hero-badge__live-chip">LIVE AI</span>
+            <span className="hero-badge__live-chip">
+              <span className="hero-badge__live-dot" aria-hidden="true" />
+              LIVE AI
+            </span>
           </div>
 
           <h1 className="hero-title">

@@ -148,9 +148,9 @@ export default function VideoGallerySection() {
             <span className="spotlight-chip">
               <i className="ri-sparkling-fill" /> TIÊU ĐIỂM DỰ ÁN
             </span>
-            <span className="spotlight-hd-tag">
+            {/* <span className="spotlight-hd-tag">
               {isMobile ? "CHUẨN MOBILE • 9:16" : "FULL HD • 60FPS"}
-            </span>
+            </span> */}
           </div>
 
           <h3 className="spotlight-title">
