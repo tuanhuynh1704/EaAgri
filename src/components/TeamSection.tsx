@@ -141,7 +141,7 @@ const advisors: AdvisorMember[] = [
     fields: ["Agtech", "IoT nông nghiệp", "Chuyển đổi số", "Phát triển bền vững"],
   },
   {
-    name: "Nguyễn Chí Hải",
+    name: "Nguyễn Lâm Chí Hải",
     roleTag: "MENTOR",
     subRole: "Cố vấn Chiến lược Khởi nghiệp",
     organization: "Mạng lưới Cố vấn Khởi nghiệp",
