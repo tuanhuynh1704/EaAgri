@@ -26,21 +26,21 @@ const vertexShader = `
 
     vec3 pos = position;
 
-    // 1. Natural Organic Wind Sway
+    // 1. Natural Organic Wind Sway (Giảm 30% biên độ đung đưa)
     if (aType == 2.0) { // Canopy
-      float wind = sin(uTime * 1.8 + pos.y * 1.5 + pos.x * 2.0 + aPhase) * 0.09;
+      float wind = sin(uTime * 1.8 + pos.y * 1.5 + pos.x * 2.0 + aPhase) * 0.063;
       pos.x += wind * (pos.y * 0.45 + 0.55);
-      pos.z += cos(uTime * 1.4 + pos.z * 1.2 + aPhase) * 0.07 * (pos.y * 0.45 + 0.55);
-      pos.y += sin(uTime * 2.2 + aPhase) * 0.035;
+      pos.z += cos(uTime * 1.4 + pos.z * 1.2 + aPhase) * 0.049 * (pos.y * 0.45 + 0.55);
+      pos.y += sin(uTime * 2.2 + aPhase) * 0.024;
     } else if (aType == 3.0) { // Fruits hanging sway
-      float fruitSway = sin(uTime * 1.5 + aPhase * 3.14) * 0.06;
+      float fruitSway = sin(uTime * 1.5 + aPhase * 3.14) * 0.042;
       pos.x += fruitSway;
-      pos.z += cos(uTime * 1.3 + aPhase * 3.14) * 0.05;
+      pos.z += cos(uTime * 1.3 + aPhase * 3.14) * 0.035;
     } else if (aType == 1.0) { // Trunk subtle breath
-      pos.x += sin(uTime * 0.8 + pos.y) * 0.02;
+      pos.x += sin(uTime * 0.8 + pos.y) * 0.014;
     }
 
-    // 2. Interactive Mouse Magnetic Repel / Ripple
+    // 2. Interactive Mouse Magnetic Repel / Ripple (Giảm 30% lực đẩy chuột)
     vec4 worldPos = modelMatrix * vec4(pos, 1.0);
     vWorldPos = worldPos.xyz;
 
@@ -49,7 +49,7 @@ const vertexShader = `
 
     float mouseForce = smoothstep(2.8, 0.0, distToMouse);
     vec3 dirFromMouse = normalize(worldPos.xyz - uMouse);
-    pos += dirFromMouse * mouseForce * 0.35 * uHoverIntensity;
+    pos += dirFromMouse * mouseForce * 0.245 * uHoverIntensity;
 
     vec4 mvPosition = modelViewMatrix * vec4(pos, 1.0);
     gl_Position = projectionMatrix * mvPosition;
@@ -350,9 +350,9 @@ export default function ParticleTree3D({ activeNode: _activeNode }: ParticleTree
       hoverIntensity += ((hovering ? 1 : 0) - hoverIntensity) * 0.1;
       material.uniforms.uHoverIntensity.value = hoverIntensity;
 
-      // Gentle continuous 3D rotation (Duoke signature magnetic spin)
-      points.rotation.y = -0.2 + Math.sin(t * 0.45) * 0.28 + (hovering ? pointer.x * 0.35 : 0);
-      points.rotation.x = 0.08 + Math.cos(t * 0.35) * 0.08 + (hovering ? -pointer.y * 0.2 : 0);
+      // Gentle continuous 3D rotation (Giảm 30% góc quay tự do)
+      points.rotation.y = -0.2 + Math.sin(t * 0.45) * 0.20 + (hovering ? pointer.x * 0.25 : 0);
+      points.rotation.x = 0.08 + Math.cos(t * 0.35) * 0.055 + (hovering ? -pointer.y * 0.14 : 0);
 
       renderer.render(scene, camera);
     };

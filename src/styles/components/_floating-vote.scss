@@ -112,7 +112,7 @@
 
 @keyframes voteBadgeJump {
   0% { transform: scale(1); }
-  100% { transform: scale(1.18); }
+  100% { transform: scale(1.12); } // Giảm 30% độ nảy (1.18 -> 1.12)
 }
 
   // Floating Tooltip Callout on Desktop
@@ -195,7 +195,7 @@
 // Animations
 @keyframes floatVoteEntrance {
   from {
-    transform: translateY(20px) scale(0.85);
+    transform: translateY(14px) scale(0.90); // Giảm 30% khoảng cách xuất hiện (20px -> 14px)
     opacity: 0;
   }
   to {
@@ -206,15 +206,15 @@
 
 @keyframes voteCoinPulse {
   0% {
-    transform: scale(0.95);
+    transform: scale(0.97);
     opacity: 0.85;
   }
   50% {
-    transform: scale(1.2);
+    transform: scale(1.14); // Giảm 30% độ phồng (1.2 -> 1.14)
     opacity: 0;
   }
   100% {
-    transform: scale(0.95);
+    transform: scale(0.97);
     opacity: 0;
   }
 }

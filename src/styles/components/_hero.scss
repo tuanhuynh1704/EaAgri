@@ -13,7 +13,7 @@
   }
 
   50% {
-    transform: translateY(-10px);
+    transform: translateY(-7px); // Giảm 30% biên độ (-10px -> -7px)
   }
 }
 
@@ -25,7 +25,7 @@
   }
 
   50% {
-    transform: translateY(-8px) scale(1.015);
+    transform: translateY(-5.5px) scale(1.01); // Giảm 30% độ bồng bềnh
   }
 }
 
@@ -67,11 +67,11 @@
 
   0%,
   100% {
-    transform: translateY(0px) rotate(-1deg);
+    transform: translateY(0px) rotate(-0.7deg);
   }
 
   50% {
-    transform: translateY(-8px) rotate(1deg);
+    transform: translateY(-5.5px) rotate(0.7deg); // Giảm 30% (-8px -> -5.5px)
   }
 }
 
@@ -79,11 +79,11 @@
 
   0%,
   100% {
-    transform: translateY(0px) rotate(1deg);
+    transform: translateY(0px) rotate(0.7deg);
   }
 
   50% {
-    transform: translateY(-12px) rotate(-1deg);
+    transform: translateY(-8px) rotate(-0.7deg); // Giảm 30% (-12px -> -8px)
   }
 }
 
@@ -95,7 +95,7 @@
   }
 
   50% {
-    transform: translateY(-6px) rotate(2deg);
+    transform: translateY(-4px) rotate(1.4deg); // Giảm 30% (-6px -> -4px)
   }
 }
 
@@ -105,7 +105,7 @@
   }
 
   50% {
-    transform: rotate(180deg) translate(15px, 15px);
+    transform: rotate(180deg) translate(10px, 10px); // Giảm 30% (15px -> 10px)
   }
 
   100% {
@@ -252,12 +252,12 @@
 
 @keyframes pulseAmbientGlow {
   0% {
-    transform: scale(0.98);
+    transform: scale(0.985);
     opacity: 0.66;
   }
 
   100% {
-    transform: scale(1.025);
+    transform: scale(1.017); // Giảm 30% độ co giãn glow (1.025 -> 1.017)
     opacity: 0.78;
   }
 }
@@ -269,7 +269,7 @@
   }
 
   100% {
-    transform: rotate(0.8deg);
+    transform: rotate(0.55deg); // Giảm 30% góc quét tia nắng (0.8deg -> 0.55deg)
     opacity: 0.58;
   }
 }
@@ -375,11 +375,11 @@
 
 @keyframes leafFlutter {
   from {
-    transform: rotateX(16deg) rotateY(-28deg) scale(0.92);
+    transform: rotateX(11deg) rotateY(-20deg) scale(0.94); // Giảm 30% góc chao đảo lá
   }
 
   to {
-    transform: rotateX(-24deg) rotateY(32deg) scale(1.04);
+    transform: rotateX(-17deg) rotateY(22deg) scale(1.03);
   }
 }
 
@@ -776,11 +776,11 @@
 
 @keyframes leafFlutter {
   from {
-    transform: rotateX(16deg) rotateY(-28deg) scale(0.92);
+    transform: rotateX(11deg) rotateY(-20deg) scale(0.94); // Giảm 30% góc chao đảo lá
   }
 
   to {
-    transform: rotateX(-24deg) rotateY(32deg) scale(1.04);
+    transform: rotateX(-17deg) rotateY(22deg) scale(1.03);
   }
 }
 

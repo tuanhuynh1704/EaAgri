@@ -351,7 +351,7 @@
 
 @keyframes livePulse {
   0%, 100% { transform: scale(1); opacity: 1; }
-  50% { transform: scale(1.35); opacity: 0.7; }
+  50% { transform: scale(1.24); opacity: 0.75; } // Giảm 30% độ phồng (1.35 -> 1.24)
 }
 
 .problem-solution__video-container {
@@ -1350,7 +1350,7 @@
     transform: translateY(0);
   }
   50% {
-    transform: translateY(-6px);
+    transform: translateY(-4px); // Giảm 30% độ nhấp nhô (-6px -> -4px)
   }
 }
 

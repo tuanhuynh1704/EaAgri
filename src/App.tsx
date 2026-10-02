@@ -43,9 +43,9 @@ function App() {
 
   useEffect(() => {
     AOS.init({
-      duration: 500,
+      duration: 350, // Giảm 30% thời lượng (500ms -> 350ms) giúp chuyển động dứt khoát, thanh thoát
       once: true,
-      offset: 50,
+      offset: 35, // Giảm ngưỡng cuộn kích hoạt
       easing: "ease-out-cubic",
     });
     AOS.refresh();

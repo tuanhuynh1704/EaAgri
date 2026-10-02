@@ -44,7 +44,7 @@ $shadow-xl: 0 30px 60px rgba(0, 0, 0, 0.15);
 // TRANSITION
 // ================================
 
-$transition: all 0.35s ease;
+$transition: all 0.25s ease; // Giảm 30% thời gian hiệu ứng chuyển đổi (0.35s -> 0.25s)
 
 // ================================
 // BREAKPOINTS

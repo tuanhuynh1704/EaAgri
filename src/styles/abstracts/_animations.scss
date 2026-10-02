@@ -9,13 +9,13 @@
 }
 
 // ================================
-// FADE UP
+// FADE UP (Reduced by 30%)
 // ================================
 
 @keyframes fade-up {
   from {
     opacity: 0;
-    transform: translateY(30px);
+    transform: translateY(21px); // Giảm 30% biên độ (30px -> 21px)
   }
 
   to {
@@ -37,3 +37,26 @@
     opacity: 1;
   }
 }
+
+// ==========================================
+// TOÀN BỘ DỰ ÁN: GIẢM 30% BIÊN ĐỘ HIỆU ỨNG AOS
+// ==========================================
+[data-aos="fade-up"] {
+  transform: translate3d(0, 32px, 0) !important; // Giảm 30% quãng đường trượt vào
+}
+
+[data-aos="fade-down"] {
+  transform: translate3d(0, -32px, 0) !important;
+}
+
+[data-aos="fade-right"] {
+  transform: translate3d(-32px, 0, 0) !important;
+}
+
+[data-aos="fade-left"] {
+  transform: translate3d(32px, 0, 0) !important;
+}
+
+[data-aos].aos-animate {
+  transform: translate3d(0, 0, 0) !important;
+}

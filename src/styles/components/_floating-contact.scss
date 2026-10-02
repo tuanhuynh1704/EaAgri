@@ -99,7 +99,7 @@
 
     &:hover {
       background: linear-gradient(135deg, #23834a 0%, #119172 50%, #07909a 100%);
-      transform: translateY(-3px) scale(1.06);
+      transform: translateY(-2px) scale(1.04); // Giảm 30% độ nảy hover (-3px/1.06 -> -2px/1.04)
       box-shadow: 0 10px 25px rgba(8, 124, 133, 0.28);
     }
 
@@ -113,7 +113,7 @@
     opacity: 0;
     visibility: hidden;
     pointer-events: none;
-    transform: translateY(18px) scale(0.72);
+    transform: translateY(12px) scale(0.80); // Giảm 30% khoảng cách xuất hiện (18px -> 12px)
   }
 
   // Toggle Support button
@@ -131,7 +131,7 @@
     }
 
     &:hover {
-      transform: translateY(-2px) scale(1.04);
+      transform: translateY(-1.5px) scale(1.03); // Giảm 30%
       box-shadow:
         0 11px 26px rgba(8, 124, 133, 0.3),
         0 0 0 6px rgba(21, 143, 104, 0.1);

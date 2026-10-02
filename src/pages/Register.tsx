@@ -33,7 +33,7 @@ export default function Register() {
   // Generate falling leaves layout across the screen
   const fallingLeaves = useMemo(
     () =>
-      Array.from({ length: 15 }, (_, index) => {
+      Array.from({ length: 10 }, (_, index) => { // Giảm 33% số lượng lá rơi (15 -> 10)
         const depth = Math.random();
         const size = 18 + depth * 32;
         const rotationDirection = Math.random() > 0.5 ? 1 : -1;
@@ -43,14 +43,14 @@ export default function Register() {
           style: {
             "--leaf-left": `${Math.random() * 95}%`,
             "--leaf-size": `${size}px`,
-            "--leaf-duration": `${12 + (1 - depth) * 10 + Math.random() * 5}s`,
+            "--leaf-duration": `${13 + (1 - depth) * 11 + Math.random() * 5}s`,
             "--leaf-delay": `${-Math.random() * 24}s`,
-            "--leaf-opacity": `${0.25 + depth * 0.55}`,
-            "--leaf-drift-a": `${-80 + Math.random() * 160}px`,
-            "--leaf-drift-b": `${-130 + Math.random() * 260}px`,
-            "--leaf-drift-c": `${-100 + Math.random() * 200}px`,
-            "--leaf-rotation": `${rotationDirection * (200 + Math.random() * 400)}deg`,
-            "--leaf-flutter-duration": `${2.2 + Math.random() * 2.2}s`,
+            "--leaf-opacity": `${0.22 + depth * 0.50}`,
+            "--leaf-drift-a": `${-56 + Math.random() * 112}px`, // Giảm 30% độ dạt
+            "--leaf-drift-b": `${-90 + Math.random() * 180}px`,  // Giảm 30%
+            "--leaf-drift-c": `${-70 + Math.random() * 140}px`,  // Giảm 30%
+            "--leaf-rotation": `${rotationDirection * (140 + Math.random() * 280)}deg`, // Giảm 30% xoay
+            "--leaf-flutter-duration": `${2.5 + Math.random() * 2.2}s`,
             "--leaf-blur": `${(1 - depth) * 1.1}px`,
           } as React.CSSProperties,
         };

@@ -554,7 +554,7 @@ export function createEaAgriScene(container, options = {}) {
       !drag &&
       time - lastTouch > 3000
     )
-      targetYaw = Math.sin(clockTime * 0.15) * 0.2 - 0.08;
+      targetYaw = Math.sin(clockTime * 0.15) * 0.14 - 0.08; // Giảm 30% biên độ xoay tự động (0.2 -> 0.14)
     yaw += (targetYaw - yaw) * 0.12;
     pitch += (targetPitch - pitch) * 0.12;
     pivot.rotation.set(pitch, yaw, 0);

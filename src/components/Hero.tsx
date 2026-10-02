@@ -24,9 +24,9 @@ const Hero = () => {
   }, []);
 
   const fallingLeaves = useMemo(() => (
-    Array.from({ length: 8 }, (_, index) => {
+    Array.from({ length: 5 }, (_, index) => { // Giảm số lượng lá rơi (~35%)
       const depth = Math.random();
-      const size = 18 + depth * 38;
+      const size = 18 + depth * 34;
       const rotationDirection = Math.random() > 0.5 ? 1 : -1;
 
       return {
@@ -34,14 +34,14 @@ const Hero = () => {
         style: {
           "--leaf-left": `${Math.random() * 96}%`,
           "--leaf-size": `${size}px`,
-          "--leaf-duration": `${12 + (1 - depth) * 10 + Math.random() * 5}s`,
+          "--leaf-duration": `${13 + (1 - depth) * 11 + Math.random() * 5}s`,
           "--leaf-delay": `${-Math.random() * 26}s`,
-          "--leaf-opacity": `${0.24 + depth * 0.56}`,
-          "--leaf-drift-a": `${-90 + Math.random() * 180}px`,
-          "--leaf-drift-b": `${-145 + Math.random() * 290}px`,
-          "--leaf-drift-c": `${-115 + Math.random() * 230}px`,
-          "--leaf-rotation": `${rotationDirection * (220 + Math.random() * 520)}deg`,
-          "--leaf-flutter-duration": `${2.4 + Math.random() * 2.8}s`,
+          "--leaf-opacity": `${0.22 + depth * 0.52}`,
+          "--leaf-drift-a": `${-63 + Math.random() * 126}px`, // Giảm 30% độ dạt ngang
+          "--leaf-drift-b": `${-100 + Math.random() * 200}px`, // Giảm 30%
+          "--leaf-drift-c": `${-80 + Math.random() * 160}px`,  // Giảm 30%
+          "--leaf-rotation": `${rotationDirection * (150 + Math.random() * 360)}deg`, // Giảm 30% góc xoay
+          "--leaf-flutter-duration": `${2.6 + Math.random() * 2.8}s`,
           "--leaf-blur": `${(1 - depth) * 1.15}px`,
         } as CSSProperties,
       };
@@ -49,14 +49,14 @@ const Hero = () => {
   ), []);
 
   const sunSparkles = useMemo(() => (
-    Array.from({ length: 14 }, (_, index) => ({
+    Array.from({ length: 10 }, (_, index) => ({ // Giảm số lượng đốm sáng (14 -> 10)
       id: index,
       style: {
         "--sparkle-left": `${10 + Math.random() * 80}%`,
         "--sparkle-top": `${8 + Math.random() * 80}%`,
-        "--sparkle-size": `${4 + Math.random() * 6}px`,
+        "--sparkle-size": `${3.5 + Math.random() * 5}px`,
         "--sparkle-delay": `${Math.random() * 3.5}s`,
-        "--sparkle-duration": `${2 + Math.random() * 2.5}s`,
+        "--sparkle-duration": `${2.2 + Math.random() * 2.5}s`,
       } as CSSProperties,
     }))
   ), []);
@@ -86,8 +86,9 @@ const Hero = () => {
 
       hero.style.setProperty("--hero-pointer-x", `${xRatio * 100}%`);
       hero.style.setProperty("--hero-pointer-y", `${yRatio * 100}%`);
-      hero.style.setProperty("--content-shift-x", `${(xRatio - 0.5) * 5}px`);
-      hero.style.setProperty("--content-shift-y", `${(yRatio - 0.5) * 3}px`);
+      // Giảm 30% biên độ parallax theo chuột
+      hero.style.setProperty("--content-shift-x", `${(xRatio - 0.5) * 3.5}px`);
+      hero.style.setProperty("--content-shift-y", `${(yRatio - 0.5) * 2.1}px`);
     });
   };
 

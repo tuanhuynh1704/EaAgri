@@ -105,7 +105,7 @@ body.modal-scroll-lock {
     background 0.3s ease;
 
   &:hover {
-    transform: translateY(-3px);
+    transform: translateY(-2px); // Giảm 30% độ nảy nút bấm (-3px -> -2px)
     box-shadow: $shadow-lg;
   }
 }
