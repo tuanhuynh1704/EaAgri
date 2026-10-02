@@ -14,18 +14,18 @@ const appScreenshots = [
 ];
 
 const appSlideContent = [
+  ["Hệ sinh thái số", "Một nền tảng xuyên suốt cho nông nghiệp thông minh."],
   ["Tổng quan Ea Agri", "Quản lý toàn bộ hoạt động canh tác trong một giao diện."],
+  ["Dữ liệu thời gian thực", "Giám sát cảm biến IoT ngay trên điện thoại."],
+  ["Cộng đồng nhà nông", "Chia sẻ kinh nghiệm và kết nối người dùng Ea Agri."],
   ["Trợ lý Ea AI", "Tư vấn kỹ thuật dựa trên dữ liệu thực tế của khu vườn."],
-  ["Câu hỏi thường gặp", "Tra cứu nhanh các tình huống phổ biến trong canh tác."],
   ["Kho tri thức", "Tra cứu nhanh các tình huống thường gặp trong canh tác."],
   ["Lịch tưới thông minh", "Điều phối lượng nước theo điều kiện môi trường."],
-  ["Nhật ký nông hộ", "Ghi nhận hoạt động và lịch sử chăm sóc mùa vụ."],
-  ["Phân tích cây trồng", "Nhận diện và đánh giá tình trạng cây bằng AI."],
   ["Phân tích hình ảnh", "Theo dõi dấu hiệu bất thường trực tiếp từ khu vườn."],
-  ["Cộng đồng nhà nông", "Chia sẻ kinh nghiệm và kết nối người dùng Ea Agri."],
+  ["Nhật ký nông hộ", "Ghi nhận hoạt động và lịch sử chăm sóc mùa vụ."],
   ["Quản lý mùa vụ", "Theo dõi tiến độ từ chăm sóc đến thu hoạch."],
-  ["Dữ liệu thời gian thực", "Giám sát cảm biến IoT ngay trên điện thoại."],
-  ["Hệ sinh thái số", "Một nền tảng xuyên suốt cho nông nghiệp thông minh."],
+  // ["Câu hỏi thường gặp", "Tra cứu nhanh các tình huống phổ biến trong canh tác."],
+  // ["Phân tích cây trồng", "Nhận diện và đánh giá tình trạng cây bằng AI."],
 ];
 
 interface TeamMember {

@@ -105,8 +105,8 @@ export default function PromoVideoModal() {
 
   const videoSrc =
     mode === "16x9"
-      ? "/Video/EaAgri_Promo_45s_16x9.mp4"
-      : "/Video/EaAgri_Promo_45s_9x16.mp4";
+      ? "/assets/EaAgri_Promo_45s_16x9_pc.mp4"
+      : "/assets/EaAgri_Promo_45s_9x16_mobile.mp4";
 
   const posterSrc =
     mode === "16x9"

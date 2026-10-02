@@ -2,23 +2,23 @@ import { useEffect, lazy } from "react";
 import { useSEO } from "../hooks/useSEO";
 import Hero from "../components/Hero";
 import SplashIntro from "../components/SplashIntro";
-import LogoMarqueeSection from "../components/LogoMarqueeSection";
 import LazySection from "../components/common/LazySection";
 
-// Progressive on-scroll loading according to exact sequence:
-// 1. Dấu ấn kết nối (LogoMarqueeSection - rendered directly below Hero)
-// 2. Hội Đồng Cố Vấn & Chuyên Gia
+// Progressive on-scroll loading according to sequence:
+// 1. Hội Đồng Cố Vấn & Chuyên Gia
 const AdvisorsSection = lazy(() => import("../components/AdvisorsSection"));
-// 3. Hình Ảnh Sản Phẩm
+// 2. Hình Ảnh Sản Phẩm
 const ProductShowcaseSection = lazy(() => import("../components/ProductShowcaseSection"));
-// 4. Vấn Đề & Giải Pháp Đột Phá
+// 3. Vấn Đề & Giải Pháp Đột Phá
 const ProblemSolutionSection = lazy(() => import("../components/ProblemSolutionSection"));
-// 5. Video & Trải Nghiệm Thực Tế + 6. PHIM TƯ LIỆU & THỰC ĐỊA
+// 4. Video & Trải Nghiệm Thực Tế + 5. PHIM TƯ LIỆU & THỰC ĐỊA
 const VideoGallerySection = lazy(() => import("../components/VideoGallerySection"));
-// 7. EAAGRI SAAS B2B • QUẢN TRỊ ĐA THUÊ (EaAgri CRM)
+// 6. EAAGRI SAAS B2B • QUẢN TRỊ ĐA THUÊ (EaAgri CRM)
 const CrmIntroductionSection = lazy(() => import("../components/CrmIntroductionSection"));
-// 8. Kết quả triển khai thực tế
+// 7. Kết quả triển khai thực tế
 const ResultSection = lazy(() => import("../components/ResultSection"));
+// 8. Dấu ấn kết nối
+const LogoMarqueeSection = lazy(() => import("../components/LogoMarqueeSection"));
 // 9. Đội Ngũ Vận Hành
 const CoreTeamSection = lazy(() => import("../components/CoreTeamSection"));
 // 10. Lộ trình phát triển & Hợp tác
@@ -90,37 +90,39 @@ export default function HomePage() {
       <SplashIntro />
       <Hero />
 
-      {/* 1. Dấu ấn kết nối */}
-      <LogoMarqueeSection />
-
-      {/* 2. Hội Đồng Cố Vấn & Chuyên Gia */}
+      {/* 1. Hội Đồng Cố Vấn & Chuyên Gia */}
       <LazySection minHeight="650px">
         <AdvisorsSection />
       </LazySection>
 
-      {/* 3. Hình Ảnh Sản Phẩm */}
+      {/* 2. Hình Ảnh Sản Phẩm */}
       <LazySection minHeight="700px">
         <ProductShowcaseSection />
       </LazySection>
 
-      {/* 4. Vấn Đề & Giải Pháp Đột Phá */}
+      {/* 3. Vấn Đề & Giải Pháp Đột Phá */}
       <LazySection minHeight="650px" className="section-bg--gradient-teal fullpage-slide">
         <ProblemSolutionSection />
       </LazySection>
 
-      {/* 5. Video & Trải Nghiệm Thực Tế -> 6. PHIM TƯ LIỆU & THỰC ĐỊA */}
+      {/* 4. Video & Trải Nghiệm Thực Tế -> 5. PHIM TƯ LIỆU & THỰC ĐỊA */}
       <LazySection minHeight="650px" className="section-bg--gradient-warm fullpage-slide">
         <VideoGallerySection />
       </LazySection>
 
-      {/* 7. EAAGRI SAAS B2B • QUẢN TRỊ ĐA THUÊ (EaAgri CRM) */}
+      {/* 6. EAAGRI SAAS B2B • QUẢN TRỊ ĐA THUÊ (EaAgri CRM) */}
       <LazySection minHeight="700px" className="fullpage-slide">
         <CrmIntroductionSection />
       </LazySection>
 
-      {/* 8. Kết quả triển khai thực tế */}
+      {/* 7. Kết quả triển khai thực tế */}
       <LazySection minHeight="550px" className="section-bg--gradient-warm fullpage-slide">
         <ResultSection />
+      </LazySection>
+
+      {/* 8. Dấu ấn kết nối */}
+      <LazySection minHeight="260px">
+        <LogoMarqueeSection />
       </LazySection>
 
       {/* 9. Đội Ngũ Vận Hành */}

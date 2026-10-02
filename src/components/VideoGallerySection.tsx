@@ -9,10 +9,10 @@ interface VideoItem {
   fallbackUrl: string;
 }
 
-const getYoutubeId = (url: string) => {
-  const match = url.match(/embed\/([^?]+)/);
-  return match ? match[1] : null;
-};
+// const getYoutubeId = (url: string) => {
+//   const match = url.match(/embed\/([^?]+)/);
+//   return match ? match[1] : null;
+// };
 
 export default function VideoGallerySection() {
   const [activeVideo, setActiveVideo] = useState<VideoItem | null>(null);
@@ -29,25 +29,27 @@ export default function VideoGallerySection() {
   }, []);
 
   const promoMode = isMobile ? "9x16" : "16x9";
+  const promoVideoSrc = isMobile
+    ? "/assets/EaAgri_Promo_45s_9x16_mobile.mp4"
+    : "/assets/EaAgri_Promo_45s_16x9_pc.mp4";
   const posterSrc = isMobile
     ? "/Video/promo_9x16_poster.webp"
     : "/Video/promo_16x9_poster.webp";
-  const badgeText = isMobile ? "BẢN ĐIỆN THOẠI • 9:16" : "BẢN WEB • 16:9";
 
-  const videos: VideoItem[] = [
-    {
-      title: "Lời Giải Cho Nông Dân",
-      description: "Sự khởi đầu và câu chuyện ý nghĩa của dự án EaAgri",
-      videoUrl: "https://www.youtube.com/embed/ap6V_7nSDm8?start=1",
-      fallbackUrl: "https://www.youtube.com/watch?v=ap6V_7nSDm8"
-    },
-    {
-      title: "Demo Thực Tế Sản Phẩm",
-      description: "Trải nghiệm thực tế các tính năng vận hành của hệ thống EaAgri",
-      videoUrl: "https://www.youtube.com/embed/WxfKTEIxSjQ",
-      fallbackUrl: "https://www.youtube.com/watch?v=WxfKTEIxSjQ"
-    }
-  ];
+  // const videos: VideoItem[] = [
+  //   {
+  //     title: "Lời Giải Cho Nông Dân",
+  //     description: "Sự khởi đầu và câu chuyện ý nghĩa của dự án EaAgri",
+  //     videoUrl: "https://www.youtube.com/embed/ap6V_7nSDm8?start=1",
+  //     fallbackUrl: "https://www.youtube.com/watch?v=ap6V_7nSDm8"
+  //   },
+  //   {
+  //     title: "Demo Thực Tế Sản Phẩm",
+  //     description: "Trải nghiệm thực tế các tính năng vận hành của hệ thống EaAgri",
+  //     videoUrl: "https://www.youtube.com/embed/WxfKTEIxSjQ",
+  //     fallbackUrl: "https://www.youtube.com/watch?v=WxfKTEIxSjQ"
+  //   }
+  // ];
 
   useEffect(() => {
     if (!activeVideo) return;
@@ -106,40 +108,19 @@ export default function VideoGallerySection() {
 
       {/* Featured Spotlight Promo Video (Side-by-Side: Video bên trái • Chữ bên phải, Không khung hộp) */}
       <div className="video-gallery__spotlight video-gallery__spotlight--split" data-aos="fade-up" data-aos-delay="100">
-        {/* Cột Trái: Video Trailer */}
+        {/* Cột Trái: Trình phát Video tương tác trực tiếp */}
         <div 
           className={`video-gallery__spotlight-media video-gallery__spotlight-media--${promoMode}`}
-          onClick={() => triggerPromoVideo(promoMode)}
-          role="button"
-          tabIndex={0}
-          aria-label="Xem video giới thiệu EaAgri 45 giây"
-          onKeyDown={(e) => { if (e.key === "Enter" || e.key === " ") triggerPromoVideo(promoMode); }}
         >
-          <picture className="video-gallery__spotlight-picture">
-            <source media="(max-width: 768px)" srcSet="/Video/promo_16x9_poster.webp" />
-            <img 
-              src={posterSrc} 
-              alt="Trailer giới thiệu EaAgri 45 giây"
-              className="video-gallery__spotlight-poster"
-              loading="lazy"
-              decoding="async"
-            />
-          </picture>
-          <div className="video-gallery__spotlight-overlay" />
-          
-          <div className="video-gallery__spotlight-play-wrap">
-            <span className="spotlight-play-pulse" />
-            <div className="spotlight-play-btn">
-              <i className="ri-play-fill" />
-            </div>
-            <span className="spotlight-play-label">Bấm xem teaser (45s)</span>
-          </div>
-
-          <span className="video-gallery__spotlight-badge">
-            <span className="spotlight-badge-dot" />
-            {isMobile ? "TRAILER • 45s" : badgeText}
-          </span>
-          <span className="video-gallery__spotlight-duration">0:45</span>
+          <video
+            key={promoVideoSrc}
+            src={promoVideoSrc}
+            poster={posterSrc}
+            className="video-gallery__spotlight-video"
+            controls
+            playsInline
+            preload="metadata"
+          />
         </div>
 
         {/* Cột Phải: Thông tin cô đọng, súc tích */}
@@ -148,9 +129,6 @@ export default function VideoGallerySection() {
             <span className="spotlight-chip">
               <i className="ri-sparkling-fill" /> TIÊU ĐIỂM DỰ ÁN
             </span>
-            {/* <span className="spotlight-hd-tag">
-              {isMobile ? "CHUẨN MOBILE • 9:16" : "FULL HD • 60FPS"}
-            </span> */}
           </div>
 
           <h3 className="spotlight-title">
@@ -181,17 +159,17 @@ export default function VideoGallerySection() {
               type="button"
               className="spotlight-btn spotlight-btn--primary"
               onClick={() => triggerPromoVideo(promoMode)}
-              title={isMobile ? "Xem video bản điện thoại (9:16)" : "Xem video bản web (16:9)"}
+              title={promoMode === "9x16" ? "Mở rạp chiếu video bản điện thoại (9:16)" : "Mở rạp chiếu video bản web (16:9)"}
             >
               <i className="ri-play-circle-fill" />
-              <span>Xem Video Giới Thiệu (45s)</span>
+              <span>Xem Phóng To Rạp Chiếu (45s)</span>
             </button>
           </div>
         </div>
       </div>
 
       {/* Section Divider */}
-      <div className="video-gallery__divider" data-aos="fade-up">
+      {/* <div className="video-gallery__divider" data-aos="fade-up">
         <span><i className="ri-film-line" /> PHIM TƯ LIỆU & THỰC ĐỊA</span>
       </div>
 
@@ -246,7 +224,7 @@ export default function VideoGallerySection() {
             </div>
           );
         })}
-      </div>
+      </div> */}
 
       {activeVideo && createPortal(
         <div className="video__modal" onClick={() => setActiveVideo(null)}>
