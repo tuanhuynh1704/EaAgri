@@ -1360,7 +1360,7 @@
     overflow: hidden;
   }
 
-  .carousel-3d { width: 100%; height: 500px; margin-bottom: .8rem; }
+  .carousel-3d { width: 100%; height: 500px; margin-bottom: 0; }
   .phone-mockup,
   .phone-mockup__fixed-wrapper { width: min(225px, 62vw) !important; }
   .phone-mockup.left,
@@ -1370,8 +1370,8 @@
   .carousel-btn { width: 42px; height: 42px; font-size: 1.15rem; }
   .carousel-btn--prev { left: .25rem; }
   .carousel-btn--next { right: .25rem; }
-  .app-showcase__caption { min-width: min(310px, 86vw); max-width: 86vw; }
-  .app-showcase__progress { grid-template-columns: auto min(130px, 38vw) auto; }
+  .app-showcase__caption { width: fit-content; max-width: min(310px, 90vw); }
+  .app-showcase__progress { display: flex; align-items: center; justify-content: center; }
 
   .awards-section__container {
     padding-top: 5.5rem;

@@ -1,8 +1,8 @@
 [
   {
     "id": "log_1790946179995",
-    "device_id": "dev_muqz43wi_ypeeluys",
-    "ip_address": "115.76.100.66",
+    "device_id": "dev_munwi6wr_63jgs391",
+    "ip_address": "203.205.33.59",
     "city": "TP. Hồ Chí Minh",
     "region": "Ho Chi Minh City",
     "country": "Việt Nam",
@@ -10,12 +10,12 @@
     "os": "Windows 11 / 10",
     "browser": "Chrome",
     "screen_resolution": "1463×823",
-    "visit_count": 1,
+    "visit_count": 4,
     "last_path": "/",
     "referrer": "Trực tiếp (Direct)",
     "is_online": true,
     "first_visit": "2026-10-02T13:02:59.995Z",
-    "last_visit": "2026-10-02T13:02:59.995Z"
+    "last_visit": "2026-10-03T00:24:32.478Z"
   },
   {
     "id": "log_1790921142961",
@@ -28,12 +28,12 @@
     "os": "Windows 11 / 10",
     "browser": "Chrome",
     "screen_resolution": "1463×823",
-    "visit_count": 42,
+    "visit_count": 43,
     "last_path": "/",
     "referrer": "Trực tiếp (Direct)",
     "is_online": true,
     "first_visit": "2026-10-02T06:05:42.961Z",
-    "last_visit": "2026-10-03T00:05:12.533Z"
+    "last_visit": "2026-10-03T00:13:35.938Z"
   },
   {
     "id": "log_1790767719944",
