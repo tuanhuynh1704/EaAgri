@@ -473,7 +473,7 @@ export default function CrmIntroductionSection() {
         )}
 
         {/* CRM BOTTOM CTA BANNER */}
-        <div className="crm__cta-banner" data-aos="fade-up">
+        {/* <div className="crm__cta-banner" data-aos="fade-up">
           <div className="crm__cta-content">
             <div className="crm__cta-badge">
               <span className="cta-dot"></span> ĐÃ TRIỂN KHAI THỰC TẾ
@@ -496,7 +496,7 @@ export default function CrmIntroductionSection() {
             </a>
             <span className="crm__cta-url">https://crm.eaagri.vn</span>
           </div>
-        </div>
+        </div> */}
       </div>
     </section>
   );
