@@ -39,8 +39,8 @@
 
 ### 1.2 Biến môi trường Frontend (`.env.local`)
 ```env
-VITE_SUPABASE_URL=https://your-supabase-project.supabase.co
-VITE_SUPABASE_ANON_KEY=eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9...
+VITE_SUPABASE_URL=https://eaktsegoxxbcdtixrgdg.supabase.co
+VITE_SUPABASE_ANON_KEY=sb_publishable_CLqbj4pweJWegtHVttQ1lQ_w41PEN1_
 VITE_API_CHATBOT_URL=https://your-ai-gateway-ngrok-or-domain.ngrok-free.app/chat
 ```
 
