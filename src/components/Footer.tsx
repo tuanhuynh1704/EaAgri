@@ -131,7 +131,7 @@ export default function Footer() {
               <i className="ri-arrow-right-up-line footer__social-arrow"></i>
             </a>
 
-            <a
+            {/* <a
               href="https://github.com/TuansHuynh/EaAgri"
               target="_blank"
               rel="noopener noreferrer"
@@ -146,7 +146,7 @@ export default function Footer() {
                 <span>Open Source Repos</span>
               </div>
               <i className="ri-arrow-right-up-line footer__social-arrow"></i>
-            </a>
+            </a> */}
           </div>
         </div>
 

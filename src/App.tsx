@@ -7,7 +7,7 @@ import Navbar from "./components/Navbar";
 import Footer from "./components/Footer";
 import FloatingContact from "./components/FloatingContact";
 import FloatingVoteWidget from "./components/FloatingVoteWidget";
-import VoteAnnouncementBar from "./components/VoteAnnouncementBar";
+// import VoteAnnouncementBar from "./components/VoteAnnouncementBar";
 import AppStoreNoticeModal from "./components/AppStoreNoticeModal";
 import PromoVideoModal from "./components/PromoVideoModal";
 import { AuthProvider } from "./context/AuthContext";
@@ -54,7 +54,7 @@ function App() {
   return (
     <AuthProvider>
       <VoteProvider>
-        {!isAuthPage && !isAdminPage && <VoteAnnouncementBar />}
+        {/* {!isAuthPage && !isAdminPage && <VoteAnnouncementBar />} */}
         {!isAuthPage && <Navbar />}
         <Suspense fallback={<RouteFallback />}>
           <Outlet />
