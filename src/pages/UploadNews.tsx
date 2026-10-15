@@ -1,4 +1,4 @@
-import React, { useState, useRef, useCallback, useMemo } from "react";
+import React, { useState, useRef, useCallback, useMemo, useEffect } from "react";
 import { Link } from "react-router-dom";
 import { supabase } from "../utils/supabase/client";
 import { useAuth } from "../context/AuthContext";
@@ -6,7 +6,12 @@ import ReactQuill from "react-quill-new";
 import "react-quill-new/dist/quill.snow.css";
 import { cleanContent, buildContentWithSummary } from "../utils/cleanContent";
 import { quillModules, quillFormats } from "../utils/quillConfig";
-import { buildImageUrlWithPosition } from "../utils/imageUtils";
+import { 
+  buildImageUrlWithPosition, 
+  MAX_IMAGE_SIZE_BYTES, 
+  formatFileSize, 
+  sanitizeFileName 
+} from "../utils/imageUtils";
 
 interface AlertState {
   type: "success" | "error" | null;
@@ -18,11 +23,19 @@ export default function UploadNews() {
   
   const [title, setTitle] = useState("");
   const [summary, setSummary] = useState("");
+  const [author, setAuthor] = useState("");
   const [category, setCategory] = useState("Kỹ thuật");
   const [content, setContent] = useState("");
   const [imageUrl, setImageUrl] = useState("");
   const [imagePosX, setImagePosX] = useState(50);
   const [imagePosY, setImagePosY] = useState(50);
+  
+  // Set author from profile if available
+  useEffect(() => {
+    if (profile?.full_name && !author) {
+      setAuthor(profile.full_name);
+    }
+  }, [profile]);
   
   // File upload state
   const [imageFile, setImageFile] = useState<File | null>(null);
@@ -38,7 +51,7 @@ export default function UploadNews() {
   const fileInputRef = useRef<HTMLInputElement>(null);
   const quillRef = useRef<any>(null);
 
-  // Custom image handler: upload to Supabase storage or insert base64
+  // Custom image handler: upload to Supabase storage (max 15MB)
   const handleImageUpload = useCallback(() => {
     const input = document.createElement("input");
     input.setAttribute("type", "file");
@@ -49,54 +62,50 @@ export default function UploadNews() {
       const file = input.files ? input.files[0] : null;
       if (!file) return;
 
-      if (file.size > 5 * 1024 * 1024) {
+      if (file.size > MAX_IMAGE_SIZE_BYTES) {
         setAlert({
           type: "error",
-          message: "Kích thước ảnh chèn vào bài viết quá lớn. Vui lòng chọn ảnh nhỏ hơn 5MB."
+          message: `Kích thước ảnh chèn vào bài viết quá lớn (${formatFileSize(file.size)}). Vui lòng chọn ảnh nhỏ hơn 15MB.`
         });
         return;
       }
 
-      const cleanFileName = file.name.replace(/[^\w.-]/g, "_");
-      const fileName = `content-${Date.now()}-${cleanFileName}`;
+      const fileName = sanitizeFileName(file.name, "content");
 
       try {
+        setAlert({
+          type: null,
+          message: "Đang tải ảnh chèn vào bài viết..."
+        });
+
         const { error: uploadError } = await supabase.storage
           .from("news-images")
           .upload(fileName, file, { cacheControl: "3600", upsert: false });
 
-        let insertedUrl = "";
-        if (!uploadError) {
-          const { data } = supabase.storage.from("news-images").getPublicUrl(fileName);
-          insertedUrl = data.publicUrl;
+        if (uploadError) {
+          console.error("Storage upload error details:", uploadError);
+          setAlert({
+            type: "error",
+            message: `Không thể tải ảnh lên Storage: ${uploadError.message}. Vui lòng thử lại.`
+          });
+          return;
         }
 
+        const { data } = supabase.storage.from("news-images").getPublicUrl(fileName);
+        const insertedUrl = data.publicUrl;
+
         const editor = quillRef.current?.getEditor();
-        if (editor) {
+        if (editor && insertedUrl) {
           const range = editor.getSelection(true) || { index: editor.getLength() };
-          if (insertedUrl) {
-            editor.insertEmbed(range.index, "image", insertedUrl);
-            editor.setSelection(range.index + 1);
-          } else {
-            const reader = new FileReader();
-            reader.onload = () => {
-              editor.insertEmbed(range.index, "image", reader.result);
-              editor.setSelection(range.index + 1);
-            };
-            reader.readAsDataURL(file);
-          }
+          editor.insertEmbed(range.index, "image", insertedUrl);
+          editor.setSelection(range.index + 1);
+          setAlert({ type: null, message: "" });
         }
-      } catch {
-        const editor = quillRef.current?.getEditor();
-        if (editor) {
-          const range = editor.getSelection(true) || { index: editor.getLength() };
-          const reader = new FileReader();
-          reader.onload = () => {
-            editor.insertEmbed(range.index, "image", reader.result);
-            editor.setSelection(range.index + 1);
-          };
-          reader.readAsDataURL(file);
-        }
+      } catch (err: any) {
+        setAlert({
+          type: "error",
+          message: err.message || "Đã xảy ra lỗi khi tải ảnh lên."
+        });
       }
     };
   }, []);
@@ -151,11 +160,11 @@ export default function UploadNews() {
     if (e.target.files && e.target.files[0]) {
       const file = e.target.files[0];
       
-      // Limit file size to 5MB
-      if (file.size > 5 * 1024 * 1024) {
+      // Limit file size to 15MB
+      if (file.size > MAX_IMAGE_SIZE_BYTES) {
         setAlert({
           type: "error",
-          message: "Kích thước ảnh quá lớn. Vui lòng chọn ảnh nhỏ hơn 5MB."
+          message: `Kích thước ảnh quá lớn (${formatFileSize(file.size)}). Vui lòng chọn ảnh nhỏ hơn 15MB.`
         });
         return;
       }
@@ -164,6 +173,7 @@ export default function UploadNews() {
       setImagePreview(URL.createObjectURL(file));
       // Clear manual image URL when local file is chosen
       setImageUrl("");
+      setAlert({ type: null, message: "" });
     }
   };
 
@@ -176,16 +186,17 @@ export default function UploadNews() {
     if (e.dataTransfer.files && e.dataTransfer.files[0]) {
       const file = e.dataTransfer.files[0];
       if (file.type.startsWith("image/")) {
-        if (file.size > 5 * 1024 * 1024) {
+        if (file.size > MAX_IMAGE_SIZE_BYTES) {
           setAlert({
             type: "error",
-            message: "Kích thước ảnh quá lớn. Vui lòng chọn ảnh nhỏ hơn 5MB."
+            message: `Kích thước ảnh quá lớn (${formatFileSize(file.size)}). Vui lòng chọn ảnh nhỏ hơn 15MB.`
           });
           return;
         }
         setImageFile(file);
         setImagePreview(URL.createObjectURL(file));
         setImageUrl("");
+        setAlert({ type: null, message: "" });
       } else {
         setAlert({
           type: "error",
@@ -244,11 +255,9 @@ export default function UploadNews() {
     try {
       let finalImageUrl = imageUrl.trim();
 
-      // 1. Upload local file if selected
+      // 1. Upload local file if selected (max 15MB)
       if (imageFile) {
-        // Generate a unique filename: timestamp + sanitized original name
-        const cleanFileName = imageFile.name.replace(/[^\w.-]/g, "_");
-        const fileName = `${Date.now()}-${cleanFileName}`;
+        const fileName = sanitizeFileName(imageFile.name);
 
         const { error: uploadError } = await supabase.storage
           .from("news-images")
@@ -278,7 +287,7 @@ export default function UploadNews() {
         {
           title: cleanContent(title.trim()),
           content: finalContent,
-          author: "EaAgri",
+          author: author.trim() || profile?.full_name || "Ban Kỹ Thuật EaAgri",
           category,
           image_url: finalImageUrlWithPos
         }
@@ -289,7 +298,8 @@ export default function UploadNews() {
         throw new Error(`Lưu bài viết thất bại: ${insertError.message}`);
       }
 
-      // Success Reset
+      // Success Reset & scroll to top
+      window.scrollTo({ top: 0, behavior: "smooth" });
       setAlert({
         type: "success",
         message: "Chúc mừng! Bài viết của bạn đã được đăng thành công lên hệ thống."
@@ -340,7 +350,47 @@ export default function UploadNews() {
             <div style={{ marginBottom: "2rem" }}>
               <div className={`upload-news__alert upload-news__alert--${alert.type}`}>
                 <i className={alert.type === "success" ? "ri-checkbox-circle-line" : "ri-error-warning-line"}></i>
-                <span>{alert.message}</span>
+                <div style={{ display: "flex", flexDirection: "column", gap: "0.5rem" }}>
+                  <span>{alert.message}</span>
+                  {alert.type === "success" && (
+                    <div style={{ marginTop: "0.25rem", display: "flex", gap: "0.75rem", flexWrap: "wrap" }}>
+                      <Link 
+                        to="/tintuc" 
+                        style={{ 
+                          textDecoration: "none", 
+                          display: "inline-flex", 
+                          alignItems: "center", 
+                          gap: "0.4rem", 
+                          padding: "0.45rem 1rem", 
+                          borderRadius: "8px", 
+                          background: "#2e7d32", 
+                          color: "#fff", 
+                          fontSize: "0.88rem", 
+                          fontWeight: 600 
+                        }}
+                      >
+                        <i className="ri-newspaper-line"></i>
+                        Xem danh sách tin tức
+                      </Link>
+                      <button 
+                        type="button" 
+                        onClick={() => setAlert({ type: null, message: "" })} 
+                        style={{ 
+                          border: "1px solid #c8e6c9", 
+                          background: "#fff", 
+                          color: "#2e7d32", 
+                          padding: "0.45rem 0.9rem", 
+                          borderRadius: "8px", 
+                          fontSize: "0.88rem", 
+                          cursor: "pointer", 
+                          fontWeight: 500 
+                        }}
+                      >
+                        Viết tiếp bài khác
+                      </button>
+                    </div>
+                  )}
+                </div>
               </div>
             </div>
           )}
@@ -380,6 +430,12 @@ export default function UploadNews() {
                         draggable={false}
                         style={{ objectPosition: `${imagePosX}% ${imagePosY}%`, width: '100%', height: '240px', objectFit: 'cover', borderRadius: '12px', cursor: isDragging ? 'grabbing' : 'grab' }} 
                       />
+                      {imageFile && (
+                        <div style={{ position: "absolute", bottom: "10px", left: "10px", background: "rgba(0,0,0,0.7)", color: "#fff", padding: "4px 8px", borderRadius: "6px", fontSize: "0.75rem", pointerEvents: "none", backdropFilter: "blur(4px)" }}>
+                          <i className="ri-image-line" style={{ marginRight: "4px" }}></i>
+                          {imageFile.name} ({formatFileSize(imageFile.size)})
+                        </div>
+                      )}
                       <button type="button" className="upload-news__remove-file" onClick={removeSelectedImage} title="Xóa ảnh">
                         <i className="ri-close-line"></i>
                       </button>
@@ -388,7 +444,7 @@ export default function UploadNews() {
                     <>
                       <i className="ri-image-add-line"></i>
                       <span>Kéo thả ảnh vào đây hoặc nhấp để chọn</span>
-                      <small>Chấp nhận định dạng JPG, PNG, WEBP (Tối đa 5MB)</small>
+                      <small>Chấp nhận định dạng JPG, PNG, WEBP (Tối đa 15MB)</small>
                     </>
                   )}
                 </div>
@@ -431,7 +487,7 @@ export default function UploadNews() {
                 )}
               </div>
 
-              {/* Right Column: Title, Summary, Category */}
+              {/* Right Column: Title, Summary, Author, Category */}
               <div className="upload-news__fields-section">
                 
                 {/* Title */}
@@ -460,21 +516,37 @@ export default function UploadNews() {
                   />
                 </div>
 
-                {/* Category */}
-                <div className="upload-news__group">
-                  <label htmlFor="category">Danh mục bài viết</label>
-                  <select
-                    id="category"
-                    className="upload-news__select"
-                    value={category}
-                    onChange={(e) => setCategory(e.target.value)}
-                  >
-                    {categories.map((cat) => (
-                      <option key={cat} value={cat}>
-                        {cat}
-                      </option>
-                    ))}
-                  </select>
+                {/* Row Grid for Author & Category */}
+                <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(200px, 1fr))", gap: "1rem" }}>
+                  {/* Author */}
+                  <div className="upload-news__group">
+                    <label htmlFor="author">Tác giả bài viết</label>
+                    <input
+                      type="text"
+                      id="author"
+                      placeholder="Nhập tên tác giả..."
+                      className="upload-news__input"
+                      value={author}
+                      onChange={(e) => setAuthor(e.target.value)}
+                    />
+                  </div>
+
+                  {/* Category */}
+                  <div className="upload-news__group">
+                    <label htmlFor="category">Danh mục bài viết</label>
+                    <select
+                      id="category"
+                      className="upload-news__select"
+                      value={category}
+                      onChange={(e) => setCategory(e.target.value)}
+                    >
+                      {categories.map((cat) => (
+                        <option key={cat} value={cat}>
+                          {cat}
+                        </option>
+                      ))}
+                    </select>
+                  </div>
                 </div>
 
               </div>
@@ -489,7 +561,7 @@ export default function UploadNews() {
                 </label>
                 <span className="upload-news__editor-tip">
                   <i className="ri-information-line"></i>
-                  Nhấn biểu tượng <strong>🖼️</strong> trên thanh công cụ hoặc dán <strong>(Ctrl+V)</strong> để chèn ảnh
+                  Nhấn biểu tượng <strong>🖼️</strong> trên thanh công cụ hoặc dán <strong>(Ctrl+V)</strong> để chèn ảnh (Tối đa 15MB/ảnh)
                 </span>
               </div>
               
@@ -521,7 +593,7 @@ export default function UploadNews() {
                 {isLoading ? (
                   <>
                     <div className="upload-news__spinner"></div>
-                    <span>Đang lưu bài viết...</span>
+                    <span>Đang tải ảnh và lưu bài viết...</span>
                   </>
                 ) : (
                   <>

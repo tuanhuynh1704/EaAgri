@@ -8,7 +8,13 @@ import ReactQuill from "react-quill-new";
 import "react-quill-new/dist/quill.snow.css";
 import { cleanContent, extractSummaryAndBody, buildContentWithSummary } from "../utils/cleanContent";
 import { quillModules, quillFormats } from "../utils/quillConfig";
-import { parseImageUrlAndPosition, buildImageUrlWithPosition } from "../utils/imageUtils";
+import { 
+  parseImageUrlAndPosition, 
+  buildImageUrlWithPosition, 
+  MAX_IMAGE_SIZE_BYTES, 
+  formatFileSize, 
+  sanitizeFileName 
+} from "../utils/imageUtils";
 
 interface NewsItem {
   id: string;
@@ -64,7 +70,7 @@ export default function ManageNews() {
   const fileInputRef = useRef<HTMLInputElement>(null);
   const modalQuillRef = useRef<any>(null);
 
-  // Custom image handler for ReactQuill in ManageNews modal
+  // Custom image handler for ReactQuill in ManageNews modal (max 15MB)
   const handleModalImageUpload = useCallback(() => {
     const input = document.createElement("input");
     input.setAttribute("type", "file");
@@ -75,13 +81,12 @@ export default function ManageNews() {
       const file = input.files ? input.files[0] : null;
       if (!file) return;
 
-      if (file.size > 5 * 1024 * 1024) {
-        alert("Kích thước ảnh quá lớn. Vui lòng chọn ảnh nhỏ hơn 5MB.");
+      if (file.size > MAX_IMAGE_SIZE_BYTES) {
+        alert(`Kích thước ảnh quá lớn (${formatFileSize(file.size)}). Vui lòng chọn ảnh nhỏ hơn 15MB.`);
         return;
       }
 
-      const cleanFileName = file.name.replace(/[^\w.-]/g, "_");
-      const fileName = `content-${Date.now()}-${cleanFileName}`;
+      const fileName = sanitizeFileName(file.name, "content");
 
       try {
         const { error: uploadError } = await supabase.storage
@@ -101,25 +106,11 @@ export default function ManageNews() {
             editor.insertEmbed(range.index, "image", insertedUrl);
             editor.setSelection(range.index + 1);
           } else {
-            const reader = new FileReader();
-            reader.onload = () => {
-              editor.insertEmbed(range.index, "image", reader.result);
-              editor.setSelection(range.index + 1);
-            };
-            reader.readAsDataURL(file);
+            alert("Lỗi tải ảnh lên storage: " + (uploadError?.message || "Không xác định"));
           }
         }
-      } catch {
-        const editor = modalQuillRef.current?.getEditor();
-        if (editor) {
-          const range = editor.getSelection(true) || { index: editor.getLength() };
-          const reader = new FileReader();
-          reader.onload = () => {
-            editor.insertEmbed(range.index, "image", reader.result);
-            editor.setSelection(range.index + 1);
-          };
-          reader.readAsDataURL(file);
-        }
+      } catch (err: any) {
+        alert("Lỗi tải ảnh lên: " + (err.message || "Không xác định"));
       }
     };
   }, []);
@@ -279,13 +270,35 @@ export default function ManageNews() {
   const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     if (e.target.files && e.target.files[0]) {
       const file = e.target.files[0];
-      if (file.size > 5 * 1024 * 1024) {
-        alert("Kích thước ảnh quá lớn. Vui lòng chọn ảnh nhỏ hơn 5MB.");
+      if (file.size > MAX_IMAGE_SIZE_BYTES) {
+        alert(`Kích thước ảnh quá lớn (${formatFileSize(file.size)}). Vui lòng chọn ảnh nhỏ hơn 15MB.`);
         return;
       }
       setFormImageFile(file);
       setFormImagePreview(URL.createObjectURL(file));
       setFormImageUrl(""); // Clear URL input if file is selected
+    }
+  };
+
+  const handleDragOver = (e: React.DragEvent) => {
+    e.preventDefault();
+  };
+
+  const handleDrop = (e: React.DragEvent) => {
+    e.preventDefault();
+    if (e.dataTransfer.files && e.dataTransfer.files[0]) {
+      const file = e.dataTransfer.files[0];
+      if (file.type.startsWith("image/")) {
+        if (file.size > MAX_IMAGE_SIZE_BYTES) {
+          alert(`Kích thước ảnh quá lớn (${formatFileSize(file.size)}). Vui lòng chọn ảnh nhỏ hơn 15MB.`);
+          return;
+        }
+        setFormImageFile(file);
+        setFormImagePreview(URL.createObjectURL(file));
+        setFormImageUrl("");
+      } else {
+        alert("Định dạng file không hợp lệ. Vui lòng chọn một file ảnh.");
+      }
     }
   };
 
@@ -339,10 +352,9 @@ export default function ManageNews() {
     try {
       let finalImageUrl = formImageUrl.trim();
 
-      // Upload file to Supabase storage if file is selected
+      // Upload file to Supabase storage if file is selected (max 15MB)
       if (formImageFile) {
-        const cleanFileName = formImageFile.name.replace(/[^\w.-]/g, "_");
-        const fileName = `${Date.now()}-${cleanFileName}`;
+        const fileName = sanitizeFileName(formImageFile.name);
 
         const { error: uploadError } = await supabase.storage
           .from("news-images")
@@ -373,7 +385,7 @@ export default function ManageNews() {
             {
               title: cleanContent(formTitle.trim()),
               content: finalContent,
-              author: formAuthor.trim() || "EaAgri",
+              author: formAuthor.trim() || profile?.full_name || "Ban Kỹ Thuật EaAgri",
               category: formCategory,
               image_url: finalImageUrlWithPos
             }
@@ -403,7 +415,7 @@ export default function ManageNews() {
           .update({
             title: cleanContent(formTitle.trim()),
             content: finalContent,
-            author: formAuthor.trim() || "EaAgri",
+            author: formAuthor.trim() || profile?.full_name || "Ban Kỹ Thuật EaAgri",
             category: formCategory,
             image_url: finalImageUrlWithPos
           })
@@ -664,6 +676,8 @@ export default function ManageNews() {
                   
                   <div 
                     className={`manage-news-modal__dropzone ${formImagePreview ? "has-image" : ""}`}
+                    onDragOver={handleDragOver}
+                    onDrop={handleDrop}
                     onClick={() => !formImagePreview && fileInputRef.current?.click()}
                   >
                     <input 
@@ -686,6 +700,12 @@ export default function ManageNews() {
                           draggable={false}
                           style={{ objectPosition: `${formImagePosX}% ${formImagePosY}%`, width: '100%', height: '250px', objectFit: 'cover', borderRadius: '12px', cursor: isDragging ? 'grabbing' : 'grab' }} 
                         />
+                        {formImageFile && (
+                          <div style={{ position: "absolute", bottom: "10px", left: "10px", background: "rgba(0,0,0,0.7)", color: "#fff", padding: "4px 8px", borderRadius: "6px", fontSize: "0.75rem", pointerEvents: "none", backdropFilter: "blur(4px)" }}>
+                            <i className="ri-image-line" style={{ marginRight: "4px" }}></i>
+                            {formImageFile.name} ({formatFileSize(formImageFile.size)})
+                          </div>
+                        )}
                         <button 
                           className="remove-btn" 
                           onClick={removeSelectedImage} 
@@ -699,8 +719,8 @@ export default function ManageNews() {
                     ) : (
                       <div className="dropzone-prompt">
                         <i className="ri-image-add-line"></i>
-                        <span>Nhấp để tải lên ảnh bìa</span>
-                        <small>Chấp nhận JPG, PNG, WEBP (Tối đa 5MB)</small>
+                        <span>Nhấp hoặc kéo thả để tải lên ảnh bìa</span>
+                        <small>Chấp nhận JPG, PNG, WEBP (Tối đa 15MB)</small>
                       </div>
                     )}
                   </div>
@@ -775,22 +795,37 @@ export default function ManageNews() {
                     />
                   </div>
 
-                  {/* Category */}
-                  <div className="modal-field">
-                    <label htmlFor="modal-category">Danh mục bài viết</label>
-                    <select
-                      id="modal-category"
-                      value={formCategory}
-                      onChange={(e) => setFormCategory(e.target.value)}
-                      className="modal-select"
-                      disabled={isSaving}
-                    >
-                      {categories.map((cat) => (
-                        <option key={cat} value={cat}>
-                          {cat}
-                        </option>
-                      ))}
-                    </select>
+                  {/* Row Grid for Author & Category */}
+                  <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: "1rem" }}>
+                    <div className="modal-field">
+                      <label htmlFor="modal-author">Tác giả bài viết</label>
+                      <input
+                        type="text"
+                        id="modal-author"
+                        placeholder="Tên tác giả..."
+                        value={formAuthor}
+                        onChange={(e) => setFormAuthor(e.target.value)}
+                        className="modal-input"
+                        disabled={isSaving}
+                      />
+                    </div>
+
+                    <div className="modal-field">
+                      <label htmlFor="modal-category">Danh mục bài viết</label>
+                      <select
+                        id="modal-category"
+                        value={formCategory}
+                        onChange={(e) => setFormCategory(e.target.value)}
+                        className="modal-select"
+                        disabled={isSaving}
+                      >
+                        {categories.map((cat) => (
+                          <option key={cat} value={cat}>
+                            {cat}
+                          </option>
+                        ))}
+                      </select>
+                    </div>
                   </div>
 
                   {/* Content (Có chèn ảnh và chữ) */}
@@ -798,7 +833,7 @@ export default function ManageNews() {
                     <label htmlFor="modal-content">Nội dung chi tiết (Có chèn ảnh và chữ) <span className="required">*</span></label>
                     <small style={{ display: "block", color: "#64748b", fontSize: "0.85rem", marginTop: "-0.25rem", marginBottom: "0.6rem" }}>
                       <i className="ri-information-line" style={{ color: "#2e7d32", marginRight: "4px" }}></i>
-                      Soạn thảo nội dung và nhấn vào biểu tượng <strong>🖼️ (Ảnh)</strong> trên thanh công cụ hoặc <strong>dán (Ctrl+V)</strong> để chèn ảnh.
+                      Soạn thảo nội dung và nhấn vào biểu tượng <strong>🖼️ (Ảnh)</strong> trên thanh công cụ hoặc <strong>dán (Ctrl+V)</strong> để chèn ảnh (Tối đa 15MB/ảnh).
                     </small>
                     <ReactQuill
                       ref={modalQuillRef}
