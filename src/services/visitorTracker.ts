@@ -163,10 +163,11 @@ export function detectDeviceInfo() {
 
   // 1. Device Type detection
   let deviceType: "Desktop" | "Mobile" | "Tablet" = "Desktop";
-  const isTabletUA = /(tablet|ipad|playbook|silk)|(android(?!.*mobi))/i.test(ua);
+  const isIPad = /iPad/i.test(ua) || (/Macintosh/i.test(ua) && isTouchDevice && (navigator.maxTouchPoints || 0) > 1);
+  const isTabletUA = isIPad || /(tablet|playbook|silk)|(android(?!.*mobi))/i.test(ua) || /SM-T|SM-X|GT-P|Tab/i.test(ua);
   const isMobileUA = /Mobile|Android.*Mobile|iPhone|iPod|IEMobile|BlackBerry|Opera Mini|Silk-Accelerated/i.test(ua);
 
-  if (isTabletUA || (isTouchDevice && screenWidth >= 680 && screenWidth <= 1024 && !ua.includes("Windows NT"))) {
+  if (isTabletUA || (isTouchDevice && screenWidth >= 680 && screenWidth <= 1280 && !ua.includes("Windows NT"))) {
     deviceType = "Tablet";
   } else if (
     isMobileUA ||
@@ -176,14 +177,14 @@ export function detectDeviceInfo() {
     deviceType = "Mobile";
   }
 
-  // 2. Operating System & Phone Model Detection ("tính bản điện thoại")
+  // 2. Operating System & Phone Model Detection ("tính bản điện thoại & tablet")
   let os = "Khác";
 
   if (/iPhone/i.test(ua)) {
     const iosMatch = ua.match(/OS (\d+[_\.]\d+)/i);
     const ver = iosMatch ? iosMatch[1].replace("_", ".") : "";
     os = ver ? `iPhone (iOS ${ver})` : "iPhone (iOS)";
-  } else if (/iPad/i.test(ua) || (deviceType === "Tablet" && /Macintosh/i.test(ua) && isTouchDevice)) {
+  } else if (isIPad) {
     const padMatch = ua.match(/OS (\d+[_\.]\d+)/i);
     const ver = padMatch ? padMatch[1].replace("_", ".") : "";
     os = ver ? `iPad (iPadOS ${ver})` : "iPad (iPadOS)";
@@ -191,9 +192,10 @@ export function detectDeviceInfo() {
     const match = ua.match(/Android\s+([0-9\.]+)/i);
     const ver = match ? `Android ${match[1]}` : "Android";
 
-    let brand = "Điện thoại Android";
-    if (/Samsung|SM-[A-Z0-9]+/i.test(ua)) brand = "Samsung Galaxy";
-    else if (/Xiaomi|Redmi|POCO|2\d{6}[A-Z]+/i.test(ua)) brand = "Xiaomi / Redmi";
+    let brand = deviceType === "Tablet" ? "Máy tính bảng Android" : "Điện thoại Android";
+    if (/SM-T|SM-X|Tab/i.test(ua)) brand = "Samsung Galaxy Tab";
+    else if (/Samsung|SM-[A-Z0-9]+/i.test(ua)) brand = "Samsung Galaxy";
+    else if (/Xiaomi|Redmi|POCO|2\d{6}[A-Z]+/i.test(ua)) brand = deviceType === "Tablet" ? "Xiaomi Pad" : "Xiaomi / Redmi";
     else if (/OPPO|CPH\d+/i.test(ua)) brand = "OPPO";
     else if (/vivo|V2\d+/i.test(ua)) brand = "Vivo";
     else if (/Realme|RMX\d+/i.test(ua)) brand = "Realme";
@@ -790,3 +792,125 @@ export function exportVisitorLogsToCsv(logs: VisitorLogItem[]): void {
   link.click();
   document.body.removeChild(link);
 }
+
+/**
+ * Check if a visitor is currently online (heartbeat within 2.5 minutes)
+ */
+export function isVisitorOnline(log: VisitorLogItem): boolean {
+  if (!log) return false;
+  const diff = Date.now() - new Date(log.last_visit).getTime();
+  return Boolean(log.is_online) && diff < 150000;
+}
+
+/**
+ * Send lightweight heartbeat to keep session active (online)
+ */
+export async function sendVisitorHeartbeat(currentPath: string = "/"): Promise<void> {
+  if (typeof window === "undefined") return;
+  const deviceId = getOrCreateDeviceId();
+  try {
+    await fetch("/api/visitor-track", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({
+        device_id: deviceId,
+        action: "heartbeat",
+        last_path: currentPath,
+      }),
+    });
+  } catch {}
+}
+
+/**
+ * Notify server that user is leaving or closing tab
+ */
+export function sendVisitorLeave(): void {
+  if (typeof window === "undefined") return;
+  const deviceId = getOrCreateDeviceId();
+  const payload = JSON.stringify({
+    device_id: deviceId,
+    action: "leave",
+    is_online: false,
+  });
+
+  if (navigator.sendBeacon) {
+    try {
+      const blob = new Blob([payload], { type: "application/json" });
+      navigator.sendBeacon("/api/visitor-track", blob);
+      return;
+    } catch {}
+  }
+
+  try {
+    fetch("/api/visitor-track", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: payload,
+      keepalive: true,
+    });
+  } catch {}
+}
+
+/**
+ * Summary statistics for the Live Floating Traffic Widget
+ */
+export interface LiveTrafficWidgetStats {
+  activeNow: number;
+  todayVisits: number;
+  totalVisits: number;
+  totalDevices: number;
+  desktopPercent: number;
+  mobilePercent: number;
+  tabletPercent: number;
+  desktopVisits: number;
+  mobileVisits: number;
+  tabletVisits: number;
+}
+
+export function computeTrafficStats(logs: VisitorLogItem[]): LiveTrafficWidgetStats {
+  const realLogs = logs.filter(isRealVisitor);
+  const scopedLogs = realLogs.length > 0 ? realLogs : logs;
+
+  const onlineCount = scopedLogs.filter(isVisitorOnline).length;
+  // If the page is active in browser, there is at least 1 current visitor
+  const activeNow = Math.max(1, onlineCount);
+
+  const todayStr = new Date().toDateString();
+  const todayVisits = scopedLogs
+    .filter((l) => new Date(l.last_visit).toDateString() === todayStr)
+    .reduce((acc, curr) => acc + (curr.visit_count || 1), 0);
+
+  const totalVisits = scopedLogs.reduce((acc, curr) => acc + (curr.visit_count || 1), 0);
+  const totalDevices = scopedLogs.length;
+
+  const devices = {
+    Desktop: 0,
+    Mobile: 0,
+    Tablet: 0,
+  };
+
+  scopedLogs.forEach((l) => {
+    const v = l.visit_count || 1;
+    if (l.device_type === "Mobile") devices.Mobile += v;
+    else if (l.device_type === "Tablet") devices.Tablet += v;
+    else devices.Desktop += v;
+  });
+
+  const desktopPercent = totalVisits ? Math.round((devices.Desktop / totalVisits) * 100) : 0;
+  const mobilePercent = totalVisits ? Math.round((devices.Mobile / totalVisits) * 100) : 0;
+  const tabletPercent = totalVisits ? Math.max(0, 100 - desktopPercent - mobilePercent) : 0;
+
+  return {
+    activeNow,
+    todayVisits,
+    totalVisits,
+    totalDevices,
+    desktopPercent,
+    mobilePercent,
+    tabletPercent,
+    desktopVisits: devices.Desktop,
+    mobileVisits: devices.Mobile,
+    tabletVisits: devices.Tablet,
+  };
+}
+

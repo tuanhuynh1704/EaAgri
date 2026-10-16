@@ -5,6 +5,7 @@ import {
   getVisitorLogs,
   getLocalOrSeedLogs,
   isRealVisitor,
+  isVisitorOnline,
   clearSampleVisitorLogs,
   deleteSingleVisitorLog,
   exportVisitorLogsToCsv,
@@ -137,13 +138,8 @@ export default function ManageTraffic() {
   const stats = useMemo(() => {
     const totalVisits = scopedLogs.reduce((acc, curr) => acc + (curr.visit_count || 1), 0);
     const uniqueDevices = scopedLogs.length;
-    const now = Date.now();
-
-    // Active now (within 15 minutes)
-    const activeNow = scopedLogs.filter((l) => {
-      const diff = now - new Date(l.last_visit).getTime();
-      return l.is_online || diff < 15 * 60 * 1000;
-    }).length;
+    // Active now: truly online devices (heartbeat / visit within 2.5 minutes)
+    const activeNow = scopedLogs.filter(isVisitorOnline).length;
 
     // Today's visits
     const todayStr = new Date().toDateString();
@@ -340,6 +336,8 @@ export default function ManageTraffic() {
   // Page label format helper
   const formatPageName = (path: string) => {
     if (path === "/" || path === "") return "Trang chủ";
+    if (path.includes("traffic")) return "Quản lý truy cập";
+    if (path.includes("admin")) return "Bảng điều khiển Admin";
     if (path.includes("giai-thuong") || path.includes("awards")) return "Bình chọn NTTU Startup";
     if (path.includes("tintuc") || path.includes("tin-tuc") || path.includes("news")) return "Tin tức nông nghiệp";
     if (path.includes("kien-truc") || path.includes("architecture")) return "Kiến trúc IoT";
@@ -542,6 +540,31 @@ export default function ManageTraffic() {
                 title={`Dữ liệu mẫu: ${100 - globalSummary.realDevicePercent}%`}
               />
             </div>
+
+            {/* Dải thống kê nhanh lượt truy cập theo 3 loại thiết bị */}
+            <div className="traffic-purity-banner__device-pills">
+              <span
+                className={`purity-device-chip ${deviceFilter === "Desktop" ? "purity-device-chip--active" : ""}`}
+                onClick={() => setDeviceFilter(deviceFilter === "Desktop" ? "All" : "Desktop")}
+                title="Lọc xem máy tính"
+              >
+                <i className="ri-computer-line" /> Máy tính: <strong>{stats.devices.Desktop.visits} lượt</strong> ({stats.devices.Desktop.count} máy • {stats.desktopPercent}%)
+              </span>
+              <span
+                className={`purity-device-chip purity-device-chip--mobile ${deviceFilter === "Mobile" ? "purity-device-chip--active" : ""}`}
+                onClick={() => setDeviceFilter(deviceFilter === "Mobile" ? "All" : "Mobile")}
+                title="Lọc xem điện thoại"
+              >
+                <i className="ri-smartphone-line" /> Điện thoại: <strong>{stats.devices.Mobile.visits} lượt</strong> ({stats.devices.Mobile.count} máy • {stats.mobilePercent}%)
+              </span>
+              <span
+                className={`purity-device-chip purity-device-chip--tablet ${deviceFilter === "Tablet" ? "purity-device-chip--active" : ""}`}
+                onClick={() => setDeviceFilter(deviceFilter === "Tablet" ? "All" : "Tablet")}
+                title="Lọc xem máy tính bảng"
+              >
+                <i className="ri-tablet-line" /> Tablet: <strong>{stats.devices.Tablet.visits} lượt</strong> ({stats.devices.Tablet.count} máy • {stats.tabletPercent}%)
+              </span>
+            </div>
           </div>
 
           {sourceFilter !== "Real" && (
@@ -608,6 +631,46 @@ export default function ManageTraffic() {
               </div>
             </div>
 
+            {/* 📱 THỐNG KÊ LƯỢT XEM ĐIỆN THOẠI */}
+            <div
+              className={`hero-metric-item hero-metric-item--clickable ${deviceFilter === "Mobile" ? "hero-metric-item--active" : ""}`}
+              onClick={() => setDeviceFilter(deviceFilter === "Mobile" ? "All" : "Mobile")}
+              title="Nhấn để lọc danh sách chỉ xem thiết bị Điện thoại"
+            >
+              <div className="hero-metric-item__icon hero-metric-item__icon--mobile">
+                <i className="ri-smartphone-line" />
+              </div>
+              <div className="hero-metric-item__text">
+                <span className="hero-metric-item__lbl">Lượt xem Điện thoại</span>
+                <strong className="hero-metric-item__val text-rose">
+                  {stats.devices.Mobile.visits.toLocaleString("vi-VN")} lượt
+                </strong>
+                <span className="hero-metric-item__sub">
+                  {stats.devices.Mobile.count} máy • {stats.mobilePercent}%
+                </span>
+              </div>
+            </div>
+
+            {/* 📟 THỐNG KÊ LƯỢT XEM TABLET */}
+            <div
+              className={`hero-metric-item hero-metric-item--clickable ${deviceFilter === "Tablet" ? "hero-metric-item--active" : ""}`}
+              onClick={() => setDeviceFilter(deviceFilter === "Tablet" ? "All" : "Tablet")}
+              title="Nhấn để lọc danh sách chỉ xem thiết bị Máy tính bảng (Tablet)"
+            >
+              <div className="hero-metric-item__icon hero-metric-item__icon--tablet">
+                <i className="ri-tablet-line" />
+              </div>
+              <div className="hero-metric-item__text">
+                <span className="hero-metric-item__lbl">Lượt xem Tablet</span>
+                <strong className="hero-metric-item__val text-cyan">
+                  {stats.devices.Tablet.visits.toLocaleString("vi-VN")} lượt
+                </strong>
+                <span className="hero-metric-item__sub">
+                  {stats.devices.Tablet.count} máy • {stats.tabletPercent}%
+                </span>
+              </div>
+            </div>
+
             <div className="hero-metric-item">
               <div className="hero-metric-item__icon hero-metric-item__icon--members">
                 <i className="ri-user-follow-line" />
@@ -628,7 +691,7 @@ export default function ManageTraffic() {
               <div className="hero-metric-item__text">
                 <span className="hero-metric-item__lbl">Đang trực tuyến</span>
                 <strong className="hero-metric-item__val text-green">{stats.activeNow} máy</strong>
-                <span className="hero-metric-item__sub">Hoạt động trong 15p</span>
+                <span className="hero-metric-item__sub">Thời gian thực (Realtime)</span>
               </div>
             </div>
 
@@ -648,7 +711,7 @@ export default function ManageTraffic() {
         {/* 💻📱📟 THỐNG KÊ CHI TIẾT THEO TỪNG LOẠI MÁY */}
         <div className="traffic-devices-grid">
           {/* Desktop */}
-          <div className="device-card">
+          <div className={`device-card ${deviceFilter === "Desktop" ? "device-card--selected" : ""}`}>
             <div className="device-card__top">
               <div className="device-card__icon device-card__icon--desktop">
                 <i className="ri-computer-line" />
@@ -675,11 +738,19 @@ export default function ManageTraffic() {
                   style={{ width: `${stats.desktopPercent}%` }}
                 />
               </div>
+              <button
+                type="button"
+                className={`device-card__action-btn ${deviceFilter === "Desktop" ? "is-active" : ""}`}
+                onClick={() => setDeviceFilter(deviceFilter === "Desktop" ? "All" : "Desktop")}
+              >
+                <i className="ri-filter-3-line" />
+                {deviceFilter === "Desktop" ? "Đang lọc máy tính" : `Xem ${stats.devices.Desktop.count} máy tính`}
+              </button>
             </div>
           </div>
 
           {/* Mobile */}
-          <div className="device-card">
+          <div className={`device-card ${deviceFilter === "Mobile" ? "device-card--selected" : ""}`}>
             <div className="device-card__top">
               <div className="device-card__icon device-card__icon--mobile">
                 <i className="ri-smartphone-line" />
@@ -693,11 +764,11 @@ export default function ManageTraffic() {
               <div className="device-card__stat-row">
                 <div className="device-stat">
                   <span className="device-stat__lbl">Số điện thoại</span>
-                  <strong className="device-stat__val">{stats.devices.Mobile.count} máy</strong>
+                  <strong className="device-stat__val text-rose">{stats.devices.Mobile.count} máy</strong>
                 </div>
                 <div className="device-stat">
                   <span className="device-stat__lbl">Số lượt xem</span>
-                  <strong className="device-stat__val">{stats.devices.Mobile.visits} lượt</strong>
+                  <strong className="device-stat__val text-rose">{stats.devices.Mobile.visits} lượt</strong>
                 </div>
               </div>
               <div className="device-progress-bar">
@@ -706,11 +777,19 @@ export default function ManageTraffic() {
                   style={{ width: `${stats.mobilePercent}%` }}
                 />
               </div>
+              <button
+                type="button"
+                className={`device-card__action-btn device-card__action-btn--mobile ${deviceFilter === "Mobile" ? "is-active" : ""}`}
+                onClick={() => setDeviceFilter(deviceFilter === "Mobile" ? "All" : "Mobile")}
+              >
+                <i className="ri-filter-3-line" />
+                {deviceFilter === "Mobile" ? "Đang lọc điện thoại" : `Xem ${stats.devices.Mobile.count} điện thoại (${stats.devices.Mobile.visits} lượt)`}
+              </button>
             </div>
           </div>
 
           {/* Tablet */}
-          <div className="device-card">
+          <div className={`device-card ${deviceFilter === "Tablet" ? "device-card--selected" : ""}`}>
             <div className="device-card__top">
               <div className="device-card__icon device-card__icon--tablet">
                 <i className="ri-tablet-line" />
@@ -724,11 +803,11 @@ export default function ManageTraffic() {
               <div className="device-card__stat-row">
                 <div className="device-stat">
                   <span className="device-stat__lbl">Số máy tính bảng</span>
-                  <strong className="device-stat__val">{stats.devices.Tablet.count} máy</strong>
+                  <strong className="device-stat__val text-cyan">{stats.devices.Tablet.count} máy</strong>
                 </div>
                 <div className="device-stat">
                   <span className="device-stat__lbl">Số lượt xem</span>
-                  <strong className="device-stat__val">{stats.devices.Tablet.visits} lượt</strong>
+                  <strong className="device-stat__val text-cyan">{stats.devices.Tablet.visits} lượt</strong>
                 </div>
               </div>
               <div className="device-progress-bar">
@@ -737,6 +816,14 @@ export default function ManageTraffic() {
                   style={{ width: `${stats.tabletPercent}%` }}
                 />
               </div>
+              <button
+                type="button"
+                className={`device-card__action-btn device-card__action-btn--tablet ${deviceFilter === "Tablet" ? "is-active" : ""}`}
+                onClick={() => setDeviceFilter(deviceFilter === "Tablet" ? "All" : "Tablet")}
+              >
+                <i className="ri-filter-3-line" />
+                {deviceFilter === "Tablet" ? "Đang lọc tablet" : `Xem ${stats.devices.Tablet.count} tablet (${stats.devices.Tablet.visits} lượt)`}
+              </button>
             </div>
           </div>
         </div>
@@ -850,28 +937,28 @@ export default function ManageTraffic() {
                 className={`filter-pill ${deviceFilter === "All" ? "filter-pill--active" : ""}`}
                 onClick={() => setDeviceFilter("All")}
               >
-                Tất cả máy ({scopedLogs.length})
+                Tất cả máy ({scopedLogs.length} máy • {stats.totalVisits} lượt)
               </button>
               <button
                 type="button"
                 className={`filter-pill ${deviceFilter === "Desktop" ? "filter-pill--active" : ""}`}
-                onClick={() => setDeviceFilter("Desktop")}
+                onClick={() => setDeviceFilter(deviceFilter === "Desktop" ? "All" : "Desktop")}
               >
-                <i className="ri-computer-line" /> Máy tính ({stats.devices.Desktop.count})
+                <i className="ri-computer-line" /> Máy tính ({stats.devices.Desktop.count} máy • {stats.devices.Desktop.visits} lượt)
               </button>
               <button
                 type="button"
                 className={`filter-pill ${deviceFilter === "Mobile" ? "filter-pill--active" : ""}`}
-                onClick={() => setDeviceFilter("Mobile")}
+                onClick={() => setDeviceFilter(deviceFilter === "Mobile" ? "All" : "Mobile")}
               >
-                <i className="ri-smartphone-line" /> Điện thoại ({stats.devices.Mobile.count})
+                <i className="ri-smartphone-line" /> Điện thoại ({stats.devices.Mobile.count} máy • {stats.devices.Mobile.visits} lượt)
               </button>
               <button
                 type="button"
                 className={`filter-pill ${deviceFilter === "Tablet" ? "filter-pill--active" : ""}`}
-                onClick={() => setDeviceFilter("Tablet")}
+                onClick={() => setDeviceFilter(deviceFilter === "Tablet" ? "All" : "Tablet")}
               >
-                <i className="ri-tablet-line" /> Tablet ({stats.devices.Tablet.count})
+                <i className="ri-tablet-line" /> Tablet ({stats.devices.Tablet.count} máy • {stats.devices.Tablet.visits} lượt)
               </button>
 
               {/* User Type Filters */}
@@ -938,12 +1025,12 @@ export default function ManageTraffic() {
                   </tr>
                 ) : (
                   filteredLogs.map((item, idx) => {
-                    const isRecent = Date.now() - new Date(item.last_visit).getTime() < 15 * 60 * 1000;
+                    const isOnline = isVisitorOnline(item);
                     const isFrequent = item.visit_count >= 5;
                     const isReal = isRealVisitor(item);
 
                     return (
-                      <tr key={item.device_id || item.id || idx}>
+                      <tr key={item.id || `${item.device_id}_${idx}`}>
                         {/* 1. Device & OS */}
                         <td>
                           <div className="device-cell">
@@ -1066,7 +1153,7 @@ export default function ManageTraffic() {
 
                         {/* 9. Status */}
                         <td>
-                          {item.is_online || isRecent ? (
+                          {isOnline ? (
                             <span className="status-chip status-chip--online">
                               <span className="status-dot" /> Online
                             </span>

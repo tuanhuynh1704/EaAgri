@@ -215,11 +215,29 @@ function customVotingApiPlugin() {
 function visitorTrackingApiPlugin() {
   const dataFilePath = path.resolve(__dirname, 'src/data/visitor_logs.json')
 
+  const cleanExpiredOnline = (logs: any[]): boolean => {
+    const now = Date.now()
+    let changed = false
+    logs.forEach((item: any) => {
+      const diff = now - new Date(item.last_visit).getTime()
+      // If older than 2.5 minutes without heartbeat, mark offline
+      if (item.is_online && diff > 150000) {
+        item.is_online = false
+        changed = true
+      }
+    })
+    return changed
+  }
+
   const readLogs = (): any[] => {
     try {
       if (fs.existsSync(dataFilePath)) {
         const fileContent = fs.readFileSync(dataFilePath, 'utf-8')
-        return JSON.parse(fileContent) || []
+        const logs = JSON.parse(fileContent) || []
+        if (cleanExpiredOnline(logs)) {
+          writeLogs(logs)
+        }
+        return logs
       }
     } catch {}
     return []
@@ -236,6 +254,22 @@ function visitorTrackingApiPlugin() {
   return {
     name: 'visitor-tracking-api-plugin',
     configureServer(server: any) {
+      // Background interval to auto-expire stale sessions if heartbeat stops (> 2.5 mins)
+      const autoCleanInterval = setInterval(() => {
+        try {
+          const logs = readLogs()
+          if (cleanExpiredOnline(logs)) {
+            writeLogs(logs)
+            server.ws.send({
+              type: 'custom',
+              event: 'eaagri:visitor-updated',
+              data: logs,
+            })
+          }
+        } catch {}
+      }, 15000)
+      server.httpServer?.on('close', () => clearInterval(autoCleanInterval))
+
       server.middlewares.use('/api/visitor-track', async (req: any, res: any, next: any) => {
         res.setHeader('Access-Control-Allow-Origin', '*')
         res.setHeader('Access-Control-Allow-Methods', 'GET, POST, DELETE, OPTIONS')
@@ -302,7 +336,7 @@ function visitorTrackingApiPlugin() {
           return
         }
 
-        // POST: Record visitor hit (enter/leave/visit)
+        // POST: Record visitor hit (enter/leave/heartbeat/visit)
         if (req.method === 'POST') {
           let body = ''
           req.on('data', (chunk: any) => {
@@ -333,6 +367,43 @@ function visitorTrackingApiPlugin() {
               const existingIdx = logs.findIndex(
                 (item: any) => item.device_id === deviceId || item.ip_address === effectiveIp
               )
+
+              // Handle "leave" action (tab closed / user leaves)
+              if (data.action === 'leave') {
+                if (existingIdx >= 0) {
+                  logs[existingIdx].is_online = false
+                  writeLogs(logs)
+                  server.ws.send({
+                    type: 'custom',
+                    event: 'eaagri:visitor-updated',
+                    data: logs,
+                  })
+                }
+                res.statusCode = 200
+                res.setHeader('Content-Type', 'application/json; charset=utf-8')
+                res.end(JSON.stringify({ success: true, action: 'leave', count: logs.length, logs }))
+                return
+              }
+
+              // Handle "heartbeat" action (keep-alive ping without incrementing visits)
+              if (data.action === 'heartbeat') {
+                if (existingIdx >= 0) {
+                  logs[existingIdx].last_visit = nowIso
+                  logs[existingIdx].is_online = true
+                  if (data.last_path) logs[existingIdx].last_path = data.last_path
+                }
+                cleanExpiredOnline(logs)
+                writeLogs(logs)
+                server.ws.send({
+                  type: 'custom',
+                  event: 'eaagri:visitor-updated',
+                  data: logs,
+                })
+                res.statusCode = 200
+                res.setHeader('Content-Type', 'application/json; charset=utf-8')
+                res.end(JSON.stringify({ success: true, action: 'heartbeat', count: logs.length, logs }))
+                return
+              }
 
               if (existingIdx >= 0) {
                 const existing = logs[existingIdx]
