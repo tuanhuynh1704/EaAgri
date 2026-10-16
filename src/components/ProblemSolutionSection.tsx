@@ -1,4 +1,4 @@
-import { useState, useRef } from "react";
+import { useState, useRef, useEffect, useCallback } from "react";
 
 interface ProblemSolutionSectionProps {
   image?: string;
@@ -164,11 +164,53 @@ export default function ProblemSolutionSection({
   const [activeMode, setActiveMode] = useState<ViewMode>("comparison");
   // Default to overview
   const [activeItemId, setActiveItemId] = useState<string>("overview");
+
+  const containerRef = useRef<HTMLDivElement>(null);
   const videoRef = useRef<HTMLVideoElement>(null);
+  const progressBarRef = useRef<HTMLDivElement>(null);
+  const hideControlsTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
+
   const [isPlaying, setIsPlaying] = useState<boolean>(true);
   const [isMuted, setIsMuted] = useState<boolean>(true);
+  const [currentTime, setCurrentTime] = useState<number>(0);
+  const [duration, setDuration] = useState<number>(0);
+  const [isFullscreen, setIsFullscreen] = useState<boolean>(false);
+  const [showControls, setShowControls] = useState<boolean>(true);
 
-  const togglePlay = () => {
+  // Định dạng thời gian mm:ss
+  const formatTime = (timeInSeconds: number) => {
+    if (isNaN(timeInSeconds) || timeInSeconds < 0) return "0:00";
+    const minutes = Math.floor(timeInSeconds / 60);
+    const seconds = Math.floor(timeInSeconds % 60);
+    return `${minutes}:${seconds < 10 ? "0" : ""}${seconds}`;
+  };
+
+  // Cập nhật thời gian khi video chạy
+  const handleTimeUpdate = () => {
+    if (!videoRef.current) return;
+    setCurrentTime(videoRef.current.currentTime);
+  };
+
+  const handleLoadedMetadata = () => {
+    if (!videoRef.current) return;
+    setDuration(videoRef.current.duration || 0);
+  };
+
+  // Tua video khi click vào thanh tiến trình
+  const handleSeek = (e: React.MouseEvent<HTMLDivElement>) => {
+    e.stopPropagation();
+    if (!progressBarRef.current || !videoRef.current) return;
+    const rect = progressBarRef.current.getBoundingClientRect();
+    const clickX = Math.max(0, Math.min(e.clientX - rect.left, rect.width));
+    const targetPercent = clickX / rect.width;
+    const newTime = targetPercent * (videoRef.current.duration || 0);
+    videoRef.current.currentTime = newTime;
+    setCurrentTime(newTime);
+  };
+
+  // Play / Pause toggle
+  const togglePlay = (e?: React.MouseEvent) => {
+    e?.stopPropagation();
     if (!videoRef.current) return;
     if (videoRef.current.paused) {
       videoRef.current.play();
@@ -179,18 +221,84 @@ export default function ProblemSolutionSection({
     }
   };
 
-  const toggleMute = () => {
+  // Mute / Unmute toggle
+  const toggleMute = (e?: React.MouseEvent) => {
+    e?.stopPropagation();
     if (!videoRef.current) return;
-    videoRef.current.muted = !videoRef.current.muted;
-    setIsMuted(videoRef.current.muted);
+    const newMuted = !videoRef.current.muted;
+    videoRef.current.muted = newMuted;
+    setIsMuted(newMuted);
   };
 
-  const handleFullscreen = () => {
+  // Tua lại từ đầu
+  const handleReplay = (e: React.MouseEvent) => {
+    e.stopPropagation();
     if (!videoRef.current) return;
-    if (videoRef.current.requestFullscreen) {
-      videoRef.current.requestFullscreen();
+    videoRef.current.currentTime = 0;
+    videoRef.current.play();
+    setIsPlaying(true);
+  };
+
+  // Toàn màn hình
+  const handleFullscreen = (e?: React.MouseEvent) => {
+    e?.stopPropagation();
+    const elem = containerRef.current || videoRef.current;
+    if (!elem) return;
+
+    if (!document.fullscreenElement) {
+      if (elem.requestFullscreen) {
+        elem.requestFullscreen();
+      } else if ((elem as any).webkitRequestFullscreen) {
+        (elem as any).webkitRequestFullscreen();
+      }
+    } else {
+      if (document.exitFullscreen) {
+        document.exitFullscreen();
+      }
     }
   };
+
+  // Lắng nghe thay đổi Fullscreen
+  useEffect(() => {
+    const handleFsChange = () => {
+      setIsFullscreen(!!document.fullscreenElement);
+    };
+    document.addEventListener("fullscreenchange", handleFsChange);
+    document.addEventListener("webkitfullscreenchange", handleFsChange);
+    return () => {
+      document.removeEventListener("fullscreenchange", handleFsChange);
+      document.removeEventListener("webkitfullscreenchange", handleFsChange);
+    };
+  }, []);
+
+  // Controls visibility: Ở chế độ xem thông thường luôn hiển thị tinh tế; ở Fullscreen thì tự ẩn sau 3s nếu không di chuột
+  const resetControlsTimer = useCallback(() => {
+    setShowControls(true);
+    if (hideControlsTimerRef.current) {
+      clearTimeout(hideControlsTimerRef.current);
+    }
+    if (isFullscreen && isPlaying) {
+      hideControlsTimerRef.current = setTimeout(() => {
+        setShowControls(false);
+      }, 3000);
+    }
+  }, [isFullscreen, isPlaying]);
+
+  useEffect(() => {
+    if (!isFullscreen) {
+      setShowControls(true);
+      if (hideControlsTimerRef.current) {
+        clearTimeout(hideControlsTimerRef.current);
+      }
+    } else {
+      resetControlsTimer();
+    }
+    return () => {
+      if (hideControlsTimerRef.current) {
+        clearTimeout(hideControlsTimerRef.current);
+      }
+    };
+  }, [isFullscreen, isPlaying, resetControlsTimer]);
 
   return (
     <>
@@ -273,8 +381,17 @@ export default function ProblemSolutionSection({
                 </span>
               </div>
 
-              {/* Video Player Container replacing image cluster */}
-              <div className="problem-solution__video-container">
+              {/* Video Player Container với Custom Controls đồng bộ */}
+              <div
+                ref={containerRef}
+                className={`problem-solution__video-container ${!isPlaying ? "problem-solution__video-container--paused" : ""}`}
+                onClick={togglePlay}
+                onMouseMove={resetControlsTimer}
+                onMouseEnter={() => setShowControls(true)}
+                onMouseLeave={() => {
+                  if (isPlaying) setShowControls(false);
+                }}
+              >
                 <video
                   ref={videoRef}
                   src="/assets/van-de-giai-phap-dot-pha.mp4"
@@ -283,45 +400,115 @@ export default function ProblemSolutionSection({
                   loop
                   muted={isMuted}
                   playsInline
-                  controls
                   preload="metadata"
+                  onTimeUpdate={handleTimeUpdate}
+                  onLoadedMetadata={handleLoadedMetadata}
                   onPlay={() => setIsPlaying(true)}
                   onPause={() => setIsPlaying(false)}
                 />
 
-                {/* Quick overlay controls */}
-                <div className="problem-solution__video-quick-bar">
+                {/* Big Center Play Button khi tạm dừng */}
+                {!isPlaying && (
                   <button
                     type="button"
-                    className="video-quick-btn"
+                    className="problem-solution__video-center-play"
                     onClick={togglePlay}
-                    title={isPlaying ? "Tạm dừng" : "Phát tiếp"}
-                    aria-label={isPlaying ? "Tạm dừng video" : "Phát tiếp video"}
+                    title="Nhấn để tiếp tục phát video"
+                    aria-label="Nhấn để tiếp tục phát video"
                   >
-                    <i className={isPlaying ? "ri-pause-fill" : "ri-play-fill"}></i>
-                    <span>{isPlaying ? "Tạm dừng" : "Phát"}</span>
+                    <div className="video-center-pulse" />
+                    <i className="ri-play-fill"></i>
                   </button>
+                )}
 
-                  <button
-                    type="button"
-                    className={`video-quick-btn ${!isMuted ? "video-quick-btn--active" : ""}`}
-                    onClick={toggleMute}
-                    title={isMuted ? "Bật âm thanh" : "Tắt âm thanh"}
-                    aria-label={isMuted ? "Bật âm thanh" : "Tắt âm thanh"}
+                {/* Custom Glassmorphism Controls Bar */}
+                <div
+                  className={`problem-solution__video-controls ${
+                    showControls || !isPlaying ? "problem-solution__video-controls--visible" : ""
+                  }`}
+                  onClick={(e) => e.stopPropagation()}
+                >
+                  {/* Scrubber / Progress timeline */}
+                  <div
+                    ref={progressBarRef}
+                    className="problem-solution__video-progress"
+                    onClick={handleSeek}
+                    title="Nhấn để tua video"
+                    role="slider"
+                    aria-label="Thanh tiến trình phát video"
+                    aria-valuemin={0}
+                    aria-valuemax={duration || 100}
+                    aria-valuenow={currentTime}
                   >
-                    <i className={isMuted ? "ri-volume-mute-fill" : "ri-volume-up-fill"}></i>
-                    <span>{isMuted ? "Bật tiếng" : "Đang bật"}</span>
-                  </button>
+                    <div className="video-progress__track">
+                      <div
+                        className="video-progress__fill"
+                        style={{ width: `${duration > 0 ? (currentTime / duration) * 100 : 0}%` }}
+                      >
+                        <div className="video-progress__thumb" />
+                      </div>
+                    </div>
+                  </div>
 
-                  <button
-                    type="button"
-                    className="video-quick-btn"
-                    onClick={handleFullscreen}
-                    title="Toàn màn hình"
-                    aria-label="Xem toàn màn hình"
-                  >
-                    <i className="ri-fullscreen-fill"></i>
-                  </button>
+                  {/* Buttons and time display */}
+                  <div className="problem-solution__video-actions">
+                    <div className="video-actions__left">
+                      {/* Play/Pause */}
+                      <button
+                        type="button"
+                        className="video-action-btn"
+                        onClick={togglePlay}
+                        title={isPlaying ? "Tạm dừng" : "Phát tiếp"}
+                        aria-label={isPlaying ? "Tạm dừng video" : "Phát tiếp video"}
+                      >
+                        <i className={isPlaying ? "ri-pause-fill" : "ri-play-fill"}></i>
+                        <span className="video-action-btn__text">{isPlaying ? "Tạm dừng" : "Phát"}</span>
+                      </button>
+
+                      {/* Mute/Unmute */}
+                      <button
+                        type="button"
+                        className={`video-action-btn ${isMuted ? "video-action-btn--muted-alert" : "video-action-btn--active"}`}
+                        onClick={toggleMute}
+                        title={isMuted ? "Bật âm thanh video" : "Tắt âm thanh"}
+                        aria-label={isMuted ? "Bật âm thanh" : "Tắt âm thanh"}
+                      >
+                        <i className={isMuted ? "ri-volume-mute-fill" : "ri-volume-up-fill"}></i>
+                        <span className="video-action-btn__text">{isMuted ? "Bật tiếng" : "Đang bật"}</span>
+                      </button>
+
+                      {/* Time display */}
+                      <div className="video-time">
+                        <span className="video-time__current">{formatTime(currentTime)}</span>
+                        <span className="video-time__divider">/</span>
+                        <span className="video-time__total">{formatTime(duration)}</span>
+                      </div>
+                    </div>
+
+                    <div className="video-actions__right">
+                      {/* Replay */}
+                      <button
+                        type="button"
+                        className="video-action-btn video-action-btn--icon"
+                        onClick={handleReplay}
+                        title="Tua lại từ đầu"
+                        aria-label="Tua lại từ đầu"
+                      >
+                        <i className="ri-restart-line"></i>
+                      </button>
+
+                      {/* Fullscreen */}
+                      <button
+                        type="button"
+                        className="video-action-btn video-action-btn--icon"
+                        onClick={handleFullscreen}
+                        title={isFullscreen ? "Thu nhỏ màn hình" : "Toàn màn hình"}
+                        aria-label={isFullscreen ? "Thu nhỏ màn hình" : "Toàn màn hình"}
+                      >
+                        <i className={isFullscreen ? "ri-fullscreen-exit-fill" : "ri-fullscreen-fill"}></i>
+                      </button>
+                    </div>
+                  </div>
                 </div>
               </div>
             </div>

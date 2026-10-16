@@ -104,6 +104,10 @@
     .logo-marquee__media img {
       filter: grayscale(0%) opacity(1) !important;
       transform: scale(1.1) !important;
+
+      &[src*="aiia"] {
+        transform: scale(1.28) !important;
+      }
     }
   }
 }
@@ -129,6 +133,10 @@
     pointer-events: none;
     -webkit-user-drag: none;
     user-select: none;
+
+    &[src*="aiia"] {
+      transform: scale(1.18);
+    }
   }
 }
 

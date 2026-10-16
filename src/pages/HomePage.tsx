@@ -15,6 +15,8 @@ const ProblemSolutionSection = lazy(() => import("../components/ProblemSolutionS
 const VideoGallerySection = lazy(() => import("../components/VideoGallerySection"));
 // 6. EAAGRI SAAS B2B • QUẢN TRỊ ĐA THUÊ (EaAgri CRM)
 const CrmIntroductionSection = lazy(() => import("../components/CrmIntroductionSection"));
+// 6.5. EAAGRI STORE • SÀN THƯƠNG MẠI VẬT TƯ & CÂY TRỒNG (store.eaagri.vn)
+const EaAgriStoreSection = lazy(() => import("../components/EaAgriStoreSection"));
 // 7. Kết quả triển khai thực tế
 const ResultSection = lazy(() => import("../components/ResultSection"));
 // 8. Dấu ấn kết nối
@@ -113,6 +115,11 @@ export default function HomePage() {
       {/* 6. EAAGRI SAAS B2B • QUẢN TRỊ ĐA THUÊ (EaAgri CRM) */}
       <LazySection minHeight="700px" className="fullpage-slide">
         <CrmIntroductionSection />
+      </LazySection>
+
+      {/* 6.5. EAAGRI STORE • SÀN THƯƠNG MẠI VẬT TƯ & CÂY TRỒNG (store.eaagri.vn) */}
+      <LazySection minHeight="380px">
+        <EaAgriStoreSection />
       </LazySection>
 
       {/* 7. Kết quả triển khai thực tế */}

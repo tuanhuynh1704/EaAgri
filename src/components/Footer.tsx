@@ -104,6 +104,17 @@ export default function Footer() {
                 <i className="ri-arrow-right-up-line" style={{ fontSize: "0.75rem", marginLeft: "4px", opacity: 0.7 }}></i>
               </a>
             </li>
+            <li>
+              <a
+                href="https://store.eaagri.vn/"
+                target="_blank"
+                rel="noopener noreferrer"
+                title="Sàn thương mại vật tư nông nghiệp chính hãng EaAgri Store (store.eaagri.vn)"
+              >
+                <i className="ri-store-2-line"></i> <span>EaAgri Store (store.eaagri.vn)</span>
+                <i className="ri-arrow-right-up-line" style={{ fontSize: "0.75rem", marginLeft: "4px", opacity: 0.7 }}></i>
+              </a>
+            </li>
           </ul>
         </div>
 

@@ -5,6 +5,7 @@ const baseLogos = [
   { src: "/Logo/FIT.webp", alt: "Khoa CNTT - NTTU", name: "FIT - NTTU" },
   { src: "/Logo/NIIC.png", alt: "Trung tâm Sáng tạo & Ươm tạo Khởi nghiệp NIIC", name: "NIIC" },
   { src: "/Logo/vietfuturelogo.png", alt: "VietFuture 2026", name: "VietFuture" },
+  { src: "/Logo/aiia.jpg", alt: "Cuộc thi AIIA 2026", name: "AIIA 2026" },
   { src: "/Logo/Intech.webp", alt: "Intech Innovation and Technology", name: "Intech" },
   { src: "/Logo/BSA.webp", alt: "Trung tâm BSA", name: "BSA" },
   { src: "/Logo/KNX.webp", alt: "Dự án Khởi nghiệp Xanh", name: "Khởi nghiệp Xanh" },
