@@ -17,6 +17,104 @@ export interface VisitorLogItem {
   is_online: boolean;
   first_visit: string;
   last_visit: string;
+  is_real?: boolean; // true: Thiết bị thật, false: Dữ liệu mẫu/thử nghiệm
+
+  // 👤 THÔNG TIN TÀI KHOẢN / KHÁCH VÃNG LAI
+  is_authenticated?: boolean; // true: Người có tài khoản đăng nhập, false: Khách vãng lai
+  user_id?: string;
+  user_email?: string;
+  user_name?: string;
+  user_role?: string;
+}
+
+/**
+ * Get current visitor user info from localStorage or session
+ */
+export function getCurrentVisitorUser(): {
+  isAuthenticated: boolean;
+  userId?: string;
+  userEmail?: string;
+  userName?: string;
+  userRole?: string;
+} {
+  if (typeof window === "undefined") {
+    return { isAuthenticated: false };
+  }
+
+  // 1. Check admin session (from .env or localStorage)
+  try {
+    const adminSessionRaw = localStorage.getItem("eaagri_admin_session");
+    if (adminSessionRaw) {
+      const { expiresAt } = JSON.parse(adminSessionRaw);
+      if (typeof expiresAt === "number" && Date.now() < expiresAt) {
+        return {
+          isAuthenticated: true,
+          userId: "eaagri-admin-sa-master",
+          userEmail: "admin@eaagri.vn",
+          userName: "Quản Trị Viên (Super Admin)",
+          userRole: "SA",
+        };
+      }
+    }
+  } catch {}
+
+  // 2. Check Supabase auth token in localStorage
+  try {
+    for (let i = 0; i < localStorage.length; i++) {
+      const key = localStorage.key(i);
+      if (key && (key.startsWith("sb-") || key.includes("supabase.auth.token"))) {
+        const item = localStorage.getItem(key);
+        if (item) {
+          const parsed = JSON.parse(item);
+          const user = parsed?.user || parsed?.currentSession?.user;
+          if (user && user.email) {
+            return {
+              isAuthenticated: true,
+              userId: user.id,
+              userEmail: user.email,
+              userName: user.user_metadata?.full_name || user.email.split("@")[0],
+              userRole: user.app_metadata?.role || user.user_metadata?.role || "user",
+            };
+          }
+        }
+      }
+    }
+  } catch {}
+
+  return { isAuthenticated: false };
+}
+
+/**
+ * Determine if a visitor log is a verified REAL device (not mock/seed/test data)
+ */
+export function isRealVisitor(item: VisitorLogItem): boolean {
+  if (!item) return false;
+  // If explicitly flagged
+  if (typeof item.is_real === "boolean") {
+    return item.is_real;
+  }
+  // If flagged as sample/test
+  if ((item as any).is_sample === true || (item as any).is_test === true) {
+    return false;
+  }
+  const id = (item.id || "").toLowerCase();
+  const devId = (item.device_id || "").toLowerCase();
+
+  // Known mock/test IDs
+  if (
+    id.startsWith("log_init") ||
+    id.includes("test") ||
+    id.includes("mock") ||
+    devId === "dev_test_phone_01" ||
+    devId === "dev_pc_owner" ||
+    devId.includes("test") ||
+    devId.includes("owner") ||
+    devId === "server_device"
+  ) {
+    return false;
+  }
+
+  return true;
 }
 
 const DEVICE_ID_KEY = "eaagri_visitor_device_id";
@@ -233,7 +331,16 @@ export async function fetchPublicIpAndLocation(): Promise<{ ip: string; city: st
 /**
  * Record a visit hit for this machine / IP
  */
-export async function recordVisitorHit(currentPath: string = "/"): Promise<void> {
+export async function recordVisitorHit(
+  currentPath: string = "/",
+  userContext?: {
+    isAuthenticated?: boolean;
+    userId?: string;
+    userEmail?: string;
+    userName?: string;
+    userRole?: string;
+  }
+): Promise<void> {
   if (typeof window === "undefined") return;
 
   // Throttle: avoid logging multiple times within 3 seconds for the same tab
@@ -251,6 +358,18 @@ export async function recordVisitorHit(currentPath: string = "/"): Promise<void>
   const geo = await fetchPublicIpAndLocation();
   const nowIso = new Date().toISOString();
 
+  // Resolve user info (from parameter or from session/localStorage)
+  const resolvedUser =
+    userContext && typeof userContext.isAuthenticated === "boolean"
+      ? {
+          isAuthenticated: userContext.isAuthenticated,
+          userId: userContext.userId,
+          userEmail: userContext.userEmail,
+          userName: userContext.userName,
+          userRole: userContext.userRole,
+        }
+      : getCurrentVisitorUser();
+
   // 1. Try sending to Central Server API (/api/visitor-track) to sync across all devices
   try {
     const res = await fetch("/api/visitor-track", {
@@ -267,6 +386,12 @@ export async function recordVisitorHit(currentPath: string = "/"): Promise<void>
         browser: info.browser,
         screen_resolution: info.screenResolution,
         last_path: currentPath,
+        is_real: true,
+        is_authenticated: resolvedUser.isAuthenticated,
+        user_id: resolvedUser.userId || null,
+        user_email: resolvedUser.userEmail || null,
+        user_name: resolvedUser.userName || null,
+        user_role: resolvedUser.userRole || null,
         referrer: document.referrer
           ? new URL(document.referrer, window.location.origin).hostname || "Trực tiếp"
           : "Trực tiếp (Direct)",
@@ -317,6 +442,12 @@ export async function recordVisitorHit(currentPath: string = "/"): Promise<void>
       last_path: currentPath,
       is_online: true,
       last_visit: nowIso,
+      is_real: true,
+      is_authenticated: resolvedUser.isAuthenticated || current.is_authenticated || false,
+      user_id: resolvedUser.userId || current.user_id,
+      user_email: resolvedUser.userEmail || current.user_email,
+      user_name: resolvedUser.userName || current.user_name,
+      user_role: resolvedUser.userRole || current.user_role,
     };
     localLogs[existingIdx] = updatedItem;
   } else {
@@ -337,6 +468,12 @@ export async function recordVisitorHit(currentPath: string = "/"): Promise<void>
       is_online: true,
       first_visit: nowIso,
       last_visit: nowIso,
+      is_real: true,
+      is_authenticated: resolvedUser.isAuthenticated,
+      user_id: resolvedUser.userId,
+      user_email: resolvedUser.userEmail,
+      user_name: resolvedUser.userName,
+      user_role: resolvedUser.userRole,
     };
     localLogs.unshift(updatedItem);
   }
@@ -418,6 +555,7 @@ export function getLocalOrSeedLogs(): VisitorLogItem[] {
   if (typeof window !== "undefined") {
     const devId = getOrCreateDeviceId();
     const info = detectDeviceInfo();
+    const userAuth = getCurrentVisitorUser();
     const firstItem: VisitorLogItem = {
       id: `log_${Date.now()}`,
       device_id: devId,
@@ -435,6 +573,12 @@ export function getLocalOrSeedLogs(): VisitorLogItem[] {
       is_online: true,
       first_visit: new Date().toISOString(),
       last_visit: new Date().toISOString(),
+      is_real: true,
+      is_authenticated: userAuth.isAuthenticated,
+      user_id: userAuth.userId,
+      user_email: userAuth.userEmail,
+      user_name: userAuth.userName,
+      user_role: userAuth.userRole,
     };
     localLogs = [firstItem];
     try {
@@ -499,7 +643,78 @@ export async function getVisitorLogs(): Promise<{ logs: VisitorLogItem[]; isFrom
 }
 
 /**
- * Clear visitor logs
+ * Clear only sample/mock visitor logs, retaining 100% of real devices
+ */
+export async function clearSampleVisitorLogs(): Promise<number> {
+  let deletedCount = 0;
+  // 1. Request server API to delete sample logs
+  try {
+    const res = await fetch("/api/visitor-track?type=sample", { method: "DELETE" });
+    if (res.ok) {
+      const data = await res.json();
+      if (data?.logs && Array.isArray(data.logs)) {
+        localStorage.setItem(LOCAL_LOGS_KEY, JSON.stringify(data.logs));
+        window.dispatchEvent(new CustomEvent("eaagri_visitor_update"));
+        return data.deletedCount || 1;
+      }
+    }
+  } catch {}
+
+  // 2. Filter local storage cache
+  try {
+    const raw = localStorage.getItem(LOCAL_LOGS_KEY);
+    if (raw) {
+      const parsed: VisitorLogItem[] = JSON.parse(raw);
+      const realOnly = parsed.filter(isRealVisitor);
+      deletedCount = parsed.length - realOnly.length;
+      localStorage.setItem(LOCAL_LOGS_KEY, JSON.stringify(realOnly));
+    }
+  } catch {}
+
+  // 3. Dispatch update event across tabs & windows
+  try {
+    window.dispatchEvent(new CustomEvent("eaagri_visitor_update"));
+    if (typeof BroadcastChannel !== "undefined") {
+      const channel = new BroadcastChannel("eaagri_visitor_channel");
+      channel.postMessage({ type: "VISITOR_CLEARED_SAMPLE" });
+      channel.close();
+    }
+  } catch {}
+
+  return deletedCount;
+}
+
+/**
+ * Delete a single visitor entry by ID or Device ID
+ */
+export async function deleteSingleVisitorLog(idOrDeviceId: string): Promise<void> {
+  try {
+    await fetch(`/api/visitor-track?id=${encodeURIComponent(idOrDeviceId)}`, { method: "DELETE" });
+  } catch {}
+
+  try {
+    const raw = localStorage.getItem(LOCAL_LOGS_KEY);
+    if (raw) {
+      const parsed: VisitorLogItem[] = JSON.parse(raw);
+      const filtered = parsed.filter(
+        (item) => item.id !== idOrDeviceId && item.device_id !== idOrDeviceId
+      );
+      localStorage.setItem(LOCAL_LOGS_KEY, JSON.stringify(filtered));
+    }
+  } catch {}
+
+  try {
+    window.dispatchEvent(new CustomEvent("eaagri_visitor_update"));
+    if (typeof BroadcastChannel !== "undefined") {
+      const channel = new BroadcastChannel("eaagri_visitor_channel");
+      channel.postMessage({ type: "VISITOR_DELETED_ONE", id: idOrDeviceId });
+      channel.close();
+    }
+  } catch {}
+}
+
+/**
+ * Clear all visitor logs
  */
 export async function clearVisitorLogs(): Promise<void> {
   try {
@@ -523,6 +738,10 @@ export function exportVisitorLogsToCsv(logs: VisitorLogItem[]): void {
   if (!logs || logs.length === 0) return;
 
   const headers = [
+    "Xác thực thiết bị",
+    "Đối tượng truy cập",
+    "Tài khoản / Email",
+    "Tên người dùng",
     "Địa chỉ IP",
     "Thành phố / Tỉnh",
     "Quốc gia",
@@ -540,6 +759,10 @@ export function exportVisitorLogsToCsv(logs: VisitorLogItem[]): void {
   ];
 
   const rows = logs.map((log) => [
+    isRealVisitor(log) ? '"Thiết bị thật"' : '"Dữ liệu mẫu"',
+    log.is_authenticated ? '"Đã đăng nhập"' : '"Khách vãng lai"',
+    `"${log.user_email || ''}"`,
+    `"${log.user_name || ''}"`,
     `"${log.ip_address}"`,
     `"${log.city || ''}"`,
     `"${log.country || ''}"`,

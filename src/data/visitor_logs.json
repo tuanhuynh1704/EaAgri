@@ -1,5 +1,29 @@
 [
   {
+    "id": "log_1792156252703",
+    "device_id": "dev_munwi6wr_63jgs391",
+    "ip_address": "2403:e200:140:4b44:4cb8:9b55:6bf:ac0d",
+    "city": "TP. Hồ Chí Minh",
+    "region": "Ho Chi Minh City",
+    "country": "Việt Nam",
+    "device_type": "Desktop",
+    "os": "Windows 11 / 10",
+    "browser": "Chrome",
+    "screen_resolution": "1830×1029",
+    "visit_count": 8,
+    "last_path": "/login",
+    "referrer": "Trực tiếp (Direct)",
+    "is_online": true,
+    "first_visit": "2026-10-16T13:10:52.703Z",
+    "last_visit": "2026-10-16T13:49:02.108Z",
+    "is_real": true,
+    "is_authenticated": true,
+    "user_id": "77c32531-95b5-4719-bc7b-92a908c10abe",
+    "user_email": "nkoc.nho.17.04@gmail.com",
+    "user_name": "Huỳnh Tuấn",
+    "user_role": "user"
+  },
+  {
     "id": "log_1790946179995",
     "device_id": "dev_munwi6wr_63jgs391",
     "ip_address": "171.227.41.82",
@@ -15,7 +39,8 @@
     "referrer": "Trực tiếp (Direct)",
     "is_online": true,
     "first_visit": "2026-10-02T13:02:59.995Z",
-    "last_visit": "2026-10-05T08:54:46.629Z"
+    "last_visit": "2026-10-05T08:54:46.629Z",
+    "is_real": true
   },
   {
     "id": "log_1790921142961",
@@ -33,7 +58,8 @@
     "referrer": "Trực tiếp (Direct)",
     "is_online": true,
     "first_visit": "2026-10-02T06:05:42.961Z",
-    "last_visit": "2026-10-03T00:13:35.938Z"
+    "last_visit": "2026-10-03T00:13:35.938Z",
+    "is_real": true
   },
   {
     "id": "log_1790767719944",
@@ -51,7 +77,8 @@
     "referrer": "Trực tiếp (Direct)",
     "is_online": true,
     "first_visit": "2026-09-30T11:28:39.944Z",
-    "last_visit": "2026-09-30T11:28:39.944Z"
+    "last_visit": "2026-09-30T11:28:39.944Z",
+    "is_real": true
   },
   {
     "id": "log_1790754668998",
@@ -67,9 +94,10 @@
     "visit_count": 2,
     "last_path": "/tin-tuc",
     "referrer": "Trực tiếp (Direct)",
-    "is_online": true,
+    "is_online": false,
     "first_visit": "2026-09-30T07:51:08.998Z",
-    "last_visit": "2026-09-30T07:51:29.496Z"
+    "last_visit": "2026-09-30T07:51:29.496Z",
+    "is_real": false
   },
   {
     "id": "log_init_01",
@@ -85,8 +113,9 @@
     "visit_count": 31,
     "last_path": "/",
     "referrer": "Trực tiếp (Direct)",
-    "is_online": true,
+    "is_online": false,
     "first_visit": "2026-09-30T06:00:00.000Z",
-    "last_visit": "2026-09-30T07:40:00.000Z"
+    "last_visit": "2026-09-30T07:40:00.000Z",
+    "is_real": false
   }
 ]

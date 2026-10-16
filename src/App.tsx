@@ -10,7 +10,7 @@ import FloatingVoteWidget from "./components/FloatingVoteWidget";
 // import VoteAnnouncementBar from "./components/VoteAnnouncementBar";
 import AppStoreNoticeModal from "./components/AppStoreNoticeModal";
 import PromoVideoModal from "./components/PromoVideoModal";
-import { AuthProvider } from "./context/AuthContext";
+import { AuthProvider, useAuth } from "./context/AuthContext";
 import { VoteProvider } from "./context/VoteContext";
 import { usePauseOffscreenAnimations } from "./hooks/usePauseOffscreenAnimations";
 import { recordVisitorHit } from "./services/visitorTracker";
@@ -23,12 +23,10 @@ function RouteFallback() {
   );
 }
 
-function App() {
+function VisitorTracker() {
   const { pathname } = useLocation();
-  const isAuthPage = pathname === "/login" || pathname === "/register";
+  const { user, profile } = useAuth();
   const isAdminPage = pathname.startsWith("/admin");
-
-  usePauseOffscreenAnimations();
 
   useEffect(() => {
     if ('scrollRestoration' in window.history) {
@@ -37,9 +35,31 @@ function App() {
     window.scrollTo(0, 0);
     // Track visitor hit for this machine / IP (skip tracking admin dashboard itself)
     if (!isAdminPage) {
-      recordVisitorHit(pathname);
+      recordVisitorHit(pathname, {
+        isAuthenticated: Boolean(user),
+        userId: user?.id,
+        userEmail: user?.email,
+        userName:
+          profile?.full_name ||
+          (user?.user_metadata as any)?.full_name ||
+          (user?.email ? user.email.split("@")[0] : undefined),
+        userRole:
+          profile?.role ||
+          (user?.app_metadata as any)?.role ||
+          (user ? "user" : undefined),
+      });
     }
-  }, [pathname, isAdminPage]);
+  }, [pathname, isAdminPage, user, profile]);
+
+  return null;
+}
+
+function App() {
+  const { pathname } = useLocation();
+  const isAuthPage = pathname === "/login" || pathname === "/register";
+  const isAdminPage = pathname.startsWith("/admin");
+
+  usePauseOffscreenAnimations();
 
   useEffect(() => {
     AOS.init({
@@ -54,6 +74,7 @@ function App() {
   return (
     <AuthProvider>
       <VoteProvider>
+        <VisitorTracker />
         {/* {!isAuthPage && !isAdminPage && <VoteAnnouncementBar />} */}
         {!isAuthPage && <Navbar />}
         <Suspense fallback={<RouteFallback />}>

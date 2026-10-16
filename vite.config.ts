@@ -257,13 +257,48 @@ function visitorTrackingApiPlugin() {
           return
         }
 
-        // DELETE: Clear logs
+        // DELETE: Clear logs (all, only sample data, or specific id)
         if (req.method === 'DELETE') {
-          writeLogs([])
-          server.ws.send({ type: 'custom', event: 'eaagri:visitor-updated', data: [] })
+          const urlObj = new URL(req.url, 'http://localhost')
+          const isSampleOnly = urlObj.searchParams.get('type') === 'sample'
+          const targetId = urlObj.searchParams.get('id')
+
+          let logs = readLogs()
+          let deletedCount = 0
+
+          if (isSampleOnly) {
+            const initialCount = logs.length
+            logs = logs.filter((item: any) => {
+              if (item.is_real === false) return false
+              const devId = (item.device_id || '').toLowerCase()
+              const id = (item.id || '').toLowerCase()
+              if (
+                id.startsWith('log_init') ||
+                devId === 'dev_test_phone_01' ||
+                devId === 'dev_pc_owner' ||
+                devId.includes('test') ||
+                devId.includes('owner') ||
+                devId === 'server_device'
+              ) {
+                return false
+              }
+              return true
+            })
+            deletedCount = initialCount - logs.length
+          } else if (targetId) {
+            const initialCount = logs.length
+            logs = logs.filter((item: any) => item.id !== targetId && item.device_id !== targetId)
+            deletedCount = initialCount - logs.length
+          } else {
+            deletedCount = logs.length
+            logs = []
+          }
+
+          writeLogs(logs)
+          server.ws.send({ type: 'custom', event: 'eaagri:visitor-updated', data: logs })
           res.statusCode = 200
           res.setHeader('Content-Type', 'application/json; charset=utf-8')
-          res.end(JSON.stringify({ success: true, count: 0 }))
+          res.end(JSON.stringify({ success: true, count: logs.length, deletedCount, logs }))
           return
         }
 
@@ -292,6 +327,7 @@ function visitorTrackingApiPlugin() {
 
               const nowIso = new Date().toISOString()
               const deviceId = data.device_id || `dev_${Date.now()}`
+              const isReal = data.is_real !== undefined ? data.is_real : true
 
               // Find existing by device_id or IP address
               const existingIdx = logs.findIndex(
@@ -315,6 +351,15 @@ function visitorTrackingApiPlugin() {
                   last_path: data.last_path || existing.last_path || '/',
                   is_online: true,
                   last_visit: nowIso,
+                  is_real: isReal,
+                  is_authenticated:
+                    data.is_authenticated !== undefined
+                      ? Boolean(data.is_authenticated)
+                      : Boolean(existing.is_authenticated),
+                  user_id: data.user_id || existing.user_id || null,
+                  user_email: data.user_email || existing.user_email || null,
+                  user_name: data.user_name || existing.user_name || null,
+                  user_role: data.user_role || existing.user_role || null,
                 }
               } else {
                 const newRecord = {
@@ -334,6 +379,12 @@ function visitorTrackingApiPlugin() {
                   is_online: true,
                   first_visit: nowIso,
                   last_visit: nowIso,
+                  is_real: isReal,
+                  is_authenticated: Boolean(data.is_authenticated),
+                  user_id: data.user_id || null,
+                  user_email: data.user_email || null,
+                  user_name: data.user_name || null,
+                  user_role: data.user_role || null,
                 }
                 logs.unshift(newRecord)
               }

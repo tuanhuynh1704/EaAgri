@@ -4,6 +4,10 @@ import { Link } from "react-router-dom";
 import {
   getVisitorLogs,
   getLocalOrSeedLogs,
+  isRealVisitor,
+  clearSampleVisitorLogs,
+  deleteSingleVisitorLog,
+  exportVisitorLogsToCsv,
   type VisitorLogItem,
 } from "../services/visitorTracker";
 
@@ -11,7 +15,11 @@ export default function ManageTraffic() {
   const { user, profile } = useAuth();
   const [logs, setLogs] = useState<VisitorLogItem[]>(() => getLocalOrSeedLogs());
   const [deviceFilter, setDeviceFilter] = useState<"All" | "Desktop" | "Mobile" | "Tablet">("All");
+  const [sourceFilter, setSourceFilter] = useState<"Real" | "All" | "Sample">("Real");
+  const [authFilter, setAuthFilter] = useState<"All" | "Member" | "Guest">("All");
   const [searchQuery, setSearchQuery] = useState("");
+  const [isCleaning, setIsCleaning] = useState(false);
+  const [toast, setToast] = useState<{ type: "success" | "info" | "error"; text: string } | null>(null);
 
   const isAdmin = user && (profile?.role === "SA" || user.id === "eaagri-admin-sa-master");
 
@@ -24,6 +32,13 @@ export default function ManageTraffic() {
       console.error("Error loading visitor logs:", err);
     }
   };
+
+  // Auto-dismiss toast
+  useEffect(() => {
+    if (!toast) return;
+    const timer = setTimeout(() => setToast(null), 5000);
+    return () => clearTimeout(timer);
+  }, [toast]);
 
   useEffect(() => {
     if (!isAdmin) return;
@@ -77,23 +92,68 @@ export default function ManageTraffic() {
     };
   }, [isAdmin]);
 
-  // Compute statistics dynamically (100% truthful, no fake numbers)
+  // Overall comparison metrics (Real vs Sample & Member vs Guest)
+  const globalSummary = useMemo(() => {
+    const realLogs = logs.filter(isRealVisitor);
+    const sampleLogs = logs.filter((l) => !isRealVisitor(l));
+
+    const totalRealDevices = realLogs.length;
+    const totalRealVisits = realLogs.reduce((acc, curr) => acc + (curr.visit_count || 1), 0);
+
+    const totalSampleDevices = sampleLogs.length;
+    const totalSampleVisits = sampleLogs.reduce((acc, curr) => acc + (curr.visit_count || 1), 0);
+
+    const totalAllDevices = logs.length;
+    const totalAllVisits = logs.reduce((acc, curr) => acc + (curr.visit_count || 1), 0);
+
+    const totalMembers = logs.filter((l) => l.is_authenticated === true).length;
+    const totalGuests = logs.filter((l) => !l.is_authenticated).length;
+
+    const realDevicePercent = totalAllDevices ? Math.round((totalRealDevices / totalAllDevices) * 100) : 100;
+    const realVisitsPercent = totalAllVisits ? Math.round((totalRealVisits / totalAllVisits) * 100) : 100;
+
+    return {
+      totalRealDevices,
+      totalRealVisits,
+      totalSampleDevices,
+      totalSampleVisits,
+      totalAllDevices,
+      totalAllVisits,
+      totalMembers,
+      totalGuests,
+      realDevicePercent,
+      realVisitsPercent,
+    };
+  }, [logs]);
+
+  // Scoped logs based on selected source filter (Real vs All vs Sample)
+  const scopedLogs = useMemo(() => {
+    if (sourceFilter === "Real") return logs.filter(isRealVisitor);
+    if (sourceFilter === "Sample") return logs.filter((l) => !isRealVisitor(l));
+    return logs;
+  }, [logs, sourceFilter]);
+
+  // Compute statistics dynamically based on current scope
   const stats = useMemo(() => {
-    const totalVisits = logs.reduce((acc, curr) => acc + (curr.visit_count || 1), 0);
-    const uniqueDevices = logs.length;
+    const totalVisits = scopedLogs.reduce((acc, curr) => acc + (curr.visit_count || 1), 0);
+    const uniqueDevices = scopedLogs.length;
     const now = Date.now();
 
     // Active now (within 15 minutes)
-    const activeNow = logs.filter((l) => {
+    const activeNow = scopedLogs.filter((l) => {
       const diff = now - new Date(l.last_visit).getTime();
       return l.is_online || diff < 15 * 60 * 1000;
     }).length;
 
     // Today's visits
     const todayStr = new Date().toDateString();
-    const todayVisits = logs
+    const todayVisits = scopedLogs
       .filter((l) => new Date(l.last_visit).toDateString() === todayStr)
       .reduce((acc, curr) => acc + (curr.visit_count || 1), 0);
+
+    // Auth breakdown inside scope
+    const membersCount = scopedLogs.filter((l) => l.is_authenticated === true).length;
+    const guestsCount = scopedLogs.filter((l) => !l.is_authenticated).length;
 
     // Device breakdown
     const devices = {
@@ -102,7 +162,7 @@ export default function ManageTraffic() {
       Tablet: { count: 0, visits: 0 },
     };
 
-    logs.forEach((l) => {
+    scopedLogs.forEach((l) => {
       const v = l.visit_count || 1;
       if (l.device_type === "Mobile") {
         devices.Mobile.count += 1;
@@ -122,7 +182,7 @@ export default function ManageTraffic() {
 
     // Operating systems breakdown
     const osMap: Record<string, number> = {};
-    logs.forEach((l) => {
+    scopedLogs.forEach((l) => {
       const os = l.os || "Khác";
       osMap[os] = (osMap[os] || 0) + (l.visit_count || 1);
     });
@@ -132,7 +192,7 @@ export default function ManageTraffic() {
 
     // Browsers breakdown
     const browserMap: Record<string, number> = {};
-    logs.forEach((l) => {
+    scopedLogs.forEach((l) => {
       const b = l.browser || "Khác";
       browserMap[b] = (browserMap[b] || 0) + (l.visit_count || 1);
     });
@@ -142,7 +202,7 @@ export default function ManageTraffic() {
 
     // Top Pages breakdown
     const pageMap: Record<string, number> = {};
-    logs.forEach((l) => {
+    scopedLogs.forEach((l) => {
       const p = l.last_path || "/";
       pageMap[p] = (pageMap[p] || 0) + (l.visit_count || 1);
     });
@@ -155,6 +215,8 @@ export default function ManageTraffic() {
       uniqueDevices,
       activeNow,
       todayVisits,
+      membersCount,
+      guestsCount,
       devices,
       desktopPercent,
       mobilePercent,
@@ -163,12 +225,17 @@ export default function ManageTraffic() {
       topBrowsers,
       topPages,
     };
-  }, [logs]);
+  }, [scopedLogs]);
 
-  // Filtered devices list for recent activity (supports search by IP, OS, Browser, Device Type, Path)
+  // Filtered devices list for recent activity table
   const filteredLogs = useMemo(() => {
-    return logs.filter((log) => {
+    return scopedLogs.filter((log) => {
       const matchDevice = deviceFilter === "All" || log.device_type === deviceFilter;
+      const matchAuth =
+        authFilter === "All" ||
+        (authFilter === "Member" && log.is_authenticated === true) ||
+        (authFilter === "Guest" && !log.is_authenticated);
+
       const q = searchQuery.trim().toLowerCase();
       const matchSearch =
         !q ||
@@ -177,10 +244,73 @@ export default function ManageTraffic() {
         log.os.toLowerCase().includes(q) ||
         log.browser.toLowerCase().includes(q) ||
         log.device_type.toLowerCase().includes(q) ||
-        log.last_path.toLowerCase().includes(q);
-      return matchDevice && matchSearch;
+        log.last_path.toLowerCase().includes(q) ||
+        (log.device_id && log.device_id.toLowerCase().includes(q)) ||
+        (log.user_email && log.user_email.toLowerCase().includes(q)) ||
+        (log.user_name && log.user_name.toLowerCase().includes(q)) ||
+        (q === "khách" && !log.is_authenticated) ||
+        (q === "đăng nhập" && log.is_authenticated);
+
+      return matchDevice && matchAuth && matchSearch;
     });
-  }, [logs, deviceFilter, searchQuery]);
+  }, [scopedLogs, deviceFilter, authFilter, searchQuery]);
+
+  // Action: Clear sample/mock logs
+  const handleClearSample = async () => {
+    if (globalSummary.totalSampleDevices === 0) {
+      setToast({ type: "info", text: "Hệ thống hiện không còn dữ liệu mẫu nào cần dọn dẹp!" });
+      return;
+    }
+    const confirmClean = window.confirm(
+      `Bạn có chắc chắn muốn dọn dẹp và xóa toàn bộ ${globalSummary.totalSampleDevices} thiết bị mẫu khỏi hệ thống?\n\nSau khi xóa, hệ thống sẽ chỉ giữ lại ${globalSummary.totalRealDevices} thiết bị thật 100%.`
+    );
+    if (!confirmClean) return;
+
+    setIsCleaning(true);
+    try {
+      const deleted = await clearSampleVisitorLogs();
+      await loadData();
+      setToast({
+        type: "success",
+        text: `Đã dọn dẹp thành công ${deleted || globalSummary.totalSampleDevices} thiết bị mẫu! Hiện chỉ còn các thiết bị thật.`,
+      });
+      setSourceFilter("Real");
+    } catch (err) {
+      setToast({ type: "error", text: "Lỗi khi dọn dẹp dữ liệu mẫu. Vui lòng thử lại!" });
+    } finally {
+      setIsCleaning(false);
+    }
+  };
+
+  // Action: Delete single log
+  const handleDeleteSingle = async (item: VisitorLogItem) => {
+    const isReal = isRealVisitor(item);
+    const label = isReal ? "thiết bị thật" : "thiết bị mẫu";
+    const confirmDel = window.confirm(
+      `Xác nhận xóa bản ghi ${label} (IP: ${item.ip_address || "127.0.0.1"} - ${item.os})?`
+    );
+    if (!confirmDel) return;
+
+    try {
+      await deleteSingleVisitorLog(item.id || item.device_id);
+      await loadData();
+      setToast({
+        type: "success",
+        text: `Đã xóa bản ghi ${item.ip_address || item.os} khỏi danh sách.`,
+      });
+    } catch (err) {
+      setToast({ type: "error", text: "Không thể xóa bản ghi này." });
+    }
+  };
+
+  // Action: Export CSV
+  const handleExportCsv = () => {
+    exportVisitorLogsToCsv(filteredLogs);
+    setToast({
+      type: "info",
+      text: `Đã xuất ${filteredLogs.length} thiết bị ra file CSV (có thông tin Thiết bị thật & Khách / Đã đăng nhập).`,
+    });
+  };
 
   // Format relative time in Vietnamese
   const formatTimeAgo = (isoString: string) => {
@@ -243,16 +373,16 @@ export default function ManageTraffic() {
   return (
     <section className="traffic-counter">
       <div className="traffic-counter__container">
-        {/* Title Header (Gọn gàng, vừa mắt) */}
+        {/* Title Header */}
         <div className="traffic-counter__header">
           <div className="traffic-counter__header-left">
             <div className="traffic-counter__live-tag">
               <span className="live-pulse" />
               <span>BỘ ĐẾM TRUY CẬP THỜI GIAN THỰC</span>
             </div>
-            <h1 className="traffic-counter__title">Thống Kê Lượt Xem & Thiết Bị</h1>
+            <h1 className="traffic-counter__title">Thống Kê Lượt Xem & Thiết Bị Thật</h1>
             <p className="traffic-counter__subtitle">
-              Đếm tổng số lượt truy cập trang web, phân loại theo dòng máy (Máy tính, Điện thoại, Tablet) và nội dung xem.
+              Phân loại chuẩn xác thiết bị thật (người dùng thực tế) và dữ liệu mẫu, theo dõi rõ ràng khách vãng lai và người đã đăng nhập tài khoản.
             </p>
           </div>
 
@@ -262,14 +392,185 @@ export default function ManageTraffic() {
           </div>
         </div>
 
-        {/* 🌟 HERO KPI BANNER (ĐÃ THU GỌN VỪA VẶN, TINH TẾ, KHÔNG BỊ QUÁ BỰ) */}
+        {/* Feedback Alert Toast */}
+        {toast && (
+          <div className={`traffic-toast traffic-toast--${toast.type}`}>
+            <div className="traffic-toast__left">
+              <i
+                className={
+                  toast.type === "success"
+                    ? "ri-checkbox-circle-fill"
+                    : toast.type === "error"
+                    ? "ri-error-warning-fill"
+                    : "ri-information-fill"
+                }
+              />
+              <span>{toast.text}</span>
+            </div>
+            <button
+              type="button"
+              className="traffic-toast__close"
+              onClick={() => setToast(null)}
+              aria-label="Đóng thông báo"
+            >
+              <i className="ri-close-line" />
+            </button>
+          </div>
+        )}
+
+        {/* 🎛️ THANH ĐIỀU KHIỂN & BỘ LỌC NGUỒN DỮ LIỆU (CHỈ THIẾT BỊ THẬT / TẤT CẢ / MẪU) */}
+        <div className="traffic-control-bar">
+          <div className="traffic-control-bar__left">
+            <span className="traffic-control-bar__label">
+              <i className="ri-shield-check-line" /> Chế độ thống kê:
+            </span>
+            <div className="traffic-control-bar__pills">
+              <button
+                type="button"
+                className={`traffic-control-bar__pill-btn ${
+                  sourceFilter === "Real" ? "traffic-control-bar__pill-btn--active-real" : ""
+                }`}
+                onClick={() => setSourceFilter("Real")}
+              >
+                <i className="ri-shield-check-fill" /> Chỉ thiết bị thật
+                <span className="traffic-control-bar__badge">{globalSummary.totalRealDevices} máy</span>
+              </button>
+
+              <button
+                type="button"
+                className={`traffic-control-bar__pill-btn ${
+                  sourceFilter === "All" ? "traffic-control-bar__pill-btn--active-all" : ""
+                }`}
+                onClick={() => setSourceFilter("All")}
+              >
+                <i className="ri-global-line" /> Tất cả dữ liệu
+                <span className="traffic-control-bar__badge">{globalSummary.totalAllDevices} máy</span>
+              </button>
+
+              {globalSummary.totalSampleDevices > 0 && (
+                <button
+                  type="button"
+                  className={`traffic-control-bar__pill-btn ${
+                    sourceFilter === "Sample" ? "traffic-control-bar__pill-btn--active-sample" : ""
+                  }`}
+                  onClick={() => setSourceFilter("Sample")}
+                >
+                  <i className="ri-flask-line" /> Dữ liệu mẫu
+                  <span className="traffic-control-bar__badge">{globalSummary.totalSampleDevices} máy</span>
+                </button>
+              )}
+            </div>
+          </div>
+
+          <div className="traffic-control-bar__actions">
+            {globalSummary.totalSampleDevices > 0 && (
+              <button
+                type="button"
+                className="btn btn--danger"
+                onClick={handleClearSample}
+                disabled={isCleaning}
+                title="Xóa vĩnh viễn các bản ghi mẫu, chỉ giữ lại thiết bị thật"
+              >
+                <i className={isCleaning ? "ri-loader-4-line spinning" : "ri-delete-bin-line"} />
+                {isCleaning ? "Đang dọn..." : `Dọn dẹp ${globalSummary.totalSampleDevices} thiết bị mẫu`}
+              </button>
+            )}
+
+            <button
+              type="button"
+              className="btn btn--refresh"
+              onClick={handleExportCsv}
+              title="Xuất danh sách ra file Excel / CSV"
+            >
+              <i className="ri-file-excel-2-line text-green" /> Xuất Excel
+            </button>
+
+            <button
+              type="button"
+              className="btn btn--refresh"
+              onClick={loadData}
+              title="Làm mới dữ liệu từ máy chủ"
+            >
+              <i className="ri-refresh-line" /> Làm mới
+            </button>
+          </div>
+        </div>
+
+        {/* 🛡️ BẢNG KIỂM ĐỊNH LƯU LƯỢNG (SO SÁNH THIẾT BỊ THẬT VS DỮ LIỆU MẪU & KHÁCH VS TÀI KHOẢN) */}
+        <div className="traffic-purity-banner">
+          <div className="traffic-purity-banner__left">
+            <div className="traffic-purity-banner__shield-wrap">
+              <i className="ri-shield-keyhole-line" />
+            </div>
+            <div className="traffic-purity-banner__title-box">
+              <h3>
+                Kiểm Định Dữ Liệu Truy Cập
+                <span className="verified-badge">
+                  {sourceFilter === "Real"
+                    ? "ĐANG XEM 100% THIẾT BỊ THẬT"
+                    : sourceFilter === "Sample"
+                    ? "ĐANG XEM DỮ LIỆU MẪU"
+                    : "ĐANG XEM TỔNG HỢP"}
+                </span>
+              </h3>
+              <p>
+                Phân biệt các thiết bị vật lý thật qua IP, User-Agent & độ phân giải; đồng thời xác định tài khoản đăng nhập và khách ghé thăm.
+              </p>
+            </div>
+          </div>
+
+          <div className="traffic-purity-banner__comparison">
+            <div className="traffic-purity-banner__labels">
+              <span className="traffic-purity-banner__label-real">
+                <span className="dot" />
+                Thiết bị thật: <strong>{globalSummary.totalRealDevices} máy</strong> ({globalSummary.totalRealVisits} lượt xem • {globalSummary.realDevicePercent}%)
+              </span>
+              <span className="traffic-purity-banner__label-sample">
+                <span className="dot" />
+                Dữ liệu mẫu: <strong>{globalSummary.totalSampleDevices} máy</strong> ({globalSummary.totalSampleVisits} lượt xem • {100 - globalSummary.realDevicePercent}%)
+              </span>
+            </div>
+            <div className="traffic-purity-banner__bar-wrap">
+              <div
+                className="traffic-purity-banner__bar-real"
+                style={{ width: `${globalSummary.realDevicePercent}%` }}
+                title={`Thiết bị thật: ${globalSummary.realDevicePercent}%`}
+              />
+              <div
+                className="traffic-purity-banner__bar-sample"
+                style={{ width: `${100 - globalSummary.realDevicePercent}%` }}
+                title={`Dữ liệu mẫu: ${100 - globalSummary.realDevicePercent}%`}
+              />
+            </div>
+          </div>
+
+          {sourceFilter !== "Real" && (
+            <div className="traffic-purity-banner__actions">
+              <button
+                type="button"
+                className="btn btn--primary"
+                onClick={() => setSourceFilter("Real")}
+              >
+                <i className="ri-shield-check-fill" /> Chỉ xem thiết bị thật
+              </button>
+            </div>
+          )}
+        </div>
+
+        {/* 🌟 HERO KPI BANNER (HIỂN THỊ CHUẨN XÁC THEO CHẾ ĐỘ ĐANG CHỌN) */}
         <div className="traffic-hero-card">
           <div className="traffic-hero-card__main">
             <div className="traffic-hero-card__pulse-wrap">
               <i className="ri-line-chart-fill traffic-hero-card__pulse-icon" />
             </div>
             <div className="traffic-hero-card__data">
-              <span className="traffic-hero-card__lbl">TỔNG LƯỢT XEM TRANG</span>
+              <span className="traffic-hero-card__lbl">
+                {sourceFilter === "Real"
+                  ? "TỔNG LƯỢT XEM TỪ THIẾT BỊ THẬT"
+                  : sourceFilter === "Sample"
+                  ? "LƯỢT XEM TỪ DỮ LIỆU MẪU"
+                  : "TỔNG LƯỢT XEM TRANG (TẤT CẢ)"}
+              </span>
               <div className="traffic-hero-card__num-row">
                 <strong className="traffic-hero-card__num">{stats.totalVisits.toLocaleString("vi-VN")}</strong>
                 <span className="traffic-hero-card__unit">lượt</span>
@@ -280,7 +581,11 @@ export default function ManageTraffic() {
                 )}
               </div>
               <span className="traffic-hero-card__desc">
-                Tổng số lần người dùng đã mở và xem các trang trên web
+                {sourceFilter === "Real"
+                  ? "Tổng số lần người dùng trên các thiết bị vật lý thật đã truy cập và mở các trang trên web"
+                  : sourceFilter === "Sample"
+                  ? "Lượt xem từ các thiết bị mẫu được tạo để kiểm thử giao diện"
+                  : "Tổng số lần người dùng và thiết bị đã mở các trang trên web"}
               </span>
             </div>
           </div>
@@ -290,12 +595,29 @@ export default function ManageTraffic() {
           <div className="traffic-hero-card__metrics">
             <div className="hero-metric-item">
               <div className="hero-metric-item__icon hero-metric-item__icon--devices">
-                <i className="ri-computer-line" />
+                <i className={sourceFilter === "Real" ? "ri-shield-check-line" : "ri-computer-line"} />
               </div>
               <div className="hero-metric-item__text">
-                <span className="hero-metric-item__lbl">Số máy / Người dùng</span>
+                <span className="hero-metric-item__lbl">
+                  {sourceFilter === "Real" ? "Thiết bị thật" : "Số máy / Thiết bị"}
+                </span>
                 <strong className="hero-metric-item__val">{stats.uniqueDevices} máy</strong>
-                <span className="hero-metric-item__sub">Thiết bị riêng biệt</span>
+                <span className="hero-metric-item__sub">
+                  {sourceFilter === "Real" ? "Người dùng thực tế" : "Thiết bị riêng biệt"}
+                </span>
+              </div>
+            </div>
+
+            <div className="hero-metric-item">
+              <div className="hero-metric-item__icon hero-metric-item__icon--members">
+                <i className="ri-user-follow-line" />
+              </div>
+              <div className="hero-metric-item__text">
+                <span className="hero-metric-item__lbl">Đăng nhập / Khách</span>
+                <strong className="hero-metric-item__val">
+                  {stats.membersCount} mem / {stats.guestsCount} khách
+                </strong>
+                <span className="hero-metric-item__sub">Phân loại đối tượng</span>
               </div>
             </div>
 
@@ -323,7 +645,7 @@ export default function ManageTraffic() {
           </div>
         </div>
 
-        {/* 💻📱📟 THỐNG KÊ CHI TIẾT THEO TỪNG LOẠI MÁY (Đã giảm gọn kích thước) */}
+        {/* 💻📱📟 THỐNG KÊ CHI TIẾT THEO TỪNG LOẠI MÁY */}
         <div className="traffic-devices-grid">
           {/* Desktop */}
           <div className="device-card">
@@ -332,7 +654,7 @@ export default function ManageTraffic() {
                 <i className="ri-computer-line" />
               </div>
               <span className="device-card__badge device-card__badge--desktop">
-                {stats.desktopPercent}% tổng truy cập
+                {stats.desktopPercent}% truy cập
               </span>
             </div>
             <div className="device-card__body">
@@ -363,7 +685,7 @@ export default function ManageTraffic() {
                 <i className="ri-smartphone-line" />
               </div>
               <span className="device-card__badge device-card__badge--mobile">
-                {stats.mobilePercent}% tổng truy cập
+                {stats.mobilePercent}% truy cập
               </span>
             </div>
             <div className="device-card__body">
@@ -394,7 +716,7 @@ export default function ManageTraffic() {
                 <i className="ri-tablet-line" />
               </div>
               <span className="device-card__badge device-card__badge--tablet">
-                {stats.tabletPercent}% tổng truy cập
+                {stats.tabletPercent}% truy cập
               </span>
             </div>
             <div className="device-card__body">
@@ -425,49 +747,57 @@ export default function ManageTraffic() {
           <div className="breakdown-card">
             <div className="breakdown-card__header">
               <i className="ri-settings-4-line text-green" />
-              <h3>Hệ Điều Hành & Trình Duyệt</h3>
+              <h3>Hệ Điều Hành & Trình Duyệt ({sourceFilter === "Real" ? "Thiết bị thật" : "Đang lọc"})</h3>
             </div>
             <div className="breakdown-card__list">
               <div className="breakdown-subgroup">
                 <span className="breakdown-subgroup__title">Hệ điều hành thiết bị:</span>
-                {stats.topOs.map((item) => (
-                  <div className="breakdown-item" key={item.name}>
-                    <div className="breakdown-item__name">
-                      <i className={getDeviceIcon("Desktop", item.name)} />
-                      <span>{item.name}</span>
+                {stats.topOs.length === 0 ? (
+                  <p className="empty-subgroup">Chưa có dữ liệu</p>
+                ) : (
+                  stats.topOs.map((item) => (
+                    <div className="breakdown-item" key={item.name}>
+                      <div className="breakdown-item__name">
+                        <i className={getDeviceIcon("Desktop", item.name)} />
+                        <span>{item.name}</span>
+                      </div>
+                      <div className="breakdown-item__bar-wrap">
+                        <div
+                          className="breakdown-item__bar"
+                          style={{
+                            width: `${stats.totalVisits ? Math.round((item.count / stats.totalVisits) * 100) : 0}%`,
+                          }}
+                        />
+                      </div>
+                      <strong className="breakdown-item__count">{item.count} lượt</strong>
                     </div>
-                    <div className="breakdown-item__bar-wrap">
-                      <div
-                        className="breakdown-item__bar"
-                        style={{
-                          width: `${stats.totalVisits ? Math.round((item.count / stats.totalVisits) * 100) : 0}%`,
-                        }}
-                      />
-                    </div>
-                    <strong className="breakdown-item__count">{item.count} lượt</strong>
-                  </div>
-                ))}
+                  ))
+                )}
               </div>
 
               <div className="breakdown-subgroup">
                 <span className="breakdown-subgroup__title">Trình duyệt phổ biến:</span>
-                {stats.topBrowsers.map((item) => (
-                  <div className="breakdown-item" key={item.name}>
-                    <div className="breakdown-item__name">
-                      <i className="ri-compass-3-line text-slate" />
-                      <span>{item.name}</span>
+                {stats.topBrowsers.length === 0 ? (
+                  <p className="empty-subgroup">Chưa có dữ liệu</p>
+                ) : (
+                  stats.topBrowsers.map((item) => (
+                    <div className="breakdown-item" key={item.name}>
+                      <div className="breakdown-item__name">
+                        <i className="ri-compass-3-line text-slate" />
+                        <span>{item.name}</span>
+                      </div>
+                      <div className="breakdown-item__bar-wrap">
+                        <div
+                          className="breakdown-item__bar breakdown-item__bar--amber"
+                          style={{
+                            width: `${stats.totalVisits ? Math.round((item.count / stats.totalVisits) * 100) : 0}%`,
+                          }}
+                        />
+                      </div>
+                      <strong className="breakdown-item__count">{item.count} lượt</strong>
                     </div>
-                    <div className="breakdown-item__bar-wrap">
-                      <div
-                        className="breakdown-item__bar breakdown-item__bar--amber"
-                        style={{
-                          width: `${stats.totalVisits ? Math.round((item.count / stats.totalVisits) * 100) : 0}%`,
-                        }}
-                      />
-                    </div>
-                    <strong className="breakdown-item__count">{item.count} lượt</strong>
-                  </div>
-                ))}
+                  ))
+                )}
               </div>
             </div>
           </div>
@@ -479,42 +809,48 @@ export default function ManageTraffic() {
               <h3>Nội Dung / Trang Được Xem Nhiều Nhất</h3>
             </div>
             <div className="breakdown-card__list">
-              {stats.topPages.map((item, idx) => (
-                <div className="page-view-item" key={item.path}>
-                  <span className="page-view-item__rank">#{idx + 1}</span>
-                  <div className="page-view-item__info">
-                    <span className="page-view-item__title">{formatPageName(item.path)}</span>
-                    <code className="page-view-item__path">{item.path}</code>
+              {stats.topPages.length === 0 ? (
+                <p className="empty-subgroup">Chưa có dữ liệu</p>
+              ) : (
+                stats.topPages.map((item, idx) => (
+                  <div className="page-view-item" key={item.path}>
+                    <span className="page-view-item__rank">#{idx + 1}</span>
+                    <div className="page-view-item__info">
+                      <span className="page-view-item__title">{formatPageName(item.path)}</span>
+                      <code className="page-view-item__path">{item.path}</code>
+                    </div>
+                    <span className="page-view-item__views">
+                      <strong>{item.count}</strong> lượt xem
+                    </span>
                   </div>
-                  <span className="page-view-item__views">
-                    <strong>{item.count}</strong> lượt xem
-                  </span>
-                </div>
-              ))}
+                ))
+              )}
             </div>
           </div>
         </div>
 
-        {/* 📋 DANH SÁCH THIẾT BỊ GẦN ĐÂY (HOÀN TOÀN KHÔNG HIỆN IP) */}
-        {/* 📋 DANH SÁCH THIẾT BỊ & IP ĐÃ GHÉ THĂM */}
+        {/* 📋 DANH SÁCH THIẾT BỊ & IP ĐÃ GHÉ THĂM (KÈM GẮN CỜ THIẾT BỊ THẬT & KHÁCH / TÀI KHOẢN) */}
         <div className="recent-devices-card">
           <div className="recent-devices-card__header">
             <div className="header-title-box">
               <i className="ri-history-line text-green" />
               <div>
                 <h3>Danh Sách Thiết Bị & IP Đã Ghé Thăm</h3>
-                <p>Theo dõi địa chỉ IP, thiết bị, số lượt xem và thời gian hoạt động của từng máy.</p>
+                <p>
+                  Theo dõi chi tiết từng máy: người dùng đăng nhập hay khách vãng lai, thiết bị thật vs dữ liệu mẫu, IP, hệ điều hành, số lượt xem và thời gian.
+                </p>
               </div>
             </div>
 
             {/* Filter Pills */}
             <div className="device-filter-pills">
+              {/* Device Types */}
               <button
                 type="button"
                 className={`filter-pill ${deviceFilter === "All" ? "filter-pill--active" : ""}`}
                 onClick={() => setDeviceFilter("All")}
               >
-                Tất cả ({logs.length})
+                Tất cả máy ({scopedLogs.length})
               </button>
               <button
                 type="button"
@@ -537,6 +873,25 @@ export default function ManageTraffic() {
               >
                 <i className="ri-tablet-line" /> Tablet ({stats.devices.Tablet.count})
               </button>
+
+              {/* User Type Filters */}
+              <button
+                type="button"
+                className={`filter-pill filter-pill--member ${authFilter === "Member" ? "filter-pill--active" : ""}`}
+                onClick={() => setAuthFilter(authFilter === "Member" ? "All" : "Member")}
+                title="Chỉ hiển thị các máy đã đăng nhập tài khoản"
+              >
+                <i className="ri-user-follow-line" /> Đã đăng nhập ({stats.membersCount})
+              </button>
+
+              <button
+                type="button"
+                className={`filter-pill filter-pill--guest ${authFilter === "Guest" ? "filter-pill--active" : ""}`}
+                onClick={() => setAuthFilter(authFilter === "Guest" ? "All" : "Guest")}
+                title="Chỉ hiển thị khách vãng lai (chưa đăng nhập)"
+              >
+                <i className="ri-user-line" /> Khách ({stats.guestsCount})
+              </button>
             </div>
           </div>
 
@@ -545,7 +900,7 @@ export default function ManageTraffic() {
             <i className="ri-search-line search-icon" />
             <input
               type="text"
-              placeholder="Tìm kiếm theo địa chỉ IP (116.111...), thiết bị (iPhone, Windows...), trình duyệt, trang xem..."
+              placeholder="Tìm kiếm theo địa chỉ IP (116.111...), email, tên người dùng, 'khách', 'đăng nhập', thiết bị, vị trí..."
               value={searchQuery}
               onChange={(e) => setSearchQuery(e.target.value)}
             />
@@ -556,35 +911,40 @@ export default function ManageTraffic() {
             )}
           </div>
 
-          {/* Devices List Table (WITH IP & LOCATION) */}
+          {/* Devices List Table (WITH REAL/SAMPLE BADGE, AUTH USER INFO & IP) */}
           <div className="recent-devices-table-wrap">
             <table className="recent-devices-table">
               <thead>
                 <tr>
                   <th>THIẾT BỊ & HỆ ĐIỀU HÀNH</th>
+                  <th>ĐỐI TƯỢNG TRUY CẬP</th>
+                  <th>XÁC THỰC NGUỒN</th>
                   <th>ĐỊA CHỈ IP & VỊ TRÍ</th>
                   <th>TRÌNH DUYỆT</th>
                   <th>SỐ LƯỢT XEM CỦA IP</th>
                   <th>TRANG XEM GẦN NHẤT</th>
                   <th>THỜI GIAN TRUY CẬP</th>
                   <th>TRẠNG THÁI</th>
+                  <th>THAO TÁC</th>
                 </tr>
               </thead>
               <tbody>
                 {filteredLogs.length === 0 ? (
                   <tr>
-                    <td colSpan={7} className="empty-state">
+                    <td colSpan={10} className="empty-state">
                       <i className="ri-inbox-line" />
-                      <span>Không tìm thấy thiết bị nào phù hợp bộ lọc</span>
+                      <span>Không tìm thấy thiết bị nào phù hợp với bộ lọc</span>
                     </td>
                   </tr>
                 ) : (
                   filteredLogs.map((item, idx) => {
                     const isRecent = Date.now() - new Date(item.last_visit).getTime() < 15 * 60 * 1000;
                     const isFrequent = item.visit_count >= 5;
+                    const isReal = isRealVisitor(item);
 
                     return (
-                      <tr key={item.device_id || idx}>
+                      <tr key={item.device_id || item.id || idx}>
+                        {/* 1. Device & OS */}
                         <td>
                           <div className="device-cell">
                             <span className="device-cell__icon">
@@ -599,6 +959,49 @@ export default function ManageTraffic() {
                           </div>
                         </td>
 
+                        {/* 2. User Authentication: Member vs Guest */}
+                        <td>
+                          {item.is_authenticated ? (
+                            <div className="visitor-user-cell">
+                              <span className="visitor-user-badge visitor-user-badge--member">
+                                <i className="ri-user-follow-fill" /> Đã đăng nhập
+                              </span>
+                              <div className="visitor-user-details">
+                                <strong className="visitor-user-name">
+                                  {item.user_name || "Thành viên"}
+                                </strong>
+                                <span className="visitor-user-email" title={item.user_email || undefined}>
+                                  <i className="ri-mail-line" /> {item.user_email || "Tài khoản hệ thống"}
+                                </span>
+                                {item.user_role === "SA" && (
+                                  <span className="visitor-role-badge">Quản trị viên</span>
+                                )}
+                              </div>
+                            </div>
+                          ) : (
+                            <div className="visitor-user-cell">
+                              <span className="visitor-user-badge visitor-user-badge--guest">
+                                <i className="ri-user-line" /> Khách vãng lai
+                              </span>
+                              <span className="visitor-user-guest-sub">Chưa đăng nhập</span>
+                            </div>
+                          )}
+                        </td>
+
+                        {/* 3. Verification Source: Real vs Sample */}
+                        <td>
+                          {isReal ? (
+                            <span className="data-type-chip data-type-chip--real" title="Thiết bị vật lý thật từ IP & User-Agent thực tế">
+                              <i className="ri-checkbox-circle-fill" /> Thiết bị thật
+                            </span>
+                          ) : (
+                            <span className="data-type-chip data-type-chip--sample" title="Dữ liệu mẫu khởi tạo thử nghiệm">
+                              <i className="ri-flask-line" /> Dữ liệu mẫu
+                            </span>
+                          )}
+                        </td>
+
+                        {/* 4. IP & Location */}
                         <td>
                           <div className="ip-cell">
                             <span className="ip-cell__address">
@@ -610,7 +1013,10 @@ export default function ManageTraffic() {
                                 onClick={(e) => {
                                   e.stopPropagation();
                                   navigator.clipboard?.writeText(item.ip_address || "127.0.0.1");
-                                  alert(`Đã sao chép IP: ${item.ip_address || "127.0.0.1"}`);
+                                  setToast({
+                                    type: "info",
+                                    text: `Đã sao chép IP: ${item.ip_address || "127.0.0.1"}`,
+                                  });
                                 }}
                                 title="Sao chép IP"
                               >
@@ -624,24 +1030,28 @@ export default function ManageTraffic() {
                           </div>
                         </td>
 
+                        {/* 5. Browser */}
                         <td>
                           <span className="browser-badge">
                             <i className="ri-compass-3-line" /> {item.browser}
                           </span>
                         </td>
 
+                        {/* 6. View Counts */}
                         <td>
                           <span className={`views-badge ${isFrequent ? "views-badge--frequent" : ""}`}>
                             <strong>{item.visit_count}</strong> lượt xem
                           </span>
                         </td>
 
+                        {/* 7. Last Path */}
                         <td>
                           <span className="page-badge">
                             {formatPageName(item.last_path)}
                           </span>
                         </td>
 
+                        {/* 8. Last Visit Time */}
                         <td>
                           <div className="time-cell">
                             <span className="time-ago">{formatTimeAgo(item.last_visit)}</span>
@@ -654,6 +1064,7 @@ export default function ManageTraffic() {
                           </div>
                         </td>
 
+                        {/* 9. Status */}
                         <td>
                           {item.is_online || isRecent ? (
                             <span className="status-chip status-chip--online">
@@ -665,6 +1076,18 @@ export default function ManageTraffic() {
                             </span>
                           )}
                         </td>
+
+                        {/* 10. Actions */}
+                        <td>
+                          <button
+                            type="button"
+                            className="row-action-btn"
+                            onClick={() => handleDeleteSingle(item)}
+                            title="Xóa bản ghi này khỏi bộ đếm"
+                          >
+                            <i className="ri-delete-bin-line" />
+                          </button>
+                        </td>
                       </tr>
                     );
                   })
@@ -675,10 +1098,12 @@ export default function ManageTraffic() {
 
           <div className="recent-devices-card__footer">
             <span>
-              Đang hiển thị <strong>{filteredLogs.length}</strong> / <strong>{logs.length}</strong> thiết bị truy cập
+              Đang hiển thị <strong>{filteredLogs.length}</strong> / <strong>{scopedLogs.length}</strong> thiết bị{" "}
+              {sourceFilter === "Real" ? "(100% thiết bị thật)" : sourceFilter === "Sample" ? "(Dữ liệu mẫu)" : "(Tất cả)"}
+              {authFilter === "Member" ? " • Chỉ người đã đăng nhập" : authFilter === "Guest" ? " • Chỉ khách vãng lai" : ""}
             </span>
             <span className="footer-privacy-note">
-              <i className="ri-shield-check-fill" /> Bảo mật quyền riêng tư: Hệ thống chỉ đếm lượt xem, không lưu trữ hoặc hiển thị địa chỉ IP
+              <i className="ri-shield-check-fill" /> Bảo mật quyền riêng tư: Hệ thống phân biệt khách và người dùng đăng nhập để hỗ trợ quản trị, bảo vệ dữ liệu người dùng.
             </span>
           </div>
         </div>
