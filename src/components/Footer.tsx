@@ -27,7 +27,7 @@ export default function Footer() {
           <div className="footer__logo-box" onClick={handleFooterHome} title="EaAgri - Về đầu trang">
             <div className="footer__logo-icon-wrap">
               <img loading="lazy" decoding="async"
-                src="/logo_v1.jpg"
+                src="/images-1/logo_v1.jpg"
                 alt="EaAgri Durian AI Mascot"
                 className="footer__logo-icon"
               />

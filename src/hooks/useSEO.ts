@@ -18,7 +18,7 @@ const DEFAULT_DESCRIPTION =
   "Hệ sinh thái nông nghiệp thông minh EaAgri ứng dụng AI, IoT và dữ liệu thời gian thực giúp tối ưu hóa chi phí, chẩn đoán sâu bệnh và nâng cao năng suất sầu riêng.";
 const DEFAULT_KEYWORDS =
   "EaAgri, Ea Agri, nông nghiệp thông minh, AI nông nghiệp, sầu riêng, cảm biến IoT, VietGAP, Đắk Lắk, sâu bệnh sầu riêng, tưới thông minh";
-const DEFAULT_IMAGE = "https://www.eaagri.vn/logo_v1.jpg";
+const DEFAULT_IMAGE = "https://www.eaagri.vn/images-1/logo_v1.jpg";
 const BASE_URL = "https://www.eaagri.vn";
 
 function updateMetaTag(attrName: string, attrVal: string, content: string) {

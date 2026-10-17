@@ -1,38 +1,176 @@
 import { useState, useEffect, useMemo } from "react";
 import { useAuth } from "../context/AuthContext";
 import { Link } from "react-router-dom";
+import { supabase } from "../utils/supabase/client";
 import {
   getVisitorLogs,
+  getVisitorHistoryLogs,
   getLocalOrSeedLogs,
   isRealVisitor,
   isVisitorOnline,
   clearSampleVisitorLogs,
   deleteSingleVisitorLog,
   exportVisitorLogsToCsv,
+  exportVisitorHistoryToCsv,
+  clearVisitorHistoryLogs,
+  checkSupabaseVisitorTableStatus,
+  isAuthorizedAdminRole,
   type VisitorLogItem,
+  type VisitorHistoryItem,
 } from "../services/visitorTracker";
+
+const SQL_SETUP_SCRIPT = `-- =======================================================
+-- SQL MIGRATION FOR EAAGRI VISITOR LOGS & REALTIME ACCESS TRACKING
+-- Run this script in your Supabase SQL Editor (SQL Editor -> New Query -> Run)
+-- =======================================================
+
+CREATE TABLE IF NOT EXISTS public.visitor_logs (
+    id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+    device_id TEXT NOT NULL UNIQUE,
+    ip_address TEXT NOT NULL,
+    city TEXT DEFAULT 'Không xác định',
+    region TEXT DEFAULT 'Việt Nam',
+    country TEXT DEFAULT 'Việt Nam',
+    device_type TEXT NOT NULL DEFAULT 'Desktop',
+    os TEXT DEFAULT 'Windows',
+    browser TEXT DEFAULT 'Chrome',
+    screen_resolution TEXT DEFAULT '1920x1080',
+    visit_count INTEGER NOT NULL DEFAULT 1,
+    last_path TEXT DEFAULT '/',
+    referrer TEXT DEFAULT 'Trực tiếp (Direct)',
+    is_online BOOLEAN NOT NULL DEFAULT true,
+    first_visit TIMESTAMPTZ NOT NULL DEFAULT now(),
+    last_visit TIMESTAMPTZ NOT NULL DEFAULT now(),
+    is_real BOOLEAN NOT NULL DEFAULT true,
+    is_authenticated BOOLEAN NOT NULL DEFAULT false,
+    user_id TEXT,
+    user_email TEXT,
+    user_name TEXT,
+    user_role TEXT,
+    created_at TIMESTAMPTZ NOT NULL DEFAULT now(),
+    updated_at TIMESTAMPTZ NOT NULL DEFAULT now()
+);
+
+CREATE TABLE IF NOT EXISTS public.visitor_history_logs (
+    id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+    device_id TEXT NOT NULL,
+    ip_address TEXT NOT NULL,
+    city TEXT DEFAULT 'Không xác định',
+    region TEXT DEFAULT 'Việt Nam',
+    country TEXT DEFAULT 'Việt Nam',
+    device_type TEXT NOT NULL DEFAULT 'Desktop',
+    os TEXT DEFAULT 'Windows',
+    browser TEXT DEFAULT 'Chrome',
+    path TEXT NOT NULL DEFAULT '/',
+    referrer TEXT DEFAULT 'Trực tiếp (Direct)',
+    action TEXT NOT NULL DEFAULT 'pageview',
+    is_authenticated BOOLEAN NOT NULL DEFAULT false,
+    user_id TEXT,
+    user_email TEXT,
+    user_name TEXT,
+    user_role TEXT,
+    is_real BOOLEAN NOT NULL DEFAULT true,
+    created_at TIMESTAMPTZ NOT NULL DEFAULT now()
+);
+
+CREATE INDEX IF NOT EXISTS idx_visitor_logs_last_visit ON public.visitor_logs(last_visit DESC);
+CREATE INDEX IF NOT EXISTS idx_visitor_logs_ip ON public.visitor_logs(ip_address);
+CREATE INDEX IF NOT EXISTS idx_visitor_logs_device_id ON public.visitor_logs(device_id);
+CREATE INDEX IF NOT EXISTS idx_visitor_logs_is_online ON public.visitor_logs(is_online);
+
+CREATE INDEX IF NOT EXISTS idx_visitor_history_created_at ON public.visitor_history_logs(created_at DESC);
+CREATE INDEX IF NOT EXISTS idx_visitor_history_device_id ON public.visitor_history_logs(device_id);
+CREATE INDEX IF NOT EXISTS idx_visitor_history_ip ON public.visitor_history_logs(ip_address);
+
+ALTER TABLE public.visitor_logs ENABLE ROW LEVEL SECURITY;
+ALTER TABLE public.visitor_history_logs ENABLE ROW LEVEL SECURITY;
+
+DROP POLICY IF EXISTS "Allow public to record visit logs" ON public.visitor_logs;
+CREATE POLICY "Allow public to record visit logs"
+ON public.visitor_logs
+FOR ALL
+TO anon, authenticated
+USING (true)
+WITH CHECK (true);
+
+DROP POLICY IF EXISTS "Allow public to record history logs" ON public.visitor_history_logs;
+CREATE POLICY "Allow public to record history logs"
+ON public.visitor_history_logs
+FOR ALL
+TO anon, authenticated
+USING (true)
+WITH CHECK (true);
+
+DO $$
+BEGIN
+    ALTER PUBLICATION supabase_realtime ADD TABLE public.visitor_logs;
+EXCEPTION
+    WHEN duplicate_object THEN NULL;
+    WHEN undefined_object THEN NULL;
+END $$;
+
+DO $$
+BEGIN
+    ALTER PUBLICATION supabase_realtime ADD TABLE public.visitor_history_logs;
+EXCEPTION
+    WHEN duplicate_object THEN NULL;
+    WHEN undefined_object THEN NULL;
+END $$;
+`;
 
 export default function ManageTraffic() {
   const { user, profile } = useAuth();
+  // Authorized: SA or Admin role or Master ID
+  const isAdmin = isAuthorizedAdminRole(user, profile);
+
   const [logs, setLogs] = useState<VisitorLogItem[]>(() => getLocalOrSeedLogs());
+  const [historyLogs, setHistoryLogs] = useState<VisitorHistoryItem[]>([]);
+  const [activeTab, setActiveTab] = useState<"devices" | "history">("devices");
+  const [supabaseStatus, setSupabaseStatus] = useState<{
+    checked: boolean;
+    tableExists: boolean;
+    errorMessage?: string;
+  }>({ checked: false, tableExists: true });
+  const [isSqlCopied, setIsSqlCopied] = useState(false);
+
+  // Filters for Device Summary
   const [deviceFilter, setDeviceFilter] = useState<"All" | "Desktop" | "Mobile" | "Tablet">("All");
   const [sourceFilter, setSourceFilter] = useState<"Real" | "All" | "Sample">("Real");
   const [authFilter, setAuthFilter] = useState<"All" | "Member" | "Guest">("All");
   const [searchQuery, setSearchQuery] = useState("");
+
+  // Filters for History Stream
+  const [historyActionFilter, setHistoryActionFilter] = useState<string>("All");
+  const [historyAuthFilter, setHistoryAuthFilter] = useState<"All" | "Member" | "Guest">("All");
+  const [historySearchQuery, setHistorySearchQuery] = useState("");
+
   const [isCleaning, setIsCleaning] = useState(false);
   const [toast, setToast] = useState<{ type: "success" | "info" | "error"; text: string } | null>(null);
-
-  const isAdmin = user && (profile?.role === "SA" || user.id === "eaagri-admin-sa-master");
 
   // Load and update visitor data silently
   const loadData = async () => {
     try {
       const res = await getVisitorLogs();
       setLogs(res.logs);
+
+      const histRes = await getVisitorHistoryLogs();
+      setHistoryLogs(histRes.history);
     } catch (err) {
       console.error("Error loading visitor logs:", err);
     }
   };
+
+  // Check Supabase visitor table existence
+  useEffect(() => {
+    if (!isAdmin) return;
+    checkSupabaseVisitorTableStatus().then((status) => {
+      setSupabaseStatus({
+        checked: true,
+        tableExists: status.tableExists,
+        errorMessage: status.errorMessage,
+      });
+    });
+  }, [isAdmin]);
 
   // Auto-dismiss toast
   useEffect(() => {
@@ -46,7 +184,29 @@ export default function ManageTraffic() {
 
     loadData();
 
-    // 1. Listen to BroadcastChannel across different browser tabs/windows
+    // 1. Supabase Realtime channel for instant cross-device updates
+    let channel: any = null;
+    try {
+      channel = supabase
+        .channel("admin-traffic-realtime")
+        .on(
+          "postgres_changes",
+          { event: "*", schema: "public", table: "visitor_logs" },
+          () => {
+            loadData();
+          }
+        )
+        .on(
+          "postgres_changes",
+          { event: "*", schema: "public", table: "visitor_history_logs" },
+          () => {
+            loadData();
+          }
+        )
+        .subscribe();
+    } catch {}
+
+    // 2. Listen to BroadcastChannel across different browser tabs/windows
     let bc: BroadcastChannel | null = null;
     if (typeof BroadcastChannel !== "undefined") {
       try {
@@ -57,35 +217,48 @@ export default function ManageTraffic() {
       } catch {}
     }
 
-    // 2. Listen to custom DOM event in same window
+    // 3. Listen to custom DOM event in same window
     const handleVisitorUpdate = () => {
       loadData();
     };
     window.addEventListener("eaagri_visitor_update", handleVisitorUpdate);
 
-    // 3. Listen to localStorage storage events from other tabs
+    // 4. Listen to localStorage storage events from other tabs
     const handleStorage = (e: StorageEvent) => {
-      if (e.key === "eaagri_visitor_logs_cache") {
+      if (
+        e.key === "eaagri_visitor_logs_cache" ||
+        e.key === "eaagri_visitor_history_cache"
+      ) {
         loadData();
       }
     };
     window.addEventListener("storage", handleStorage);
 
-    // 4. Polling heartbeat every 3 seconds for continuous realtime accuracy
+    // 5. Polling heartbeat every 4 seconds for continuous realtime accuracy
     const timer = setInterval(() => {
       loadData();
-    }, 3000);
+    }, 4000);
 
-    // 5. Listen to Vite WebSocket for instant 0ms realtime updates
+    // 6. Listen to Vite WebSocket for instant 0ms realtime updates
     if (import.meta.hot) {
       import.meta.hot.on("eaagri:visitor-updated", (data: any) => {
         if (Array.isArray(data)) {
           setLogs(data);
         }
       });
+      import.meta.hot.on("eaagri:visitor-history-updated", (data: any) => {
+        if (Array.isArray(data)) {
+          setHistoryLogs(data);
+        }
+      });
     }
 
     return () => {
+      if (channel) {
+        try {
+          supabase.removeChannel(channel);
+        } catch {}
+      }
       if (bc) bc.close();
       window.removeEventListener("eaagri_visitor_update", handleVisitorUpdate);
       window.removeEventListener("storage", handleStorage);
@@ -299,7 +472,7 @@ export default function ManageTraffic() {
     }
   };
 
-  // Action: Export CSV
+  // Action: Export CSV for Devices
   const handleExportCsv = () => {
     exportVisitorLogsToCsv(filteredLogs);
     setToast({
@@ -307,6 +480,89 @@ export default function ManageTraffic() {
       text: `Đã xuất ${filteredLogs.length} thiết bị ra file CSV (có thông tin Thiết bị thật & Khách / Đã đăng nhập).`,
     });
   };
+
+  // Action: Export CSV for History Logs
+  const handleExportHistoryCsv = () => {
+    exportVisitorHistoryToCsv(filteredHistory);
+    setToast({
+      type: "info",
+      text: `Đã xuất ${filteredHistory.length} sự kiện nhật ký truy cập ra file CSV.`,
+    });
+  };
+
+  // Action: Clear History Logs
+  const handleClearHistory = async () => {
+    const confirmClear = window.confirm(
+      "Bạn có chắc chắn muốn xóa toàn bộ lịch sử sự kiện truy cập không?"
+    );
+    if (!confirmClear) return;
+    try {
+      await clearVisitorHistoryLogs();
+      await loadData();
+      setToast({ type: "success", text: "Đã xóa toàn bộ nhật ký sự kiện truy cập thành công!" });
+    } catch {
+      setToast({ type: "error", text: "Không thể xóa nhật ký lúc này." });
+    }
+  };
+
+  // Action: Copy Supabase Setup SQL
+  const handleCopySql = () => {
+    if (navigator.clipboard) {
+      navigator.clipboard.writeText(SQL_SETUP_SCRIPT);
+    }
+    setIsSqlCopied(true);
+    setToast({
+      type: "success",
+      text: "Đã sao chép mã SQL cài đặt Supabase! Hãy mở Supabase -> SQL Editor -> Dán và bấm Run.",
+    });
+    setTimeout(() => setIsSqlCopied(false), 4000);
+  };
+
+  // Action: Retry Supabase connection check
+  const handleCheckSupabaseAgain = async () => {
+    setToast({ type: "info", text: "Đang kiểm tra kết nối bảng visitor_logs trên Supabase..." });
+    const status = await checkSupabaseVisitorTableStatus();
+    setSupabaseStatus({
+      checked: true,
+      tableExists: status.tableExists,
+      errorMessage: status.errorMessage,
+    });
+    if (status.tableExists) {
+      setToast({ type: "success", text: "Tuyệt vời! Bảng visitor_logs trên Supabase đã hoạt động." });
+      await loadData();
+    } else {
+      setToast({
+        type: "error",
+        text: `Bảng chưa tồn tại (${status.errorMessage || "chưa tạo"}). Hãy chạy mã SQL trong Supabase SQL Editor.`,
+      });
+    }
+  };
+
+  // Filtered history list
+  const filteredHistory = useMemo(() => {
+    return historyLogs.filter((item) => {
+      const matchAction =
+        historyActionFilter === "All" || item.action === historyActionFilter;
+      const matchAuth =
+        historyAuthFilter === "All" ||
+        (historyAuthFilter === "Member" && item.is_authenticated) ||
+        (historyAuthFilter === "Guest" && !item.is_authenticated);
+
+      const q = historySearchQuery.trim().toLowerCase();
+      const matchSearch =
+        !q ||
+        (item.ip_address && item.ip_address.toLowerCase().includes(q)) ||
+        (item.path && item.path.toLowerCase().includes(q)) ||
+        (item.user_email && item.user_email.toLowerCase().includes(q)) ||
+        (item.user_name && item.user_name.toLowerCase().includes(q)) ||
+        (item.city && item.city.toLowerCase().includes(q)) ||
+        (item.device_type && item.device_type.toLowerCase().includes(q)) ||
+        (item.os && item.os.toLowerCase().includes(q)) ||
+        (item.browser && item.browser.toLowerCase().includes(q));
+
+      return matchAction && matchAuth && matchSearch;
+    });
+  }, [historyLogs, historyActionFilter, historyAuthFilter, historySearchQuery]);
 
   // Format relative time in Vietnamese
   const formatTimeAgo = (isoString: string) => {
@@ -345,7 +601,7 @@ export default function ManageTraffic() {
     return path;
   };
 
-  // If user is not Super Admin, show unauthorized screen
+  // If user is not Super Admin or Admin, show unauthorized screen
   if (!isAdmin) {
     return (
       <section className="traffic-counter">
@@ -353,7 +609,7 @@ export default function ManageTraffic() {
           <div className="traffic-counter__unauth">
             <i className="ri-lock-password-fill traffic-counter__unauth-icon" />
             <h2>Khu vực dành riêng cho Quản Trị Viên</h2>
-            <p>Vui lòng đăng nhập với tài khoản Quản Trị Cấp Cao (admin / admin@123) để xem bộ đếm truy cập.</p>
+            <p>Vui lòng đăng nhập với tài khoản có quyền Quản Trị (role SA hoặc admin) để theo dõi toàn bộ lưu lượng và nhật ký truy cập đồng bộ tất cả các máy.</p>
             <div className="traffic-counter__unauth-actions">
               <Link to="/login" className="btn btn--primary">
                 <i className="ri-login-box-line" /> Đăng nhập ngay
@@ -380,13 +636,17 @@ export default function ManageTraffic() {
             </div>
             <h1 className="traffic-counter__title">Thống Kê Lượt Xem & Thiết Bị Thật</h1>
             <p className="traffic-counter__subtitle">
-              Phân loại chuẩn xác thiết bị thật (người dùng thực tế) và dữ liệu mẫu, theo dõi rõ ràng khách vãng lai và người đã đăng nhập tài khoản.
+              Đồng bộ dữ liệu đa thiết bị trên toàn hệ thống, theo dõi lượt xem trực tuyến, lưu lại nhật ký chi tiết và quản lý người dùng đăng nhập vs khách vãng lai.
             </p>
           </div>
 
           <div className="traffic-counter__realtime-tag">
             <span className="live-pulse" />
-            <span>Tự động cập nhật trực tiếp (Realtime)</span>
+            <span>
+              {supabaseStatus.tableExists
+                ? "Đồng bộ Đám mây Supabase (Realtime Đa Thiết Bị)"
+                : "Đồng bộ Máy chủ nội bộ & API"}
+            </span>
           </div>
         </div>
 
@@ -413,6 +673,40 @@ export default function ManageTraffic() {
             >
               <i className="ri-close-line" />
             </button>
+          </div>
+        )}
+
+        {/* Supabase Table Missing Warning Card */}
+        {supabaseStatus.checked && !supabaseStatus.tableExists && (
+          <div className="supabase-warning-card">
+            <div className="supabase-warning-card__left">
+              <div className="supabase-warning-card__icon-box">
+                <i className="ri-database-2-line" />
+              </div>
+              <div>
+                <h4>Chưa kích hoạt bảng visitor_logs trên Supabase</h4>
+                <p>
+                  Để các thiết bị khác nhau (điện thoại, máy tính, mạng khác) đồng bộ chung 100% số lượt truy cập và xem trực tuyến, bạn hãy sao chép mã SQL và chạy trong <strong>Supabase SQL Editor</strong> (chỉ mất 5 giây).
+                </p>
+              </div>
+            </div>
+            <div className="supabase-warning-card__actions">
+              <button
+                type="button"
+                className="btn--copy-sql"
+                onClick={handleCopySql}
+                title="Sao chép mã SQL migration"
+              >
+                <i className="ri-file-copy-line" /> {isSqlCopied ? "Đã sao chép SQL!" : "Sao chép mã SQL Supabase"}
+              </button>
+              <button
+                type="button"
+                className="btn--retry-check"
+                onClick={handleCheckSupabaseAgain}
+              >
+                <i className="ri-refresh-line" /> Kiểm tra lại kết nối
+              </button>
+            </div>
           </div>
         )}
 
@@ -916,284 +1210,540 @@ export default function ManageTraffic() {
           </div>
         </div>
 
-        {/* 📋 DANH SÁCH THIẾT BỊ & IP ĐÃ GHÉ THĂM (KÈM GẮN CỜ THIẾT BỊ THẬT & KHÁCH / TÀI KHOẢN) */}
-        <div className="recent-devices-card">
-          <div className="recent-devices-card__header">
-            <div className="header-title-box">
-              <i className="ri-history-line text-green" />
-              <div>
-                <h3>Danh Sách Thiết Bị & IP Đã Ghé Thăm</h3>
-                <p>
-                  Theo dõi chi tiết từng máy: người dùng đăng nhập hay khách vãng lai, thiết bị thật vs dữ liệu mẫu, IP, hệ điều hành, số lượt xem và thời gian.
-                </p>
+        {/* TAB NAVIGATION: TỔNG QUAN THIẾT BỊ vs NHẬT KÝ TRUY CẬP THỜI GIAN THỰC */}
+        <div className="traffic-tabs">
+          <button
+            type="button"
+            className={`traffic-tab-btn ${activeTab === "devices" ? "traffic-tab-btn--active" : ""}`}
+            onClick={() => setActiveTab("devices")}
+          >
+            <i className="ri-computer-line" />
+            <span>Quản Lý Thiết Bị & Lưu Lượng</span>
+            <span className="traffic-tab-badge">{scopedLogs.length}</span>
+          </button>
+
+          <button
+            type="button"
+            className={`traffic-tab-btn ${activeTab === "history" ? "traffic-tab-btn--active" : ""}`}
+            onClick={() => setActiveTab("history")}
+          >
+            <i className="ri-history-line" />
+            <span>Nhật Ký & Lịch Sử Truy Cập Thời Gian Thực</span>
+            <span className="traffic-tab-badge traffic-tab-badge--green">{historyLogs.length}</span>
+          </button>
+        </div>
+
+        {/* 📋 TAB 1: DANH SÁCH THIẾT BỊ & IP ĐÃ GHÉ THĂM */}
+        {activeTab === "devices" && (
+          <div className="recent-devices-card">
+            <div className="recent-devices-card__header">
+              <div className="header-title-box">
+                <i className="ri-history-line text-green" />
+                <div>
+                  <h3>Danh Sách Thiết Bị & IP Đã Ghé Thăm</h3>
+                  <p>
+                    Theo dõi chi tiết từng máy: người dùng đăng nhập hay khách vãng lai, thiết bị thật vs dữ liệu mẫu, IP, hệ điều hành, số lượt xem và thời gian.
+                  </p>
+                </div>
+              </div>
+
+              {/* Filter Pills */}
+              <div className="device-filter-pills">
+                {/* Device Types */}
+                <button
+                  type="button"
+                  className={`filter-pill ${deviceFilter === "All" ? "filter-pill--active" : ""}`}
+                  onClick={() => setDeviceFilter("All")}
+                >
+                  Tất cả máy ({scopedLogs.length} máy • {stats.totalVisits} lượt)
+                </button>
+                <button
+                  type="button"
+                  className={`filter-pill ${deviceFilter === "Desktop" ? "filter-pill--active" : ""}`}
+                  onClick={() => setDeviceFilter(deviceFilter === "Desktop" ? "All" : "Desktop")}
+                >
+                  <i className="ri-computer-line" /> Máy tính ({stats.devices.Desktop.count} máy • {stats.devices.Desktop.visits} lượt)
+                </button>
+                <button
+                  type="button"
+                  className={`filter-pill ${deviceFilter === "Mobile" ? "filter-pill--active" : ""}`}
+                  onClick={() => setDeviceFilter(deviceFilter === "Mobile" ? "All" : "Mobile")}
+                >
+                  <i className="ri-smartphone-line" /> Điện thoại ({stats.devices.Mobile.count} máy • {stats.devices.Mobile.visits} lượt)
+                </button>
+                <button
+                  type="button"
+                  className={`filter-pill ${deviceFilter === "Tablet" ? "filter-pill--active" : ""}`}
+                  onClick={() => setDeviceFilter(deviceFilter === "Tablet" ? "All" : "Tablet")}
+                >
+                  <i className="ri-tablet-line" /> Tablet ({stats.devices.Tablet.count} máy • {stats.devices.Tablet.visits} lượt)
+                </button>
+
+                {/* User Type Filters */}
+                <button
+                  type="button"
+                  className={`filter-pill filter-pill--member ${authFilter === "Member" ? "filter-pill--active" : ""}`}
+                  onClick={() => setAuthFilter(authFilter === "Member" ? "All" : "Member")}
+                  title="Chỉ hiển thị các máy đã đăng nhập tài khoản"
+                >
+                  <i className="ri-user-follow-line" /> Đã đăng nhập ({stats.membersCount})
+                </button>
+
+                <button
+                  type="button"
+                  className={`filter-pill filter-pill--guest ${authFilter === "Guest" ? "filter-pill--active" : ""}`}
+                  onClick={() => setAuthFilter(authFilter === "Guest" ? "All" : "Guest")}
+                  title="Chỉ hiển thị khách vãng lai (chưa đăng nhập)"
+                >
+                  <i className="ri-user-line" /> Khách ({stats.guestsCount})
+                </button>
               </div>
             </div>
 
-            {/* Filter Pills */}
-            <div className="device-filter-pills">
-              {/* Device Types */}
-              <button
-                type="button"
-                className={`filter-pill ${deviceFilter === "All" ? "filter-pill--active" : ""}`}
-                onClick={() => setDeviceFilter("All")}
-              >
-                Tất cả máy ({scopedLogs.length} máy • {stats.totalVisits} lượt)
-              </button>
-              <button
-                type="button"
-                className={`filter-pill ${deviceFilter === "Desktop" ? "filter-pill--active" : ""}`}
-                onClick={() => setDeviceFilter(deviceFilter === "Desktop" ? "All" : "Desktop")}
-              >
-                <i className="ri-computer-line" /> Máy tính ({stats.devices.Desktop.count} máy • {stats.devices.Desktop.visits} lượt)
-              </button>
-              <button
-                type="button"
-                className={`filter-pill ${deviceFilter === "Mobile" ? "filter-pill--active" : ""}`}
-                onClick={() => setDeviceFilter(deviceFilter === "Mobile" ? "All" : "Mobile")}
-              >
-                <i className="ri-smartphone-line" /> Điện thoại ({stats.devices.Mobile.count} máy • {stats.devices.Mobile.visits} lượt)
-              </button>
-              <button
-                type="button"
-                className={`filter-pill ${deviceFilter === "Tablet" ? "filter-pill--active" : ""}`}
-                onClick={() => setDeviceFilter(deviceFilter === "Tablet" ? "All" : "Tablet")}
-              >
-                <i className="ri-tablet-line" /> Tablet ({stats.devices.Tablet.count} máy • {stats.devices.Tablet.visits} lượt)
-              </button>
-
-              {/* User Type Filters */}
-              <button
-                type="button"
-                className={`filter-pill filter-pill--member ${authFilter === "Member" ? "filter-pill--active" : ""}`}
-                onClick={() => setAuthFilter(authFilter === "Member" ? "All" : "Member")}
-                title="Chỉ hiển thị các máy đã đăng nhập tài khoản"
-              >
-                <i className="ri-user-follow-line" /> Đã đăng nhập ({stats.membersCount})
-              </button>
-
-              <button
-                type="button"
-                className={`filter-pill filter-pill--guest ${authFilter === "Guest" ? "filter-pill--active" : ""}`}
-                onClick={() => setAuthFilter(authFilter === "Guest" ? "All" : "Guest")}
-                title="Chỉ hiển thị khách vãng lai (chưa đăng nhập)"
-              >
-                <i className="ri-user-line" /> Khách ({stats.guestsCount})
-              </button>
+            {/* Search box with IP search */}
+            <div className="devices-search-box">
+              <i className="ri-search-line search-icon" />
+              <input
+                type="text"
+                placeholder="Tìm kiếm theo địa chỉ IP (116.111...), email, tên người dùng, 'khách', 'đăng nhập', thiết bị, vị trí..."
+                value={searchQuery}
+                onChange={(e) => setSearchQuery(e.target.value)}
+              />
+              {searchQuery && (
+                <button type="button" className="clear-search-btn" onClick={() => setSearchQuery("")}>
+                  <i className="ri-close-line" />
+                </button>
+              )}
             </div>
-          </div>
 
-          {/* Search box with IP search */}
-          <div className="devices-search-box">
-            <i className="ri-search-line search-icon" />
-            <input
-              type="text"
-              placeholder="Tìm kiếm theo địa chỉ IP (116.111...), email, tên người dùng, 'khách', 'đăng nhập', thiết bị, vị trí..."
-              value={searchQuery}
-              onChange={(e) => setSearchQuery(e.target.value)}
-            />
-            {searchQuery && (
-              <button type="button" className="clear-search-btn" onClick={() => setSearchQuery("")}>
-                <i className="ri-close-line" />
-              </button>
-            )}
-          </div>
-
-          {/* Devices List Table (WITH REAL/SAMPLE BADGE, AUTH USER INFO & IP) */}
-          <div className="recent-devices-table-wrap">
-            <table className="recent-devices-table">
-              <thead>
-                <tr>
-                  <th>THIẾT BỊ & HỆ ĐIỀU HÀNH</th>
-                  <th>ĐỐI TƯỢNG TRUY CẬP</th>
-                  <th>XÁC THỰC NGUỒN</th>
-                  <th>ĐỊA CHỈ IP & VỊ TRÍ</th>
-                  <th>TRÌNH DUYỆT</th>
-                  <th>SỐ LƯỢT XEM CỦA IP</th>
-                  <th>TRANG XEM GẦN NHẤT</th>
-                  <th>THỜI GIAN TRUY CẬP</th>
-                  <th>TRẠNG THÁI</th>
-                  <th>THAO TÁC</th>
-                </tr>
-              </thead>
-              <tbody>
-                {filteredLogs.length === 0 ? (
+            {/* Devices List Table (WITH REAL/SAMPLE BADGE, AUTH USER INFO & IP) */}
+            <div className="recent-devices-table-wrap">
+              <table className="recent-devices-table">
+                <thead>
                   <tr>
-                    <td colSpan={10} className="empty-state">
-                      <i className="ri-inbox-line" />
-                      <span>Không tìm thấy thiết bị nào phù hợp với bộ lọc</span>
-                    </td>
+                    <th>THIẾT BỊ & HỆ ĐIỀU HÀNH</th>
+                    <th>ĐỐI TƯỢNG TRUY CẬP</th>
+                    <th>XÁC THỰC NGUỒN</th>
+                    <th>ĐỊA CHỈ IP & VỊ TRÍ</th>
+                    <th>TRÌNH DUYỆT</th>
+                    <th>SỐ LƯỢT XEM CỦA IP</th>
+                    <th>TRANG XEM GẦN NHẤT</th>
+                    <th>THỜI GIAN TRUY CẬP</th>
+                    <th>TRẠNG THÁI</th>
+                    <th>THAO TÁC</th>
                   </tr>
-                ) : (
-                  filteredLogs.map((item, idx) => {
-                    const isOnline = isVisitorOnline(item);
-                    const isFrequent = item.visit_count >= 5;
-                    const isReal = isRealVisitor(item);
+                </thead>
+                <tbody>
+                  {filteredLogs.length === 0 ? (
+                    <tr>
+                      <td colSpan={10} className="empty-state">
+                        <i className="ri-inbox-line" />
+                        <span>Không tìm thấy thiết bị nào phù hợp với bộ lọc</span>
+                      </td>
+                    </tr>
+                  ) : (
+                    filteredLogs.map((item, idx) => {
+                      const isOnline = isVisitorOnline(item);
+                      const isFrequent = item.visit_count >= 5;
+                      const isReal = isRealVisitor(item);
 
-                    return (
-                      <tr key={item.id || `${item.device_id}_${idx}`}>
-                        {/* 1. Device & OS */}
-                        <td>
-                          <div className="device-cell">
-                            <span className="device-cell__icon">
-                              <i className={getDeviceIcon(item.device_type, item.os)} />
-                            </span>
-                            <div className="device-cell__info">
-                              <strong className="device-cell__name">{item.os}</strong>
-                              <span className="device-cell__sub">
-                                {item.device_type} • Màn hình {item.screen_resolution}
+                      return (
+                        <tr key={item.id || `${item.device_id}_${idx}`}>
+                          {/* 1. Device & OS */}
+                          <td>
+                            <div className="device-cell">
+                              <span className="device-cell__icon">
+                                <i className={getDeviceIcon(item.device_type, item.os)} />
                               </span>
-                            </div>
-                          </div>
-                        </td>
-
-                        {/* 2. User Authentication: Member vs Guest */}
-                        <td>
-                          {item.is_authenticated ? (
-                            <div className="visitor-user-cell">
-                              <span className="visitor-user-badge visitor-user-badge--member">
-                                <i className="ri-user-follow-fill" /> Đã đăng nhập
-                              </span>
-                              <div className="visitor-user-details">
-                                <strong className="visitor-user-name">
-                                  {item.user_name || "Thành viên"}
-                                </strong>
-                                <span className="visitor-user-email" title={item.user_email || undefined}>
-                                  <i className="ri-mail-line" /> {item.user_email || "Tài khoản hệ thống"}
+                              <div className="device-cell__info">
+                                <strong className="device-cell__name">{item.os}</strong>
+                                <span className="device-cell__sub">
+                                  {item.device_type} • Màn hình {item.screen_resolution}
                                 </span>
-                                {item.user_role === "SA" && (
-                                  <span className="visitor-role-badge">Quản trị viên</span>
-                                )}
                               </div>
                             </div>
-                          ) : (
-                            <div className="visitor-user-cell">
-                              <span className="visitor-user-badge visitor-user-badge--guest">
-                                <i className="ri-user-line" /> Khách vãng lai
+                          </td>
+
+                          {/* 2. User Authentication: Member vs Guest */}
+                          <td>
+                            {item.is_authenticated ? (
+                              <div className="visitor-user-cell">
+                                <span className="visitor-user-badge visitor-user-badge--member">
+                                  <i className="ri-user-follow-fill" /> Đã đăng nhập
+                                </span>
+                                <div className="visitor-user-details">
+                                  <strong className="visitor-user-name">
+                                    {item.user_name || "Thành viên"}
+                                  </strong>
+                                  <span className="visitor-user-email" title={item.user_email || undefined}>
+                                    <i className="ri-mail-line" /> {item.user_email || "Tài khoản hệ thống"}
+                                  </span>
+                                  {item.user_role && (
+                                    <span className="visitor-role-badge">{item.user_role}</span>
+                                  )}
+                                </div>
+                              </div>
+                            ) : (
+                              <div className="visitor-user-cell">
+                                <span className="visitor-user-badge visitor-user-badge--guest">
+                                  <i className="ri-user-line" /> Khách vãng lai
+                                </span>
+                                <span className="visitor-user-guest-sub">Chưa đăng nhập</span>
+                              </div>
+                            )}
+                          </td>
+
+                          {/* 3. Verification Source: Real vs Sample */}
+                          <td>
+                            {isReal ? (
+                              <span className="data-type-chip data-type-chip--real" title="Thiết bị vật lý thật từ IP & User-Agent thực tế">
+                                <i className="ri-checkbox-circle-fill" /> Thiết bị thật
                               </span>
-                              <span className="visitor-user-guest-sub">Chưa đăng nhập</span>
+                            ) : (
+                              <span className="data-type-chip data-type-chip--sample" title="Dữ liệu mẫu khởi tạo thử nghiệm">
+                                <i className="ri-flask-line" /> Dữ liệu mẫu
+                              </span>
+                            )}
+                          </td>
+
+                          {/* 4. IP & Location */}
+                          <td>
+                            <div className="ip-cell">
+                              <span className="ip-cell__address">
+                                <i className="ri-global-line text-green" />
+                                <code>{item.ip_address || "127.0.0.1"}</code>
+                                <button
+                                  type="button"
+                                  className="copy-ip-btn"
+                                  onClick={(e) => {
+                                    e.stopPropagation();
+                                    navigator.clipboard?.writeText(item.ip_address || "127.0.0.1");
+                                    setToast({
+                                      type: "info",
+                                      text: `Đã sao chép IP: ${item.ip_address || "127.0.0.1"}`,
+                                    });
+                                  }}
+                                  title="Sao chép IP"
+                                >
+                                  <i className="ri-file-copy-line" />
+                                </button>
+                              </span>
+                              <span className="ip-cell__location">
+                                <i className="ri-map-pin-2-fill" />
+                                {item.city ? `${item.city}, ${item.country || "VN"}` : (item.region || "Việt Nam")}
+                              </span>
                             </div>
-                          )}
-                        </td>
+                          </td>
 
-                        {/* 3. Verification Source: Real vs Sample */}
-                        <td>
-                          {isReal ? (
-                            <span className="data-type-chip data-type-chip--real" title="Thiết bị vật lý thật từ IP & User-Agent thực tế">
-                              <i className="ri-checkbox-circle-fill" /> Thiết bị thật
+                          {/* 5. Browser */}
+                          <td>
+                            <span className="browser-badge">
+                              <i className="ri-compass-3-line" /> {item.browser}
                             </span>
-                          ) : (
-                            <span className="data-type-chip data-type-chip--sample" title="Dữ liệu mẫu khởi tạo thử nghiệm">
-                              <i className="ri-flask-line" /> Dữ liệu mẫu
+                          </td>
+
+                          {/* 6. View Counts */}
+                          <td>
+                            <span className={`views-badge ${isFrequent ? "views-badge--frequent" : ""}`}>
+                              <strong>{item.visit_count}</strong> lượt xem
                             </span>
-                          )}
-                        </td>
+                          </td>
 
-                        {/* 4. IP & Location */}
-                        <td>
-                          <div className="ip-cell">
-                            <span className="ip-cell__address">
-                              <i className="ri-global-line text-green" />
-                              <code>{item.ip_address || "127.0.0.1"}</code>
-                              <button
-                                type="button"
-                                className="copy-ip-btn"
-                                onClick={(e) => {
-                                  e.stopPropagation();
-                                  navigator.clipboard?.writeText(item.ip_address || "127.0.0.1");
-                                  setToast({
-                                    type: "info",
-                                    text: `Đã sao chép IP: ${item.ip_address || "127.0.0.1"}`,
-                                  });
-                                }}
-                                title="Sao chép IP"
-                              >
-                                <i className="ri-file-copy-line" />
-                              </button>
+                          {/* 7. Last Path */}
+                          <td>
+                            <span className="page-badge">
+                              {formatPageName(item.last_path)}
                             </span>
-                            <span className="ip-cell__location">
-                              <i className="ri-map-pin-2-fill" />
-                              {item.city ? `${item.city}, ${item.country || "VN"}` : (item.region || "Việt Nam")}
-                            </span>
-                          </div>
-                        </td>
+                          </td>
 
-                        {/* 5. Browser */}
-                        <td>
-                          <span className="browser-badge">
-                            <i className="ri-compass-3-line" /> {item.browser}
-                          </span>
-                        </td>
+                          {/* 8. Last Visit Time */}
+                          <td>
+                            <div className="time-cell">
+                              <span className="time-ago">{formatTimeAgo(item.last_visit)}</span>
+                              <span className="time-exact">
+                                {new Date(item.last_visit).toLocaleTimeString("vi-VN", {
+                                  hour: "2-digit",
+                                  minute: "2-digit",
+                                })}
+                              </span>
+                            </div>
+                          </td>
 
-                        {/* 6. View Counts */}
-                        <td>
-                          <span className={`views-badge ${isFrequent ? "views-badge--frequent" : ""}`}>
-                            <strong>{item.visit_count}</strong> lượt xem
-                          </span>
-                        </td>
+                          {/* 9. Status */}
+                          <td>
+                            {isOnline ? (
+                              <span className="status-chip status-chip--online">
+                                <span className="status-dot" /> Online
+                              </span>
+                            ) : (
+                              <span className="status-chip status-chip--offline">
+                                Ngoại tuyến
+                              </span>
+                            )}
+                          </td>
 
-                        {/* 7. Last Path */}
-                        <td>
-                          <span className="page-badge">
-                            {formatPageName(item.last_path)}
-                          </span>
-                        </td>
+                          {/* 10. Actions */}
+                          <td>
+                            <button
+                              type="button"
+                              className="row-action-btn"
+                              onClick={() => handleDeleteSingle(item)}
+                              title="Xóa bản ghi này khỏi bộ đếm"
+                            >
+                              <i className="ri-delete-bin-line" />
+                            </button>
+                          </td>
+                        </tr>
+                      );
+                    })
+                  )}
+                </tbody>
+              </table>
+            </div>
 
-                        {/* 8. Last Visit Time */}
-                        <td>
-                          <div className="time-cell">
-                            <span className="time-ago">{formatTimeAgo(item.last_visit)}</span>
-                            <span className="time-exact">
-                              {new Date(item.last_visit).toLocaleTimeString("vi-VN", {
-                                hour: "2-digit",
-                                minute: "2-digit",
-                              })}
-                            </span>
-                          </div>
-                        </td>
+            <div className="recent-devices-card__footer">
+              <span>
+                Đang hiển thị <strong>{filteredLogs.length}</strong> / <strong>{scopedLogs.length}</strong> thiết bị{" "}
+                {sourceFilter === "Real" ? "(100% thiết bị thật)" : sourceFilter === "Sample" ? "(Dữ liệu mẫu)" : "(Tất cả)"}
+                {authFilter === "Member" ? " • Chỉ người đã đăng nhập" : authFilter === "Guest" ? " • Chỉ khách vãng lai" : ""}
+              </span>
+              <span className="footer-privacy-note">
+                <i className="ri-shield-check-fill" /> Bảo mật quyền riêng tư: Hệ thống phân biệt khách và người dùng đăng nhập để hỗ trợ quản trị, bảo vệ dữ liệu người dùng.
+              </span>
+            </div>
+          </div>
+        )}
 
-                        {/* 9. Status */}
-                        <td>
-                          {isOnline ? (
-                            <span className="status-chip status-chip--online">
-                              <span className="status-dot" /> Online
-                            </span>
-                          ) : (
-                            <span className="status-chip status-chip--offline">
-                              Ngoại tuyến
-                            </span>
-                          )}
-                        </td>
+        {/* 📋 TAB 2: NHẬT KÝ & LỊCH SỬ TRUY CẬP CHI TIẾT */}
+        {activeTab === "history" && (
+          <div className="recent-devices-card">
+            <div className="recent-devices-card__header">
+              <div className="header-title-box">
+                <i className="ri-history-line text-green" />
+                <div>
+                  <h3>Nhật Ký & Lịch Sử Truy Cập Thời Gian Thực</h3>
+                  <p>
+                    Ghi nhận từng lượt xem trang, tương tác và phiên hoạt động từ mọi máy và địa chỉ IP, hiển thị rõ ràng người dùng đăng nhập và khách vãng lai.
+                  </p>
+                </div>
+              </div>
 
-                        {/* 10. Actions */}
-                        <td>
-                          <button
-                            type="button"
-                            className="row-action-btn"
-                            onClick={() => handleDeleteSingle(item)}
-                            title="Xóa bản ghi này khỏi bộ đếm"
-                          >
-                            <i className="ri-delete-bin-line" />
-                          </button>
-                        </td>
-                      </tr>
-                    );
-                  })
+              {/* Action Filters */}
+              <div className="device-filter-pills">
+                <button
+                  type="button"
+                  className={`filter-pill ${historyActionFilter === "All" ? "filter-pill--active" : ""}`}
+                  onClick={() => setHistoryActionFilter("All")}
+                >
+                  Tất cả ({historyLogs.length})
+                </button>
+                <button
+                  type="button"
+                  className={`filter-pill ${historyActionFilter === "pageview" ? "filter-pill--active" : ""}`}
+                  onClick={() => setHistoryActionFilter(historyActionFilter === "pageview" ? "All" : "pageview")}
+                >
+                  <i className="ri-eye-line" /> Xem trang ({historyLogs.filter((h) => h.action === "pageview" || !h.action).length})
+                </button>
+                <button
+                  type="button"
+                  className={`filter-pill filter-pill--member ${historyAuthFilter === "Member" ? "filter-pill--active" : ""}`}
+                  onClick={() => setHistoryAuthFilter(historyAuthFilter === "Member" ? "All" : "Member")}
+                >
+                  <i className="ri-user-follow-line" /> Thành viên ({historyLogs.filter((h) => h.is_authenticated).length})
+                </button>
+                <button
+                  type="button"
+                  className={`filter-pill filter-pill--guest ${historyAuthFilter === "Guest" ? "filter-pill--active" : ""}`}
+                  onClick={() => setHistoryAuthFilter(historyAuthFilter === "Guest" ? "All" : "Guest")}
+                >
+                  <i className="ri-user-line" /> Khách vãng lai ({historyLogs.filter((h) => !h.is_authenticated).length})
+                </button>
+              </div>
+            </div>
+
+            {/* Search Box & Controls for History */}
+            <div style={{ display: "flex", gap: "0.75rem", flexWrap: "wrap", padding: "0 1.5rem 1rem", alignItems: "center", justifyContent: "space-between" }}>
+              <div className="devices-search-box" style={{ margin: 0, flex: 1, minWidth: "260px" }}>
+                <i className="ri-search-line search-icon" />
+                <input
+                  type="text"
+                  placeholder="Tìm kiếm nhật ký theo IP, trang (URL), email, tên người dùng, thiết bị..."
+                  value={historySearchQuery}
+                  onChange={(e) => setHistorySearchQuery(e.target.value)}
+                />
+                {historySearchQuery && (
+                  <button type="button" className="clear-search-btn" onClick={() => setHistorySearchQuery("")}>
+                    <i className="ri-close-line" />
+                  </button>
                 )}
-              </tbody>
-            </table>
-          </div>
+              </div>
 
-          <div className="recent-devices-card__footer">
-            <span>
-              Đang hiển thị <strong>{filteredLogs.length}</strong> / <strong>{scopedLogs.length}</strong> thiết bị{" "}
-              {sourceFilter === "Real" ? "(100% thiết bị thật)" : sourceFilter === "Sample" ? "(Dữ liệu mẫu)" : "(Tất cả)"}
-              {authFilter === "Member" ? " • Chỉ người đã đăng nhập" : authFilter === "Guest" ? " • Chỉ khách vãng lai" : ""}
-            </span>
-            <span className="footer-privacy-note">
-              <i className="ri-shield-check-fill" /> Bảo mật quyền riêng tư: Hệ thống phân biệt khách và người dùng đăng nhập để hỗ trợ quản trị, bảo vệ dữ liệu người dùng.
-            </span>
+              <div style={{ display: "flex", gap: "0.5rem" }}>
+                <button
+                  type="button"
+                  className="btn btn--refresh"
+                  onClick={handleExportHistoryCsv}
+                  title="Xuất toàn bộ lịch sử truy cập ra file CSV"
+                >
+                  <i className="ri-file-excel-2-line text-green" /> Xuất CSV Lịch Sử
+                </button>
+                <button
+                  type="button"
+                  className="btn btn--danger"
+                  style={{ padding: "0.5rem 0.85rem", fontSize: "0.8rem", borderRadius: "8px" }}
+                  onClick={handleClearHistory}
+                  title="Xóa toàn bộ nhật ký sự kiện"
+                >
+                  <i className="ri-delete-bin-line" /> Xóa Nhật Ký
+                </button>
+              </div>
+            </div>
+
+            {/* History Table */}
+            <div className="recent-devices-table-wrap">
+              <table className="recent-devices-table">
+                <thead>
+                  <tr>
+                    <th>THỜI GIAN</th>
+                    <th>HÀNH ĐỘNG</th>
+                    <th>TRANG XEM (PATH)</th>
+                    <th>ĐỐI TƯỢNG TRUY CẬP</th>
+                    <th>ĐỊA CHỈ IP & VỊ TRÍ</th>
+                    <th>THIẾT BỊ & HỆ ĐIỀU HÀNH</th>
+                    <th>TRÌNH DUYỆT</th>
+                    <th>NGUỒN GIỚI THIỆU</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  {filteredHistory.length === 0 ? (
+                    <tr>
+                      <td colSpan={8} className="empty-state">
+                        <i className="ri-inbox-line" />
+                        <span>Chưa có sự kiện truy cập nào được ghi lại</span>
+                      </td>
+                    </tr>
+                  ) : (
+                    filteredHistory.map((item, idx) => {
+                      return (
+                        <tr key={item.id || `${item.device_id}_hist_${idx}`}>
+                          <td>
+                            <div className="time-cell">
+                              <span className="time-ago">{formatTimeAgo(item.created_at)}</span>
+                              <span className="time-exact">
+                                {new Date(item.created_at).toLocaleTimeString("vi-VN", {
+                                  hour: "2-digit",
+                                  minute: "2-digit",
+                                  second: "2-digit",
+                                })}
+                              </span>
+                            </div>
+                          </td>
+                          <td>
+                            <span className={`action-chip action-chip--${item.action || "pageview"}`}>
+                              {item.action === "pageview" ? "Xem trang" : item.action === "login" ? "Đăng nhập" : item.action === "leave" ? "Rời trang" : item.action}
+                            </span>
+                          </td>
+                          <td>
+                            <div style={{ display: "flex", flexDirection: "column", gap: "0.15rem" }}>
+                              <strong style={{ fontSize: "0.82rem", color: "#0f172a" }}>
+                                {formatPageName(item.path)}
+                              </strong>
+                              <code style={{ fontSize: "0.72rem", color: "#64748b" }}>{item.path}</code>
+                            </div>
+                          </td>
+                          <td>
+                            {item.is_authenticated ? (
+                              <div className="visitor-user-cell">
+                                <span className="visitor-user-badge visitor-user-badge--member">
+                                  <i className="ri-user-follow-fill" /> Đã đăng nhập
+                                </span>
+                                <div className="visitor-user-details">
+                                  <strong className="visitor-user-name">
+                                    {item.user_name || "Thành viên"}
+                                  </strong>
+                                  <span className="visitor-user-email">
+                                    <i className="ri-mail-line" /> {item.user_email || "Tài khoản hệ thống"}
+                                  </span>
+                                  {item.user_role && (
+                                    <span className="visitor-role-badge">{item.user_role}</span>
+                                  )}
+                                </div>
+                              </div>
+                            ) : (
+                              <div className="visitor-user-cell">
+                                <span className="visitor-user-badge visitor-user-badge--guest">
+                                  <i className="ri-user-line" /> Khách vãng lai
+                                </span>
+                                <span className="visitor-user-guest-sub">Chưa đăng nhập</span>
+                              </div>
+                            )}
+                          </td>
+                          <td>
+                            <div className="ip-cell">
+                              <span className="ip-cell__address">
+                                <i className="ri-global-line text-green" />
+                                <code>{item.ip_address || "127.0.0.1"}</code>
+                                <button
+                                  type="button"
+                                  className="copy-ip-btn"
+                                  onClick={(e) => {
+                                    e.stopPropagation();
+                                    navigator.clipboard?.writeText(item.ip_address || "127.0.0.1");
+                                    setToast({
+                                      type: "info",
+                                      text: `Đã sao chép IP: ${item.ip_address || "127.0.0.1"}`,
+                                    });
+                                  }}
+                                  title="Sao chép IP"
+                                >
+                                  <i className="ri-file-copy-line" />
+                                </button>
+                              </span>
+                              <span className="ip-cell__location">
+                                <i className="ri-map-pin-2-fill" />
+                                {item.city ? `${item.city}, ${item.country || "VN"}` : (item.region || "Việt Nam")}
+                              </span>
+                            </div>
+                          </td>
+                          <td>
+                            <div className="device-cell">
+                              <span className="device-cell__icon">
+                                <i className={getDeviceIcon(item.device_type, item.os)} />
+                              </span>
+                              <div className="device-cell__info">
+                                <strong className="device-cell__name">{item.os}</strong>
+                                <span className="device-cell__sub">{item.device_type}</span>
+                              </div>
+                            </div>
+                          </td>
+                          <td>
+                            <span className="browser-badge">
+                              <i className="ri-compass-3-line" /> {item.browser}
+                            </span>
+                          </td>
+                          <td>
+                            <span className="page-badge" style={{ maxWidth: "160px", overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>
+                              {item.referrer || "Trực tiếp"}
+                            </span>
+                          </td>
+                        </tr>
+                      );
+                    })
+                  )}
+                </tbody>
+              </table>
+            </div>
+
+            <div className="recent-devices-card__footer">
+              <span>
+                Đang hiển thị <strong>{filteredHistory.length}</strong> / <strong>{historyLogs.length}</strong> sự kiện nhật ký truy cập
+              </span>
+              <span className="footer-privacy-note">
+                <i className="ri-shield-check-fill" /> Toàn bộ nhật ký được lưu trữ bảo mật và đồng bộ thời gian thực cho Quản Trị Viên (Admin / SA).
+              </span>
+            </div>
           </div>
-        </div>
+        )}
       </div>
     </section>
   );

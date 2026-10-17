@@ -1,6 +1,7 @@
 User-agent: *
 Allow: /
-Allow: /logo_v1.jpg
+Allow: /images-1/
 Allow: /assets/
+Allow: /images/
 
 Sitemap: https://www.eaagri.vn/sitemap.xml

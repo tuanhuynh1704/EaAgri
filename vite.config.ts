@@ -214,14 +214,15 @@ function customVotingApiPlugin() {
 
 function visitorTrackingApiPlugin() {
   const dataFilePath = path.resolve(__dirname, 'src/data/visitor_logs.json')
+  const historyFilePath = path.resolve(__dirname, 'src/data/visitor_history.json')
 
   const cleanExpiredOnline = (logs: any[]): boolean => {
     const now = Date.now()
     let changed = false
     logs.forEach((item: any) => {
       const diff = now - new Date(item.last_visit).getTime()
-      // If older than 2.5 minutes without heartbeat, mark offline
-      if (item.is_online && diff > 150000) {
+      // If older than 2 minutes without heartbeat, mark offline
+      if (item.is_online && diff > 120000) {
         item.is_online = false
         changed = true
       }
@@ -251,10 +252,28 @@ function visitorTrackingApiPlugin() {
     } catch {}
   }
 
+  const readHistory = (): any[] => {
+    try {
+      if (fs.existsSync(historyFilePath)) {
+        const fileContent = fs.readFileSync(historyFilePath, 'utf-8')
+        return JSON.parse(fileContent) || []
+      }
+    } catch {}
+    return []
+  }
+
+  const writeHistory = (history: any[]) => {
+    try {
+      const dir = path.dirname(historyFilePath)
+      if (!fs.existsSync(dir)) fs.mkdirSync(dir, { recursive: true })
+      fs.writeFileSync(historyFilePath, JSON.stringify(history, null, 2), 'utf-8')
+    } catch {}
+  }
+
   return {
     name: 'visitor-tracking-api-plugin',
     configureServer(server: any) {
-      // Background interval to auto-expire stale sessions if heartbeat stops (> 2.5 mins)
+      // Background interval to auto-expire stale sessions if heartbeat stops (> 2 mins)
       const autoCleanInterval = setInterval(() => {
         try {
           const logs = readLogs()
@@ -267,9 +286,108 @@ function visitorTrackingApiPlugin() {
             })
           }
         } catch {}
-      }, 15000)
+      }, 10000)
       server.httpServer?.on('close', () => clearInterval(autoCleanInterval))
 
+      // API: /api/visitor-history (detailed access timeline)
+      server.middlewares.use('/api/visitor-history', async (req: any, res: any, next: any) => {
+        res.setHeader('Access-Control-Allow-Origin', '*')
+        res.setHeader('Access-Control-Allow-Methods', 'GET, POST, DELETE, OPTIONS')
+        res.setHeader('Access-Control-Allow-Headers', 'Content-Type, Authorization')
+
+        if (req.method === 'OPTIONS') {
+          res.statusCode = 200
+          res.end()
+          return
+        }
+
+        if (req.method === 'GET') {
+          const history = readHistory()
+          res.statusCode = 200
+          res.setHeader('Content-Type', 'application/json; charset=utf-8')
+          res.setHeader('Cache-Control', 'no-store, no-cache, must-revalidate')
+          res.end(JSON.stringify(history))
+          return
+        }
+
+        if (req.method === 'DELETE') {
+          writeHistory([])
+          server.ws.send({ type: 'custom', event: 'eaagri:visitor-history-updated', data: [] })
+          res.statusCode = 200
+          res.setHeader('Content-Type', 'application/json; charset=utf-8')
+          res.end(JSON.stringify({ success: true, count: 0 }))
+          return
+        }
+
+        if (req.method === 'POST') {
+          let body = ''
+          req.on('data', (chunk: any) => {
+            body += chunk
+          })
+          req.on('end', () => {
+            try {
+              const data = JSON.parse(body || '{}')
+              let history = readHistory()
+
+              const socketIp =
+                req.headers['x-forwarded-for']?.toString().split(',')[0].trim() ||
+                req.socket?.remoteAddress ||
+                '127.0.0.1'
+              const cleanSocketIp = socketIp.replace(/^.*:/, '')
+
+              const effectiveIp =
+                data.ip_address && data.ip_address !== '127.0.0.1' && !data.ip_address.startsWith('192.168.')
+                  ? data.ip_address
+                  : (cleanSocketIp || data.ip_address || '116.111.184.173')
+
+              const item = {
+                id: `hist_${Date.now()}_${Math.random().toString(36).substring(2, 7)}`,
+                device_id: data.device_id || `dev_${Date.now()}`,
+                ip_address: effectiveIp,
+                city: data.city || 'TP. Hồ Chí Minh',
+                region: data.region || 'Việt Nam',
+                country: data.country || 'Việt Nam',
+                device_type: data.device_type || 'Desktop',
+                os: data.os || 'Khác',
+                browser: data.browser || 'Chrome',
+                path: data.path || data.last_path || '/',
+                referrer: data.referrer || 'Trực tiếp (Direct)',
+                action: data.action || 'pageview',
+                is_authenticated: Boolean(data.is_authenticated),
+                user_id: data.user_id || null,
+                user_email: data.user_email || null,
+                user_name: data.user_name || null,
+                user_role: data.user_role || null,
+                is_real: data.is_real !== undefined ? Boolean(data.is_real) : true,
+                created_at: new Date().toISOString(),
+              }
+
+              history.unshift(item)
+              if (history.length > 500) history = history.slice(0, 500)
+              writeHistory(history)
+
+              server.ws.send({
+                type: 'custom',
+                event: 'eaagri:visitor-history-updated',
+                data: history,
+              })
+
+              res.statusCode = 200
+              res.setHeader('Content-Type', 'application/json; charset=utf-8')
+              res.end(JSON.stringify({ success: true, count: history.length, item }))
+            } catch (err: any) {
+              res.statusCode = 400
+              res.setHeader('Content-Type', 'application/json; charset=utf-8')
+              res.end(JSON.stringify({ success: false, error: err.message }))
+            }
+          })
+          return
+        }
+
+        next()
+      })
+
+      // API: /api/visitor-track (device aggregation & heartbeats)
       server.middlewares.use('/api/visitor-track', async (req: any, res: any, next: any) => {
         res.setHeader('Access-Control-Allow-Origin', '*')
         res.setHeader('Access-Control-Allow-Methods', 'GET, POST, DELETE, OPTIONS')
@@ -361,12 +479,10 @@ function visitorTrackingApiPlugin() {
 
               const nowIso = new Date().toISOString()
               const deviceId = data.device_id || `dev_${Date.now()}`
-              const isReal = data.is_real !== undefined ? data.is_real : true
+              const isReal = data.is_real !== undefined ? Boolean(data.is_real) : true
 
-              // Find existing by device_id or IP address
-              const existingIdx = logs.findIndex(
-                (item: any) => item.device_id === deviceId || item.ip_address === effectiveIp
-              )
+              // CRITICAL FIX: Match ONLY by unique device_id (never merge different machines by IP)
+              const existingIdx = logs.findIndex((item: any) => item.device_id === deviceId)
 
               // Handle "leave" action (tab closed / user leaves)
               if (data.action === 'leave') {
@@ -460,6 +576,41 @@ function visitorTrackingApiPlugin() {
                 logs.unshift(newRecord)
               }
 
+              // Also record to history log stream
+              try {
+                let history = readHistory()
+                const histItem = {
+                  id: `hist_${Date.now()}_${Math.random().toString(36).substring(2, 7)}`,
+                  device_id: deviceId,
+                  ip_address: effectiveIp,
+                  city: data.city || 'TP. Hồ Chí Minh',
+                  region: data.region || 'Việt Nam',
+                  country: data.country || 'Việt Nam',
+                  device_type: data.device_type || 'Desktop',
+                  os: data.os || 'Windows',
+                  browser: data.browser || 'Chrome',
+                  path: data.last_path || '/',
+                  referrer: data.referrer || 'Trực tiếp (Direct)',
+                  action: 'pageview',
+                  is_authenticated: Boolean(data.is_authenticated),
+                  user_id: data.user_id || null,
+                  user_email: data.user_email || null,
+                  user_name: data.user_name || null,
+                  user_role: data.user_role || null,
+                  is_real: isReal,
+                  created_at: nowIso,
+                }
+                history.unshift(histItem)
+                if (history.length > 500) history = history.slice(0, 500)
+                writeHistory(history)
+                server.ws.send({
+                  type: 'custom',
+                  event: 'eaagri:visitor-history-updated',
+                  data: history,
+                })
+              } catch {}
+
+              cleanExpiredOnline(logs)
               writeLogs(logs)
 
               // Broadcast update to all open dashboards in realtime

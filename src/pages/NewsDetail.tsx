@@ -56,7 +56,7 @@ export default function NewsDetail() {
           "@type": "NewsArticle",
           "headline": article.title,
           "description": articleSnippet,
-          "image": imageUrl ? [imageUrl] : ["https://www.eaagri.vn/logo_v1.jpg"],
+          "image": imageUrl ? [imageUrl] : ["https://www.eaagri.vn/images-1/logo_v1.jpg"],
           "datePublished": article.created_at,
           "dateModified": article.created_at,
           "author": {
@@ -68,7 +68,7 @@ export default function NewsDetail() {
             "name": "EaAgri",
             "logo": {
               "@type": "ImageObject",
-              "url": "https://www.eaagri.vn/logo_v1.jpg"
+              "url": "https://www.eaagri.vn/images-1/logo_v1.jpg"
             }
           },
           "mainEntityOfPage": {

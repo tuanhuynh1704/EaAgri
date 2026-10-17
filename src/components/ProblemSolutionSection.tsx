@@ -40,7 +40,7 @@ const MATRIX_DATA: RiskSolutionPair[] = [
     number: "01",
     categoryLabel: "Nước & Khí Hậu",
     themeColor: "cyan",
-    image: "/ẢNh 1.webp",
+    image: "/images-1/ẢNh 1.webp",
     imageAlt: "Mô hình 3D vườn sầu riêng thông minh kết nối cảm biến IoT và ứng dụng EaAgri",
     riskTitle: "Sốc Nước & Khô Hạn Cực Đoan",
     riskIcon: "ri-drop-line",

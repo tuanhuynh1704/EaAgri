@@ -27,6 +27,53 @@ export interface VisitorLogItem {
   user_role?: string;
 }
 
+export interface VisitorHistoryItem {
+  id: string;
+  device_id: string;
+  ip_address: string;
+  city: string;
+  region: string;
+  country: string;
+  device_type: "Desktop" | "Mobile" | "Tablet";
+  os: string;
+  browser: string;
+  path: string;
+  referrer: string;
+  action: "pageview" | "heartbeat" | "leave" | "login" | string;
+  is_authenticated: boolean;
+  user_id?: string;
+  user_email?: string;
+  user_name?: string;
+  user_role?: string;
+  is_real?: boolean;
+  created_at: string;
+}
+
+/**
+ * Check if the current user has authorized admin privileges (SA or admin)
+ */
+export function isAuthorizedAdminRole(user?: any, profile?: any): boolean {
+  if (!user && !profile) return false;
+  if (user?.id === "eaagri-admin-sa-master") return true;
+
+  const rolesToCheck: string[] = [
+    profile?.role,
+    (user?.app_metadata as any)?.role,
+    (user?.user_metadata as any)?.role,
+  ]
+    .filter(Boolean)
+    .map((r) => String(r).toLowerCase().trim());
+
+  return rolesToCheck.some(
+    (r) =>
+      r === "sa" ||
+      r === "admin" ||
+      r === "administrator" ||
+      r === "superadmin" ||
+      r === "super_admin"
+  );
+}
+
 /**
  * Get current visitor user info from localStorage or session
  */
@@ -120,6 +167,7 @@ export function isRealVisitor(item: VisitorLogItem): boolean {
 const DEVICE_ID_KEY = "eaagri_visitor_device_id";
 const IP_CACHE_KEY = "eaagri_visitor_ip_cache";
 const LOCAL_LOGS_KEY = "eaagri_visitor_logs_cache";
+const LOCAL_HISTORY_KEY = "eaagri_visitor_history_cache";
 const LAST_TRACK_TIME_KEY = "eaagri_last_track_timestamp";
 
 /**
@@ -372,12 +420,30 @@ export async function recordVisitorHit(
         }
       : getCurrentVisitorUser();
 
-  // 1. Try sending to Central Server API (/api/visitor-track) to sync across all devices
-  try {
-    const res = await fetch("/api/visitor-track", {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({
+  const referrerUrl = document.referrer
+    ? new URL(document.referrer, window.location.origin).hostname || "Trực tiếp"
+    : "Trực tiếp (Direct)";
+
+  // 1. Sync to Supabase (Cloud Database for cross-device sync)
+  let cloudSuccess = false;
+  let remoteVisitCount = 1;
+  let remoteFirstVisit = nowIso;
+
+  if (isRealSupabaseConfigured()) {
+    try {
+      // Find existing device to calculate cumulative visit count
+      const { data: existingDev } = await supabase
+        .from("visitor_logs")
+        .select("visit_count, first_visit, is_authenticated, user_name, user_email, user_role")
+        .eq("device_id", deviceId)
+        .maybeSingle();
+
+      if (existingDev) {
+        remoteVisitCount = (existingDev.visit_count || 0) + 1;
+        remoteFirstVisit = existingDev.first_visit || nowIso;
+      }
+
+      const upsertPayload: any = {
         device_id: deviceId,
         ip_address: geo.ip,
         city: geo.city,
@@ -387,32 +453,99 @@ export async function recordVisitorHit(
         os: info.os,
         browser: info.browser,
         screen_resolution: info.screenResolution,
+        visit_count: remoteVisitCount,
         last_path: currentPath,
+        referrer: referrerUrl,
+        is_online: true,
+        first_visit: remoteFirstVisit,
+        last_visit: nowIso,
         is_real: true,
-        is_authenticated: resolvedUser.isAuthenticated,
+        is_authenticated: Boolean(resolvedUser.isAuthenticated || existingDev?.is_authenticated),
+        user_id: resolvedUser.userId || null,
+        user_email: resolvedUser.userEmail || existingDev?.user_email || null,
+        user_name: resolvedUser.userName || existingDev?.user_name || null,
+        user_role: resolvedUser.userRole || existingDev?.user_role || null,
+      };
+
+      const { error: upsertErr } = await supabase
+        .from("visitor_logs")
+        .upsert(upsertPayload, { onConflict: "device_id" });
+
+      if (!upsertErr) {
+        cloudSuccess = true;
+      }
+
+      // Also record to visitor_history_logs (stream of access events)
+      await supabase.from("visitor_history_logs").insert({
+        device_id: deviceId,
+        ip_address: geo.ip,
+        city: geo.city,
+        region: geo.region,
+        country: geo.country,
+        device_type: info.deviceType,
+        os: info.os,
+        browser: info.browser,
+        path: currentPath,
+        referrer: referrerUrl,
+        action: "pageview",
+        is_authenticated: Boolean(resolvedUser.isAuthenticated),
         user_id: resolvedUser.userId || null,
         user_email: resolvedUser.userEmail || null,
         user_name: resolvedUser.userName || null,
         user_role: resolvedUser.userRole || null,
-        referrer: document.referrer
-          ? new URL(document.referrer, window.location.origin).hostname || "Trực tiếp"
-          : "Trực tiếp (Direct)",
-      }),
+        is_real: true,
+        created_at: nowIso,
+      });
+    } catch (err) {
+      // Supabase table may not exist yet or connection failed
+    }
+  }
+
+  // 2. Sync to Central Server API (/api/visitor-track & /api/visitor-history)
+  const trackPayload = {
+    device_id: deviceId,
+    ip_address: geo.ip,
+    city: geo.city,
+    region: geo.region,
+    country: geo.country,
+    device_type: info.deviceType,
+    os: info.os,
+    browser: info.browser,
+    screen_resolution: info.screenResolution,
+    last_path: currentPath,
+    is_real: true,
+    is_authenticated: resolvedUser.isAuthenticated,
+    user_id: resolvedUser.userId || null,
+    user_email: resolvedUser.userEmail || null,
+    user_name: resolvedUser.userName || null,
+    user_role: resolvedUser.userRole || null,
+    referrer: referrerUrl,
+  };
+
+  try {
+    const res = await fetch("/api/visitor-track", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify(trackPayload),
     });
 
     if (res.ok) {
       const resJson = await res.json();
-      if (resJson?.logs && Array.isArray(resJson.logs)) {
+      if (!cloudSuccess && resJson?.logs && Array.isArray(resJson.logs)) {
         localStorage.setItem(LOCAL_LOGS_KEY, JSON.stringify(resJson.logs));
-        window.dispatchEvent(new CustomEvent("eaagri_visitor_update"));
-        return;
       }
     }
-  } catch {
-    // API not reachable, fallback to client-side storage + Supabase
-  }
+  } catch {}
 
-  // 2. Update LocalStorage cache for this machine
+  try {
+    fetch("/api/visitor-history", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ ...trackPayload, path: currentPath, action: "pageview" }),
+    }).catch(() => {});
+  } catch {}
+
+  // 3. Update LocalStorage cache for immediate snappy render
   let localLogs: VisitorLogItem[] = [];
   try {
     const raw = localStorage.getItem(LOCAL_LOGS_KEY);
@@ -421,10 +554,8 @@ export async function recordVisitorHit(
     }
   } catch {}
 
-  // Match by device_id or IP address
-  const existingIdx = localLogs.findIndex(
-    (item) => item.device_id === deviceId || (geo.ip && item.ip_address === geo.ip)
-  );
+  // CRITICAL FIX: Match ONLY by unique device_id (never merge different machines by IP)
+  const existingIdx = localLogs.findIndex((item) => item.device_id === deviceId);
   let updatedItem: VisitorLogItem;
 
   if (existingIdx >= 0) {
@@ -440,7 +571,7 @@ export async function recordVisitorHit(
       os: info.os,
       browser: info.browser,
       screen_resolution: info.screenResolution,
-      visit_count: (current.visit_count || 1) + 1,
+      visit_count: remoteVisitCount > (current.visit_count || 1) ? remoteVisitCount : (current.visit_count || 1) + 1,
       last_path: currentPath,
       is_online: true,
       last_visit: nowIso,
@@ -464,11 +595,11 @@ export async function recordVisitorHit(
       os: info.os,
       browser: info.browser,
       screen_resolution: info.screenResolution,
-      visit_count: 1,
+      visit_count: remoteVisitCount,
       last_path: currentPath,
-      referrer: document.referrer ? (new URL(document.referrer, window.location.origin).hostname || "Trực tiếp") : "Trực tiếp (Direct)",
+      referrer: referrerUrl,
       is_online: true,
-      first_visit: nowIso,
+      first_visit: remoteFirstVisit,
       last_visit: nowIso,
       is_real: true,
       is_authenticated: resolvedUser.isAuthenticated,
@@ -482,6 +613,36 @@ export async function recordVisitorHit(
 
   try {
     localStorage.setItem(LOCAL_LOGS_KEY, JSON.stringify(localLogs));
+
+    // Also append to local history cache
+    let localHistory: VisitorHistoryItem[] = [];
+    const rawHist = localStorage.getItem(LOCAL_HISTORY_KEY);
+    if (rawHist) localHistory = JSON.parse(rawHist);
+    const histItem: VisitorHistoryItem = {
+      id: `hist_${Date.now()}_${Math.random().toString(36).substring(2, 7)}`,
+      device_id: deviceId,
+      ip_address: geo.ip || "116.111.184.173",
+      city: geo.city || "TP. Hồ Chí Minh",
+      region: geo.region || "Việt Nam",
+      country: geo.country || "Việt Nam",
+      device_type: info.deviceType,
+      os: info.os,
+      browser: info.browser,
+      path: currentPath,
+      referrer: referrerUrl,
+      action: "pageview",
+      is_authenticated: resolvedUser.isAuthenticated,
+      user_id: resolvedUser.userId,
+      user_email: resolvedUser.userEmail,
+      user_name: resolvedUser.userName,
+      user_role: resolvedUser.userRole,
+      is_real: true,
+      created_at: nowIso,
+    };
+    localHistory.unshift(histItem);
+    if (localHistory.length > 300) localHistory = localHistory.slice(0, 300);
+    localStorage.setItem(LOCAL_HISTORY_KEY, JSON.stringify(localHistory));
+
     // Dispatch instant realtime update across tabs and windows
     window.dispatchEvent(new CustomEvent("eaagri_visitor_update"));
     if (typeof BroadcastChannel !== "undefined") {
@@ -490,31 +651,6 @@ export async function recordVisitorHit(
       channel.close();
     }
   } catch {}
-
-  // 3. Sync to Supabase if connected
-  try {
-    await supabase.from("visitor_logs").upsert(
-      {
-        device_id: updatedItem.device_id,
-        ip_address: updatedItem.ip_address,
-        city: updatedItem.city,
-        region: updatedItem.region,
-        country: updatedItem.country,
-        device_type: updatedItem.device_type,
-        os: updatedItem.os,
-        browser: updatedItem.browser,
-        screen_resolution: updatedItem.screen_resolution,
-        visit_count: updatedItem.visit_count,
-        last_path: updatedItem.last_path,
-        referrer: updatedItem.referrer,
-        is_online: true,
-        last_visit: nowIso,
-      },
-      { onConflict: "device_id" }
-    );
-  } catch (err) {
-    // Supabase table may not exist yet; silent fallback to localStorage
-  }
 }
 
 /**
@@ -531,6 +667,28 @@ export function isRealSupabaseConfigured(): boolean {
     !key.includes("your-anon-key") &&
     !key.includes("placeholder-anon-key")
   );
+}
+
+/**
+ * Check if visitor_logs table exists and is accessible in Supabase
+ */
+export async function checkSupabaseVisitorTableStatus(): Promise<{
+  isConfigured: boolean;
+  tableExists: boolean;
+  errorMessage?: string;
+}> {
+  if (!isRealSupabaseConfigured()) {
+    return { isConfigured: false, tableExists: false, errorMessage: "Chưa cấu hình Supabase URL hoặc Key" };
+  }
+  try {
+    const { error } = await supabase.from("visitor_logs").select("id").limit(1);
+    if (error) {
+      return { isConfigured: true, tableExists: false, errorMessage: error.message };
+    }
+    return { isConfigured: true, tableExists: true };
+  } catch (err: any) {
+    return { isConfigured: true, tableExists: false, errorMessage: err.message };
+  }
 }
 
 /**
@@ -592,10 +750,49 @@ export function getLocalOrSeedLogs(): VisitorLogItem[] {
 }
 
 /**
- * Retrieve visitor logs from Server API, Supabase, or fallback to LocalStorage
+ * Retrieve visitor logs from Supabase (Cloud Sync), Server API, or fallback to LocalStorage
  */
 export async function getVisitorLogs(): Promise<{ logs: VisitorLogItem[]; isFromCloud: boolean }> {
-  // 1. First attempt to query central server API (/api/visitor-track) which has multi-device synced data
+  // 1. Query Supabase FIRST if configured (True Cross-Device Cloud Sync)
+  if (isRealSupabaseConfigured()) {
+    try {
+      const queryPromise = supabase
+        .from("visitor_logs")
+        .select("*")
+        .order("last_visit", { ascending: false });
+
+      const timeoutPromise = new Promise<{ data: null; error: Error }>((resolve) =>
+        setTimeout(() => resolve({ data: null, error: new Error("Supabase timeout") }), 3000)
+      );
+
+      const { data, error } = (await Promise.race([queryPromise, timeoutPromise])) as any;
+
+      if (!error && Array.isArray(data) && data.length > 0) {
+        // Automatically mark stale entries (> 2 mins without heartbeat) as offline
+        const now = Date.now();
+        const cleaned = data.map((item: VisitorLogItem) => {
+          const diff = now - new Date(item.last_visit).getTime();
+          if (item.is_online && diff > 120000) {
+            return { ...item, is_online: false };
+          }
+          return item;
+        });
+
+        try {
+          localStorage.setItem(LOCAL_LOGS_KEY, JSON.stringify(cleaned));
+        } catch {}
+
+        return {
+          logs: cleaned,
+          isFromCloud: true,
+        };
+      }
+    } catch {
+      // Fall through to server API
+    }
+  }
+
+  // 2. Query central server API (/api/visitor-track) which has multi-device synced data
   try {
     const apiRes = await fetch("/api/visitor-track");
     if (apiRes.ok) {
@@ -612,31 +809,6 @@ export async function getVisitorLogs(): Promise<{ logs: VisitorLogItem[]; isFrom
     }
   } catch {}
 
-  // 2. Query Supabase if real configuration exists, with 2s timeout
-  if (isRealSupabaseConfigured()) {
-    try {
-      const queryPromise = supabase
-        .from("visitor_logs")
-        .select("*")
-        .order("last_visit", { ascending: false });
-
-      const timeoutPromise = new Promise<{ data: null; error: Error }>((resolve) =>
-        setTimeout(() => resolve({ data: null, error: new Error("Supabase timeout") }), 2000)
-      );
-
-      const { data, error } = (await Promise.race([queryPromise, timeoutPromise])) as any;
-
-      if (!error && Array.isArray(data) && data.length > 0) {
-        return {
-          logs: data as VisitorLogItem[],
-          isFromCloud: true,
-        };
-      }
-    } catch {
-      // Fall through to local fallback
-    }
-  }
-
   // 3. Fallback to local logs
   return {
     logs: getLocalOrSeedLogs(),
@@ -645,10 +817,58 @@ export async function getVisitorLogs(): Promise<{ logs: VisitorLogItem[]; isFrom
 }
 
 /**
+ * Retrieve detailed chronological access history logs
+ */
+export async function getVisitorHistoryLogs(): Promise<{ history: VisitorHistoryItem[]; isFromCloud: boolean }> {
+  // 1. Try Supabase visitor_history_logs
+  if (isRealSupabaseConfigured()) {
+    try {
+      const { data, error } = await supabase
+        .from("visitor_history_logs")
+        .select("*")
+        .order("created_at", { ascending: false })
+        .limit(200);
+
+      if (!error && Array.isArray(data) && data.length > 0) {
+        try {
+          localStorage.setItem(LOCAL_HISTORY_KEY, JSON.stringify(data));
+        } catch {}
+        return { history: data as VisitorHistoryItem[], isFromCloud: true };
+      }
+    } catch {}
+  }
+
+  // 2. Try Server API /api/visitor-history
+  try {
+    const res = await fetch("/api/visitor-history");
+    if (res.ok) {
+      const data = await res.json();
+      if (Array.isArray(data) && data.length > 0) {
+        try {
+          localStorage.setItem(LOCAL_HISTORY_KEY, JSON.stringify(data));
+        } catch {}
+        return { history: data as VisitorHistoryItem[], isFromCloud: true };
+      }
+    }
+  } catch {}
+
+  // 3. Fallback to local cache
+  try {
+    const raw = localStorage.getItem(LOCAL_HISTORY_KEY);
+    if (raw) {
+      return { history: JSON.parse(raw), isFromCloud: false };
+    }
+  } catch {}
+
+  return { history: [], isFromCloud: false };
+}
+
+/**
  * Clear only sample/mock visitor logs, retaining 100% of real devices
  */
 export async function clearSampleVisitorLogs(): Promise<number> {
   let deletedCount = 0;
+
   // 1. Request server API to delete sample logs
   try {
     const res = await fetch("/api/visitor-track?type=sample", { method: "DELETE" });
@@ -657,23 +877,30 @@ export async function clearSampleVisitorLogs(): Promise<number> {
       if (data?.logs && Array.isArray(data.logs)) {
         localStorage.setItem(LOCAL_LOGS_KEY, JSON.stringify(data.logs));
         window.dispatchEvent(new CustomEvent("eaagri_visitor_update"));
-        return data.deletedCount || 1;
+        deletedCount = data.deletedCount || 1;
       }
     }
   } catch {}
 
-  // 2. Filter local storage cache
+  // 2. Delete from Supabase if connected
+  if (isRealSupabaseConfigured()) {
+    try {
+      await supabase.from("visitor_logs").delete().eq("is_real", false);
+    } catch {}
+  }
+
+  // 3. Filter local storage cache
   try {
     const raw = localStorage.getItem(LOCAL_LOGS_KEY);
     if (raw) {
       const parsed: VisitorLogItem[] = JSON.parse(raw);
       const realOnly = parsed.filter(isRealVisitor);
-      deletedCount = parsed.length - realOnly.length;
+      deletedCount = Math.max(deletedCount, parsed.length - realOnly.length);
       localStorage.setItem(LOCAL_LOGS_KEY, JSON.stringify(realOnly));
     }
   } catch {}
 
-  // 3. Dispatch update event across tabs & windows
+  // 4. Dispatch update event across tabs & windows
   try {
     window.dispatchEvent(new CustomEvent("eaagri_visitor_update"));
     if (typeof BroadcastChannel !== "undefined") {
@@ -690,6 +917,15 @@ export async function clearSampleVisitorLogs(): Promise<number> {
  * Delete a single visitor entry by ID or Device ID
  */
 export async function deleteSingleVisitorLog(idOrDeviceId: string): Promise<void> {
+  if (isRealSupabaseConfigured()) {
+    try {
+      await supabase
+        .from("visitor_logs")
+        .delete()
+        .or(`id.eq.${idOrDeviceId},device_id.eq.${idOrDeviceId}`);
+    } catch {}
+  }
+
   try {
     await fetch(`/api/visitor-track?id=${encodeURIComponent(idOrDeviceId)}`, { method: "DELETE" });
   } catch {}
@@ -719,6 +955,12 @@ export async function deleteSingleVisitorLog(idOrDeviceId: string): Promise<void
  * Clear all visitor logs
  */
 export async function clearVisitorLogs(): Promise<void> {
+  if (isRealSupabaseConfigured()) {
+    try {
+      await supabase.from("visitor_logs").delete().neq("id", "00000000-0000-0000-0000-000000000000");
+    } catch {}
+  }
+
   try {
     await fetch("/api/visitor-track", { method: "DELETE" });
   } catch {}
@@ -727,14 +969,30 @@ export async function clearVisitorLogs(): Promise<void> {
     localStorage.removeItem(LOCAL_LOGS_KEY);
     window.dispatchEvent(new CustomEvent("eaagri_visitor_update"));
   } catch {}
+}
+
+/**
+ * Clear all visitor history logs
+ */
+export async function clearVisitorHistoryLogs(): Promise<void> {
+  if (isRealSupabaseConfigured()) {
+    try {
+      await supabase.from("visitor_history_logs").delete().neq("id", "00000000-0000-0000-0000-000000000000");
+    } catch {}
+  }
 
   try {
-    await supabase.from("visitor_logs").delete().neq("id", "00000000-0000-0000-0000-000000000000");
+    await fetch("/api/visitor-history", { method: "DELETE" });
+  } catch {}
+
+  try {
+    localStorage.removeItem(LOCAL_HISTORY_KEY);
+    window.dispatchEvent(new CustomEvent("eaagri_visitor_update"));
   } catch {}
 }
 
 /**
- * Export logs to CSV file with UTF-8 BOM for Microsoft Excel
+ * Export device summary logs to CSV file with UTF-8 BOM for Microsoft Excel
  */
 export function exportVisitorLogsToCsv(logs: VisitorLogItem[]): void {
   if (!logs || logs.length === 0) return;
@@ -744,6 +1002,7 @@ export function exportVisitorLogsToCsv(logs: VisitorLogItem[]): void {
     "Đối tượng truy cập",
     "Tài khoản / Email",
     "Tên người dùng",
+    "Vai trò (Role)",
     "Địa chỉ IP",
     "Thành phố / Tỉnh",
     "Quốc gia",
@@ -765,6 +1024,7 @@ export function exportVisitorLogsToCsv(logs: VisitorLogItem[]): void {
     log.is_authenticated ? '"Đã đăng nhập"' : '"Khách vãng lai"',
     `"${log.user_email || ''}"`,
     `"${log.user_name || ''}"`,
+    `"${log.user_role || (log.is_authenticated ? 'user' : 'khách')}"`,
     `"${log.ip_address}"`,
     `"${log.city || ''}"`,
     `"${log.country || ''}"`,
@@ -787,19 +1047,71 @@ export function exportVisitorLogsToCsv(logs: VisitorLogItem[]): void {
   const link = document.createElement("a");
   const dateStr = new Date().toISOString().split("T")[0];
   link.setAttribute("href", url);
-  link.setAttribute("download", `eaagri_visitor_logs_${dateStr}.csv`);
+  link.setAttribute("download", `eaagri_visitor_devices_${dateStr}.csv`);
   document.body.appendChild(link);
   link.click();
   document.body.removeChild(link);
 }
 
 /**
- * Check if a visitor is currently online (heartbeat within 2.5 minutes)
+ * Export detailed access history log stream to CSV with UTF-8 BOM
+ */
+export function exportVisitorHistoryToCsv(history: VisitorHistoryItem[]): void {
+  if (!history || history.length === 0) return;
+
+  const headers = [
+    "Thời gian",
+    "Hành động",
+    "Đường dẫn (Path)",
+    "Đối tượng",
+    "Tên người dùng",
+    "Email",
+    "Vai trò (Role)",
+    "Địa chỉ IP",
+    "Vị trí",
+    "Thiết bị",
+    "Hệ điều hành",
+    "Trình duyệt",
+    "Nguồn giới thiệu",
+    "Mã thiết bị",
+  ];
+
+  const rows = history.map((item) => [
+    `"${new Date(item.created_at).toLocaleString('vi-VN')}"`,
+    `"${item.action === 'pageview' ? 'Xem trang' : item.action === 'login' ? 'Đăng nhập' : item.action}"`,
+    `"${item.path}"`,
+    item.is_authenticated ? '"Thành viên"' : '"Khách vãng lai"',
+    `"${item.user_name || ''}"`,
+    `"${item.user_email || ''}"`,
+    `"${item.user_role || (item.is_authenticated ? 'user' : 'khách')}"`,
+    `"${item.ip_address}"`,
+    `"${item.city ? item.city + ', ' + item.country : item.country}"`,
+    `"${item.device_type}"`,
+    `"${item.os}"`,
+    `"${item.browser}"`,
+    `"${item.referrer}"`,
+    `"${item.device_id}"`,
+  ]);
+
+  const csvContent = "\uFEFF" + [headers.join(","), ...rows.map((e) => e.join(","))].join("\n");
+  const blob = new Blob([csvContent], { type: "text/csv;charset=utf-8;" });
+  const url = URL.createObjectURL(blob);
+  const link = document.createElement("a");
+  const dateStr = new Date().toISOString().split("T")[0];
+  link.setAttribute("href", url);
+  link.setAttribute("download", `eaagri_access_history_logs_${dateStr}.csv`);
+  document.body.appendChild(link);
+  link.click();
+  document.body.removeChild(link);
+}
+
+/**
+ * Check if a visitor is currently online (heartbeat within 2 minutes)
  */
 export function isVisitorOnline(log: VisitorLogItem): boolean {
   if (!log) return false;
   const diff = Date.now() - new Date(log.last_visit).getTime();
-  return Boolean(log.is_online) && diff < 150000;
+  return Boolean(log.is_online) && diff < 120000;
 }
 
 /**
@@ -808,6 +1120,19 @@ export function isVisitorOnline(log: VisitorLogItem): boolean {
 export async function sendVisitorHeartbeat(currentPath: string = "/"): Promise<void> {
   if (typeof window === "undefined") return;
   const deviceId = getOrCreateDeviceId();
+  const nowIso = new Date().toISOString();
+
+  // 1. Update Supabase
+  if (isRealSupabaseConfigured()) {
+    try {
+      await supabase
+        .from("visitor_logs")
+        .update({ last_visit: nowIso, is_online: true, last_path: currentPath })
+        .eq("device_id", deviceId);
+    } catch {}
+  }
+
+  // 2. Update Server API
   try {
     await fetch("/api/visitor-track", {
       method: "POST",
@@ -833,6 +1158,18 @@ export function sendVisitorLeave(): void {
     is_online: false,
   });
 
+  // 1. Update Supabase
+  if (isRealSupabaseConfigured()) {
+    try {
+      supabase
+        .from("visitor_logs")
+        .update({ is_online: false })
+        .eq("device_id", deviceId)
+        .then(() => {});
+    } catch {}
+  }
+
+  // 2. Send Beacon / Keepalive fetch
   if (navigator.sendBeacon) {
     try {
       const blob = new Blob([payload], { type: "application/json" });

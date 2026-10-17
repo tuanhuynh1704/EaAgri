@@ -136,7 +136,7 @@ export default function Register() {
       {/* Full-screen Background Banner Image */}
       <div
         className="auth-page__bg"
-        style={{ backgroundImage: "url('/Banner 3.webp')" }}
+        style={{ backgroundImage: "url('/images-1/Banner 3.webp')" }}
       ></div>
       <div className="auth-page__overlay"></div>
 
@@ -156,7 +156,7 @@ export default function Register() {
           <span className="auth-page__intro-label">
             <i className="ri-sparkling-2-line" /> EA AGRI ECOSYSTEM
           </span>
-          <img src="/logo_navbar.webp" alt="Ea Agri" className="auth-page__intro-logo" />
+          <img src="/images-1/logo_navbar.webp" alt="Ea Agri" className="auth-page__intro-logo" />
           <h2>
             Đồng hành cùng<br />
             <span>Nông nghiệp số 4.0.</span>

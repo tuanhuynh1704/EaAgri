@@ -1,10 +1,12 @@
 import { useState, useEffect, useMemo } from "react";
 import { Link } from "react-router-dom";
 import { useAuth } from "../context/AuthContext";
+import { supabase } from "../utils/supabase/client";
 import {
   getLocalOrSeedLogs,
   getVisitorLogs,
   computeTrafficStats,
+  isAuthorizedAdminRole,
   type VisitorLogItem,
 } from "../services/visitorTracker";
 
@@ -12,7 +14,8 @@ const DISMISS_KEY = "eaagri_traffic_widget_dismissed";
 
 export default function FloatingTrafficWidget() {
   const { user, profile } = useAuth();
-  const isAdmin = user && (profile?.role === "SA" || user.id === "eaagri-admin-sa-master");
+  // Only users with role admin or SA (or master admin) are permitted to view traffic counts
+  const isAdmin = isAuthorizedAdminRole(user, profile);
 
   const [logs, setLogs] = useState<VisitorLogItem[]>(() => getLocalOrSeedLogs());
   const [isReady, setIsReady] = useState(false);
@@ -34,14 +37,31 @@ export default function FloatingTrafficWidget() {
   };
 
   useEffect(() => {
-    // Show smoothly after 800ms
+    if (!isAdmin) return;
+
+    // Show smoothly after 600ms
     const timer = setTimeout(() => {
       setIsReady(true);
-    }, 800);
+    }, 600);
 
     loadData();
 
-    // 1. BroadcastChannel across tabs
+    // 1. Supabase Realtime for instant multi-device cloud synchronization
+    let channel: any = null;
+    try {
+      channel = supabase
+        .channel("floating-traffic-realtime")
+        .on(
+          "postgres_changes",
+          { event: "*", schema: "public", table: "visitor_logs" },
+          () => {
+            loadData();
+          }
+        )
+        .subscribe();
+    } catch {}
+
+    // 2. BroadcastChannel across tabs on the same machine
     let bc: BroadcastChannel | null = null;
     if (typeof BroadcastChannel !== "undefined") {
       try {
@@ -50,20 +70,20 @@ export default function FloatingTrafficWidget() {
       } catch {}
     }
 
-    // 2. Custom DOM event in same window
+    // 3. Custom DOM event in same window
     const handleUpdate = () => loadData();
     window.addEventListener("eaagri_visitor_update", handleUpdate);
 
-    // 3. Storage event
+    // 4. Storage event
     const handleStorage = (e: StorageEvent) => {
       if (e.key === "eaagri_visitor_logs_cache") loadData();
     };
     window.addEventListener("storage", handleStorage);
 
-    // 4. Polling heartbeat every 8 seconds
-    const interval = setInterval(loadData, 8000);
+    // 5. Polling heartbeat every 5 seconds for continuous real-time accuracy
+    const interval = setInterval(loadData, 5000);
 
-    // 5. Hot reload websocket
+    // 6. Hot reload websocket (local dev)
     if (import.meta.hot) {
       import.meta.hot.on("eaagri:visitor-updated", (data: any) => {
         if (Array.isArray(data)) setLogs(data);
@@ -73,14 +93,20 @@ export default function FloatingTrafficWidget() {
     return () => {
       clearTimeout(timer);
       clearInterval(interval);
+      if (channel) {
+        try {
+          supabase.removeChannel(channel);
+        } catch {}
+      }
       if (bc) bc.close();
       window.removeEventListener("eaagri_visitor_update", handleUpdate);
       window.removeEventListener("storage", handleStorage);
     };
-  }, []);
+  }, [isAdmin]);
 
   // Smoothly alternate pill text between Active Users & Total Visits every 3.5s
   useEffect(() => {
+    if (!isAdmin) return;
     const cycle = setInterval(() => {
       setPillMode((prev) => (prev === "online" ? "total" : "online"));
     }, 3500);
@@ -105,7 +131,7 @@ export default function FloatingTrafficWidget() {
     } catch {}
   };
 
-  if (!isReady) return null;
+  if (!isAdmin || !isReady) return null;
 
   // Minimized trigger pill if dismissed
   if (isDismissed) {

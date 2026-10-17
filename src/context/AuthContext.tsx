@@ -7,7 +7,7 @@ interface Profile {
   id: string;
   email: string;
   full_name: string | null;
-  role: "SA" | "user";
+  role: "SA" | "admin" | "user" | string;
   created_at: string;
 }
 

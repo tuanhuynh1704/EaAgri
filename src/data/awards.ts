@@ -134,17 +134,17 @@ export const AWARDS_LIST: AwardDetail[] = [
     ],
     images: [
       {
-        url: "/Khởi nghiệp 3.webp",
+        url: "/images-1/Khởi nghiệp 3.webp",
         title: "Bằng Khen Giải Nhất Bảng 1C & Huy Chương",
         caption: "Giấy chứng nhận Giải Nhất Bảng 1C cùng Huy chương danh dự từ Ban Tổ Chức NTTU Innovation Startup 2026.",
       },
       {
-        url: "/Khởi nghiệp 1.webp",
+        url: "/images-1/Khởi nghiệp 1.webp",
         title: "Trình Báo Cáo Hội Đồng Ban Giám Khảo",
         caption: "Đội ngũ kỹ sư EaAgri thuyết minh mô hình trạm quan trắc IoT và giải thuật AI tại bàn triển lãm vòng Bán kết.",
       },
       {
-        url: "/Khởi nghiệp 2.webp",
+        url: "/images-1/Khởi nghiệp 2.webp",
         title: "Đội Ngũ Sáng Lập EaAgri",
         caption: "Các thành viên nòng cốt của dự án EaAgri trong ngày vinh danh chiến thắng vòng Bán kết.",
       },

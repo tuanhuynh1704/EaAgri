@@ -742,7 +742,7 @@ const TeamSection = () => {
                 loading="lazy"
                 decoding="async"
                 onError={(e) => {
-                  (e.target as HTMLImageElement).src = "/Iphone.webp";
+                  (e.target as HTMLImageElement).src = "/images-1/Iphone.webp";
                 }}
               />
             </div>

@@ -1,6 +1,7 @@
 import { useState, useEffect, useRef } from "react";
 import { useNavigate, useLocation } from "react-router-dom";
 import { useAuth } from "../context/AuthContext";
+import { isAuthorizedAdminRole } from "../services/visitorTracker";
 
 const Navbar = () => {
   const navigate = useNavigate();
@@ -101,7 +102,7 @@ const Navbar = () => {
 
   const displayName = profile?.full_name || user?.email?.split("@")[0] || "Thành viên";
   const initialChar = displayName.trim().charAt(0).toUpperCase() || "U";
-  const isAdmin = profile?.role === "SA";
+  const isAdmin = isAuthorizedAdminRole(user, profile);
 
   return (
     <>
@@ -110,7 +111,7 @@ const Navbar = () => {
       >
       <div className="nav__logo" onClick={handleHome} title="EaAgri - Về đầu trang">
         <img
-          src="/logo_banner.jpg"
+          src="/images-1/logo_banner.jpg"
           alt="EaAgri Logo"
           className="nav__logo-img"
         />
@@ -341,7 +342,7 @@ const Navbar = () => {
             handleHome();
           }}
         >
-          <img src="/logo_banner.jpg" alt="EaAgri" className="mobile-drawer__logo-img" />
+          <img src="/images-1/logo_banner.jpg" alt="EaAgri" className="mobile-drawer__logo-img" />
         </div>
         <button
           type="button"

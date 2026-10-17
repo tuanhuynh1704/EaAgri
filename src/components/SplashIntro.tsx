@@ -608,7 +608,7 @@ export default function SplashIntro({
           }`}
         >
           <img
-            src="/logo_banner.jpg"
+            src="/images-1/logo_banner.jpg"
             alt="EA Agri Logo"
             className="homepage-splash__logo"
           />
