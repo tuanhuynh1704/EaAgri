@@ -11,13 +11,13 @@ export default function ArchitecturePage() {
             "Khám phá kiến trúc công nghệ Hybrid của EaAgri: Mạng lưới cảm biến độ ẩm đất đa tầng, bộ não kép AI Vision YOLOv9 và Gemini reasoning, hệ thống RAG và dự báo giá LSTM.",
         keywords:
             "Kiến trúc EaAgri, IoT nông nghiệp, AI Dual-Brain, YOLOv9 VietGAP, tưới tự động 3 lớp, LSTM dự báo giá",
-        canonicalUrl: "https://www.eaagri.vn/architecture",
+        canonicalUrl: "https://www.eaagri.vn/kien-truc",
         structuredData: {
             "@context": "https://schema.org",
             "@type": "TechArticle",
             "headline": "Kiến Trúc Hệ Thống Nông Nghiệp Thông Minh EaAgri (IoT & AI)",
             "description": "Mô hình Hybrid kết hợp cảm biến IoT thời gian thực, AI thị giác máy tính và hệ thống RAG tri thức chuẩn hóa VietGAP.",
-            "url": "https://www.eaagri.vn/architecture",
+            "url": "https://www.eaagri.vn/kien-truc",
             "author": {
                 "@type": "Organization",
                 "name": "EaAgri Team"
@@ -34,7 +34,7 @@ export default function ArchitecturePage() {
     }, []);
 
     return (
-        <div className="section-bg--gradient-soft" style={{ paddingTop: '90px' }}>
+        <div className="architecture-page section-bg--gradient-soft">
             <section className="architecture-tech-hero section__container" data-aos="fade-up">
                 <div className="architecture-tech-hero__copy">
                     <span className="architecture-tech-hero__eyebrow">
@@ -56,7 +56,7 @@ export default function ArchitecturePage() {
                 <div className="architecture-tech-hero__visual">
                     <span className="architecture-tech-hero__glow" aria-hidden="true"></span>
                     <img
-                        src="/Cây 2.png"
+                        src="/Cây 2.webp"
                         alt="Mô hình cây sầu riêng ứng dụng IoT và AI của Ea Agri"
                     />
                     <span className="architecture-tech-hero__status">
@@ -141,7 +141,7 @@ export default function ArchitecturePage() {
                 <StoryFeatureSection
                     title="3. Hệ thống RAG"
                     description="Hệ thống chuẩn hóa và chuyển đổi dữ liệu đầu vào thành vector để truy xuất ngữ cảnh chính xác từ cơ sở dữ liệu, từ đó giúp LLM phản hồi thông minh về giá cả và kỹ thuật canh tác cây trồng."
-                    image="/assets/Rag1.jpg"
+                    image="/assets/Rag1.webp"
                     list={[
                         {
                             title: "Prompt & Embedding",
@@ -167,7 +167,7 @@ export default function ArchitecturePage() {
                 <StoryFeatureSection
                     title="4. Module Dự Báo Thị Trường"
                     description="Giải quyết vấn đề bất đối xứng thông tin thị trường cho nông dân:"
-                    image="/assets/mohinhgia.jpg"
+                    image="/assets/mohinhgia.webp"
                     reverse
                     list={[
                         {

@@ -7,26 +7,32 @@
     <changefreq>daily</changefreq>
     <priority>1.0</priority>
     <image:image>
-      <image:loc>https://www.eaagri.vn/logo_v1.jpg</image:loc>
+      <image:loc>https://www.eaagri.vn/images-1/logo_v1.jpg</image:loc>
       <image:title>Logo EaAgri - Nông nghiệp Thông Minh</image:title>
       <image:caption>Hệ sinh thái Nông nghiệp Thông minh EaAgri tích hợp AI và IoT</image:caption>
     </image:image>
   </url>
   <url>
-    <loc>https://www.eaagri.vn/architecture</loc>
-    <lastmod>2026-09-11</lastmod>
+    <loc>https://www.eaagri.vn/kien-truc</loc>
+    <lastmod>2026-09-28</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.8</priority>
   </url>
   <url>
-    <loc>https://www.eaagri.vn/news</loc>
-    <lastmod>2026-09-11</lastmod>
+    <loc>https://www.eaagri.vn/giai-thuong</loc>
+    <lastmod>2026-09-28</lastmod>
+    <changefreq>weekly</changefreq>
+    <priority>0.8</priority>
+  </url>
+  <url>
+    <loc>https://www.eaagri.vn/tintuc</loc>
+    <lastmod>2026-09-28</lastmod>
     <changefreq>daily</changefreq>
     <priority>0.8</priority>
   </url>
   <url>
     <loc>https://www.eaagri.vn/privacy-policy</loc>
-    <lastmod>2026-09-11</lastmod>
+    <lastmod>2026-09-27</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.5</priority>
   </url>

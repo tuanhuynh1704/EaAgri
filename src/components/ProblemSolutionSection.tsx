@@ -1,5 +1,4 @@
-import { useState, useEffect } from "react";
-import { createPortal } from "react-dom";
+import { useState, useRef, useEffect, useCallback } from "react";
 
 interface ProblemSolutionSectionProps {
   image?: string;
@@ -19,6 +18,8 @@ interface TelemetryWidget {
 interface RiskSolutionPair {
   id: string;
   number: string;
+  categoryLabel: string;
+  themeColor: "cyan" | "purple" | "teal" | "amber";
   image: string;
   imageAlt: string;
   riskTitle: string;
@@ -33,35 +34,13 @@ interface RiskSolutionPair {
   widget2: TelemetryWidget;
 }
 
-const OVERVIEW_DATA = {
-  id: "overview",
-  number: "00",
-  shortTitle: "Tổng quan",
-  icon: "ri-dashboard-line",
-  image: "/assets/mohinhtongquan",
-  imageAlt: "Sơ đồ tổng quan kiến trúc hệ thống AI & IoT EaAgri - Lời Giải Cho Nông Dân",
-  windowTitle: "EaAgri IoT & AI System Architecture • Sơ Đồ Toàn Hệ Sinh Thái",
-  widget1: {
-    icon: "ri-radar-line",
-    type: "temp" as const,
-    title: "Mạng lưới IoT",
-    badge: "Online 24/7",
-    val: "Thu thập dữ liệu đất thời gian thực",
-  },
-  widget2: {
-    icon: "ri-cpu-line",
-    type: "ai" as const,
-    title: "Lõi AI Phân tích",
-    badge: "AI Core Hub",
-    val: "Khỏe mạnh 98% • Tối ưu mùa vụ",
-  },
-};
-
 const MATRIX_DATA: RiskSolutionPair[] = [
   {
     id: "water",
     number: "01",
-    image: "/ẢNh 1.png",
+    categoryLabel: "Nước & Khí Hậu",
+    themeColor: "cyan",
+    image: "/images-1/ẢNh 1.webp",
     imageAlt: "Mô hình 3D vườn sầu riêng thông minh kết nối cảm biến IoT và ứng dụng EaAgri",
     riskTitle: "Sốc Nước & Khô Hạn Cực Đoan",
     riskIcon: "ri-drop-line",
@@ -89,7 +68,9 @@ const MATRIX_DATA: RiskSolutionPair[] = [
   {
     id: "disease",
     number: "02",
-    image: "/assets/phantichanhbenh.png",
+    categoryLabel: "Sâu Bệnh & AI Vision",
+    themeColor: "purple",
+    image: "/assets/phantichanhbenh.webp",
     imageAlt: "Mô hình AI Vision nhận diện sâu bệnh và nấm lá",
     riskTitle: "Dịch Bệnh & Nấm Phytophthora",
     riskIcon: "ri-virus-line",
@@ -117,7 +98,9 @@ const MATRIX_DATA: RiskSolutionPair[] = [
   {
     id: "knowledge",
     number: "03",
-    image: "/assets/Rag.jpg",
+    categoryLabel: "Tri Thức & AI RAG",
+    themeColor: "teal",
+    image: "/assets/Rag.webp",
     imageAlt: "Trợ lý AI chuyên gia RAG tư vấn kỹ thuật 24/7",
     riskTitle: "Thiếu Hụt Tri Thức Canh Tác Sâu",
     riskIcon: "ri-book-read-line",
@@ -145,7 +128,9 @@ const MATRIX_DATA: RiskSolutionPair[] = [
   {
     id: "market",
     number: "04",
-    image: "/assets/mohinhgia.jpg",
+    categoryLabel: "Thị Trường & Giá Cả",
+    themeColor: "amber",
+    image: "/assets/mohinhgia.webp",
     imageAlt: "Biểu đồ biến động giá và phân tích thị trường nông sản",
     riskTitle: "Bất Đối Xứng Giá & Thị Trường",
     riskIcon: "ri-funds-line",
@@ -179,55 +164,149 @@ export default function ProblemSolutionSection({
   const [activeMode, setActiveMode] = useState<ViewMode>("comparison");
   // Default to overview
   const [activeItemId, setActiveItemId] = useState<string>("overview");
-  const [isZoomOpen, setIsZoomOpen] = useState<boolean>(false);
 
-  const matchedPair = MATRIX_DATA.find((p) => p.id === activeItemId);
+  const containerRef = useRef<HTMLDivElement>(null);
+  const videoRef = useRef<HTMLVideoElement>(null);
+  const progressBarRef = useRef<HTMLDivElement>(null);
+  const hideControlsTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
 
-  const currentDisplay = matchedPair
-    ? {
-        image: matchedPair.image,
-        imageAlt: matchedPair.imageAlt,
-        windowTitle: `Tính Năng 0${matchedPair.number} • ${matchedPair.solutionTitle}`,
-        widget1: matchedPair.widget1,
-        widget2: matchedPair.widget2,
-      }
-    : {
-        image: OVERVIEW_DATA.image,
-        imageAlt: OVERVIEW_DATA.imageAlt,
-        windowTitle: OVERVIEW_DATA.windowTitle,
-        widget1: OVERVIEW_DATA.widget1,
-        widget2: OVERVIEW_DATA.widget2,
-      };
+  const [isPlaying, setIsPlaying] = useState<boolean>(true);
+  const [isMuted, setIsMuted] = useState<boolean>(true);
+  const [currentTime, setCurrentTime] = useState<number>(0);
+  const [duration, setDuration] = useState<number>(0);
+  const [isFullscreen, setIsFullscreen] = useState<boolean>(false);
+  const [showControls, setShowControls] = useState<boolean>(true);
 
-  // Keyboard accessibility and body scroll lock for modal
-  useEffect(() => {
-    const handleKeyDown = (e: KeyboardEvent) => {
-      if (e.key === "Escape" && isZoomOpen) {
-        setIsZoomOpen(false);
-      }
-    };
+  // Định dạng thời gian mm:ss
+  const formatTime = (timeInSeconds: number) => {
+    if (isNaN(timeInSeconds) || timeInSeconds < 0) return "0:00";
+    const minutes = Math.floor(timeInSeconds / 60);
+    const seconds = Math.floor(timeInSeconds % 60);
+    return `${minutes}:${seconds < 10 ? "0" : ""}${seconds}`;
+  };
 
-    if (isZoomOpen) {
-      document.body.style.overflow = "hidden";
-      window.addEventListener("keydown", handleKeyDown);
+  // Cập nhật thời gian khi video chạy
+  const handleTimeUpdate = () => {
+    if (!videoRef.current) return;
+    setCurrentTime(videoRef.current.currentTime);
+  };
+
+  const handleLoadedMetadata = () => {
+    if (!videoRef.current) return;
+    setDuration(videoRef.current.duration || 0);
+  };
+
+  // Tua video khi click vào thanh tiến trình
+  const handleSeek = (e: React.MouseEvent<HTMLDivElement>) => {
+    e.stopPropagation();
+    if (!progressBarRef.current || !videoRef.current) return;
+    const rect = progressBarRef.current.getBoundingClientRect();
+    const clickX = Math.max(0, Math.min(e.clientX - rect.left, rect.width));
+    const targetPercent = clickX / rect.width;
+    const newTime = targetPercent * (videoRef.current.duration || 0);
+    videoRef.current.currentTime = newTime;
+    setCurrentTime(newTime);
+  };
+
+  // Play / Pause toggle
+  const togglePlay = (e?: React.MouseEvent) => {
+    e?.stopPropagation();
+    if (!videoRef.current) return;
+    if (videoRef.current.paused) {
+      videoRef.current.play();
+      setIsPlaying(true);
     } else {
-      document.body.style.overflow = "";
+      videoRef.current.pause();
+      setIsPlaying(false);
     }
+  };
 
-    return () => {
-      document.body.style.overflow = "";
-      window.removeEventListener("keydown", handleKeyDown);
+  // Mute / Unmute toggle
+  const toggleMute = (e?: React.MouseEvent) => {
+    e?.stopPropagation();
+    if (!videoRef.current) return;
+    const newMuted = !videoRef.current.muted;
+    videoRef.current.muted = newMuted;
+    setIsMuted(newMuted);
+  };
+
+  // Tua lại từ đầu
+  const handleReplay = (e: React.MouseEvent) => {
+    e.stopPropagation();
+    if (!videoRef.current) return;
+    videoRef.current.currentTime = 0;
+    videoRef.current.play();
+    setIsPlaying(true);
+  };
+
+  // Toàn màn hình
+  const handleFullscreen = (e?: React.MouseEvent) => {
+    e?.stopPropagation();
+    const elem = containerRef.current || videoRef.current;
+    if (!elem) return;
+
+    if (!document.fullscreenElement) {
+      if (elem.requestFullscreen) {
+        elem.requestFullscreen();
+      } else if ((elem as any).webkitRequestFullscreen) {
+        (elem as any).webkitRequestFullscreen();
+      }
+    } else {
+      if (document.exitFullscreen) {
+        document.exitFullscreen();
+      }
+    }
+  };
+
+  // Lắng nghe thay đổi Fullscreen
+  useEffect(() => {
+    const handleFsChange = () => {
+      setIsFullscreen(!!document.fullscreenElement);
     };
-  }, [isZoomOpen]);
+    document.addEventListener("fullscreenchange", handleFsChange);
+    document.addEventListener("webkitfullscreenchange", handleFsChange);
+    return () => {
+      document.removeEventListener("fullscreenchange", handleFsChange);
+      document.removeEventListener("webkitfullscreenchange", handleFsChange);
+    };
+  }, []);
+
+  // Controls visibility: Ở chế độ xem thông thường luôn hiển thị tinh tế; ở Fullscreen thì tự ẩn sau 3s nếu không di chuột
+  const resetControlsTimer = useCallback(() => {
+    setShowControls(true);
+    if (hideControlsTimerRef.current) {
+      clearTimeout(hideControlsTimerRef.current);
+    }
+    if (isFullscreen && isPlaying) {
+      hideControlsTimerRef.current = setTimeout(() => {
+        setShowControls(false);
+      }, 3000);
+    }
+  }, [isFullscreen, isPlaying]);
+
+  useEffect(() => {
+    if (!isFullscreen) {
+      setShowControls(true);
+      if (hideControlsTimerRef.current) {
+        clearTimeout(hideControlsTimerRef.current);
+      }
+    } else {
+      resetControlsTimer();
+    }
+    return () => {
+      if (hideControlsTimerRef.current) {
+        clearTimeout(hideControlsTimerRef.current);
+      }
+    };
+  }, [isFullscreen, isPlaying, resetControlsTimer]);
 
   return (
     <>
       <section className="section__container problem-solution__container">
         {/* Dynamic Background Aurora */}
         <div
-          className={`problem-solution__aurora-bg problem-solution__aurora-bg--${
-            activeMode === "problem" ? "red" : "emerald"
-          }`}
+          className={`problem-solution__aurora-bg problem-solution__aurora-bg--${activeMode === "problem" ? "red" : "emerald"
+            }`}
         />
 
         {/* Section Header */}
@@ -247,37 +326,37 @@ export default function ProblemSolutionSection({
             <button
               role="tab"
               aria-selected={activeMode === "comparison"}
-              className={`problem-solution__mode-btn ${
-                activeMode === "comparison" ? "problem-solution__mode-btn--active" : ""
-              }`}
+              className={`problem-solution__mode-btn ${activeMode === "comparison" ? "problem-solution__mode-btn--active" : ""
+                }`}
               onClick={() => setActiveMode("comparison")}
             >
               <i className="ri-shuffle-line"></i>
-              <span>Đối chiếu 4 Cặp Rủi Ro & Lời Giải</span>
+              <span className="mode-btn__text-full">Đối chiếu 4 Cặp Rủi Ro & Lời Giải</span>
+              <span className="mode-btn__text-short">Đối chiếu</span>
             </button>
 
             <button
               role="tab"
               aria-selected={activeMode === "problem"}
-              className={`problem-solution__mode-btn problem-solution__mode-btn--danger ${
-                activeMode === "problem" ? "problem-solution__mode-btn--active" : ""
-              }`}
+              className={`problem-solution__mode-btn problem-solution__mode-btn--danger ${activeMode === "problem" ? "problem-solution__mode-btn--active" : ""
+                }`}
               onClick={() => setActiveMode("problem")}
             >
               <i className="ri-error-warning-line"></i>
-              <span>⚠️ Tứ Giác Rủi Ro</span>
+              <span className="mode-btn__text-full">Tứ Giác Rủi Ro</span>
+              <span className="mode-btn__text-short">Rủi ro</span>
             </button>
 
             <button
               role="tab"
               aria-selected={activeMode === "solution"}
-              className={`problem-solution__mode-btn problem-solution__mode-btn--success ${
-                activeMode === "solution" ? "problem-solution__mode-btn--active" : ""
-              }`}
+              className={`problem-solution__mode-btn problem-solution__mode-btn--success ${activeMode === "solution" ? "problem-solution__mode-btn--active" : ""
+                }`}
               onClick={() => setActiveMode("solution")}
             >
-              <i className="ri-checkbox-circle-line"></i>
-              <span>🚀 Lời Giải EaAgri</span>
+              <i className="ri-rocket-2-line"></i>
+              <span className="mode-btn__text-full">Lời Giải EaAgri</span>
+              <span className="mode-btn__text-short">Lời giải</span>
             </button>
           </div>
         </div>
@@ -293,319 +372,331 @@ export default function ProblemSolutionSection({
                   <span className="dot dot--yellow"></span>
                   <span className="dot dot--green"></span>
                 </div>
-                <span className="problem-solution__window-title">
-                  {currentDisplay.windowTitle}
+                <span className="problem-solution__window-title" title="EaAgri • Video Demo Vấn Đề & Giải Pháp Đột Phá">
+                  <span className="window-title--desktop">EaAgri • Video Demo Vấn Đề &amp; Giải Pháp Đột Phá</span>
+                  <span className="window-title--mobile">Video Giải Pháp</span>
                 </span>
                 <span className="problem-solution__status-pill">
-                  <span className="live-dot" /> Online 24/7
+                  <span className="live-dot" /> Live Video
                 </span>
               </div>
 
-              {/* Image Container with Dynamic Transition & Zoom Trigger */}
+              {/* Video Player Container với Custom Controls đồng bộ */}
               <div
-                className="problem-solution__image-container"
-                onClick={() => setIsZoomOpen(true)}
-                title="Nhấn để phóng to xem chi tiết hình ảnh tính năng"
+                ref={containerRef}
+                className={`problem-solution__video-container ${!isPlaying ? "problem-solution__video-container--paused" : ""}`}
+                onClick={togglePlay}
+                onMouseMove={resetControlsTimer}
+                onMouseEnter={() => setShowControls(true)}
+                onMouseLeave={() => {
+                  if (isPlaying) setShowControls(false);
+                }}
               >
-                <img
-                  key={currentDisplay.image}
-                  src={currentDisplay.image}
-                  alt={currentDisplay.imageAlt}
-                  className="problem-solution__img"
+                <video
+                  ref={videoRef}
+                  src="/assets/van-de-giai-phap-dot-pha.mp4"
+                  className="problem-solution__video"
+                  autoPlay
+                  loop
+                  muted={isMuted}
+                  playsInline
+                  preload="metadata"
+                  onTimeUpdate={handleTimeUpdate}
+                  onLoadedMetadata={handleLoadedMetadata}
+                  onPlay={() => setIsPlaying(true)}
+                  onPause={() => setIsPlaying(false)}
                 />
-                <div className="problem-solution__image-overlay">
-                  <div className="problem-solution__zoom-btn">
-                    <i className="ri-zoom-in-line"></i> Phóng to ảnh
-                  </div>
-                </div>
-              </div>
 
-              {/* Quick Thumbnail Navigation (00 Tổng Quan + 01 Tưới IoT + 02-04) */}
-              <div className="problem-solution__thumb-strip">
-                {/* Button 00: Overview (Ảnh 1 mohinhtongquan) */}
-                <button
-                  className={`problem-solution__thumb-item ${
-                    activeItemId === "overview" ? "problem-solution__thumb-item--active" : ""
-                  }`}
-                  onClick={() => setActiveItemId("overview")}
-                  title="00. Sơ đồ kiến trúc tổng quan EaAgri"
-                >
-                  <i className={OVERVIEW_DATA.icon}></i>
-                  <span>00. Tổng quan</span>
-                </button>
-
-                {/* Buttons 01 -> 04 */}
-                {MATRIX_DATA.map((item) => {
-                  const isSelected = item.id === activeItemId;
-                  return (
-                    <button
-                      key={item.id}
-                      className={`problem-solution__thumb-item ${
-                        isSelected ? "problem-solution__thumb-item--active" : ""
-                      }`}
-                      onClick={() => setActiveItemId(item.id)}
-                      title={`0${item.number}. ${item.solutionTitle}`}
-                    >
-                      <i className={item.solutionIcon}></i>
-                      <span>0{item.number}</span>
-                    </button>
-                  );
-                })}
-              </div>
-
-              {/* Floating Dynamic Telemetry Widgets */}
-              <div className="problem-solution__widget problem-solution__widget--top">
-                <div className={`problem-solution__widget-icon problem-solution__widget-icon--${currentDisplay.widget1.type}`}>
-                  <i className={currentDisplay.widget1.icon}></i>
-                </div>
-                <div>
-                  <div className="problem-solution__widget-top">
-                    <strong>{currentDisplay.widget1.title}</strong>
-                    <span className="badge-live">{currentDisplay.widget1.badge}</span>
-                  </div>
-                  <span className="problem-solution__widget-val">
-                    {currentDisplay.widget1.val}
-                  </span>
-                </div>
-              </div>
-
-              <div className="problem-solution__widget problem-solution__widget--bottom">
-                <div className={`problem-solution__widget-icon problem-solution__widget-icon--${currentDisplay.widget2.type}`}>
-                  <i className={currentDisplay.widget2.icon}></i>
-                </div>
-                <div>
-                  <div className="problem-solution__widget-top">
-                    <strong>{currentDisplay.widget2.title}</strong>
-                    <span className="badge-ai">{currentDisplay.widget2.badge}</span>
-                  </div>
-                  <span className="problem-solution__widget-val">
-                    {currentDisplay.widget2.val}
-                  </span>
-                </div>
-              </div>
-            </div>
-          </div>
-
-          {/* Right Side: Dynamic Content based on Active Mode */}
-          <div className="problem-solution__content-side" data-aos="fade-left">
-            {/* 1. Comparison Mode: 4-Pair Interactive Cards */}
-            {activeMode === "comparison" && (
-              <div className="problem-solution__matrix-list">
-                {MATRIX_DATA.map((item, idx) => {
-                  const isExpanded = activeItemId === item.id;
-                  return (
-                    <div
-                      key={item.id}
-                      className={`problem-solution__matrix-card ${
-                        isExpanded ? "problem-solution__matrix-card--active" : ""
-                      }`}
-                      onClick={() =>
-                        setActiveItemId(isExpanded ? "overview" : item.id)
-                      }
-                      style={{ animationDelay: `${idx * 0.08}s` }}
-                    >
-                      <div className="problem-solution__matrix-header">
-                        <span className="problem-solution__matrix-num">
-                          {item.number}
-                        </span>
-                        <div className="problem-solution__matrix-titles">
-                          <div className="matrix-title-risk">
-                            <i className={item.riskIcon}></i>
-                            <span>{item.riskTitle}</span>
-                          </div>
-                          <i className="ri-arrow-right-line matrix-arrow-separator"></i>
-                          <div className="matrix-title-solution">
-                            <i className={item.solutionIcon}></i>
-                            <span>{item.solutionTitle}</span>
-                          </div>
-                        </div>
-                        <i
-                          className={`ri-arrow-down-s-line matrix-toggle-icon ${
-                            isExpanded ? "matrix-toggle-icon--open" : ""
-                          }`}
-                        ></i>
-                      </div>
-
-                      {/* Detail Body */}
-                      <div
-                        className={`problem-solution__matrix-body ${
-                          isExpanded ? "problem-solution__matrix-body--open" : ""
-                        }`}
-                      >
-                        <div className="problem-solution__matrix-split">
-                          {/* Risk Box */}
-                          <div className="matrix-box matrix-box--risk">
-                            <div className="matrix-box__badge">
-                              <i className="ri-error-warning-line"></i> Thách thức
-                            </div>
-                            <p>{item.riskDesc}</p>
-                            <span className="matrix-box__chip matrix-box__chip--risk">
-                              {item.riskTag}
-                            </span>
-                          </div>
-
-                          {/* Solution Box */}
-                          <div className="matrix-box matrix-box--solution">
-                            <div className="matrix-box__badge">
-                              <i className="ri-checkbox-circle-line"></i> Lời giải EaAgri
-                            </div>
-                            <p>{item.solutionDesc}</p>
-                            <span className="matrix-box__chip matrix-box__chip--solution">
-                              {item.solutionTag}
-                            </span>
-                          </div>
-                        </div>
-                      </div>
-                    </div>
-                  );
-                })}
-              </div>
-            )}
-
-            {/* 2. Problem Mode Only: Focus on 4 Key Risks */}
-            {activeMode === "problem" && (
-              <div className="problem-solution__risk-list">
-                <div className="problem-solution__alert-banner">
-                  <i className="ri-error-warning-fill"></i>
-                  <div>
-                    <strong>"Tứ Giác Rủi Ro" Nông Nghiệp Tây Nguyên</strong>
-                    <p>
-                      Mô hình truyền thống khiến nông dân chịu rủi ro chi phí cao, thất thoát mùa vụ và thiếu quyền tự quyết về giá.
-                    </p>
-                  </div>
-                </div>
-
-                <div className="problem-solution__items-grid">
-                  {MATRIX_DATA.map((item, idx) => (
-                    <div
-                      key={item.id}
-                      className={`problem-solution__card problem-solution__card--problem ${
-                        item.id === activeItemId ? "problem-solution__card--active" : ""
-                      }`}
-                      style={{ animationDelay: `${idx * 0.08}s` }}
-                      onClick={() => setActiveItemId(item.id === activeItemId ? "overview" : item.id)}
-                    >
-                      <div className="problem-solution__card-icon">
-                        <i className={item.riskIcon}></i>
-                      </div>
-                      <div className="problem-solution__card-body">
-                        <div className="problem-solution__card-title-row">
-                          <h3>{item.riskTitle}</h3>
-                          <span className="risk-badge-tag">{item.riskTag}</span>
-                        </div>
-                        <p>{item.riskDesc}</p>
-                      </div>
-                    </div>
-                  ))}
-                </div>
-              </div>
-            )}
-
-            {/* 3. Solution Mode Only: Focus on 4 EaAgri Breakthroughs */}
-            {activeMode === "solution" && (
-              <div className="problem-solution__solution-list">
-                <div className="problem-solution__solution-banner">
-                  <i className="ri-sparkling-fill"></i>
-                  <div>
-                    <strong>Hệ Sinh Thái Nông Nghiệp Số Data-Driven</strong>
-                    <p>
-                      Kết hợp cảm biến IoT thời gian thực và trí tuệ nhân tạo AI giúp tối ưu tài nguyên, nâng cao năng suất và bảo vệ mùa màng.
-                    </p>
-                  </div>
-                </div>
-
-                <div className="problem-solution__items-grid">
-                  {MATRIX_DATA.map((item, idx) => (
-                    <div
-                      key={item.id}
-                      className={`problem-solution__card problem-solution__card--solution ${
-                        item.id === activeItemId ? "problem-solution__card--active" : ""
-                      }`}
-                      style={{ animationDelay: `${idx * 0.08}s` }}
-                      onClick={() => setActiveItemId(item.id === activeItemId ? "overview" : item.id)}
-                    >
-                      <div className="problem-solution__card-icon">
-                        <i className={item.solutionIcon}></i>
-                      </div>
-                      <div className="problem-solution__card-body">
-                        <div className="problem-solution__card-title-row">
-                          <h3>{item.solutionTitle}</h3>
-                          <span className="solution-badge-tag">{item.solutionTag}</span>
-                        </div>
-                        <p>{item.solutionDesc}</p>
-                      </div>
-                    </div>
-                  ))}
-                </div>
-              </div>
-            )}
-          </div>
-        </div>
-      </section>
-
-      {/* Lightbox Modal via React Portal */}
-      {isZoomOpen &&
-        typeof document !== "undefined" &&
-        createPortal(
-          <div
-            className="problem-solution__modal-backdrop"
-            onClick={() => setIsZoomOpen(false)}
-          >
-            <div
-              className="problem-solution__modal-content"
-              onClick={(e) => e.stopPropagation()}
-            >
-              <div className="problem-solution__modal-header">
-                <div className="problem-solution__modal-title">
-                  <i className="ri-image-2-line"></i>
-                  <span>{currentDisplay.imageAlt}</span>
-                </div>
-                <button
-                  className="problem-solution__modal-close"
-                  onClick={() => setIsZoomOpen(false)}
-                  title="Đóng (Esc)"
-                  aria-label="Đóng"
-                >
-                  <i className="ri-close-line"></i>
-                </button>
-              </div>
-
-              <div className="problem-solution__modal-img-wrap">
-                <img
-                  src={currentDisplay.image}
-                  alt={currentDisplay.imageAlt}
-                  className="problem-solution__modal-img"
-                />
-              </div>
-
-              <div className="problem-solution__modal-footer">
-                <button
-                  className={`problem-solution__modal-pill ${
-                    activeItemId === "overview" ? "problem-solution__modal-pill--active" : ""
-                  }`}
-                  onClick={() => setActiveItemId("overview")}
-                >
-                  <i className={OVERVIEW_DATA.icon}></i>
-                  <span>00 • Tổng Quan Sơ Đồ Hệ Thống</span>
-                </button>
-
-                {MATRIX_DATA.map((item) => (
+                {/* Big Center Play Button khi tạm dừng */}
+                {!isPlaying && (
                   <button
-                    key={item.id}
-                    className={`problem-solution__modal-pill ${
-                      item.id === activeItemId ? "problem-solution__modal-pill--active" : ""
-                    }`}
-                    onClick={() => setActiveItemId(item.id)}
+                    type="button"
+                    className="problem-solution__video-center-play"
+                    onClick={togglePlay}
+                    title="Nhấn để tiếp tục phát video"
+                    aria-label="Nhấn để tiếp tục phát video"
                   >
-                    <i className={item.solutionIcon}></i>
-                    <span>0{item.number} • {item.solutionTitle}</span>
+                    <div className="video-center-pulse" />
+                    <i className="ri-play-fill"></i>
                   </button>
-                ))}
+                )}
+
+                {/* Custom Glassmorphism Controls Bar */}
+                <div
+                  className={`problem-solution__video-controls ${
+                    showControls || !isPlaying ? "problem-solution__video-controls--visible" : ""
+                  }`}
+                  onClick={(e) => e.stopPropagation()}
+                >
+                  {/* Scrubber / Progress timeline */}
+                  <div
+                    ref={progressBarRef}
+                    className="problem-solution__video-progress"
+                    onClick={handleSeek}
+                    title="Nhấn để tua video"
+                    role="slider"
+                    aria-label="Thanh tiến trình phát video"
+                    aria-valuemin={0}
+                    aria-valuemax={duration || 100}
+                    aria-valuenow={currentTime}
+                  >
+                    <div className="video-progress__track">
+                      <div
+                        className="video-progress__fill"
+                        style={{ width: `${duration > 0 ? (currentTime / duration) * 100 : 0}%` }}
+                      >
+                        <div className="video-progress__thumb" />
+                      </div>
+                    </div>
+                  </div>
+
+                  {/* Buttons and time display */}
+                  <div className="problem-solution__video-actions">
+                    <div className="video-actions__left">
+                      {/* Play/Pause */}
+                      <button
+                        type="button"
+                        className="video-action-btn"
+                        onClick={togglePlay}
+                        title={isPlaying ? "Tạm dừng" : "Phát tiếp"}
+                        aria-label={isPlaying ? "Tạm dừng video" : "Phát tiếp video"}
+                      >
+                        <i className={isPlaying ? "ri-pause-fill" : "ri-play-fill"}></i>
+                        <span className="video-action-btn__text">{isPlaying ? "Tạm dừng" : "Phát"}</span>
+                      </button>
+
+                      {/* Mute/Unmute */}
+                      <button
+                        type="button"
+                        className={`video-action-btn ${isMuted ? "video-action-btn--muted-alert" : "video-action-btn--active"}`}
+                        onClick={toggleMute}
+                        title={isMuted ? "Bật âm thanh video" : "Tắt âm thanh"}
+                        aria-label={isMuted ? "Bật âm thanh" : "Tắt âm thanh"}
+                      >
+                        <i className={isMuted ? "ri-volume-mute-fill" : "ri-volume-up-fill"}></i>
+                        <span className="video-action-btn__text">{isMuted ? "Bật tiếng" : "Đang bật"}</span>
+                      </button>
+
+                      {/* Time display */}
+                      <div className="video-time">
+                        <span className="video-time__current">{formatTime(currentTime)}</span>
+                        <span className="video-time__divider">/</span>
+                        <span className="video-time__total">{formatTime(duration)}</span>
+                      </div>
+                    </div>
+
+                    <div className="video-actions__right">
+                      {/* Replay */}
+                      <button
+                        type="button"
+                        className="video-action-btn video-action-btn--icon"
+                        onClick={handleReplay}
+                        title="Tua lại từ đầu"
+                        aria-label="Tua lại từ đầu"
+                      >
+                        <i className="ri-restart-line"></i>
+                      </button>
+
+                      {/* Fullscreen */}
+                      <button
+                        type="button"
+                        className="video-action-btn video-action-btn--icon"
+                        onClick={handleFullscreen}
+                        title={isFullscreen ? "Thu nhỏ màn hình" : "Toàn màn hình"}
+                        aria-label={isFullscreen ? "Thu nhỏ màn hình" : "Toàn màn hình"}
+                      >
+                        <i className={isFullscreen ? "ri-fullscreen-exit-fill" : "ri-fullscreen-fill"}></i>
+                      </button>
+                    </div>
+                  </div>
+                </div>
               </div>
             </div>
-          </div>,
-          document.body
-        )}
+          </div>
+
+            {/* Right Side: Dynamic Content based on Active Mode */}
+            <div className="problem-solution__content-side" data-aos="fade-left">
+              {/* 1. Comparison Mode: 4-Pair Interactive Cards */}
+              {activeMode === "comparison" && (
+                <div className="problem-solution__matrix-list">
+                  {MATRIX_DATA.map((item, idx) => {
+                    const isExpanded = activeItemId === item.id;
+                    return (
+                      <div
+                        key={item.id}
+                        className={`problem-solution__matrix-card problem-solution__matrix-card--${item.themeColor} ${isExpanded ? "problem-solution__matrix-card--active" : ""
+                          }`}
+                        onClick={() =>
+                          setActiveItemId(isExpanded ? "overview" : item.id)
+                        }
+                        style={{ animationDelay: `${idx * 0.08}s` }}
+                      >
+                        {/* Top Bar: Category Pill & Animated Toggle Arrow */}
+                        <div className="problem-solution__matrix-header-top">
+                          <div className="matrix-category-tag">
+                            <span className={`matrix-category-num matrix-category-num--${item.themeColor}`}>
+                              {item.number}
+                            </span>
+                            <span className="matrix-category-name">{item.categoryLabel}</span>
+                          </div>
+                          <div
+                            className={`matrix-toggle-circle ${isExpanded ? "matrix-toggle-circle--open" : ""
+                              }`}
+                          >
+                            <i className="ri-arrow-down-s-line"></i>
+                          </div>
+                        </div>
+
+                        {/* Before vs After Dual Badges */}
+                        <div className="problem-solution__matrix-header">
+                          <div className="problem-solution__matrix-titles">
+                            <div className="matrix-badge matrix-badge--risk">
+                              <span className="matrix-badge__pill">
+                                <i className={item.riskIcon}></i> Rủi ro
+                              </span>
+                              <span className="matrix-badge__title">{item.riskTitle}</span>
+                            </div>
+                            <div className="matrix-badge__connector">
+                              <i className="ri-arrow-down-line"></i>
+                            </div>
+                            <div className="matrix-badge matrix-badge--solution">
+                              <span className="matrix-badge__pill">
+                                <i className={item.solutionIcon}></i> Lời giải
+                              </span>
+                              <span className="matrix-badge__title">{item.solutionTitle}</span>
+                            </div>
+                          </div>
+                        </div>
+
+                        {/* Detail Body */}
+                        <div
+                          className={`problem-solution__matrix-body ${isExpanded ? "problem-solution__matrix-body--open" : ""
+                            }`}
+                        >
+                          <div className="problem-solution__matrix-split">
+                            {/* Risk Box */}
+                            <div className="matrix-box matrix-box--risk">
+                              <div className="matrix-box__badge">
+                                <i className="ri-error-warning-line"></i> Thách thức thực tế
+                              </div>
+                              <p>{item.riskDesc}</p>
+                              <span className="matrix-box__chip matrix-box__chip--risk">
+                                {item.riskTag}
+                              </span>
+                            </div>
+
+                            {/* Solution Box */}
+                            <div className="matrix-box matrix-box--solution">
+                              <div className="matrix-box__badge">
+                                <i className="ri-checkbox-circle-line"></i> Lời giải EaAgri
+                              </div>
+                              <p>{item.solutionDesc}</p>
+                              <span className="matrix-box__chip matrix-box__chip--solution">
+                                {item.solutionTag}
+                              </span>
+                            </div>
+                          </div>
+
+                          {/* Interactive Hint: Tap to view image above */}
+                          <div
+                            className="matrix-box__action-hint"
+                            onClick={(e) => {
+                              e.stopPropagation();
+                              setActiveItemId(item.id);
+                              const imageEl = document.querySelector(".problem-solution__image-wrapper");
+                              if (imageEl) {
+                                imageEl.scrollIntoView({ behavior: "smooth", block: "center" });
+                              }
+                            }}
+                          >
+                            <i className="ri-eye-line"></i>
+                            <span>Xem mô hình tính năng {item.number} trên sơ đồ phía trên</span>
+                          </div>
+                        </div>
+                      </div>
+                    );
+                  })}
+                </div>
+              )}
+
+              {/* 2. Problem Mode Only: Focus on 4 Key Risks */}
+              {activeMode === "problem" && (
+                <div className="problem-solution__risk-list">
+                  <div className="problem-solution__alert-banner">
+                    <i className="ri-error-warning-fill"></i>
+                    <div>
+                      <strong>"Tứ Giác Rủi Ro" Nông Nghiệp Tây Nguyên</strong>
+                      <p>
+                        Mô hình truyền thống khiến nông dân chịu rủi ro chi phí cao, thất thoát mùa vụ và thiếu quyền tự quyết về giá.
+                      </p>
+                    </div>
+                  </div>
+
+                  <div className="problem-solution__items-grid">
+                    {MATRIX_DATA.map((item, idx) => (
+                      <div
+                        key={item.id}
+                        className={`problem-solution__card problem-solution__card--problem ${item.id === activeItemId ? "problem-solution__card--active" : ""
+                          }`}
+                        style={{ animationDelay: `${idx * 0.08}s` }}
+                        onClick={() => setActiveItemId(item.id === activeItemId ? "overview" : item.id)}
+                      >
+                        <div className="problem-solution__card-icon">
+                          <i className={item.riskIcon}></i>
+                        </div>
+                        <div className="problem-solution__card-body">
+                          <div className="problem-solution__card-title-row">
+                            <h3>{item.riskTitle}</h3>
+                            <span className="risk-badge-tag">{item.riskTag}</span>
+                          </div>
+                          <p>{item.riskDesc}</p>
+                        </div>
+                      </div>
+                    ))}
+                  </div>
+                </div>
+              )}
+
+              {/* 3. Solution Mode Only: Focus on 4 EaAgri Breakthroughs */}
+              {activeMode === "solution" && (
+                <div className="problem-solution__solution-list">
+                  <div className="problem-solution__solution-banner">
+                    <i className="ri-sparkling-fill"></i>
+                    <div>
+                      <strong>Hệ Sinh Thái Nông Nghiệp Số Data-Driven</strong>
+                      <p>
+                        Kết hợp cảm biến IoT thời gian thực và trí tuệ nhân tạo AI giúp tối ưu tài nguyên, nâng cao năng suất và bảo vệ mùa màng.
+                      </p>
+                    </div>
+                  </div>
+
+                  <div className="problem-solution__items-grid">
+                    {MATRIX_DATA.map((item, idx) => (
+                      <div
+                        key={item.id}
+                        className={`problem-solution__card problem-solution__card--solution ${item.id === activeItemId ? "problem-solution__card--active" : ""
+                          }`}
+                        style={{ animationDelay: `${idx * 0.08}s` }}
+                        onClick={() => setActiveItemId(item.id === activeItemId ? "overview" : item.id)}
+                      >
+                        <div className="problem-solution__card-icon">
+                          <i className={item.solutionIcon}></i>
+                        </div>
+                        <div className="problem-solution__card-body">
+                          <div className="problem-solution__card-title-row">
+                            <h3>{item.solutionTitle}</h3>
+                            <span className="solution-badge-tag">{item.solutionTag}</span>
+                          </div>
+                          <p>{item.solutionDesc}</p>
+                        </div>
+                      </div>
+                    ))}
+                  </div>
+                </div>
+              )}
+            </div>
+          </div>
+      </section>
     </>
   );
 }

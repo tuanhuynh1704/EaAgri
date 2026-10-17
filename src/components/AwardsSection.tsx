@@ -1,5 +1,8 @@
 import { useState, useEffect, useRef, useCallback } from "react";
 import { createPortal } from "react-dom";
+import { Link } from "react-router-dom";
+import { NTTU_VOTE_CONFIG } from "../data/voteConfig";
+import { useVoteStats } from "../context/VoteContext";
 
 interface AwardImage {
   url: string;
@@ -69,7 +72,7 @@ const AWARDS_DATA: AwardItem[] = [
     },
     images: [
       {
-        url: "/assets/IMG_2695.JPEG",
+        url: "/assets/IMG_2695.webp",
         alt: "Vinh danh Cuộc thi Trí Tuệ Nhân Tạo 2026",
         caption: "Giấy chứng nhận Quán quân & Cúp Vinh danh",
         shortTitle: "Bằng chứng nhận & Cúp",
@@ -119,19 +122,19 @@ const AWARDS_DATA: AwardItem[] = [
     },
     images: [
       {
-        url: "/Khởi nghiệp 3.jpg",
+        url: "/Khởi nghiệp 3.webp",
         alt: "Bằng chứng nhận Giải Nhất Bảng 1C và Huy chương Bán kết",
         caption: "Bằng chứng nhận Nhất Bảng 1C & Huy chương Bán Kết",
         shortTitle: "Bằng khen & Huy chương",
       },
       {
-        url: "/Khởi nghiệp 1.jpg",
+        url: "/Khởi nghiệp 1.webp",
         alt: "Đội thi EaAgri thuyết trình mô hình với Ban giám khảo",
         caption: "Trình diễn thiết bị IoT & Mô hình AI cho Hội đồng Giám Khảo",
         shortTitle: "Báo cáo Hội đồng",
       },
       {
-        url: "/Khởi nghiệp 2.jpg",
+        url: "/Khởi nghiệp 2.webp",
         alt: "Đội ngũ kỹ sư sáng lập dự án EaAgri",
         caption: "Đội ngũ kỹ sư EaAgri tại vòng Bán kết Khởi nghiệp",
         shortTitle: "Đội ngũ EaAgri",
@@ -161,6 +164,7 @@ const AUTO_SWITCH_INTERVAL = 8000; // 8 seconds per tab
 const SUB_IMAGE_INTERVAL = 3800; // 3.8 seconds per sub-image
 
 export default function AwardsSection() {
+  const { formattedVotes, rank } = useVoteStats();
   const [activeTabIdx, setActiveTabIdx] = useState(0);
   const [activeImgIdx, setActiveImgIdx] = useState(0);
   const [isPaused, setIsPaused] = useState(false);
@@ -304,6 +308,7 @@ export default function AwardsSection() {
   return (
     <>
       <section
+        id="section-awards"
         className={`section__container awards-section__container awards-section--theme-${currentAward.themeColor}`}
         onMouseEnter={() => setIsPaused(true)}
         onMouseLeave={() => setIsPaused(false)}
@@ -447,7 +452,7 @@ export default function AwardsSection() {
                   title="Nhấn để phóng to & lướt xem ảnh sắc nét"
                 >
                   {currentAward.images.map((img, imgIdx) => (
-                    <img
+                    <img loading="lazy" decoding="async"
                       key={img.url}
                       src={img.url}
                       alt={img.alt}
@@ -509,7 +514,7 @@ export default function AwardsSection() {
                           }}
                         >
                           <div className="awards-section__thumb-img-wrap">
-                            <img src={thumb.url} alt={thumb.shortTitle} />
+                            <img loading="lazy" decoding="async" src={thumb.url} alt={thumb.shortTitle} />
                             {isThumbActive && (
                               <span className="awards-section__thumb-live-dot" />
                             )}
@@ -580,6 +585,35 @@ export default function AwardsSection() {
               </aside>
             )}
 
+            {currentAward.id === "startup-contest" && (
+              <div className="awards-section__vote-card" data-aos="zoom-in" data-aos-delay="150">
+                <div className="awards-section__vote-glow" aria-hidden="true" />
+                <div className="awards-section__vote-content">
+                  <div className="awards-section__vote-badge">
+                    <span className="awards-section__vote-dot" />
+                    <span>CỔNG BÌNH CHỌN CỘNG ĐỒNG ĐANG MỞ</span>
+                  </div>
+                  <h4 className="awards-section__vote-title">
+                    Tiếp Sức Cho Dự Án EaAgri Tại NTTU Startup 2026
+                  </h4>
+                  <p className="awards-section__vote-desc">
+                    Dự án đã đạt <strong>{formattedVotes}</strong> lượt vote{rank ? ` (Top ${rank})` : ""}! Chỉ mất 5 giây với 1 chạm để giúp đưa công nghệ AI &amp; IoT hỗ trợ nông dân sầu riêng vươn xa.
+                  </p>
+                </div>
+                <a
+                  href={NTTU_VOTE_CONFIG.url}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="awards-section__vote-btn"
+                  title="Bình chọn cho EaAgri trên cổng NIIC"
+                >
+                  <i className="ri-heart-pulse-fill" />
+                  <span>Bình chọn ngay</span>
+                  <i className="ri-arrow-right-line" />
+                </a>
+              </div>
+            )}
+
             {/* Staggered Highlight Point Cards */}
             <div className="awards-section__points">
               {currentAward.points.map((point, pIdx) => (
@@ -600,6 +634,15 @@ export default function AwardsSection() {
                   </div>
                 </div>
               ))}
+            </div>
+
+            {/* Link to Dedicated Awards Page */}
+            <div className="awards-section__explore-btn-wrap">
+              <Link to="/giai-thuong" className="awards-section__explore-btn">
+                <i className="ri-award-fill"></i>
+                <span>Xem đầy đủ Phòng truyền thống & Bằng chứng nhận</span>
+                <i className="ri-arrow-right-line"></i>
+              </Link>
             </div>
           </div>
         </div>
@@ -643,7 +686,7 @@ export default function AwardsSection() {
               <div className="awards-section__modal-viewport">
                 <div className="awards-section__modal-img-wrap">
                   {currentAward.images.map((img, imgIdx) => (
-                    <img
+                    <img loading="lazy" decoding="async"
                       key={img.url}
                       src={img.url}
                       alt={img.alt}
@@ -697,7 +740,7 @@ export default function AwardsSection() {
                         onClick={() => setActiveImgIdx(tIdx)}
                         title={thumb.shortTitle}
                       >
-                        <img src={thumb.url} alt={thumb.shortTitle} />
+                        <img loading="lazy" decoding="async" src={thumb.url} alt={thumb.shortTitle} />
                         <span>{thumb.shortTitle}</span>
                       </button>
                     );

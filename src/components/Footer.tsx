@@ -1,7 +1,20 @@
-import { useNavigate } from "react-router-dom";
+import { useNavigate, useLocation } from "react-router-dom";
+import { triggerAppStoreNotice } from "./AppStoreNoticeModal";
 
 export default function Footer() {
   const navigate = useNavigate();
+  const { pathname } = useLocation();
+
+  const handleFooterHome = () => {
+    if (pathname === "/") {
+      window.scrollTo({ top: 0, behavior: "smooth" });
+    } else {
+      navigate("/");
+      setTimeout(() => {
+        window.scrollTo({ top: 0, behavior: "smooth" });
+      }, 50);
+    }
+  };
 
   return (
     <footer className="footer">
@@ -11,10 +24,10 @@ export default function Footer() {
       <div className="section__container footer__container">
         {/* Brand Column */}
         <div className="footer__brand-col" data-aos="fade-up">
-          <div className="footer__logo-box" onClick={() => navigate("/")} title="EaAgri - Về trang chủ">
+          <div className="footer__logo-box" onClick={handleFooterHome} title="EaAgri - Về đầu trang">
             <div className="footer__logo-icon-wrap">
-              <img
-                src="/logo_v1.jpg"
+              <img loading="lazy" decoding="async"
+                src="/images-1/logo_v1.jpg"
                 alt="EaAgri Durian AI Mascot"
                 className="footer__logo-icon"
               />
@@ -33,9 +46,9 @@ export default function Footer() {
           </p>
 
           <div className="footer__contact-list">
-            <a href="mailto:eaagri@eaagri.id.vn" className="footer__contact-chip" title="Gửi email liên hệ">
+            <a href="mailto:info@eaagri.vn" className="footer__contact-chip" title="Gửi email liên hệ">
               <i className="ri-mail-send-line"></i>
-              <span>eaagri@eaagri.id.vn</span>
+              <span>info@eaagri.vn</span>
             </a>
             <div className="footer__contact-chip footer__contact-chip--location">
               <i className="ri-map-pin-2-line"></i>
@@ -54,27 +67,52 @@ export default function Footer() {
               </a>
             </li>
             <li>
-              <a href="#" onClick={(e) => { e.preventDefault(); navigate("/architecture"); }}>
+              <a href="#" onClick={(e) => { e.preventDefault(); navigate("/kien-truc"); }}>
                 <i className="ri-node-tree"></i> <span>Kiến trúc hệ thống</span>
               </a>
             </li>
             <li>
-              <a href="#" onClick={(e) => { e.preventDefault(); navigate("/news"); }}>
+              <a
+                href="/tintuc"
+                onClick={(e) => {
+                  e.preventDefault();
+                  navigate("/tintuc");
+                }}
+              >
                 <i className="ri-newspaper-line"></i> <span>Tin tức & Sự kiện</span>
               </a>
             </li>
             <li>
               <a
-                href="#awards"
+                href="/giai-thuong"
                 onClick={(e) => {
                   e.preventDefault();
-                  navigate("/");
-                  setTimeout(() => {
-                    document.querySelector('.awards-section__container')?.scrollIntoView({ behavior: 'smooth' });
-                  }, 100);
+                  navigate("/giai-thuong");
                 }}
               >
-                <i className="ri-trophy-line"></i> <span>Danh hiệu & Giải thưởng</span>
+                <i className="ri-trophy-line"></i> <span>Phòng truyền thống & Giải thưởng</span>
+              </a>
+            </li>
+            <li>
+              <a
+                href="https://crm.eaagri.vn/"
+                target="_blank"
+                rel="noopener noreferrer"
+                title="Hệ sinh thái EaAgri CRM cho Đại lý VTNN (crm.eaagri.vn)"
+              >
+                <i className="ri-building-4-line"></i> <span>Hệ thống CRM (crm.eaagri.vn)</span>
+                <i className="ri-arrow-right-up-line" style={{ fontSize: "0.75rem", marginLeft: "4px", opacity: 0.7 }}></i>
+              </a>
+            </li>
+            <li>
+              <a
+                href="https://store.eaagri.vn/"
+                target="_blank"
+                rel="noopener noreferrer"
+                title="Sàn thương mại vật tư nông nghiệp chính hãng EaAgri Store (store.eaagri.vn)"
+              >
+                <i className="ri-store-2-line"></i> <span>EaAgri Store (store.eaagri.vn)</span>
+                <i className="ri-arrow-right-up-line" style={{ fontSize: "0.75rem", marginLeft: "4px", opacity: 0.7 }}></i>
               </a>
             </li>
           </ul>
@@ -104,7 +142,7 @@ export default function Footer() {
               <i className="ri-arrow-right-up-line footer__social-arrow"></i>
             </a>
 
-            <a
+            {/* <a
               href="https://github.com/TuansHuynh/EaAgri"
               target="_blank"
               rel="noopener noreferrer"
@@ -119,7 +157,7 @@ export default function Footer() {
                 <span>Open Source Repos</span>
               </div>
               <i className="ri-arrow-right-up-line footer__social-arrow"></i>
-            </a>
+            </a> */}
           </div>
         </div>
 
@@ -129,22 +167,31 @@ export default function Footer() {
           <p className="footer__download-desc">
             Quản lý và giám sát vườn sầu riêng của bạn mọi lúc, mọi nơi trực tiếp trên smartphone.
           </p>
-          
+
           <div className="footer__download-row">
-            <a href="#" className="footer__download-btn" aria-label="App Store">
-              <img
+            <a
+              href="#app-store"
+              className="footer__download-btn"
+              onClick={(e) => {
+                e.preventDefault();
+                triggerAppStoreNotice();
+              }}
+              aria-label="App Store (iOS)"
+              title="Tải trên App Store (iOS)"
+            >
+              <img loading="lazy" decoding="async"
                 src="/assets/apple.png"
                 alt="Tải trên App Store"
               />
             </a>
-            <a 
-              href="https://play.google.com/store/apps/details?id=com.eaagri.app&hl=vi" 
-              target="_blank" 
-              rel="noopener noreferrer" 
-              className="footer__download-btn" 
+            <a
+              href="https://play.google.com/store/apps/details?id=com.eaagri.app&hl=vi"
+              target="_blank"
+              rel="noopener noreferrer"
+              className="footer__download-btn"
               aria-label="Google Play"
             >
-              <img
+              <img loading="lazy" decoding="async"
                 src="/assets/google.png"
                 alt="Tải trên Google Play"
               />
@@ -175,6 +222,15 @@ export default function Footer() {
               }}
             >
               Chính sách bảo mật
+            </a>
+            <span className="footer__bar-divider"></span>
+            <a
+              href="https://crm.eaagri.vn/"
+              target="_blank"
+              rel="noopener noreferrer"
+              title="Cổng Quản trị & Bán hàng EaAgri CRM"
+            >
+              Cổng EaAgri CRM
             </a>
             <span className="footer__bar-divider"></span>
             <a href="#">Quy chuẩn VietGAP</a>

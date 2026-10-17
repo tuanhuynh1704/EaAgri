@@ -1,0 +1,540 @@
+@use "../abstracts/variables" as *;
+
+.floating-traffic-badge {
+  position: fixed;
+  bottom: 2rem;
+  left: 2rem;
+  z-index: 9988;
+  display: flex;
+  align-items: center;
+  animation: floatTrafficEntrance 0.45s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+  user-select: none;
+
+  @media (max-width: $mobile) {
+    bottom: 1.25rem;
+    left: 1.25rem;
+  }
+
+  &__body {
+    position: relative;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    width: 60px;
+    height: 60px;
+    border-radius: 50%;
+    background: radial-gradient(circle at 35% 30%, #065f46 0%, #022c22 85%);
+    border: 2px solid rgba(52, 211, 153, 0.7);
+    box-shadow: 0 8px 24px rgba(0, 0, 0, 0.4), 0 0 16px rgba(16, 185, 129, 0.28),
+      inset 0 1px 2px rgba(255, 255, 255, 0.45), inset 0 -2px 4px rgba(0, 0, 0, 0.4);
+    cursor: pointer;
+    transition: all 0.28s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+    overflow: visible;
+
+    // Glass Reflection Sheen
+    &::before {
+      content: "";
+      position: absolute;
+      inset: 2px 2px auto 2px;
+      height: 48%;
+      border-radius: 999px 999px 0 0;
+      background: linear-gradient(
+        180deg,
+        rgba(255, 255, 255, 0.26) 0%,
+        rgba(255, 255, 255, 0.02) 100%
+      );
+      pointer-events: none;
+    }
+
+    &:hover {
+      transform: scale(1.08) translateY(-2px);
+      box-shadow: 0 12px 28px rgba(0, 0, 0, 0.5), 0 0 22px rgba(16, 185, 129, 0.42);
+      border-color: #6ee7b7;
+    }
+  }
+
+  // Pulsing outer ripple ring
+  &__pulse {
+    position: absolute;
+    inset: -6px;
+    border-radius: 50%;
+    border: 1.5px solid rgba(52, 211, 153, 0.4);
+    animation: trafficPulse 2.4s infinite;
+    pointer-events: none;
+  }
+
+  // Live Green Beacon Dot at Top-Left
+  &__live-beacon {
+    position: absolute;
+    top: 3px;
+    left: 4px;
+    width: 8px;
+    height: 8px;
+    border-radius: 50%;
+    background: #10b981;
+    box-shadow: 0 0 8px #10b981;
+    animation: trafficBeacon 1.8s infinite;
+    z-index: 3;
+  }
+
+  // Center Golden Community/Traffic Icon
+  &__icon-wrap {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin-top: -4px;
+  }
+
+  &__icon {
+    font-size: 1.55rem;
+    line-height: 1;
+    background: linear-gradient(180deg, #fffbeb 0%, #fde047 30%, #f59e0b 70%, #b45309 100%);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    filter: drop-shadow(0 2px 4px rgba(0, 0, 0, 0.45));
+    animation: trafficIconBob 3.5s ease-in-out infinite;
+  }
+
+  // Overlapping Bottom Pill Badge
+  &__pill {
+    position: absolute;
+    bottom: -9px;
+    left: 50%;
+    transform: translateX(-50%);
+    background: linear-gradient(135deg, #10b981, #059669);
+    padding: 0.14rem 0.52rem;
+    border-radius: 999px;
+    border: 1px solid rgba(167, 243, 208, 0.65);
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.35), 0 0 10px rgba(16, 185, 129, 0.4);
+    display: flex;
+    align-items: center;
+    gap: 0.25rem;
+    white-space: nowrap;
+    z-index: 4;
+    transition: all 0.25s ease;
+
+    .pill-dot {
+      width: 5px;
+      height: 5px;
+      border-radius: 50%;
+      background: #ffffff;
+      box-shadow: 0 0 4px #ffffff;
+      animation: blinkPillDot 1.4s infinite;
+      flex-shrink: 0;
+    }
+
+    .pill-text {
+      font-size: 0.64rem;
+      font-weight: 850;
+      color: #ffffff;
+      letter-spacing: 0.02em;
+      line-height: 1.1;
+      text-shadow: 0 1px 2px rgba(0, 0, 0, 0.3);
+    }
+  }
+
+  // Close Button at Top-Right
+  &__close {
+    position: absolute;
+    top: -5px;
+    right: -5px;
+    width: 21px;
+    height: 21px;
+    border-radius: 50%;
+    border: 1px solid rgba(255, 255, 255, 0.28);
+    background: rgba(15, 23, 42, 0.88);
+    color: rgba(255, 255, 255, 0.92);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    font-size: 0.72rem;
+    box-shadow: 0 2px 6px rgba(0, 0, 0, 0.35);
+    transition: all 0.2s ease;
+    z-index: 5;
+
+    &:hover {
+      background: rgba(239, 68, 68, 0.95);
+      border-color: #ef4444;
+      color: #ffffff;
+      transform: scale(1.15);
+    }
+  }
+
+  // 📋 Popover Card
+  &__popover {
+    position: absolute;
+    bottom: -10px;
+    left: calc(100% + 14px);
+    width: 285px;
+    background: linear-gradient(135deg, rgba(6, 38, 28, 0.97), rgba(2, 28, 20, 0.98));
+    border: 1px solid rgba(52, 211, 153, 0.35);
+    border-radius: 14px;
+    padding: 0.85rem 1rem;
+    box-shadow: 0 16px 36px rgba(0, 0, 0, 0.5), 0 0 20px rgba(16, 185, 129, 0.16);
+    backdrop-filter: blur(12px);
+    display: flex;
+    flex-direction: column;
+    gap: 0.55rem;
+    opacity: 0;
+    visibility: hidden;
+    transform: translateX(-10px);
+    transition: all 0.25s cubic-bezier(0.16, 1, 0.3, 1);
+    pointer-events: none;
+    z-index: 10;
+
+    &.is-visible {
+      opacity: 1;
+      visibility: visible;
+      transform: translateX(0);
+      pointer-events: auto;
+    }
+
+    // Speech arrow pointing left toward the circular badge
+    &::after {
+      content: "";
+      position: absolute;
+      top: auto;
+      bottom: 26px;
+      left: -12px;
+      border: 6px solid transparent;
+      border-right-color: rgba(6, 38, 28, 0.97);
+    }
+
+    @media (max-width: 600px) {
+      left: 0;
+      bottom: calc(100% + 14px);
+      transform: translateY(8px);
+
+      &.is-visible {
+        transform: translateY(0);
+      }
+
+      &::after {
+        top: 100%;
+        bottom: auto;
+        left: 20px;
+        border-right-color: transparent;
+        border-top-color: rgba(2, 28, 20, 0.98);
+      }
+    }
+
+    .popover-header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 0.5rem;
+    }
+
+    .popover-live-tag {
+      display: inline-flex;
+      align-items: center;
+      gap: 0.35rem;
+      font-size: 0.65rem;
+      font-weight: 800;
+      color: #6ee7b7;
+      letter-spacing: 0.04em;
+      text-transform: uppercase;
+
+      .live-dot {
+        width: 6px;
+        height: 6px;
+        border-radius: 50%;
+        background: #10b981;
+        box-shadow: 0 0 6px #10b981;
+        animation: trafficBeacon 1.5s infinite;
+      }
+    }
+
+    .popover-close-btn {
+      width: 18px;
+      height: 18px;
+      border-radius: 50%;
+      background: transparent;
+      border: none;
+      color: rgba(255, 255, 255, 0.6);
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 0.85rem;
+
+      &:hover {
+        color: #ffffff;
+      }
+    }
+
+    .popover-main-metric {
+      display: flex;
+      align-items: center;
+      gap: 0.65rem;
+      padding: 0.2rem 0;
+
+      .popover-icon-box {
+        width: 36px;
+        height: 36px;
+        border-radius: 10px;
+        background: rgba(16, 185, 129, 0.16);
+        border: 1px solid rgba(16, 185, 129, 0.3);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 1.25rem;
+        flex-shrink: 0;
+      }
+
+      .popover-lbl {
+        font-size: 0.68rem;
+        color: rgba(255, 255, 255, 0.72);
+        display: block;
+      }
+
+      .popover-val {
+        font-size: 1.05rem;
+        font-weight: 850;
+        line-height: 1.15;
+      }
+    }
+
+    .popover-divider {
+      width: 100%;
+      height: 1px;
+      background: rgba(255, 255, 255, 0.1);
+    }
+
+    .popover-stats-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 0.6rem;
+    }
+
+    .popover-stat-item {
+      display: flex;
+      flex-direction: column;
+      gap: 0.1rem;
+
+      .popover-stat-lbl {
+        font-size: 0.65rem;
+        color: rgba(255, 255, 255, 0.65);
+        display: inline-flex;
+        align-items: center;
+        gap: 0.25rem;
+
+        i {
+          font-size: 0.75rem;
+        }
+      }
+
+      .popover-stat-val {
+        font-size: 0.88rem;
+        font-weight: 800;
+        color: #ffffff;
+      }
+    }
+
+    .popover-devices {
+      display: flex;
+      flex-direction: column;
+      gap: 0.35rem;
+      background: rgba(0, 0, 0, 0.22);
+      padding: 0.45rem 0.55rem;
+      border-radius: 8px;
+
+      &-title {
+        font-size: 0.62rem;
+        font-weight: 700;
+        color: rgba(255, 255, 255, 0.68);
+      }
+
+      &-bar {
+        display: flex;
+        height: 6px;
+        border-radius: 999px;
+        overflow: hidden;
+        background: rgba(255, 255, 255, 0.1);
+
+        .device-bar-fill {
+          height: 100%;
+          transition: width 0.3s ease;
+
+          &--desktop {
+            background: #10b981;
+          }
+          &--mobile {
+            background: #f43f5e;
+          }
+          &--tablet {
+            background: #06b6d4;
+          }
+        }
+      }
+
+      &-legend {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        font-size: 0.62rem;
+        font-weight: 650;
+        color: rgba(255, 255, 255, 0.78);
+
+        span {
+          display: inline-flex;
+          align-items: center;
+          gap: 0.2rem;
+        }
+
+        .text-rose {
+          color: #fda4af;
+        }
+        .text-cyan {
+          color: #67e8f9;
+        }
+      }
+    }
+
+    .popover-action-link {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      gap: 0.35rem;
+      padding: 0.38rem 0.65rem;
+      border-radius: 8px;
+      font-size: 0.72rem;
+      font-weight: 750;
+      background: rgba(16, 185, 129, 0.25);
+      border: 1px solid rgba(16, 185, 129, 0.4);
+      color: #a7f3d0;
+      text-decoration: none;
+      transition: all 0.2s ease;
+
+      &:hover {
+        background: #10b981;
+        color: #ffffff;
+      }
+    }
+
+    .popover-footer-note {
+      font-size: 0.64rem;
+      color: rgba(255, 255, 255, 0.6);
+      text-align: center;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 0.25rem;
+
+      i {
+        color: #10b981;
+      }
+    }
+
+    .text-green {
+      color: #6ee7b7;
+    }
+    .text-gold {
+      color: #fde047;
+    }
+  }
+}
+
+// Minimized pill when dismissed
+.floating-traffic-minimized {
+  position: fixed;
+  bottom: 1.5rem;
+  left: 1.5rem;
+  z-index: 9988;
+  display: inline-flex;
+  align-items: center;
+  gap: 0.35rem;
+  padding: 0.3rem 0.65rem;
+  border-radius: 999px;
+  background: rgba(6, 78, 59, 0.92);
+  border: 1px solid rgba(52, 211, 153, 0.6);
+  color: #ffffff;
+  font-size: 0.72rem;
+  font-weight: 800;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
+  cursor: pointer;
+  backdrop-filter: blur(8px);
+  transition: all 0.2s ease;
+
+  .live-dot {
+    width: 6px;
+    height: 6px;
+    border-radius: 50%;
+    background: #10b981;
+    box-shadow: 0 0 6px #10b981;
+    animation: trafficBeacon 1.5s infinite;
+  }
+
+  i {
+    font-size: 0.85rem;
+    color: #fde047;
+  }
+
+  &:hover {
+    transform: translateY(-2px);
+    background: #047857;
+    border-color: #6ee7b7;
+    box-shadow: 0 6px 18px rgba(0, 0, 0, 0.4);
+  }
+}
+
+// Animations
+@keyframes floatTrafficEntrance {
+  from {
+    transform: translateY(14px) scale(0.9);
+    opacity: 0;
+  }
+  to {
+    transform: translateY(0) scale(1);
+    opacity: 1;
+  }
+}
+
+@keyframes trafficPulse {
+  0% {
+    transform: scale(0.97);
+    opacity: 0.85;
+  }
+  50% {
+    transform: scale(1.15);
+    opacity: 0;
+  }
+  100% {
+    transform: scale(0.97);
+    opacity: 0;
+  }
+}
+
+@keyframes trafficBeacon {
+  0%,
+  100% {
+    transform: scale(1);
+    opacity: 1;
+  }
+  50% {
+    transform: scale(1.3);
+    opacity: 0.55;
+  }
+}
+
+@keyframes trafficIconBob {
+  0%,
+  100% {
+    transform: translateY(0);
+  }
+  50% {
+    transform: translateY(-2px);
+  }
+}
+
+@keyframes blinkPillDot {
+  0%,
+  100% {
+    opacity: 1;
+  }
+  50% {
+    opacity: 0.3;
+  }
+}

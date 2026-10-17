@@ -1,6 +1,7 @@
 import { useEffect, useRef, useState, useCallback } from "react";
 import { createPortal } from "react-dom";
-import * as THREE from "three";
+// three.js is loaded on demand inside the effect so it stays out of the main bundle
+import type * as T3 from "three";
 
 interface SplashIntroProps {
   onComplete?: () => void;
@@ -10,23 +11,24 @@ interface SplashIntroProps {
 
 const DEFAULT_TITLE_LINES = [
   "Chào mừng đến với hệ sinh thái",
-  "NÔNG NGHIỆP THÔNG MINH EA AGRI"
+  "NÔNG NGHIỆP"
 ];
 
-const TYPE_DURATION = 2400;
-const TYPE_DELAY = 350;
-const HOLD_AFTER_TYPED = 1200;
-const MAX_SPLASH = 6800;
+const TYPE_DURATION = 950;
+const TYPE_DELAY = 120;
+const HOLD_BEFORE_DISSOLVE = 300;
+const WARP_FLY_DURATION = 1350; // Total fly-through duration (ms)
+const MAX_SPLASH = 4000;
 const SPLASH_SEEN_KEY = "eaagri_homepage_splash_seen_v1";
+
+type SplashPhase = "typing" | "text_dissolve" | "flying_logo" | "leaving";
 
 const vertexShader = `
   uniform float uTime;
   uniform vec3 uMouse;
   uniform vec3 uCameraPosition;
   uniform float uHoverIntensity;
-  uniform float uConvergence;
-  uniform float uWarp;
-  uniform vec2 uWarpTarget;
+  uniform float uPixelRatio;
 
   varying float vDistanceFromCenter;
   varying float vMouseInfluence;
@@ -34,54 +36,14 @@ const vertexShader = `
   varying float vDepth;
   varying float vTunnelProgress;
 
-  vec3 applyGravitationalLensing(vec3 pos, float time) {
-    vec2 toCenter = pos.xy;
-    float radialDist = length(toCenter);
-    float horizonWarp = smoothstep(2.4, 0.4, radialDist);
-    float warpStrength = horizonWarp * 0.22;
-    float angle = atan(pos.y, pos.x);
-    float spiralSpeed = (1.0 - radialDist * 0.35) * time * 0.4;
-    float newAngle = angle + spiralSpeed * horizonWarp;
-    vec2 warped = vec2(cos(newAngle) * radialDist, sin(newAngle) * radialDist);
-    pos.xy = mix(toCenter, warped, warpStrength);
-    float compression = horizonWarp * 0.12;
-    pos.xy *= (1.0 - compression);
-    return pos;
-  }
-
-  vec3 applySpacetimeRipples(vec3 pos, float time) {
-    float wave1 = sin(pos.z * 1.5 - time * 2.0) * 0.04;
-    float wave2 = cos(pos.z * 2.5 + time * 1.5) * 0.03;
-    float radialDist = length(pos.xy);
-    float rippleStrength = smoothstep(2.5, 0.8, radialDist);
-    pos.xy += normalize(pos.xy) * (wave1 + wave2) * rippleStrength;
-    return pos;
-  }
-
   void main() {
     vec3 pos = position;
-    vTunnelProgress = (position.z + 12.5) / 25.0;
-    float warpTargetEase = smoothstep(0.02, 1.18, uWarp);
 
-    float convEase = 1.0 - pow(1.0 - uConvergence, 3.0);
-    pos.xy *= mix(2.6, 1.0, convEase);
-    pos.z *= mix(1.5, 1.0, convEase);
-
-    pos = applyGravitationalLensing(pos, uTime);
-    pos = applySpacetimeRipples(pos, uTime);
-
-    float resonance = sin(uTime * 2.0) * 0.5 + 0.5;
-    float resonanceStrength = sin(vTunnelProgress * 6.28318 + uTime * 3.0) * 0.02;
-    pos.xy += normalize(pos.xy) * resonanceStrength * resonance;
-
-    vec2 toCenter = -pos.xy;
-    float radialDist = length(pos.xy);
-    float gravityPull = smoothstep(1.8, 0.4, radialDist);
-    float breathe = sin(uTime * 0.5) * 0.08 + 1.0;
-    pos.xy += normalize(toCenter) * gravityPull * 0.12 * breathe;
-    pos.xy += uWarpTarget * warpTargetEase;
-
-    vDistanceFromCenter = smoothstep(2.8, 0.4, radialDist);
+    // Organic bio-pulse wave along the tunnel
+    float wave = sin(pos.z * 0.35 - uTime * 2.0) * 0.05;
+    float breathe = sin(uTime * 1.2 + pos.z * 0.15) * 0.03;
+    vec2 radialDir = normalize(pos.xy + vec2(0.0001, 0.0001));
+    pos.xy += radialDir * (wave + breathe);
 
     vec3 worldPos = (modelMatrix * vec4(pos, 1.0)).xyz;
     vWorldPosition = worldPos;
@@ -89,22 +51,25 @@ const vertexShader = `
     float depthFromCamera = length(uCameraPosition - worldPos);
     vDepth = depthFromCamera;
 
+    // Interactive mouse deflection
     float distToMouse = length(worldPos - uMouse);
     float mouseInfluence = smoothstep(3.5, 0.0, distToMouse);
     mouseInfluence = pow(mouseInfluence, 2.0) * uHoverIntensity;
     vMouseInfluence = mouseInfluence;
 
-    vec3 direction = normalize(uMouse - worldPos);
-    pos += direction * mouseInfluence * 0.35;
+    vec3 direction = normalize(uMouse - worldPos + vec3(0.001));
+    pos += direction * mouseInfluence * 0.3;
 
     vec4 mvPosition = modelViewMatrix * vec4(pos, 1.0);
     gl_Position = projectionMatrix * mvPosition;
 
-    float depthSize = smoothstep(20.0, 2.0, depthFromCamera);
-    float centerSize = vDistanceFromCenter * 2.6;
-    float perspectiveScale = 1.0 / (1.0 + depthFromCamera * 0.06);
-    float warpSize = 1.0 + uWarp * 6.0;
-    gl_PointSize = (3.0 + depthSize * 5.2 + centerSize + mouseInfluence * 0.8) * perspectiveScale * warpSize;
+    // Tunnel progress and center distance
+    vTunnelProgress = clamp((-pos.z + 10.0) / 55.0, 0.0, 1.0);
+    vDistanceFromCenter = smoothstep(3.2, 0.5, length(pos.xy));
+
+    // Particle sizing: strictly capped, crisp and elegant (NEVER giant blotches!)
+    float depthSize = clamp(14.0 / max(depthFromCamera, 1.2), 0.8, 3.8);
+    gl_PointSize = (1.8 + depthSize + mouseInfluence * 0.5) * uPixelRatio;
   }
 `;
 
@@ -117,52 +82,56 @@ const fragmentShader = `
   varying float vDepth;
   varying float vTunnelProgress;
 
-  vec3 getWormholeColor(vec3 worldPos, float tunnelProgress, float time) {
+  vec3 getEcoColor(vec3 worldPos, float progress, float time) {
     float radialDist = length(worldPos.xy);
-    float horizonGlow = smoothstep(1.8, 0.0, radialDist);
-    
-    // Deep Forest & Eco-Stars Palette
-    vec3 dawnLightCenter = vec3(1.15, 1.25, 1.0);
-    vec3 deepForest = vec3(0.04, 0.18, 0.14);
-    vec3 emeraldBio = vec3(0.2, 0.9, 0.55);
-    vec3 goldenPollen = vec3(1.0, 0.85, 0.35);
-    vec3 cyanMist = vec3(0.35, 0.75, 0.98);
+    float centerGlow = smoothstep(2.5, 0.2, radialDist);
 
-    float resonance = sin(time * 2.0) * 0.5 + 0.5;
-    float colorPhase1 = sin(tunnelProgress * 3.14159 + time * 0.5) * 0.5 + 0.5;
-    float colorPhase2 = cos(radialDist * 2.5 - time * 0.6) * 0.5 + 0.5;
-    float colorPhase3 = sin(radialDist * 3.0 + time * 0.8) * 0.5 + 0.5;
+    // Light Eco Theme: Fresh emerald bio, vibrant mint aqua, golden pollen, deep jade
+    vec3 forestDeep = vec3(0.03, 0.40, 0.22);
+    vec3 emeraldBio = vec3(0.05, 0.72, 0.40);
+    vec3 goldenPollen = vec3(0.96, 0.70, 0.14);
+    vec3 mintAqua = vec3(0.09, 0.68, 0.54);
 
-    vec3 baseColor = mix(deepForest, emeraldBio, colorPhase1 * 0.8);
-    baseColor = mix(baseColor, cyanMist, colorPhase2 * 0.5);
-    baseColor = mix(baseColor, goldenPollen, colorPhase3 * 0.35 * resonance);
-    
-    vec3 finalColor = mix(baseColor, dawnLightCenter, horizonGlow * 0.8);
-    finalColor += vec3(0.2, 0.3, 0.25) * vMouseInfluence * uHoverIntensity;
-    return finalColor;
+    float phase1 = sin(progress * 3.14159 + time * 0.6) * 0.5 + 0.5;
+    float phase2 = cos(radialDist * 2.2 - time * 0.8) * 0.5 + 0.5;
+    float phase3 = sin(radialDist * 2.8 + time * 1.0) * 0.5 + 0.5;
+
+    vec3 col = mix(forestDeep, emeraldBio, phase1 * 0.85);
+    col = mix(col, mintAqua, phase2 * 0.4);
+    col = mix(col, goldenPollen, phase3 * 0.35);
+    col = mix(col, emeraldBio, centerGlow * 0.35);
+
+    return col;
   }
 
   void main() {
     vec2 center = gl_PointCoord - 0.5;
     float dist = length(center);
     if (dist > 0.5) discard;
-    float roundMask = 1.0 - smoothstep(0.24, 0.5, dist);
+
+    // Smooth rounded circular mask
+    float roundMask = 1.0 - smoothstep(0.28, 0.5, dist);
     if (roundMask <= 0.001) discard;
-    float coreGlow = exp(-dist * dist * 11.0);
-    float softEdge = pow(roundMask, 1.35) * (0.62 + coreGlow * 0.38);
-    float depthFade = smoothstep(22.0, 2.0, vDepth);
-    depthFade = pow(depthFade, 2.0);
 
-    float alpha = 0.5 + vDistanceFromCenter * 0.45;
-    alpha = mix(alpha, 0.85, vMouseInfluence * 0.4);
-    alpha *= depthFade;
-    alpha *= softEdge;
+    // Core glow for luminous bio-particles
+    float coreGlow = exp(-dist * dist * 10.0);
 
-    vec3 wormholeColor = getWormholeColor(vWorldPosition, vTunnelProgress, uTime);
-    float intensity = 1.7 + vDistanceFromCenter * 0.7 + vMouseInfluence * 0.4;
-    wormholeColor = mix(wormholeColor, vec3(1.0), coreGlow * 0.25);
-    wormholeColor *= intensity;
-    gl_FragColor = vec4(wormholeColor, alpha);
+    // CRITICAL: Near-Camera Dissolve - particles within 2.8 units smoothly dissolve to 0!
+    // This absolutely guarantees NO giant dots or blurry discs can ever appear!
+    float nearFade = smoothstep(1.0, 2.8, vDepth);
+
+    // Far fade: distant particles fade into background mist
+    float farFade = smoothstep(48.0, 8.0, vDepth);
+
+    float alpha = (0.55 + coreGlow * 0.45) * roundMask * nearFade * farFade;
+    alpha = mix(alpha, 0.95, vMouseInfluence * 0.4);
+
+    if (alpha <= 0.015) discard;
+
+    vec3 color = getEcoColor(vWorldPosition, vTunnelProgress, uTime);
+    color *= (1.05 + vDistanceFromCenter * 0.3 + coreGlow * 0.15);
+
+    gl_FragColor = vec4(color, alpha);
   }
 `;
 
@@ -173,11 +142,13 @@ export default function SplashIntro({
 }: SplashIntroProps) {
   const [shouldRender, setShouldRender] = useState(false);
   const [typedText, setTypedText] = useState("");
-  const [isWarping, setIsWarping] = useState(false);
+  const [phase, setPhase] = useState<SplashPhase>("typing");
+  const [isBlooming, setIsBlooming] = useState(false);
   const [isLeaving, setIsLeaving] = useState(false);
   const [showCaret, setShowCaret] = useState(true);
 
   const canvasRef = useRef<HTMLCanvasElement | null>(null);
+  const logoBoxRef = useRef<HTMLDivElement | null>(null);
   const wormholeRef = useRef<{
     start: () => void;
     warpOut: () => Promise<void>;
@@ -206,18 +177,26 @@ export default function SplashIntro({
     if (!shouldRender || !canvasRef.current) return;
 
     const canvas = canvasRef.current;
-    const isMobile = window.innerWidth <= 768;
-    const numRings = isMobile ? 90 : 140;
-    const pointsPerRing = isMobile ? 110 : 170;
-    const tunnelLength = 25;
-    const warpRamp = 1.4;
+    let cancelled = false;
 
-    let renderer: THREE.WebGLRenderer | null = null;
-    let scene: THREE.Scene | null = null;
-    let camera: THREE.PerspectiveCamera | null = null;
-    let points: THREE.Points | null = null;
-    let material: THREE.ShaderMaterial | null = null;
-    let clock: THREE.Clock | null = null;
+    // Dynamic import: the typed text + gradient fallback show immediately; the particle
+    // tunnel fades in once three.js arrives. finish() already copes with no wormhole.
+    import("three").then((THREE) => {
+    if (cancelled) return;
+    const isMobile = window.innerWidth <= 768;
+    const numRings = isMobile ? 100 : 160;
+    const pointsPerRing = isMobile ? 90 : 150;
+    const zStart = 8;
+    const zEnd = -46;
+    const tunnelLength = zStart - zEnd;
+    const warpDuration = WARP_FLY_DURATION / 1000; // in seconds
+
+    let renderer: T3.WebGLRenderer | null = null;
+    let scene: T3.Scene | null = null;
+    let camera: T3.PerspectiveCamera | null = null;
+    let points: T3.Points | null = null;
+    let material: T3.ShaderMaterial | null = null;
+    let clock: T3.Clock | null = null;
     let rafId = 0;
     let disposed = false;
     let hovering = false;
@@ -226,16 +205,24 @@ export default function SplashIntro({
     const raycaster = new THREE.Raycaster();
     const plane = new THREE.Plane(new THREE.Vector3(0, 0, 1), 0);
     const pointer = new THREE.Vector2(0, 0);
-    let warp = 0;
+
     let warping = false;
     let warpStart = 0;
-    let speedMult = 1;
+
+    // Organic spine function: curves gently through 3D space
+    // At z = 5 (initial camera position), spine is exactly (0, 0)
+    const getSpine = (z: number) => {
+      const dz = z - 5;
+      const x = Math.sin(dz * 0.08) * 1.6;
+      const y = (Math.cos(dz * 0.065) - 1.0) * 1.2;
+      return { x, y };
+    };
 
     try {
-      renderer = new THREE.WebGLRenderer({ canvas, antialias: true, alpha: false });
-      // Deep dark forest night background
-      renderer.setClearColor(0x02110c, 1);
-      renderer.setPixelRatio(Math.min(window.devicePixelRatio, isMobile ? 1.5 : 2));
+      renderer = new THREE.WebGLRenderer({ canvas, antialias: true, alpha: true });
+      renderer.setClearColor(0xf6fbf7, 1);
+      const pixelRatio = Math.min(window.devicePixelRatio, isMobile ? 1.5 : 2);
+      renderer.setPixelRatio(pixelRatio);
       renderer.setSize(window.innerWidth, window.innerHeight, false);
 
       scene = new THREE.Scene();
@@ -243,19 +230,23 @@ export default function SplashIntro({
       camera.position.set(0, 0, 5);
 
       const positions: number[] = [];
-      const velocities: number[] = [];
 
       for (let ring = 0; ring < numRings; ring++) {
-        const z = (ring / numRings) * tunnelLength - tunnelLength * 0.5;
         const ringProgress = ring / numRings;
-        // Wider tunnel base radius to keep the center spacious and clear for text
-        const baseRadius = 1.55 + Math.sin(ringProgress * Math.PI) * 0.55;
+        const z = zStart - ringProgress * tunnelLength;
+        const spine = getSpine(z);
+
+        // Wide opening at front to keep text & logo clean and spacious
+        const baseRadius = 2.0 + Math.sin(ringProgress * Math.PI) * 0.9;
 
         for (let i = 0; i < pointsPerRing; i++) {
           const angle = (i / pointsPerRing) * Math.PI * 2;
-          const radius = baseRadius + Math.sin(ring * 0.5 + i * 0.2) * 0.08;
-          positions.push(Math.cos(angle) * radius, Math.sin(angle) * radius, z);
-          velocities.push(-0.034 - Math.random() * 0.017);
+          const radius = baseRadius + Math.sin(ring * 0.45 + i * 0.25) * 0.12;
+          positions.push(
+            spine.x + Math.cos(angle) * radius,
+            spine.y + Math.sin(angle) * radius,
+            z
+          );
         }
       }
 
@@ -268,15 +259,13 @@ export default function SplashIntro({
           uMouse: { value: mouse3D },
           uCameraPosition: { value: camera.position },
           uHoverIntensity: { value: 0 },
-          uConvergence: { value: 0 },
-          uWarp: { value: 0 },
-          uWarpTarget: { value: new THREE.Vector2(0, 0) },
+          uPixelRatio: { value: pixelRatio },
         },
         vertexShader,
         fragmentShader,
         transparent: true,
         depthWrite: false,
-        blending: THREE.AdditiveBlending,
+        blending: THREE.NormalBlending,
       });
 
       points = new THREE.Points(geometry, material);
@@ -324,37 +313,52 @@ export default function SplashIntro({
         rafId = requestAnimationFrame(loop);
         const t = clock.getElapsedTime();
 
-        const posAttr = points.geometry.attributes.position as THREE.BufferAttribute;
-        const arr = posAttr.array as Float32Array;
-        for (let i = 0, v = 0; i < arr.length; i += 3, v++) {
-          arr[i + 2] += velocities[v] * speedMult;
-          if (arr[i + 2] < -12.5) {
-            arr[i + 2] = warping ? arr[i + 2] : 12.5;
-          }
-        }
-        posAttr.needsUpdate = true;
-
-        points.rotation.z += 0.0018;
+        points.rotation.z += 0.0012;
         hoverIntensity += ((hovering ? 1 : 0) - hoverIntensity) * 0.1;
 
         if (warping) {
-          const wt = t - warpStart;
-          const eIn = (wt / warpRamp) * (wt / warpRamp);
-          warp = Math.min(eIn, 1.5);
-          speedMult = 1 + Math.min(eIn, 1.6) * 20;
-          camera.position.x += (0 - camera.position.x) * 0.1;
-          camera.position.y += (0 - camera.position.y) * 0.1;
-          camera.position.z += (0.3 - camera.position.z) * 0.05;
-          camera.lookAt(0, 0, -2);
+          const wt = Math.min((t - warpStart) / warpDuration, 1.0);
+          // Smooth easeInOutQuad for cinematic surge and landing
+          const easeP = wt < 0.5 ? 2 * wt * wt : 1 - Math.pow(-2 * wt + 2, 2) / 2;
+
+          // Camera plunges forward along Z through the curved tunnel ("chạy vào")
+          const camZ = THREE.MathUtils.lerp(5, -34, easeP);
+          const spine = getSpine(camZ);
+
+          // Serpentine weave ("luồng lách") inside the tunnel!
+          const weaveAngle = easeP * Math.PI * 3.0; // 1.5 complete S-curves
+          const weaveAmp = Math.sin(easeP * Math.PI); // Envelope: 0 at start, peak at center, 0 at exit
+          const weaveX = Math.sin(weaveAngle) * 0.75 * weaveAmp;
+          const weaveY = Math.cos(weaveAngle * 0.85) * 0.45 * weaveAmp;
+
+          camera.position.x = spine.x + weaveX;
+          camera.position.y = spine.y + weaveY;
+          camera.position.z = camZ;
+
+          // Dynamic banking roll: tilts into turns like a glider/drone
+          const roll = -Math.cos(weaveAngle) * 0.14 * weaveAmp;
+          camera.rotation.z = roll;
+
+          // Look ahead along curve
+          const lookAheadZ = camZ - 5.5;
+          const lookSpine = getSpine(lookAheadZ);
+          const lookWeaveX = Math.sin(weaveAngle + 0.6) * 0.55 * weaveAmp;
+          const lookWeaveY = Math.cos((weaveAngle + 0.6) * 0.85) * 0.35 * weaveAmp;
+          camera.lookAt(lookSpine.x + lookWeaveX, lookSpine.y + lookWeaveY, lookAheadZ);
+        } else {
+          // Subtle breathing & mouse interaction in idle state
+          camera.position.x = mouse3D.x * 0.08 + Math.sin(t * 0.8) * 0.04;
+          camera.position.y = mouse3D.y * 0.08 + Math.cos(t * 0.7) * 0.03;
+          camera.position.z = 5;
+          camera.rotation.z = 0;
+          camera.lookAt(0, 0, -4);
         }
 
         const u = material.uniforms;
         u.uTime.value = t;
-        u.uConvergence.value = warping ? 1 : Math.min(0.35 + t / 2.2, 1.0);
         u.uCameraPosition.value.copy(camera.position);
         u.uMouse.value.copy(mouse3D);
         u.uHoverIntensity.value = hoverIntensity;
-        u.uWarp.value = warp;
 
         renderer.render(scene, camera);
       };
@@ -366,7 +370,7 @@ export default function SplashIntro({
         warpOut: () => {
           warping = true;
           if (clock) warpStart = clock.getElapsedTime();
-          return new Promise<void>((resolve) => setTimeout(resolve, 1300));
+          return new Promise<void>((resolve) => setTimeout(resolve, WARP_FLY_DURATION));
         },
         dispose: () => {
           disposed = true;
@@ -377,38 +381,117 @@ export default function SplashIntro({
           canvas.removeEventListener("pointerleave", handlePointerLeave);
           if (geometry) geometry.dispose();
           if (material) material.dispose();
-          if (renderer) renderer.dispose();
+          // Release the WebGL context now so it doesn't count against the browser's
+          // context limit and evict the hero's 3D model.
+          if (renderer) {
+            renderer.forceContextLoss();
+            renderer.dispose();
+          }
         },
       };
     } catch (err) {
       console.warn("WebGL initialization failed, running in fallback mode", err);
     }
+    }).catch((err) => {
+      console.warn("three.js failed to load, running in fallback mode", err);
+    });
 
     return () => {
+      cancelled = true;
       wormholeRef.current?.dispose();
+      wormholeRef.current = null;
     };
   }, [shouldRender]);
 
-  // Finish sequence (Warp out -> Dawn Flash -> Reveal Homepage)
+  // Finish sequence:
+  // 1. Text dissolves ("mất chữ")
+  // 2. Camera weaves into the tunnel ("chạy vào")
+  // 3. Logo EA Agri appears in center ("sẽ hiện logo thêm")
+  // 4. Daylight bloom opens and smoothly enters homepage ("rầu vào web trang chủ")
   const finish = useCallback(async () => {
     if (finishedRef.current) return;
     finishedRef.current = true;
 
     setShowCaret(false);
-    setIsWarping(true);
+    // 1. Chữ mờ biến mất ("mất chữ")
+    setPhase("text_dissolve");
 
-    document.body.classList.remove("homepage-splash-prime");
-    document.body.classList.add("homepage-splash-reveal");
+    // Bắt đầu cho camera lao vào đường hầm ("chạy vào")
+    const warpPromise = wormholeRef.current ? wormholeRef.current.warpOut() : Promise.resolve();
+
+    // 2. Khi vừa bắt đầu chạy vào (sau 280ms khi chữ vừa tan), LOGO XUẤT HIỆN Ở TRUNG TÂM!
+    const logoTimer = setTimeout(() => {
+      setPhase("flying_logo");
+    }, 280);
+
+    // 3. Khi chạy gần hết hầm (sau 950ms): Daylight Bloom hé mở từ tâm
+    const bloomTimer = setTimeout(() => {
+      setIsBlooming(true);
+    }, 950);
 
     try {
-      if (wormholeRef.current) {
-        await wormholeRef.current.warpOut();
-      }
+      await warpPromise;
     } catch (e) {
       console.error(e);
     }
 
+    clearTimeout(logoTimer);
+    clearTimeout(bloomTimer);
+    setIsBlooming(true);
+
+    // 4. Logo bay vào vị trí navbar logo
+    setPhase("leaving");
     setIsLeaving(true);
+
+    // Tính toán vị trí navbar logo để bay vào chính xác
+    if (logoBoxRef.current) {
+      const navLogo = document.querySelector('.nav__logo-img') as HTMLElement;
+      if (navLogo) {
+        // #root is scaled to 1.03 during the splash (homepage-splash-prime) and eases back
+        // to none on reveal. Measure the navbar logo with that transform removed so the
+        // flight lands where the logo will actually sit, not where it is mid-animation.
+        // Same for the navbar's own AOS fade-down slide.
+        const root = document.getElementById('root');
+        const nav = navLogo.closest('nav') as HTMLElement | null;
+        const settled = [root, nav].filter(Boolean) as HTMLElement[];
+        settled.forEach((node) => {
+          node.style.setProperty('transition', 'none', 'important');
+          node.style.setProperty('transform', 'none', 'important');
+        });
+        const navRect = navLogo.getBoundingClientRect();
+        settled.forEach((node) => {
+          node.style.removeProperty('transform');
+          node.style.removeProperty('transition');
+        });
+
+        const el = logoBoxRef.current;
+        const splashRect = el.getBoundingClientRect();
+        const splashCenterX = splashRect.left + splashRect.width / 2;
+        const splashCenterY = splashRect.top + splashRect.height / 2;
+        const navCenterX = navRect.left + navRect.width / 2;
+        const navCenterY = navRect.top + navRect.height / 2;
+        const dx = navCenterX - splashCenterX;
+        const dy = navCenterY - splashCenterY;
+        // offsetHeight = untransformed size. The inline transform below replaces the
+        // CSS scale on the box, so the ratio must be taken against the unscaled height.
+        const scaleTarget = navRect.height / el.offsetHeight;
+
+        // Bước 1: Bay về đúng vị trí logo navbar — giữ rõ nét suốt đường bay
+        el.style.transition = 'transform 0.6s cubic-bezier(0.32, 0, 0.15, 1)';
+        el.style.transform = `translate(calc(-50% + ${dx}px), calc(-50% + ${dy}px)) scale(${scaleTarget})`;
+        el.style.filter = 'none';
+        el.style.opacity = '1';
+
+        // Bước 2: Đã tới đích -> hòa vào logo thật trên navbar
+        setTimeout(() => {
+          el.style.transition = 'opacity 0.15s ease-out';
+          el.style.opacity = '0';
+        }, 600);
+      }
+    }
+
+    document.body.classList.remove("homepage-splash-prime");
+    document.body.classList.add("homepage-splash-reveal");
 
     setTimeout(() => {
       document.body.classList.remove(
@@ -418,7 +501,7 @@ export default function SplashIntro({
       );
       setShouldRender(false);
       if (onComplete) onComplete();
-    }, 1250);
+    }, 750);
   }, [onComplete]);
 
   // Typing Effect
@@ -434,7 +517,7 @@ export default function SplashIntro({
 
     let rafId = 0;
     let typingTimeout = 0;
-    let holdTimeout = 0;
+    let finishTimeout = 0;
     let maxTimeout = 0;
 
     typingTimeout = window.setTimeout(() => {
@@ -449,7 +532,10 @@ export default function SplashIntro({
 
         if (count >= totalChars) {
           setShowCaret(false);
-          holdTimeout = window.setTimeout(finish, HOLD_AFTER_TYPED);
+          // Gõ xong chữ -> dừng 300ms rồi tự động kích hoạt finish (mất chữ -> chạy vào hiện logo -> vào web)
+          finishTimeout = window.setTimeout(() => {
+            finish();
+          }, HOLD_BEFORE_DISSOLVE);
           return;
         }
 
@@ -463,7 +549,7 @@ export default function SplashIntro({
 
     return () => {
       clearTimeout(typingTimeout);
-      clearTimeout(holdTimeout);
+      clearTimeout(finishTimeout);
       clearTimeout(maxTimeout);
       cancelAnimationFrame(rafId);
     };
@@ -495,29 +581,44 @@ export default function SplashIntro({
       {/* ThreeJS WebGL Canvas Particle Tunnel */}
       <canvas ref={canvasRef} className="homepage-splash__canvas" />
 
-      {/* Cinematic Flash Beam on Warp Out */}
-      <div className="homepage-splash__flash-wrap">
-        <div className={`homepage-splash__flash ${isWarping ? "is-on" : ""}`} />
-      </div>
+      {/* Daylight Bloom Portal Reveal */}
+      <div className={`homepage-splash__bloom ${isBlooming ? "is-blooming" : ""}`} />
 
-      {/* Centered Luminous Animated Title (Pure floating text with NO box) */}
-      <div className={`homepage-splash__title-wrap ${isWarping ? "is-warping" : ""}`}>
-        <h1 className="homepage-splash__title">
-          <span className="homepage-splash__text">
-            {typedText}
-          </span>
-          {showCaret && (
-            <span className="homepage-splash__caret" aria-hidden="true">
-              ▌
+      {/* Centered Content: Title and Emerging Logo */}
+      <div className="homepage-splash__content">
+        {/* Title: Centered, dissolves smoothly when typing completes ("mất chữ") */}
+        <div className={`homepage-splash__title-box ${phase !== "typing" ? "is-faded" : ""}`}>
+          <h1 className="homepage-splash__title">
+            <span className="homepage-splash__text">
+              {typedText}
             </span>
-          )}
-        </h1>
+            {showCaret && (
+              <span className="homepage-splash__caret" aria-hidden="true">
+                ▌
+              </span>
+            )}
+          </h1>
+        </div>
+
+        {/* Logo: Appears when camera flies into tunnel ("chạy vào sẽ hiện logo thêm") */}
+        <div
+          ref={logoBoxRef}
+          className={`homepage-splash__logo-box ${
+            phase === "flying_logo" ? "is-visible" : phase === "leaving" ? "is-leaving" : ""
+          }`}
+        >
+          <img
+            src="/images-1/logo_banner.jpg"
+            alt="EA Agri Logo"
+            className="homepage-splash__logo"
+          />
+        </div>
       </div>
 
       {/* Skip button with Glassmorphism */}
       <button
         type="button"
-        className={`homepage-splash__skip ${isWarping ? "is-hidden" : ""}`}
+        className={`homepage-splash__skip ${phase === "leaving" ? "is-hidden" : ""}`}
         onClick={finish}
       >
         Bỏ qua ›

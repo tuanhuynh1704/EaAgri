@@ -133,7 +133,7 @@ const StoryFeatureSection = ({
                   <i className="ri-arrow-left-s-line"></i>
                 </button>
                 
-                <img src={images[currentIndex]} alt={`${title} ${currentIndex + 1}`} className="story__slider-img" />
+                <img loading="lazy" decoding="async" src={images[currentIndex]} alt={`${title} ${currentIndex + 1}`} className="story__slider-img" />
                 
                 <button className="story__slider-btn story__slider-btn--next" onClick={handleNext} aria-label="Next image">
                   <i className="ri-arrow-right-s-line"></i>
@@ -151,7 +151,7 @@ const StoryFeatureSection = ({
                 </div>
               </div>
             ) : (
-              <img src={images[0]} alt={title} className="story__single-img" />
+              <img loading="lazy" decoding="async" src={images[0]} alt={title} className="story__single-img" />
             )}
           </div>
         </div>
