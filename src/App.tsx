@@ -18,6 +18,7 @@ import {
   recordVisitorHit,
   sendVisitorHeartbeat,
   sendVisitorLeave,
+  isBotOrCrawler,
 } from "./services/visitorTracker";
 
 function RouteFallback() {
@@ -38,31 +39,65 @@ function VisitorTracker() {
     }
     window.scrollTo(0, 0);
 
-    // Track visitor hit for this machine / IP
-    recordVisitorHit(pathname, {
-      isAuthenticated: Boolean(user),
-      userId: user?.id,
-      userEmail: user?.email,
-      userName:
-        profile?.full_name ||
-        (user?.user_metadata as any)?.full_name ||
-        (user?.email ? user.email.split("@")[0] : undefined),
-      userRole:
-        profile?.role ||
-        (user?.app_metadata as any)?.role ||
-        (user ? "user" : undefined),
-    });
+    // 🛑 1. ANTI-BOT GATE: Headless scrapers & crawlers are completely ignored
+    if (isBotOrCrawler()) return;
+
+    // 🛡️ 2. HUMAN INTERACTION & DWELL-TIME GATE:
+    // Scrapers & automated probes fetch & close in <1s without any mouse/touch interaction.
+    // Real users interact or stay on page. Delay logging until first interaction or 2.5s active view.
+    let tracked = false;
+    const triggerTrack = () => {
+      if (tracked) return;
+      tracked = true;
+      recordVisitorHit(pathname, {
+        isAuthenticated: Boolean(user),
+        userId: user?.id,
+        userEmail: user?.email,
+        userName:
+          profile?.full_name ||
+          (user?.user_metadata as any)?.full_name ||
+          (user?.email ? user.email.split("@")[0] : undefined),
+        userRole:
+          profile?.role ||
+          (user?.app_metadata as any)?.role ||
+          (user ? "user" : undefined),
+      });
+      cleanup();
+    };
+
+    const cleanup = () => {
+      window.removeEventListener("pointerdown", triggerTrack);
+      window.removeEventListener("keydown", triggerTrack);
+      window.removeEventListener("scroll", triggerTrack);
+      window.removeEventListener("touchstart", triggerTrack);
+      clearTimeout(dwellTimer);
+    };
+
+    window.addEventListener("pointerdown", triggerTrack, { once: true, passive: true });
+    window.addEventListener("keydown", triggerTrack, { once: true, passive: true });
+    window.addEventListener("scroll", triggerTrack, { once: true, passive: true });
+    window.addEventListener("touchstart", triggerTrack, { once: true, passive: true });
+    const dwellTimer = setTimeout(triggerTrack, 2500);
+
+    return cleanup;
   }, [pathname, user, profile]);
 
-  // Realtime Heartbeat (every 15s) and Instant Leave Listener (pagehide & beforeunload)
+  // Realtime Heartbeat (every 30s) and Instant Leave Listener (pagehide & beforeunload)
   useEffect(() => {
-    // Send immediate heartbeat on mount
-    sendVisitorHeartbeat(window.location.pathname);
+    // 🛑 Do not run background heartbeats for bots
+    if (isBotOrCrawler()) return;
 
-    // Periodic heartbeat every 15s to maintain active online status
-    const interval = setInterval(() => {
+    // Send immediate heartbeat on mount if tab is visible
+    if (document.visibilityState === "visible") {
       sendVisitorHeartbeat(window.location.pathname);
-    }, 15000);
+    }
+
+    // Periodic heartbeat every 30s to maintain active online status
+    const interval = setInterval(() => {
+      if (document.visibilityState === "visible") {
+        sendVisitorHeartbeat(window.location.pathname);
+      }
+    }, 30000);
 
     // Instant leave notification when tab/window closes or navigates away
     const handleLeave = () => {

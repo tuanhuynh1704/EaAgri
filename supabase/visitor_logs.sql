@@ -22,6 +22,7 @@ CREATE TABLE IF NOT EXISTS public.visitor_logs (
     first_visit TIMESTAMPTZ NOT NULL DEFAULT now(),
     last_visit TIMESTAMPTZ NOT NULL DEFAULT now(),
     is_real BOOLEAN NOT NULL DEFAULT true,
+    is_bot BOOLEAN NOT NULL DEFAULT false,
     is_authenticated BOOLEAN NOT NULL DEFAULT false,
     user_id TEXT,
     user_email TEXT,
@@ -36,6 +37,9 @@ DO $$
 BEGIN
     IF NOT EXISTS (SELECT 1 FROM information_schema.columns WHERE table_name = 'visitor_logs' AND column_name = 'is_real') THEN
         ALTER TABLE public.visitor_logs ADD COLUMN is_real BOOLEAN NOT NULL DEFAULT true;
+    END IF;
+    IF NOT EXISTS (SELECT 1 FROM information_schema.columns WHERE table_name = 'visitor_logs' AND column_name = 'is_bot') THEN
+        ALTER TABLE public.visitor_logs ADD COLUMN is_bot BOOLEAN NOT NULL DEFAULT false;
     END IF;
     IF NOT EXISTS (SELECT 1 FROM information_schema.columns WHERE table_name = 'visitor_logs' AND column_name = 'is_authenticated') THEN
         ALTER TABLE public.visitor_logs ADD COLUMN is_authenticated BOOLEAN NOT NULL DEFAULT false;
@@ -74,8 +78,17 @@ CREATE TABLE IF NOT EXISTS public.visitor_history_logs (
     user_name TEXT,
     user_role TEXT,
     is_real BOOLEAN NOT NULL DEFAULT true,
+    is_bot BOOLEAN NOT NULL DEFAULT false,
     created_at TIMESTAMPTZ NOT NULL DEFAULT now()
 );
+
+-- Ensure is_bot column exists on visitor_history_logs
+DO $$ 
+BEGIN
+    IF NOT EXISTS (SELECT 1 FROM information_schema.columns WHERE table_name = 'visitor_history_logs' AND column_name = 'is_bot') THEN
+        ALTER TABLE public.visitor_history_logs ADD COLUMN is_bot BOOLEAN NOT NULL DEFAULT false;
+    END IF;
+END $$;
 
 -- 3. Indexes for high performance querying & sorting
 CREATE INDEX IF NOT EXISTS idx_visitor_logs_last_visit ON public.visitor_logs(last_visit DESC);
@@ -124,3 +137,21 @@ EXCEPTION
     WHEN duplicate_object THEN NULL;
     WHEN undefined_object THEN NULL;
 END $$;
+
+-- 7. CLEANUP / PURGE BOT & CRAWLER SPAM
+-- Deletes headless Docker crawlers (e.g. Linux with 800x600 resolution or cloud datacenter IPs)
+DELETE FROM public.visitor_logs
+WHERE os = 'Linux' AND (screen_resolution LIKE '%800%' OR screen_resolution = '0x0')
+   OR ip_address LIKE '13.57.%'
+   OR ip_address LIKE '54.183.%'
+   OR ip_address LIKE '54.215.%'
+   OR ip_address LIKE '52.53.%'
+   OR is_bot = true;
+
+DELETE FROM public.visitor_history_logs
+WHERE os = 'Linux'
+   OR ip_address LIKE '13.57.%'
+   OR ip_address LIKE '54.183.%'
+   OR ip_address LIKE '54.215.%'
+   OR ip_address LIKE '52.53.%'
+   OR is_bot = true;

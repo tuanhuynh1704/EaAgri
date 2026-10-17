@@ -68,16 +68,36 @@ export default async function handler(req, res) {
     return res.status(200).json(logs);
   }
 
+  // Global rate limiter map in memory
+  if (!global.__trafficRateLimit) global.__trafficRateLimit = new Map();
+
   // DELETE: Delete logs
   if (req.method === "DELETE") {
     const urlObj = new URL(req.url, "http://localhost");
     const isSampleOnly = urlObj.searchParams.get("type") === "sample";
+    const isBotOnly = urlObj.searchParams.get("type") === "bot";
     const targetId = urlObj.searchParams.get("id");
 
     let logs = readLogs();
     let deletedCount = 0;
 
-    if (isSampleOnly) {
+    if (isBotOnly) {
+      const initialCount = logs.length;
+      logs = logs.filter((item) => {
+        const os = String(item.os || "").toLowerCase();
+        const screen = String(item.screen_resolution || "").replace(/\s+/g, "");
+        const ip = String(item.ip_address || "").trim();
+        if (item.is_bot === true) return false;
+        if (os.includes("linux") && (screen.includes("800×600") || screen.includes("800x600") || screen === "0×0" || screen === "0x0")) {
+          return false;
+        }
+        if (ip.startsWith("13.57.") || ip.startsWith("54.183.") || ip.startsWith("54.215.") || ip.startsWith("52.53.")) {
+          return false;
+        }
+        return true;
+      });
+      deletedCount = initialCount - logs.length;
+    } else if (isSampleOnly) {
       const initialCount = logs.length;
       logs = logs.filter((item) => {
         if (item.is_real === false) return false;
@@ -126,6 +146,31 @@ export default async function handler(req, res) {
         data.ip_address && data.ip_address !== "127.0.0.1" && !data.ip_address.startsWith("192.168.")
           ? data.ip_address
           : cleanSocketIp || data.ip_address || "116.111.184.173";
+
+      // 🛑 1. BOT & CRAWLER FILTER (Zero DB/file writing for automated scrapers)
+      const ua = (req.headers["user-agent"] || "").toLowerCase();
+      const isBotUa = /(bot|crawler|spider|headlesschrome|lighthouse|slurp|python|curl|wget|urllib|requests|axios|shodan|censys|nikto|nmap)/i.test(ua);
+      const isDockerHeadless = String(data.os || "").toLowerCase().includes("linux") && String(data.screen_resolution || "").includes("800");
+      const isAwsScraperIp = effectiveIp.startsWith("13.57.") || effectiveIp.startsWith("54.183.") || effectiveIp.startsWith("54.215.");
+
+      if (isBotUa || isDockerHeadless || isAwsScraperIp || data.is_bot) {
+        return res.status(200).json({ success: true, ignored: true, reason: "bot_filtered" });
+      }
+
+      // 🛑 2. RATE LIMITER: Max 30 requests per minute per IP
+      const now = Date.now();
+      const rateRecord = global.__trafficRateLimit.get(effectiveIp) || { count: 0, resetAt: now + 60000 };
+      if (now > rateRecord.resetAt) {
+        rateRecord.count = 1;
+        rateRecord.resetAt = now + 60000;
+      } else {
+        rateRecord.count++;
+      }
+      global.__trafficRateLimit.set(effectiveIp, rateRecord);
+
+      if (rateRecord.count > 30) {
+        return res.status(200).json({ success: true, ignored: true, reason: "rate_limited" });
+      }
 
       const nowIso = new Date().toISOString();
       const deviceId = data.device_id || `dev_${Date.now()}`;

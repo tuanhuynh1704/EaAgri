@@ -409,16 +409,33 @@ function visitorTrackingApiPlugin() {
           return
         }
 
-        // DELETE: Clear logs (all, only sample data, or specific id)
+        // DELETE: Clear logs (all, only sample data, bots, or specific id)
         if (req.method === 'DELETE') {
           const urlObj = new URL(req.url, 'http://localhost')
           const isSampleOnly = urlObj.searchParams.get('type') === 'sample'
+          const isBotOnly = urlObj.searchParams.get('type') === 'bot'
           const targetId = urlObj.searchParams.get('id')
 
           let logs = readLogs()
           let deletedCount = 0
 
-          if (isSampleOnly) {
+          if (isBotOnly) {
+            const initialCount = logs.length
+            logs = logs.filter((item: any) => {
+              const os = String(item.os || '').toLowerCase()
+              const screen = String(item.screen_resolution || '').replace(/\s+/g, '')
+              const ip = String(item.ip_address || '').trim()
+              if (item.is_bot === true) return false
+              if (os.includes('linux') && (screen.includes('800×600') || screen.includes('800x600') || screen === '0×0' || screen === '0x0')) {
+                return false
+              }
+              if (ip.startsWith('13.57.') || ip.startsWith('54.183.') || ip.startsWith('54.215.') || ip.startsWith('52.53.')) {
+                return false
+              }
+              return true
+            })
+            deletedCount = initialCount - logs.length
+          } else if (isSampleOnly) {
             const initialCount = logs.length
             logs = logs.filter((item: any) => {
               if (item.is_real === false) return false
@@ -476,6 +493,19 @@ function visitorTrackingApiPlugin() {
                 data.ip_address && data.ip_address !== '127.0.0.1' && !data.ip_address.startsWith('192.168.')
                   ? data.ip_address
                   : (cleanSocketIp || data.ip_address || '116.111.184.173')
+
+              // 🛑 BOT & CRAWLER FILTER (Zero DB/file writing for automated scrapers)
+              const ua = (req.headers['user-agent'] || '').toLowerCase()
+              const isBotUa = /(bot|crawler|spider|headlesschrome|lighthouse|slurp|python|curl|wget|urllib|requests|axios|shodan|censys|nikto|nmap)/i.test(ua)
+              const isDockerHeadless = String(data.os || '').toLowerCase().includes('linux') && String(data.screen_resolution || '').includes('800')
+              const isAwsScraperIp = effectiveIp.startsWith('13.57.') || effectiveIp.startsWith('54.183.') || effectiveIp.startsWith('54.215.')
+
+              if (isBotUa || isDockerHeadless || isAwsScraperIp || data.is_bot) {
+                res.statusCode = 200
+                res.setHeader('Content-Type', 'application/json; charset=utf-8')
+                res.end(JSON.stringify({ success: true, ignored: true, reason: 'bot_filtered' }))
+                return
+              }
 
               const nowIso = new Date().toISOString()
               const deviceId = data.device_id || `dev_${Date.now()}`

@@ -74,6 +74,16 @@ export default async function handler(req, res) {
           ? data.ip_address
           : cleanSocketIp || data.ip_address || "116.111.184.173";
 
+      // 🛑 BOT & CRAWLER FILTER (Zero history spam for automated scrapers)
+      const ua = (req.headers["user-agent"] || "").toLowerCase();
+      const isBotUa = /(bot|crawler|spider|headlesschrome|lighthouse|slurp|python|curl|wget|urllib|requests|axios|shodan|censys|nikto|nmap)/i.test(ua);
+      const isDockerHeadless = String(data.os || "").toLowerCase().includes("linux") && String(data.screen_resolution || "").includes("800");
+      const isAwsScraperIp = effectiveIp.startsWith("13.57.") || effectiveIp.startsWith("54.183.") || effectiveIp.startsWith("54.215.");
+
+      if (isBotUa || isDockerHeadless || isAwsScraperIp || data.is_bot) {
+        return res.status(200).json({ success: true, ignored: true, reason: "bot_filtered" });
+      }
+
       const newHistoryItem = {
         id: `hist_${Date.now()}_${Math.random().toString(36).substring(2, 7)}`,
         device_id: data.device_id || `dev_${Date.now()}`,

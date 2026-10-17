@@ -18,6 +18,8 @@ export interface VisitorLogItem {
   first_visit: string;
   last_visit: string;
   is_real?: boolean; // true: Thiết bị thật, false: Dữ liệu mẫu/thử nghiệm
+  is_bot?: boolean; // true: Bot / Automated Web Scraper
+  is_datacenter?: boolean; // true: IP đến từ Datacenter / Cloud VPS (AWS, GCP...)
 
   // 👤 THÔNG TIN TÀI KHOẢN / KHÁCH VÃNG LAI
   is_authenticated?: boolean; // true: Người có tài khoản đăng nhập, false: Khách vãng lai
@@ -46,6 +48,7 @@ export interface VisitorHistoryItem {
   user_name?: string;
   user_role?: string;
   is_real?: boolean;
+  is_bot?: boolean;
   created_at: string;
 }
 
@@ -132,22 +135,122 @@ export function getCurrentVisitorUser(): {
 }
 
 /**
- * Determine if a visitor log is a verified REAL device (not mock/seed/test data)
+ * Detect if the current client is an automated bot, headless scraper, or crawler
+ */
+export function isBotOrCrawler(): boolean {
+  if (typeof window === "undefined") return true;
+
+  // 1. Check standard automation flag (Puppeteer, Selenium, Playwright, Chrome Headless)
+  if (navigator.webdriver) {
+    return true;
+  }
+
+  const ua = (navigator.userAgent || "").toLowerCase();
+
+  // 2. Automated tool & web scraper User-Agent signatures
+  const botUaRegex =
+    /(bot|crawler|spider|headlesschrome|lighthouse|slurp|googlebot|bingbot|yandex|baiduspider|duckduckbot|sogou|exabot|facebot|facebookexternalhit|ia_archiver|curl|wget|python|urllib|requests|axios|go-http-client|postman|phantomjs|selenium|playwright|puppeteer|semrush|ahrefs|mj12bot|dotbot|petalbot|bytespider|zoominfobot|censys|shodan|nmap|sqlmap|nikto|masscan|zgrab|openvas)/i;
+  if (botUaRegex.test(ua)) {
+    return true;
+  }
+
+  // 3. Automation-specific window globals
+  const w = window as any;
+  if (
+    w._phantom ||
+    w.__nightmare ||
+    w.callPhantom ||
+    w.__selenium_evaluate ||
+    w.__webdriver_evaluate ||
+    w.__driver_evaluate ||
+    w.__webdriver_unwrapped ||
+    w.domAutomation ||
+    w.domAutomationController
+  ) {
+    return true;
+  }
+
+  // 4. Puppeteer/Docker headless Linux signature (Linux Desktop + default 800x600 screen)
+  const isLinux = /linux/i.test(ua) && !/android/i.test(ua);
+  const width = window.screen?.width || 0;
+  const height = window.screen?.height || 0;
+  if (isLinux && width === 800 && height === 600) {
+    return true;
+  }
+
+  // 5. Zero-size viewport / headless signs
+  if ((width === 0 && height === 0) || (window.outerWidth === 0 && window.outerHeight === 0)) {
+    return true;
+  }
+
+  // 6. Missing languages in headless environment
+  if (navigator.languages && navigator.languages.length === 0) {
+    return true;
+  }
+
+  return false;
+}
+
+/**
+ * Check if a log entry represents a bot / automated scraper
+ */
+export function isItemBot(item: Partial<VisitorLogItem> | any): boolean {
+  if (!item) return false;
+  if (item.is_bot === true) return true;
+
+  const os = String(item.os || "").toLowerCase();
+  const screen = String(item.screen_resolution || "").replace(/\s+/g, "");
+
+  // Linux + 800x600 / 0x0 is the signature of AWS EC2 Docker Headless Chrome
+  if (
+    os.includes("linux") &&
+    (screen.includes("800×600") || screen.includes("800x600") || screen === "0×0" || screen === "0x0")
+  ) {
+    return true;
+  }
+
+  // Known AWS EC2 / datacenter scanner IP blocks seen in logs
+  const ip = String(item.ip_address || "").trim();
+  if (
+    ip.startsWith("13.57.") ||
+    ip.startsWith("54.183.") ||
+    ip.startsWith("54.215.") ||
+    ip.startsWith("52.53.") ||
+    ip.startsWith("3.14.") ||
+    ip.startsWith("3.15.") ||
+    ip.startsWith("18.216.") ||
+    ip.startsWith("18.217.")
+  ) {
+    return true;
+  }
+
+  const browser = String(item.browser || "").toLowerCase();
+  if (browser.includes("bot") || browser.includes("crawler") || browser.includes("spider") || browser.includes("headless")) {
+    return true;
+  }
+
+  return false;
+}
+
+/**
+ * Determine if a visitor log is a verified REAL device (not mock/seed/test data and not a bot)
  */
 export function isRealVisitor(item: VisitorLogItem): boolean {
   if (!item) return false;
-  // If explicitly flagged
-  if (typeof item.is_real === "boolean") {
-    return item.is_real;
+
+  // 1. If it matches bot signatures, it is NEVER a real visitor
+  if (isItemBot(item)) {
+    return false;
   }
-  // If flagged as sample/test
+
+  // 2. If flagged as sample/test
   if ((item as any).is_sample === true || (item as any).is_test === true) {
     return false;
   }
+
+  // 3. Known mock/test IDs
   const id = (item.id || "").toLowerCase();
   const devId = (item.device_id || "").toLowerCase();
-
-  // Known mock/test IDs
   if (
     id.startsWith("log_init") ||
     id.includes("test") ||
@@ -159,6 +262,11 @@ export function isRealVisitor(item: VisitorLogItem): boolean {
     devId === "server_device"
   ) {
     return false;
+  }
+
+  // 4. If explicitly flagged as real
+  if (typeof item.is_real === "boolean") {
+    return item.is_real;
   }
 
   return true;
@@ -312,11 +420,14 @@ export async function fetchPublicIpAndLocation(): Promise<{ ip: string; city: st
         else if (city.toLowerCase().includes("da nang") || city.toLowerCase().includes("danang")) city = "Đà Nẵng";
         else if (city.toLowerCase().includes("buon ma thuot") || city.toLowerCase().includes("dak lak")) city = "Buôn Ma Thuột";
 
+        let country = data.country || (data.country_code === "VN" ? "Việt Nam" : data.country_name) || "Việt Nam";
+        if (country.toLowerCase().includes("united states") || country.toLowerCase() === "us") country = "Hoa Kỳ";
+
         const result = {
           ip: data.ip || "116.111.184.173",
           city: city,
-          region: data.region || "Việt Nam",
-          country: "Việt Nam",
+          region: data.region || country,
+          country: country,
         };
         try {
           sessionStorage.setItem(IP_CACHE_KEY, JSON.stringify(result));
@@ -336,11 +447,14 @@ export async function fetchPublicIpAndLocation(): Promise<{ ip: string; city: st
       if (data && data.ip) {
         let city = data.city || data.region || "Việt Nam";
         if (city.toLowerCase().includes("ho chi minh")) city = "TP. Hồ Chí Minh";
+        let country = data.country_name || (data.country_code === "VN" ? "Việt Nam" : data.country) || "Việt Nam";
+        if (country.toLowerCase().includes("united states") || country.toLowerCase() === "us") country = "Hoa Kỳ";
+
         const result = {
           ip: data.ip,
           city: city,
-          region: data.region || "Việt Nam",
-          country: data.country_name || "Việt Nam",
+          region: data.region || country,
+          country: country,
         };
         try {
           sessionStorage.setItem(IP_CACHE_KEY, JSON.stringify(result));
@@ -393,6 +507,12 @@ export async function recordVisitorHit(
 ): Promise<void> {
   if (typeof window === "undefined") return;
 
+  // 🛑 1. ANTI-BOT SHIELD: Do not record automated bots, headless crawlers or scrapers
+  if (isBotOrCrawler()) {
+    console.info("[VisitorTracker] Automated bot / headless crawler detected. Suppressing DB hit to eliminate spam and lag.");
+    return;
+  }
+
   // Throttle: avoid logging multiple times within 3 seconds for the same tab
   try {
     const lastTrack = sessionStorage.getItem(LAST_TRACK_TIME_KEY);
@@ -406,6 +526,12 @@ export async function recordVisitorHit(
   const deviceId = getOrCreateDeviceId();
   const info = detectDeviceInfo();
   const geo = await fetchPublicIpAndLocation();
+
+  // 🛑 2. DATACENTER / SCRAPER DETECTION: Block headless Linux 800x600 AWS scanners
+  if (isItemBot({ os: info.os, screen_resolution: info.screenResolution, ip_address: geo.ip })) {
+    console.info("[VisitorTracker] Headless cloud scraper signature detected. Suppressing DB hit.");
+    return;
+  }
   const nowIso = new Date().toISOString();
 
   // Resolve user info (from parameter or from session/localStorage)
@@ -1119,6 +1245,13 @@ export function isVisitorOnline(log: VisitorLogItem): boolean {
  */
 export async function sendVisitorHeartbeat(currentPath: string = "/"): Promise<void> {
   if (typeof window === "undefined") return;
+
+  // 🛑 Block heartbeats for bots / headless crawlers
+  if (isBotOrCrawler()) return;
+
+  // 🛑 Don't send heartbeats if the browser tab is hidden or minimized
+  if (typeof document !== "undefined" && document.visibilityState === "hidden") return;
+
   const deviceId = getOrCreateDeviceId();
   const nowIso = new Date().toISOString();
 
@@ -1151,6 +1284,10 @@ export async function sendVisitorHeartbeat(currentPath: string = "/"): Promise<v
  */
 export function sendVisitorLeave(): void {
   if (typeof window === "undefined") return;
+
+  // 🛑 Do not send leave beacons for bots
+  if (isBotOrCrawler()) return;
+
   const deviceId = getOrCreateDeviceId();
   const payload = JSON.stringify({
     device_id: deviceId,
@@ -1250,4 +1387,89 @@ export function computeTrafficStats(logs: VisitorLogItem[]): LiveTrafficWidgetSt
     tabletVisits: devices.Tablet,
   };
 }
+
+/**
+ * Purge bot, crawler, and cloud scraper logs from Supabase & Serverless API
+ */
+export async function purgeBotLogsFromDatabase(): Promise<{
+  success: boolean;
+  deletedCount: number;
+  message: string;
+}> {
+  let deletedCount = 0;
+
+  // 1. Purge from Supabase
+  if (isRealSupabaseConfigured()) {
+    try {
+      const { data: allLogs } = await supabase
+        .from("visitor_logs")
+        .select("id, os, screen_resolution, ip_address, is_bot");
+
+      if (allLogs && allLogs.length > 0) {
+        const botIds = allLogs
+          .filter((item) => isItemBot(item))
+          .map((item) => item.id);
+
+        if (botIds.length > 0) {
+          const { error: delErr } = await supabase
+            .from("visitor_logs")
+            .delete()
+            .in("id", botIds);
+
+          if (!delErr) {
+            deletedCount += botIds.length;
+          }
+        }
+      }
+
+      // Also clean from visitor_history_logs
+      await supabase
+        .from("visitor_history_logs")
+        .delete()
+        .or("os.eq.Linux,ip_address.like.13.57.%,ip_address.like.54.183.%,ip_address.like.54.215.%");
+    } catch (err) {
+      console.warn("[VisitorTracker] Supabase bot purge error:", err);
+    }
+  }
+
+  // 2. Purge from Serverless API / Local JSON
+  try {
+    const res = await fetch("/api/visitor-track?type=bot", { method: "DELETE" });
+    if (res.ok) {
+      const data = await res.json();
+      if (data.deletedCount) {
+        deletedCount = Math.max(deletedCount, data.deletedCount);
+      }
+    }
+  } catch {}
+
+  // 3. Clean from localStorage cache
+  try {
+    const localLogsRaw = localStorage.getItem(LOCAL_LOGS_KEY);
+    if (localLogsRaw) {
+      const localLogs: VisitorLogItem[] = JSON.parse(localLogsRaw);
+      const cleaned = localLogs.filter((item) => !isItemBot(item));
+      localStorage.setItem(LOCAL_LOGS_KEY, JSON.stringify(cleaned));
+    }
+
+    const localHistRaw = localStorage.getItem(LOCAL_HISTORY_KEY);
+    if (localHistRaw) {
+      const localHist: VisitorHistoryItem[] = JSON.parse(localHistRaw);
+      const cleanedHist = localHist.filter((item) => !isItemBot(item));
+      localStorage.setItem(LOCAL_HISTORY_KEY, JSON.stringify(cleanedHist));
+    }
+  } catch {}
+
+  // Dispatch update event
+  if (typeof window !== "undefined") {
+    window.dispatchEvent(new CustomEvent("eaagri_visitor_update"));
+  }
+
+  return {
+    success: true,
+    deletedCount,
+    message: `Đã dọn dẹp ${deletedCount} bản ghi bot / web crawler rác thành công!`,
+  };
+}
+
 

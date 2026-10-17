@@ -1423,6 +1423,17 @@
         color: #ffffff;
       }
     }
+
+    &--active-bot {
+      background: linear-gradient(135deg, #ef4444 0%, #dc2626 100%) !important;
+      color: #ffffff !important;
+      box-shadow: 0 3px 10px rgba(239, 68, 68, 0.3);
+
+      .traffic-control-bar__badge {
+        background: rgba(255, 255, 255, 0.25);
+        color: #ffffff;
+      }
+    }
   }
 
   &__badge {
@@ -1432,6 +1443,11 @@
     background: #e2e8f0;
     color: #334155;
     font-weight: 800;
+
+    &--bot {
+      background: #fee2e2;
+      color: #b91c1c;
+    }
   }
 
   &__actions {
@@ -1439,6 +1455,18 @@
     align-items: center;
     gap: 0.5rem;
     flex-wrap: wrap;
+
+    .btn-traffic-action--purge-bot {
+      background: linear-gradient(135deg, #ef4444, #dc2626);
+      color: #ffffff;
+      border: none;
+      box-shadow: 0 2px 8px rgba(239, 68, 68, 0.25);
+
+      &:hover {
+        background: linear-gradient(135deg, #dc2626, #b91c1c);
+        color: #ffffff;
+      }
+    }
   }
 }
 
@@ -1575,6 +1603,21 @@
     }
   }
 
+  &__label-bot {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.35rem;
+    color: #b91c1c;
+    font-weight: 700;
+
+    .dot {
+      width: 7px;
+      height: 7px;
+      border-radius: 50%;
+      background: #ef4444;
+    }
+  }
+
   &__device-pills {
     display: flex;
     align-items: center;
@@ -1688,6 +1731,17 @@
 
     i {
       color: #f59e0b;
+      font-size: 0.85rem;
+    }
+  }
+
+  &--bot {
+    background: #fef2f2;
+    border: 1px solid #fca5a5;
+    color: #b91c1c;
+
+    i {
+      color: #ef4444;
       font-size: 0.85rem;
     }
   }

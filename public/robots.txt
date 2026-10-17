@@ -3,5 +3,7 @@ Allow: /
 Allow: /images-1/
 Allow: /assets/
 Allow: /images/
+Disallow: /api/
+Disallow: /admin/
 
 Sitemap: https://www.eaagri.vn/sitemap.xml

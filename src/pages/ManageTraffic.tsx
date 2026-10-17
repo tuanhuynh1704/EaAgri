@@ -7,6 +7,8 @@ import {
   getVisitorHistoryLogs,
   getLocalOrSeedLogs,
   isRealVisitor,
+  isItemBot,
+  purgeBotLogsFromDatabase,
   isVisitorOnline,
   clearSampleVisitorLogs,
   deleteSingleVisitorLog,
@@ -42,6 +44,7 @@ CREATE TABLE IF NOT EXISTS public.visitor_logs (
     first_visit TIMESTAMPTZ NOT NULL DEFAULT now(),
     last_visit TIMESTAMPTZ NOT NULL DEFAULT now(),
     is_real BOOLEAN NOT NULL DEFAULT true,
+    is_bot BOOLEAN NOT NULL DEFAULT false,
     is_authenticated BOOLEAN NOT NULL DEFAULT false,
     user_id TEXT,
     user_email TEXT,
@@ -70,8 +73,20 @@ CREATE TABLE IF NOT EXISTS public.visitor_history_logs (
     user_name TEXT,
     user_role TEXT,
     is_real BOOLEAN NOT NULL DEFAULT true,
+    is_bot BOOLEAN NOT NULL DEFAULT false,
     created_at TIMESTAMPTZ NOT NULL DEFAULT now()
 );
+
+-- Ensure is_bot and is_real columns exist if tables already created
+DO $$ 
+BEGIN
+    IF NOT EXISTS (SELECT 1 FROM information_schema.columns WHERE table_name = 'visitor_logs' AND column_name = 'is_bot') THEN
+        ALTER TABLE public.visitor_logs ADD COLUMN is_bot BOOLEAN NOT NULL DEFAULT false;
+    END IF;
+    IF NOT EXISTS (SELECT 1 FROM information_schema.columns WHERE table_name = 'visitor_history_logs' AND column_name = 'is_bot') THEN
+        ALTER TABLE public.visitor_history_logs ADD COLUMN is_bot BOOLEAN NOT NULL DEFAULT false;
+    END IF;
+END $$;
 
 CREATE INDEX IF NOT EXISTS idx_visitor_logs_last_visit ON public.visitor_logs(last_visit DESC);
 CREATE INDEX IF NOT EXISTS idx_visitor_logs_ip ON public.visitor_logs(ip_address);
@@ -116,6 +131,23 @@ EXCEPTION
     WHEN duplicate_object THEN NULL;
     WHEN undefined_object THEN NULL;
 END $$;
+
+-- CLEANUP / PURGE BOT & CRAWLER SPAM (Run this if you want to wipe old crawler records)
+DELETE FROM public.visitor_logs
+WHERE os = 'Linux' AND (screen_resolution LIKE '%800%' OR screen_resolution = '0x0')
+   OR ip_address LIKE '13.57.%'
+   OR ip_address LIKE '54.183.%'
+   OR ip_address LIKE '54.215.%'
+   OR ip_address LIKE '52.53.%'
+   OR is_bot = true;
+
+DELETE FROM public.visitor_history_logs
+WHERE os = 'Linux'
+   OR ip_address LIKE '13.57.%'
+   OR ip_address LIKE '54.183.%'
+   OR ip_address LIKE '54.215.%'
+   OR ip_address LIKE '52.53.%'
+   OR is_bot = true;
 `;
 
 export default function ManageTraffic() {
@@ -135,7 +167,7 @@ export default function ManageTraffic() {
 
   // Filters for Device Summary
   const [deviceFilter, setDeviceFilter] = useState<"All" | "Desktop" | "Mobile" | "Tablet">("All");
-  const [sourceFilter, setSourceFilter] = useState<"Real" | "All" | "Sample">("Real");
+  const [sourceFilter, setSourceFilter] = useState<"Real" | "All" | "Sample" | "Bot">("Real");
   const [authFilter, setAuthFilter] = useState<"All" | "Member" | "Guest">("All");
   const [searchQuery, setSearchQuery] = useState("");
 
@@ -266,10 +298,14 @@ export default function ManageTraffic() {
     };
   }, [isAdmin]);
 
-  // Overall comparison metrics (Real vs Sample & Member vs Guest)
+  // Overall comparison metrics (Real vs Sample & Member vs Guest & Bot)
   const globalSummary = useMemo(() => {
+    const botLogs = logs.filter(isItemBot);
     const realLogs = logs.filter(isRealVisitor);
-    const sampleLogs = logs.filter((l) => !isRealVisitor(l));
+    const sampleLogs = logs.filter((l) => !isRealVisitor(l) && !isItemBot(l));
+
+    const totalBotDevices = botLogs.length;
+    const totalBotVisits = botLogs.reduce((acc, curr) => acc + (curr.visit_count || 1), 0);
 
     const totalRealDevices = realLogs.length;
     const totalRealVisits = realLogs.reduce((acc, curr) => acc + (curr.visit_count || 1), 0);
@@ -287,6 +323,8 @@ export default function ManageTraffic() {
     const realVisitsPercent = totalAllVisits ? Math.round((totalRealVisits / totalAllVisits) * 100) : 100;
 
     return {
+      totalBotDevices,
+      totalBotVisits,
       totalRealDevices,
       totalRealVisits,
       totalSampleDevices,
@@ -300,10 +338,11 @@ export default function ManageTraffic() {
     };
   }, [logs]);
 
-  // Scoped logs based on selected source filter (Real vs All vs Sample)
+  // Scoped logs based on selected source filter (Real vs All vs Sample vs Bot)
   const scopedLogs = useMemo(() => {
     if (sourceFilter === "Real") return logs.filter(isRealVisitor);
-    if (sourceFilter === "Sample") return logs.filter((l) => !isRealVisitor(l));
+    if (sourceFilter === "Sample") return logs.filter((l) => !isRealVisitor(l) && !isItemBot(l));
+    if (sourceFilter === "Bot") return logs.filter(isItemBot);
     return logs;
   }, [logs, sourceFilter]);
 
@@ -423,6 +462,33 @@ export default function ManageTraffic() {
       return matchDevice && matchAuth && matchSearch;
     });
   }, [scopedLogs, deviceFilter, authFilter, searchQuery]);
+
+  // Action: Purge bot / crawler logs from Database & Local
+  const handlePurgeBots = async () => {
+    if (globalSummary.totalBotDevices === 0) {
+      setToast({ type: "info", text: "Hệ thống hiện không phát hiện bot hay IP quét rác nào!" });
+      return;
+    }
+    const confirmClean = window.confirm(
+      `Phát hiện ${globalSummary.totalBotDevices} thiết bị bot / crawler quét rác (${globalSummary.totalBotVisits} lượt truy cập).\n\nBạn có chắc chắn muốn dọn dẹp và xóa toàn bộ các IP quét rác này khỏi cơ sở dữ liệu để giải phóng server và làm sạch thống kê?`
+    );
+    if (!confirmClean) return;
+
+    setIsCleaning(true);
+    try {
+      const res = await purgeBotLogsFromDatabase();
+      await loadData();
+      setToast({
+        type: "success",
+        text: res.message || `Đã dọn dẹp ${globalSummary.totalBotDevices} bot / crawler thành công!`,
+      });
+      setSourceFilter("Real");
+    } catch (err) {
+      setToast({ type: "error", text: "Lỗi khi dọn dẹp bot. Vui lòng thử lại!" });
+    } finally {
+      setIsCleaning(false);
+    }
+  };
 
   // Action: Clear sample/mock logs
   const handleClearSample = async () => {
@@ -739,6 +805,21 @@ export default function ManageTraffic() {
                 <span className="traffic-control-bar__badge">{globalSummary.totalAllDevices} máy</span>
               </button>
 
+              {globalSummary.totalBotDevices > 0 && (
+                <button
+                  type="button"
+                  className={`traffic-control-bar__pill-btn ${
+                    sourceFilter === "Bot" ? "traffic-control-bar__pill-btn--active-bot" : ""
+                  }`}
+                  onClick={() => setSourceFilter("Bot")}
+                >
+                  <i className="ri-robot-line" /> Bot quét rác
+                  <span className="traffic-control-bar__badge traffic-control-bar__badge--bot">
+                    {globalSummary.totalBotDevices} bot
+                  </span>
+                </button>
+              )}
+
               {globalSummary.totalSampleDevices > 0 && (
                 <button
                   type="button"
@@ -755,6 +836,19 @@ export default function ManageTraffic() {
           </div>
 
           <div className="traffic-control-bar__actions">
+            {globalSummary.totalBotDevices > 0 && (
+              <button
+                type="button"
+                className="btn btn--danger btn-traffic-action--purge-bot"
+                onClick={handlePurgeBots}
+                disabled={isCleaning}
+                title="Xóa toàn bộ các bản ghi bot quét rác, ngăn làm nhiễu dữ liệu và giảm tải database"
+              >
+                <i className={isCleaning ? "ri-loader-4-line spinning" : "ri-robot-line"} />
+                {isCleaning ? "Đang xử lý..." : `Dọn sạch ${globalSummary.totalBotDevices} bot rác`}
+              </button>
+            )}
+
             {globalSummary.totalSampleDevices > 0 && (
               <button
                 type="button"
@@ -802,6 +896,8 @@ export default function ManageTraffic() {
                     ? "ĐANG XEM 100% THIẾT BỊ THẬT"
                     : sourceFilter === "Sample"
                     ? "ĐANG XEM DỮ LIỆU MẪU"
+                    : sourceFilter === "Bot"
+                    ? "ĐANG XEM BOT / IP QUÉT RÁC"
                     : "ĐANG XEM TỔNG HỢP"}
                 </span>
               </h3>
@@ -817,6 +913,12 @@ export default function ManageTraffic() {
                 <span className="dot" />
                 Thiết bị thật: <strong>{globalSummary.totalRealDevices} máy</strong> ({globalSummary.totalRealVisits} lượt xem • {globalSummary.realDevicePercent}%)
               </span>
+              {globalSummary.totalBotDevices > 0 && (
+                <span className="traffic-purity-banner__label-bot">
+                  <span className="dot" />
+                  Bot quét rác: <strong>{globalSummary.totalBotDevices} máy</strong> ({globalSummary.totalBotVisits} lượt xem)
+                </span>
+              )}
               <span className="traffic-purity-banner__label-sample">
                 <span className="dot" />
                 Dữ liệu mẫu: <strong>{globalSummary.totalSampleDevices} máy</strong> ({globalSummary.totalSampleVisits} lượt xem • {100 - globalSummary.realDevicePercent}%)
@@ -1345,6 +1447,7 @@ export default function ManageTraffic() {
                     filteredLogs.map((item, idx) => {
                       const isOnline = isVisitorOnline(item);
                       const isFrequent = item.visit_count >= 5;
+                      const isBot = isItemBot(item);
                       const isReal = isRealVisitor(item);
 
                       return (
@@ -1393,9 +1496,13 @@ export default function ManageTraffic() {
                             )}
                           </td>
 
-                          {/* 3. Verification Source: Real vs Sample */}
+                          {/* 3. Verification Source: Real vs Sample vs Bot */}
                           <td>
-                            {isReal ? (
+                            {isBot ? (
+                              <span className="data-type-chip data-type-chip--bot" title="Phát hiện bot / crawler / IP quét tự động">
+                                <i className="ri-robot-line" /> Bot quét rác
+                              </span>
+                            ) : isReal ? (
                               <span className="data-type-chip data-type-chip--real" title="Thiết bị vật lý thật từ IP & User-Agent thực tế">
                                 <i className="ri-checkbox-circle-fill" /> Thiết bị thật
                               </span>
@@ -1504,7 +1611,13 @@ export default function ManageTraffic() {
             <div className="recent-devices-card__footer">
               <span>
                 Đang hiển thị <strong>{filteredLogs.length}</strong> / <strong>{scopedLogs.length}</strong> thiết bị{" "}
-                {sourceFilter === "Real" ? "(100% thiết bị thật)" : sourceFilter === "Sample" ? "(Dữ liệu mẫu)" : "(Tất cả)"}
+                {sourceFilter === "Real"
+                  ? "(100% thiết bị thật)"
+                  : sourceFilter === "Sample"
+                  ? "(Dữ liệu mẫu)"
+                  : sourceFilter === "Bot"
+                  ? "(Bot quét rác)"
+                  : "(Tất cả)"}
                 {authFilter === "Member" ? " • Chỉ người đã đăng nhập" : authFilter === "Guest" ? " • Chỉ khách vãng lai" : ""}
               </span>
               <span className="footer-privacy-note">
@@ -1624,6 +1737,7 @@ export default function ManageTraffic() {
                     </tr>
                   ) : (
                     filteredHistory.map((item, idx) => {
+                      const isBot = isItemBot(item);
                       return (
                         <tr key={item.id || `${item.device_id}_hist_${idx}`}>
                           <td>
@@ -1652,7 +1766,14 @@ export default function ManageTraffic() {
                             </div>
                           </td>
                           <td>
-                            {item.is_authenticated ? (
+                            {isBot ? (
+                              <div className="visitor-user-cell">
+                                <span className="visitor-user-badge" style={{ background: "#fef2f2", color: "#b91c1c", border: "1px solid #fca5a5" }}>
+                                  <i className="ri-robot-line" /> Bot quét tự động
+                                </span>
+                                <span className="visitor-user-guest-sub" style={{ color: "#ef4444" }}>Crawler / Scanner</span>
+                              </div>
+                            ) : item.is_authenticated ? (
                               <div className="visitor-user-cell">
                                 <span className="visitor-user-badge visitor-user-badge--member">
                                   <i className="ri-user-follow-fill" /> Đã đăng nhập
