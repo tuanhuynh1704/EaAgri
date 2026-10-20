@@ -125,7 +125,7 @@ const Hero = () => {
           <span className="wind-seed wind-seed--3"></span>
         </div>
 
-        
+
         {/* Dynamic Sunlight Illumination & Rays Effect */}
         <div className="hero-sun-illumination">
           <div className="sun-ambient-glow"></div>
@@ -154,7 +154,7 @@ const Hero = () => {
         >
           <div className="image-wrapper-container hero-3d-wrapper">
             <span className="hero-visual-depth-glow" aria-hidden="true"></span>
-            
+
             {/* The 3D Tree, IoT devices and Farmer interactive model */}
             <Suspense
               fallback={
@@ -204,10 +204,10 @@ const Hero = () => {
             </div>
           </a>
 
-          <a 
-            href="https://play.google.com/store/apps/details?id=com.eaagri.app&hl=vi" 
-            target="_blank" 
-            rel="noopener noreferrer" 
+          <a
+            href="https://play.google.com/store/apps/details?id=com.eaagri.app&hl=vi"
+            target="_blank"
+            rel="noopener noreferrer"
             className="download-btn"
           >
             <span className="download-btn__icon google-play-icon">
@@ -298,10 +298,10 @@ const Hero = () => {
               </div>
             </a>
 
-            <a 
-              href="https://play.google.com/store/apps/details?id=com.eaagri.app&hl=vi" 
-              target="_blank" 
-              rel="noopener noreferrer" 
+            <a
+              href="https://play.google.com/store/apps/details?id=com.eaagri.app&hl=vi"
+              target="_blank"
+              rel="noopener noreferrer"
               className="download-btn"
             >
               <span className="download-btn__icon google-play-icon">

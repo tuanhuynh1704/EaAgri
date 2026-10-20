@@ -17,6 +17,7 @@ const AccountManagement = lazy(() => import("../pages/AccountManagement"));
 const ManageNews = lazy(() => import("../pages/ManageNews"));
 const ManageCooperation = lazy(() => import("../pages/ManageCooperation"));
 const ManageTraffic = lazy(() => import("../pages/ManageTraffic"));
+const ChPlayRedirect = lazy(() => import("../pages/ChPlayRedirect"));
 
 export const router = createBrowserRouter([
   {
@@ -42,6 +43,11 @@ export const router = createBrowserRouter([
       { path: "/tin-tuc/:id", element: <NewsDetail /> },
       { path: "/tin-tuc/create", element: <UploadNews /> },
       // Legacy English / Old URLs: keep old shared links working
+      // Chuyển hướng tự động sang Google Play
+      { path: "/app/ch-play", element: <ChPlayRedirect /> },
+      { path: "/app/chplay", element: <ChPlayRedirect /> },
+      { path: "/ch-play", element: <ChPlayRedirect /> },
+      { path: "/chplay", element: <ChPlayRedirect /> },
       { path: "/news", element: <Navigate to="/tintuc" replace /> },
       { path: "/news/:id", element: <NewsDetail /> },
       { path: "/news/create", element: <Navigate to="/tintuc/create" replace /> },
