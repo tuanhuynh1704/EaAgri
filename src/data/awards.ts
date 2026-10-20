@@ -66,7 +66,7 @@ export const AWARDS_LIST: AwardDetail[] = [
     year: "2026",
     trophyIcon: "ri-vip-crown-fill",
     badgeText: "QUÁN QUÂN TOÀN TRƯỜNG • EXCELLENT NO. 1",
-    shortBadge: "Quán quân",
+    shortBadge: "Á quân",
     title: "Cuộc Thi Trí Tuệ Nhân Tạo 2026",
     organizer: "Khoa Công Nghệ Thông Tin — Trường Đại học Nguyễn Tất Thành",
     shortOrganizer: "Khoa CNTT · ĐH Nguyễn Tất Thành",
