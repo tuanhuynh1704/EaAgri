@@ -9,6 +9,7 @@ const baseLogos = [
   { src: "/Logo/Intech.webp", alt: "Intech Innovation and Technology", name: "Intech" },
   { src: "/Logo/BSA.webp", alt: "Trung tâm BSA", name: "BSA" },
   { src: "/Logo/KNX.webp", alt: "Dự án Khởi nghiệp Xanh", name: "Khởi nghiệp Xanh" },
+  { src: "/Logo/felix.jpg", alt: "Touch Of Quality", name: "Felix" },
 ];
 
 // Nhân bản danh sách 3 lần trong mỗi nhóm để đảm bảo chiều dài vượt xa mọi kích thước màn hình
