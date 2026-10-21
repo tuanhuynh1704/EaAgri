@@ -56,7 +56,7 @@ export default function ArchitecturePage() {
                 <div className="architecture-tech-hero__visual">
                     <span className="architecture-tech-hero__glow" aria-hidden="true"></span>
                     <img
-                        src="/Cây 2.webp"
+                        src="/images-1/Cây 2.webp"
                         alt="Mô hình cây sầu riêng ứng dụng IoT và AI của Ea Agri"
                     />
                     <span className="architecture-tech-hero__status">
