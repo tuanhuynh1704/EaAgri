@@ -225,6 +225,9 @@ export default function AdvisorsSection() {
               className={`advisor-card advisor-card--${advisor.themeColor} ${flippedAdvisorCards[index] ? "is-flipped" : ""}`}
               key={advisor.advisorCode}
               onClick={() => handleAdvisorCardClick(index)}
+              onMouseLeave={() => {
+                setFlippedAdvisorCards((prev) => (prev[index] ? { ...prev, [index]: false } : prev));
+              }}
               onKeyDown={(e) => {
                 if (e.key === "Enter" || e.key === " ") {
                   e.preventDefault();

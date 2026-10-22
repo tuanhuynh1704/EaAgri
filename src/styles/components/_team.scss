@@ -273,9 +273,20 @@
   transition: transform 0.65s cubic-bezier(0.34, 1.25, 0.64, 1);
 }
 
+.team-card:hover .team-card__flipper,
 .team-card.is-flipped .team-card__flipper {
   transform: rotateY(180deg);
   -webkit-transform: rotateY(180deg);
+}
+
+.team-card:hover .team-card__front,
+.team-card.is-flipped .team-card__front {
+  pointer-events: none;
+}
+
+.team-card:hover .team-card__back,
+.team-card.is-flipped .team-card__back {
+  pointer-events: auto;
 }
 
 .team-card__front {
@@ -1123,9 +1134,20 @@
   transition: transform 0.65s cubic-bezier(0.34, 1.25, 0.64, 1);
 }
 
+.advisor-card:hover .advisor-card__flipper,
 .advisor-card.is-flipped .advisor-card__flipper {
   transform: rotateY(180deg);
   -webkit-transform: rotateY(180deg);
+}
+
+.advisor-card:hover .advisor-card__front,
+.advisor-card.is-flipped .advisor-card__front {
+  pointer-events: none;
+}
+
+.advisor-card:hover .advisor-card__back,
+.advisor-card.is-flipped .advisor-card__back {
+  pointer-events: auto;
 }
 
 // Front face: Thẻ đứng sang trọng, không vuông - ảnh ở trên, chữ ở dưới

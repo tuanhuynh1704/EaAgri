@@ -5,6 +5,7 @@ interface TeamMember {
   roleTag: string;
   task: string;
   avatar: string;
+  avatarPosition?: string;
   themeColor: "green" | "blue" | "purple" | "orange";
   topIcon: string;
   roleIcon: string;
@@ -19,7 +20,8 @@ const teamMembers: TeamMember[] = [
     name: "PHAN ĐĂNG HUY",
     roleTag: "FOUNDER & CEO",
     task: "Chiến lược sản phẩm - Điều phối - Gọi vốn",
-    avatar: "/images/webp/huy.webp",
+    avatar: "/images/webp/Huy-CEO.webp",
+    avatarPosition: "40% 15%",
     themeColor: "green",
     topIcon: "ri-shield-star-line",
     roleIcon: "ri-vip-crown-fill",
@@ -184,6 +186,9 @@ export default function CoreTeamSection() {
               className={`team-card team-card--${member.themeColor} ${flippedCards[index] ? "is-flipped" : ""}`}
               key={index}
               onClick={() => handleCardClick(index)}
+              onMouseLeave={() => {
+                setFlippedCards((prev) => (prev[index] ? { ...prev, [index]: false } : prev));
+              }}
               onKeyDown={(e) => {
                 if (e.key === "Enter" || e.key === " ") {
                   e.preventDefault();
@@ -203,6 +208,7 @@ export default function CoreTeamSection() {
                       src={member.avatar}
                       alt={member.name}
                       className="team-card__rect-avatar-img"
+                      style={member.avatarPosition ? { objectPosition: member.avatarPosition } : undefined}
                       loading="lazy"
                       decoding="async"
                     />

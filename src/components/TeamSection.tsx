@@ -35,6 +35,7 @@ interface TeamMember {
   // major: string;
   // id: string;
   avatar: string;
+  avatarPosition?: string;
   themeColor: "green" | "blue" | "purple" | "orange";
   topIcon: string;
   roleIcon: string;
@@ -617,6 +618,7 @@ const TeamSection = () => {
                         src={member.avatar}
                         alt={member.name}
                         className="team-card__rect-avatar-img"
+                        style={member.avatarPosition ? { objectPosition: member.avatarPosition } : undefined}
                         loading="lazy"
                         decoding="async"
                       />
