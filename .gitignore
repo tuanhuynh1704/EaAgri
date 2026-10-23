@@ -1,5 +1,31 @@
-# Logs
-logs
+# ================================
+# DEPENDENCIES
+# ================================
+node_modules/
+.pnp
+.pnp.js
+
+# ================================
+# BUILD OUTPUT
+# ================================
+dist/
+dist-ssr/
+build/
+out/
+
+# ================================
+# ENVIRONMENT & SECRETS
+# ================================
+.env
+.env.local
+.env.development.local
+.env.test.local
+.env.production.local
+
+# ================================
+# LOGS
+# ================================
+logs/
 *.log
 npm-debug.log*
 yarn-debug.log*
@@ -7,26 +33,47 @@ yarn-error.log*
 pnpm-debug.log*
 lerna-debug.log*
 
-node_modules
-dist
-dist-ssr
+# ================================
+# CACHE & TEMP
+# ================================
+.cache/
+.parcel-cache/
+.vite/
 *.local
-.env
+.eslintcache
+.stylelintcache
 
-ui-ux-pro-max-skill
-
-# Editor directories and files
+# ================================
+# EDITOR & OS
+# ================================
 .vscode/*
 !.vscode/extensions.json
-.idea
+!.vscode/settings.json
+.idea/
 .DS_Store
+Thumbs.db
 *.suo
 *.ntvs*
 *.njsproj
 *.sln
 *.sw?
 
-# Source/design files moved out of public/ (not served by the site). Keep a copy on Drive.
+# ================================
+# TESTING
+# ================================
+coverage/
+*.lcov
+.nyc_output/
+
+# ================================
+# TYPESCRIPT
+# ================================
+*.tsbuildinfo
+
+# ================================
+# PROJECT SPECIFIC
+# ================================
+# Design / reference assets (large files, keep on Drive)
 design-assets/
 _references/
-
+ui-ux-pro-max-skill/
