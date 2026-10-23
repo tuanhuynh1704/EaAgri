@@ -28,12 +28,18 @@ const appSlideContent = [
   // ["Phân tích cây trồng", "Nhận diện và đánh giá tình trạng cây bằng AI."],
 ];
 
+interface Achievement {
+  title: string;
+  desc?: string;
+}
+
 interface TeamMember {
   name: string;
+  displayName?: string;
   roleTag: string;
+  bio?: string;
   task: string;
-  // major: string;
-  // id: string;
+  achievements?: Achievement[];
   avatar: string;
   avatarPosition?: string;
   themeColor: "green" | "blue" | "purple" | "orange";
@@ -48,10 +54,36 @@ interface TeamMember {
 const teamMembers: TeamMember[] = [
   {
     name: "PHAN ĐĂNG HUY",
+    displayName: "Phan Đăng Huy",
     roleTag: "FOUNDER & CEO",
-    task: "Chiến lược sản phẩm - Điều phối - Gọi vốn",
-    // major: "Khoa học dữ liệu",
-    // id: "2311559215",
+    bio: "Founder & CEO EaAgri. Dự án ứng dụng AI trong nông nghiệp thông minh.",
+    task: "Founder & CEO EaAgri – Dự án ứng dụng AI trong nông nghiệp thông minh.",
+    achievements: [
+      {
+        title: "Best Student Paper – AIIA 2026",
+        desc: "Nghiên cứu EaAgri về AI và RAG trong hỗ trợ chẩn đoán bệnh sầu riêng · Trường Đại học Nguyễn Tất Thành",
+      },
+      {
+        title: "Á quân & Đội thi được yêu thích nhất",
+        desc: "NTTU Innovation Startup Challenge 2026 · Khoa Công Nghệ Thông Tin",
+      },
+      {
+        title: "Giải Nhất vòng Bán kết",
+        desc: "NTTU Innovation Startup Challenge 2026, bảng Công nghệ Nông nghiệp và Thực phẩm · Khoa CNTT",
+      },
+      {
+        title: "Giải Nhì – AI trong sinh viên 2026",
+        desc: "Khoa Công nghệ Thông tin, Trường Đại học Nguyễn Tất Thành",
+      },
+      {
+        title: "Giải Khuyến khích – Khoa học dữ liệu 2026",
+        desc: "Dự án phân tích bán lẻ tích hợp AI Agent và dự báo thông minh · Khoa CNTT",
+      },
+      {
+        title: "Á quân & Đội thi được yêu thích nhất",
+        desc: "Dự án khởi nghiệp đổi mới sáng tạo ứng dụng công nghệ số",
+      },
+    ],
     avatar: "/images/webp/huy.webp",
     themeColor: "green",
     topIcon: "ri-shield-star-line",
@@ -63,9 +95,28 @@ const teamMembers: TeamMember[] = [
   },
   {
     name: "NGUYỄN ANH GIẢNG",
+    displayName: "Nguyễn Anh Giảng",
     roleTag: "CTO / AI & DATA LEAD",
+    bio: "CTO & Trưởng nhóm AI & Dữ liệu tại EaAgri. Thiết kế kiến trúc giải pháp công nghệ.",
     task: "AI & dữ liệu - Kiến trúc kỹ thuật - Phát triển giải pháp",
-    // id: "2311558913",
+    achievements: [
+      {
+        title: "Kiến trúc sư hệ thống AI & Data Lead",
+        desc: "Thiết kế kiến trúc hệ thống AI Dual-Brain & đường ống dữ liệu IoT vi khí hậu",
+      },
+      {
+        title: "Nghiên cứu thị giác máy tính YOLOv9",
+        desc: "Huấn luyện mô hình nhận diện bệnh sầu riêng chuyên sâu đạt độ chính xác >92%",
+      },
+      {
+        title: "Hệ thống RAG & Khuyến nông tự động",
+        desc: "Phát triển cơ sở tri thức số hóa và truy xuất khuyến nghị canh tác thông minh",
+      },
+      {
+        title: "Á quân NTTU Innovation Startup Challenge 2026",
+        desc: "Đồng tác giả giải pháp kỹ thuật công nghệ nông nghiệp số EaAgri",
+      },
+    ],
     avatar: "/images/webp/giang-1.webp",
     themeColor: "blue",
     topIcon: "ri-brain-line",
@@ -77,10 +128,28 @@ const teamMembers: TeamMember[] = [
   },
   {
     name: "ĐẶNG VĂN CHUNG",
+    displayName: "Đặng Văn Chung",
     roleTag: "FIELD OPERATION LEAD",
-    task: "Khảo sát vườn - Hỗ trợ kỹ thuật - Triển khai Pilot",
-    // major: "Khoa học dữ liệu",
-    // id: "2311559253",
+    bio: "Field Operation Lead EaAgri. Dự án ứng dụng AI trong nông nghiệp thông minh.",
+    task: "Field Operation Lead EaAgri – Dự án ứng dụng AI trong nông nghiệp thông minh.",
+    achievements: [
+      {
+        title: "Á quân & Đội thi được yêu thích nhất",
+        desc: "NTTU Innovation Startup Challenge 2026 · Khoa Công Nghệ Thông Tin",
+      },
+      {
+        title: "Giải Nhất vòng Bán kết",
+        desc: "NTTU Innovation Startup Challenge 2026, bảng Công nghệ Nông nghiệp và Thực phẩm · Khoa CNTT",
+      },
+      {
+        title: "Giải Khuyến khích – Khoa học dữ liệu 2026",
+        desc: "Dự án phân tích bán lẻ tích hợp AI Agent và dự báo thông minh · Khoa CNTT",
+      },
+      {
+        title: "Á quân & Đội thi được yêu thích nhất",
+        desc: "Dự án khởi nghiệp đổi mới sáng tạo ứng dụng công nghệ số",
+      },
+    ],
     avatar: "/images/webp/chung-1.webp",
     themeColor: "purple",
     topIcon: "ri-code-s-slash-line",
@@ -92,10 +161,28 @@ const teamMembers: TeamMember[] = [
   },
   {
     name: "HUỲNH ANH TUẤN",
+    displayName: "Huỳnh Anh Tuấn",
     roleTag: "GROWTH & OPERATIONS LEAD",
-    task: "Truyền thông - Onboarding người dùng - Vận hành.",
-    // major: "Khoa học dữ liệu",
-    // id: "2200005725",
+    bio: "Growth & Operations Lead EaAgri. Dự án ứng dụng AI trong nông nghiệp thông minh.",
+    task: "Growth & Operations Lead EaAgri – Dự án ứng dụng AI trong nông nghiệp thông minh.",
+    achievements: [
+      {
+        title: "Á quân & Đội thi được yêu thích nhất",
+        desc: "NTTU Innovation Startup Challenge 2026 · Khoa Công Nghệ Thông Tin",
+      },
+      {
+        title: "Giải Nhất vòng Bán kết",
+        desc: "NTTU Innovation Startup Challenge 2026, bảng Công nghệ Nông nghiệp và Thực phẩm · Khoa CNTT",
+      },
+      {
+        title: "Giải Khuyến khích – Kỹ thuật phần mềm 2026",
+        desc: "Dự án quản lí thông tin, lên lịch học và tóm tắt, chấm bài thi, báo cáo thông minh · Khoa CNTT",
+      },
+      {
+        title: "Á quân & Đội thi được yêu thích nhất",
+        desc: "Dự án khởi nghiệp đổi mới sáng tạo ứng dụng công nghệ số",
+      },
+    ],
     avatar: "/images/webp/tuan1.webp",
     themeColor: "orange",
     topIcon: "ri-megaphone-line",
@@ -204,7 +291,7 @@ const advisors: AdvisorMember[] = [
   {
     name: "TS. HOÀNG THỊNH NHÂN",
     roleTag: "CỐ VẤN CHUYÊN MÔN CNTT",
-    subRole: "Giảng viên Khoa CNTT — ĐH Nguyễn Tất Thành",
+    subRole: "Phó Giám đốc Trung tâm Sáng tạo và Ươm tạo Khởi nghiệp.\nGiảng viên, chuyên gia tại Trường ĐH Nguyễn Tất Thành",
     organization: "ĐH Nguyễn Tất Thành",
     task: "Cố vấn học thuật, mô hình giải thuật toán học & phương pháp nghiên cứu AI chuyên sâu.",
     avatar: "/images/webp/advisors/hoang-thinh-nhan.webp",
@@ -514,7 +601,13 @@ const TeamSection = () => {
                       <h3 className="advisor-card__name">{advisor.name}</h3>
 
                       {/* Advisor Subrole */}
-                      <p className="advisor-card__subrole">{advisor.subRole}</p>
+                      <p className="advisor-card__subrole">
+                        {advisor.subRole.split("\n").map((line, lIdx) => (
+                          <span key={lIdx} style={{ display: "block" }} className="advisor-card__subrole-line">
+                            {line}
+                          </span>
+                        ))}
+                      </p>
                     </div>
                   </div>
 
@@ -522,23 +615,16 @@ const TeamSection = () => {
                   <div className="advisor-card__back">
                     <div className="advisor-card__back-main">
                       <h3 className="advisor-card__back-name">{advisor.name}</h3>
-                      <p className="advisor-card__back-subrole">{advisor.subRole}</p>
+                      <p className="advisor-card__back-subrole">
+                        {advisor.subRole.split("\n").map((line, lIdx) => (
+                          <span key={lIdx} style={{ display: "block" }} className="advisor-card__subrole-line">
+                            {line}
+                          </span>
+                        ))}
+                      </p>
                       {advisor.task && (
                         <p className="advisor-card__back-task">{advisor.task}</p>
                       )}
-                    </div>
-
-                    <div className="advisor-card__back-bottom">
-                      <div
-                        className="advisor-card__back-return-pill"
-                        onClick={(e) => {
-                          e.stopPropagation();
-                          handleAdvisorCardClick(index);
-                        }}
-                      >
-                        <i className="ri-arrow-go-back-line"></i>
-                        <span>Lật lại</span>
-                      </div>
                     </div>
                   </div>
                 </div>
@@ -636,27 +722,46 @@ const TeamSection = () => {
                     </div>
                   </div>
 
-                  {/* BACK: Detailed Info (Full-card 3D flip) */}
+                  {/* BACK: Editorial Profile Card (Matching CoreTeamSection design) */}
                   <div className="team-card__back">
+                    {/* Subtle Portrait Watermark in background */}
+                    <div
+                      className="team-card__back-watermark"
+                      style={{
+                        backgroundImage: `url(${member.avatar})`,
+                        backgroundPosition: member.avatarPosition || "center 15%",
+                      }}
+                      aria-hidden="true"
+                    />
 
-                    <div className="team-card__back-main">
-                      <div className="team-card__back-role">
-                        <span>{member.roleTag}</span>
+                    {/* Scrollable Editorial Content */}
+                    <div className="team-card__back-content">
+                      <div className="team-card__back-header">
+                        <h3 className="team-card__back-name">
+                          {member.displayName || member.name}
+                        </h3>
+                        <p className="team-card__back-bio">
+                          {member.bio || member.task}
+                        </p>
                       </div>
-                      <h3 className="team-card__back-name">{member.name}</h3>
-                      <p className="team-card__back-task">{member.task}</p>
-                    </div>
 
-                    <div className="team-card__back-bottom">
-                      <div
-                        className="team-card__back-return-pill"
-                        onClick={(e) => {
-                          e.stopPropagation();
-                          handleCardClick(index);
-                        }}
-                      >
-                        <i className="ri-arrow-go-back-line"></i>
-                        <span>Lật lại</span>
+                      <div className="team-card__back-divider" />
+
+                      <div className="team-card__back-section-label">THÀNH TỰU</div>
+
+                      <div className="team-card__back-list">
+                        {member.achievements && member.achievements.length > 0 ? (
+                          member.achievements.map((item, aIdx) => (
+                            <div key={aIdx} className="team-card__back-item">
+                              <h4 className="team-card__back-item-title">{item.title}</h4>
+                              {item.desc && (
+                                <p className="team-card__back-item-desc">{item.desc}</p>
+                              )}
+                            </div>
+                          ))
+                        ) : (
+                          <p className="team-card__back-task">{member.task}</p>
+                        )}
                       </div>
                     </div>
                   </div>

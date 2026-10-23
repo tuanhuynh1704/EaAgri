@@ -1069,18 +1069,181 @@
       font-size: 0.58rem !important;
       font-weight: 500;
       color: rgba(255, 255, 255, 0.88) !important;
-      line-height: 1.3;
+      line-height: 1.35;
       margin: 0;
       min-height: auto;
-      display: -webkit-box !important;
-      -webkit-line-clamp: 2;
-      -webkit-box-orient: vertical;
-      overflow: hidden;
+      display: block !important;
+      white-space: pre-line !important;
       text-shadow: 0 1px 4px rgba(0, 0, 0, 0.8);
+    }
+
+    .advisor-card__subrole-line {
+      display: block;
     }
   }
 
-  .team-card__back,
+  // Team Card Back Face: Clean Editorial Profile (Matches desktop & reference photo)
+  .team-card__back {
+    display: flex !important;
+    position: absolute;
+    inset: 0;
+    width: 100%;
+    height: 100%;
+    border-radius: 16px !important;
+    border: 1px solid #e7ebe8 !important;
+    background: #ffffff !important;
+    box-shadow: 0 8px 24px rgba(0, 0, 0, 0.08) !important;
+    z-index: 1;
+    overflow: hidden;
+    transform: rotateY(180deg);
+    -webkit-transform: rotateY(180deg);
+    opacity: 1 !important;
+    visibility: visible !important;
+    backface-visibility: hidden !important;
+    -webkit-backface-visibility: hidden !important;
+    transform-style: preserve-3d;
+    -webkit-transform-style: preserve-3d;
+    padding: 0.75rem 0.65rem 0.55rem !important;
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+
+    &::before {
+      content: '';
+      position: absolute;
+      top: 0;
+      left: 0;
+      right: 0;
+      height: 3px;
+      background: var(--tech-accent, #10b981);
+      z-index: 3;
+    }
+
+    .team-card__back-watermark {
+      position: absolute !important;
+      inset: 0 !important;
+      width: 100% !important;
+      height: 100% !important;
+      border-radius: inherit !important;
+      background-size: cover !important;
+      background-repeat: no-repeat !important;
+      opacity: 0.08 !important;
+      filter: grayscale(100%) contrast(110%) !important;
+      pointer-events: none !important;
+      z-index: 0 !important;
+      mask-image: linear-gradient(to bottom, black 0%, black 82%, rgba(0, 0, 0, 0.4) 92%, transparent 100%) !important;
+      -webkit-mask-image: linear-gradient(to bottom, black 0%, black 82%, rgba(0, 0, 0, 0.4) 92%, transparent 100%) !important;
+    }
+
+    .team-card__back-content {
+      position: relative !important;
+      z-index: 2 !important;
+      display: flex !important;
+      flex-direction: column !important;
+      flex: 1 !important;
+      min-height: 0 !important;
+      overflow-y: auto !important;
+      padding-right: 0.25rem !important;
+      scrollbar-width: thin;
+      scrollbar-color: #cbd5e1 transparent;
+
+      &::-webkit-scrollbar {
+        width: 3px;
+      }
+      &::-webkit-scrollbar-thumb {
+        background: #cbd5e1;
+        border-radius: 3px;
+      }
+    }
+
+    .team-card__back-header {
+      margin-bottom: 0.15rem !important;
+    }
+
+    .team-card__back-name {
+      font-family: "Merriweather", "Playfair Display", Georgia, serif !important;
+      font-size: 0.86rem !important;
+      font-weight: 800 !important;
+      color: #111827 !important;
+      line-height: 1.25 !important;
+      margin-bottom: 0.15rem !important;
+      text-transform: none !important;
+      text-shadow: none !important;
+    }
+
+    .team-card__back-bio {
+      font-size: 0.6rem !important;
+      line-height: 1.35 !important;
+      color: #4b5563 !important;
+    }
+
+    .team-card__back-divider {
+      width: 100% !important;
+      height: 1px !important;
+      background-color: #e5e7eb !important;
+      margin: 0.35rem 0 !important;
+    }
+
+    .team-card__back-section-label {
+      font-size: 0.52rem !important;
+      font-weight: 700 !important;
+      color: #6b7280 !important;
+      text-transform: uppercase !important;
+      letter-spacing: 0.8px !important;
+      margin-bottom: 0.4rem !important;
+    }
+
+    .team-card__back-list {
+      display: flex !important;
+      flex-direction: column !important;
+      gap: 0.45rem !important;
+    }
+
+    .team-card__back-item {
+      display: flex !important;
+      flex-direction: column !important;
+      gap: 0.08rem !important;
+    }
+
+    .team-card__back-item-title {
+      font-size: 0.66rem !important;
+      font-weight: 700 !important;
+      color: #18181b !important;
+      line-height: 1.3 !important;
+      margin: 0 !important;
+    }
+
+    .team-card__back-item-desc {
+      font-size: 0.58rem !important;
+      color: #64748b !important;
+      line-height: 1.35 !important;
+      margin: 0 !important;
+      font-weight: 400 !important;
+    }
+
+    .team-card__back-bottom {
+      padding-top: 0.35rem !important;
+      margin-top: 0.25rem !important;
+      border-top: 1px solid #f3f4f6 !important;
+    }
+
+    .team-card__back-return-pill {
+      font-size: 0.56rem !important;
+      padding: 0.18rem 0.65rem !important;
+      color: #4b5563 !important;
+      background: #f8fafc !important;
+      border: 1px solid #e2e8f0 !important;
+      box-shadow: 0 1px 3px rgba(0, 0, 0, 0.04) !important;
+      margin: 0 !important;
+
+      i {
+        font-size: 0.65rem !important;
+        color: #10b981 !important;
+      }
+    }
+  }
+
+  // Advisor Card Back Face (Preserves existing dark theme)
   .advisor-card__back {
     display: flex !important;
     position: absolute;
@@ -1106,15 +1269,13 @@
     flex-direction: column;
     justify-content: space-between;
 
-    .advisor-card__back-role,
-    .team-card__back-role {
+    .advisor-card__back-role {
       font-size: 0.44rem !important;
       margin-bottom: 0.15rem !important;
       padding: 0.1rem 0.35rem !important;
     }
 
-    .advisor-card__back-name,
-    .team-card__back-name {
+    .advisor-card__back-name {
       font-size: 0.7rem !important;
       font-weight: 800 !important;
       line-height: 1.2 !important;
@@ -1125,10 +1286,12 @@
       font-size: 0.5rem !important;
       margin-bottom: 0.25rem !important;
       opacity: 0.85;
+      white-space: pre-line !important;
+      display: block !important;
+      text-align: center !important;
     }
 
-    .advisor-card__back-task,
-    .team-card__back-task {
+    .advisor-card__back-task {
       font-size: 0.52rem !important;
       line-height: 1.3 !important;
       display: -webkit-box;
@@ -1137,30 +1300,11 @@
       overflow: hidden;
     }
 
-    .team-card__back-return-pill,
     .advisor-card__back-return-pill {
       font-size: 0.48rem !important;
       padding: 0.15rem 0.45rem !important;
       margin-top: 0.2rem !important;
     }
-  }
-
-  // Theme gradient backgrounds cho mặt sau thẻ trên mobile
-  .team-card--green .team-card__back {
-    background: radial-gradient(circle at 50% 10%, rgba(37, 138, 76, 0.45) 0%, #111a15 65%, #0a110d 100%) !important;
-    border-color: rgba(46, 204, 113, 0.45) !important;
-  }
-  .team-card--blue .team-card__back {
-    background: radial-gradient(circle at 50% 10%, rgba(22, 141, 179, 0.45) 0%, #0d1920 65%, #081015 100%) !important;
-    border-color: rgba(56, 189, 248, 0.45) !important;
-  }
-  .team-card--purple .team-card__back {
-    background: radial-gradient(circle at 50% 10%, rgba(102, 115, 200, 0.45) 0%, #161524 65%, #0d0c17 100%) !important;
-    border-color: rgba(167, 139, 250, 0.45) !important;
-  }
-  .team-card--orange .team-card__back {
-    background: radial-gradient(circle at 50% 10%, rgba(189, 138, 45, 0.45) 0%, #201912 65%, #15100a 100%) !important;
-    border-color: rgba(245, 158, 11, 0.45) !important;
   }
 
   // Advisor Theme gradient backgrounds trên mobile

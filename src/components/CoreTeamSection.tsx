@@ -1,9 +1,17 @@
 import { useState, useRef } from "react";
 
+interface Achievement {
+  title: string;
+  desc?: string;
+}
+
 interface TeamMember {
   name: string;
+  displayName?: string;
   roleTag: string;
+  bio?: string;
   task: string;
+  achievements?: Achievement[];
   avatar: string;
   avatarPosition?: string;
   themeColor: "green" | "blue" | "purple" | "orange";
@@ -18,8 +26,53 @@ interface TeamMember {
 const teamMembers: TeamMember[] = [
   {
     name: "PHAN ĐĂNG HUY",
+    displayName: "Phan Đăng Huy",
     roleTag: "FOUNDER & CEO",
-    task: "Chiến lược sản phẩm - Điều phối - Gọi vốn",
+    bio: "Founder & CEO EaAgri. Dự án ứng dụng AI trong nông nghiệp thông minh.",
+    task: `Founder & CEO EaAgri – Dự án ứng dụng AI trong nông nghiệp thông minh.
+
+• Best Student Paper – AIIA 2026 – Nghiên cứu EaAgri về AI và RAG trong hỗ trợ chẩn đoán bệnh sầu riêng.
+  Trường Đại học Nguyễn Tất Thành
+
+• Á quân & Giải Đội thi được yêu thích nhất – NTTU Innovation Startup Challenge 2026.
+  Khoa Công Nghệ Thông Tin
+
+• Giải Nhất vòng Bán kết – NTTU Innovation Startup Challenge 2026, bảng Công nghệ Nông nghiệp và Công nghệ Thực phẩm.
+  Khoa Công Nghệ Thông Tin
+
+• Giải Nhì – Cuộc thi Trí tuệ nhân tạo trong sinh viên 2026, Khoa Công nghệ Thông tin, NTTU.
+  Khoa Công Nghệ Thông Tin
+
+• Giải Khuyến khích – Cuộc thi Khoa học dữ liệu Khoa CNTT 2026, với dự án phân tích dữ liệu bán lẻ tích hợp AI Agent và dự báo thông minh.
+  Khoa Công Nghệ Thông Tin
+
+• Á quân & Giải Đội thi được yêu thích nhất.`,
+    achievements: [
+      {
+        title: "Best Student Paper – AIIA 2026",
+        desc: "Nghiên cứu EaAgri về AI và RAG trong hỗ trợ chẩn đoán bệnh sầu riêng · Trường Đại học Nguyễn Tất Thành",
+      },
+      {
+        title: "Á quân & Đội thi được yêu thích nhất",
+        desc: "NTTU Innovation Startup Challenge 2026 · Khoa Công Nghệ Thông Tin",
+      },
+      {
+        title: "Giải Nhất vòng Bán kết",
+        desc: "NTTU Innovation Startup Challenge 2026, bảng Công nghệ Nông nghiệp và Thực phẩm · Khoa CNTT",
+      },
+      {
+        title: "Giải Nhì – AI trong sinh viên 2026",
+        desc: "Khoa Công nghệ Thông tin, Trường Đại học Nguyễn Tất Thành",
+      },
+      {
+        title: "Giải Khuyến khích – Khoa học dữ liệu 2026",
+        desc: "Dự án phân tích bán lẻ tích hợp AI Agent và dự báo thông minh · Khoa CNTT",
+      },
+      {
+        title: "Á quân & Đội thi được yêu thích nhất",
+        desc: "Dự án khởi nghiệp đổi mới sáng tạo ứng dụng công nghệ số",
+      },
+    ],
     avatar: "/images/webp/Huy-CEO.webp",
     avatarPosition: "40% 15%",
     themeColor: "green",
@@ -32,8 +85,53 @@ const teamMembers: TeamMember[] = [
   },
   {
     name: "NGUYỄN ANH GIẢNG",
-    roleTag: "CTO / AI & DATA LEAD",
-    task: "AI & dữ liệu - Kiến trúc kỹ thuật - Phát triển giải pháp",
+    displayName: "Nguyễn Anh Giảng",
+    roleTag: "Co-founder & CTO",
+    bio: "Co-founder & CTO. Dự án ứng dụng AI trong nông nghiệp thông minh.",
+    task: `Co-founder & CTO – Dự án ứng dụng AI trong nông nghiệp thông minh.
+
+• Best Student Paper – AIIA 2026 – Nghiên cứu EaAgri về AI và RAG trong hỗ trợ chẩn đoán bệnh sầu riêng.
+  Trường Đại học Nguyễn Tất Thành
+
+• Á quân & Giải Đội thi được yêu thích nhất – NTTU Innovation Startup Challenge 2026.
+  Khoa Công Nghệ Thông Tin
+
+• Giải Nhất vòng Bán kết – NTTU Innovation Startup Challenge 2026, bảng Công nghệ Nông nghiệp và Công nghệ Thực phẩm.
+  Khoa Công Nghệ Thông Tin
+
+• Giải Nhì – Cuộc thi Trí tuệ nhân tạo trong sinh viên 2026, Khoa Công nghệ Thông tin, NTTU.
+  Khoa Công Nghệ Thông Tin
+
+• Giải Khuyến khích – Cuộc thi Khoa học dữ liệu Khoa CNTT 2026, với dự án phân tích dữ liệu bán lẻ tích hợp AI Agent và dự báo thông minh.
+  Khoa Công Nghệ Thông Tin
+
+• Á quân & Giải Đội thi được yêu thích nhất.`,
+    achievements: [
+      {
+        title: "Best Student Paper – AIIA 2026",
+        desc: "Nghiên cứu EaAgri về AI và RAG trong hỗ trợ chẩn đoán bệnh sầu riêng · Trường Đại học Nguyễn Tất Thành",
+      },
+      {
+        title: "Á quân & Đội thi được yêu thích nhất",
+        desc: "NTTU Innovation Startup Challenge 2026 · Khoa Công Nghệ Thông Tin",
+      },
+      {
+        title: "Giải Nhất vòng Bán kết",
+        desc: "NTTU Innovation Startup Challenge 2026, bảng Công nghệ Nông nghiệp và Thực phẩm · Khoa CNTT",
+      },
+      {
+        title: "Giải Nhì – AI trong sinh viên 2026",
+        desc: "Khoa Công nghệ Thông tin, Trường Đại học Nguyễn Tất Thành",
+      },
+      {
+        title: "Giải Khuyến khích – Khoa học dữ liệu 2026",
+        desc: "Dự án phân tích bán lẻ tích hợp AI Agent và dự báo thông minh · Khoa CNTT",
+      },
+      {
+        title: "Á quân & Đội thi được yêu thích nhất",
+        desc: "Dự án khởi nghiệp đổi mới sáng tạo ứng dụng công nghệ số",
+      },
+    ],
     avatar: "/images/webp/giang-1.webp",
     themeColor: "blue",
     topIcon: "ri-brain-line",
@@ -45,8 +143,39 @@ const teamMembers: TeamMember[] = [
   },
   {
     name: "ĐẶNG VĂN CHUNG",
+    displayName: "Đặng Văn Chung",
     roleTag: "FIELD OPERATION LEAD",
-    task: "Khảo sát vườn - Hỗ trợ kỹ thuật - Triển khai Pilot",
+    bio: "Field Operation Lead EaAgri. Dự án ứng dụng AI trong nông nghiệp thông minh.",
+    task: `Field Operation Lead EaAgri – Dự án ứng dụng AI trong nông nghiệp thông minh.
+
+• Á quân & Giải Đội thi được yêu thích nhất – NTTU Innovation Startup Challenge 2026.
+  Khoa Công Nghệ Thông Tin
+
+• Giải Nhất vòng Bán kết – NTTU Innovation Startup Challenge 2026, bảng Công nghệ Nông nghiệp và Công nghệ Thực phẩm.
+  Khoa Công Nghệ Thông Tin
+
+• Giải Khuyến khích – Cuộc thi Khoa học dữ liệu Khoa CNTT 2026, với dự án phân tích dữ liệu bán lẻ tích hợp AI Agent và dự báo thông minh.
+  Khoa Công Nghệ Thông Tin
+
+• Á quân & Giải Đội thi được yêu thích nhất.`,
+    achievements: [
+      {
+        title: "Á quân & Đội thi được yêu thích nhất",
+        desc: "NTTU Innovation Startup Challenge 2026 · Khoa Công Nghệ Thông Tin",
+      },
+      {
+        title: "Giải Nhất vòng Bán kết",
+        desc: "NTTU Innovation Startup Challenge 2026, bảng Công nghệ Nông nghiệp và Thực phẩm · Khoa CNTT",
+      },
+      {
+        title: "Giải Khuyến khích – Khoa học dữ liệu 2026",
+        desc: "Dự án phân tích bán lẻ tích hợp AI Agent và dự báo thông minh · Khoa CNTT",
+      },
+      {
+        title: "Á quân & Đội thi được yêu thích nhất",
+        desc: "Dự án khởi nghiệp đổi mới sáng tạo ứng dụng công nghệ số",
+      },
+    ],
     avatar: "/images/webp/chung-1.webp",
     themeColor: "purple",
     topIcon: "ri-code-s-slash-line",
@@ -58,8 +187,28 @@ const teamMembers: TeamMember[] = [
   },
   {
     name: "HUỲNH ANH TUẤN",
+    displayName: "Huỳnh Anh Tuấn",
     roleTag: "GROWTH & OPERATIONS LEAD",
-    task: "Truyền thông - Onboarding người dùng - Vận hành.",
+    bio: "Growth & Operations Lead EaAgri. Dự án ứng dụng AI trong nông nghiệp thông minh.",
+    task: "Growth & Operations Lead EaAgri – Dự án ứng dụng AI trong nông nghiệp thông minh.",
+    achievements: [
+      {
+        title: "Á quân & Đội thi được yêu thích nhất",
+        desc: "NTTU Innovation Startup Challenge 2026 · Khoa Công Nghệ Thông Tin",
+      },
+      {
+        title: "Giải Nhất vòng Bán kết",
+        desc: "NTTU Innovation Startup Challenge 2026, bảng Công nghệ Nông nghiệp và Thực phẩm · Khoa CNTT",
+      },
+      {
+        title: "Giải Khuyến khích – Kỹ thuật phần mềm 2026",
+        desc: "Dự án quản lí thông tin, lên lịch học và tóm tắt, chấm bài thi, báo cáo thông minh · Khoa CNTT",
+      },
+      {
+        title: "Á quân & Đội thi được yêu thích nhất",
+        desc: "Dự án khởi nghiệp đổi mới sáng tạo ứng dụng công nghệ số",
+      },
+    ],
     avatar: "/images/webp/tuan1.webp",
     themeColor: "orange",
     topIcon: "ri-megaphone-line",
@@ -224,27 +373,50 @@ export default function CoreTeamSection() {
                 </div>
 
                 {/* BACK: Detailed Info (Full-card 3D flip) */}
+                {/* BACK: Editorial Profile Card (Matching reference photo) */}
                 <div className="team-card__back">
-                  <div className="team-card__back-main">
-                    <div className="team-card__back-role">
-                      <span>{member.roleTag}</span>
+                  {/* Subtle Portrait Watermark in background */}
+                  <div
+                    className="team-card__back-watermark"
+                    style={{
+                      backgroundImage: `url(${member.avatar})`,
+                      backgroundPosition: member.avatarPosition || "center 15%",
+                    }}
+                    aria-hidden="true"
+                  />
+
+                  {/* Scrollable Editorial Content */}
+                  <div className="team-card__back-content">
+                    <div className="team-card__back-header">
+                      <h3 className="team-card__back-name">
+                        {member.displayName || member.name}
+                      </h3>
+                      <p className="team-card__back-bio">
+                        {member.bio || member.task}
+                      </p>
                     </div>
-                    <h3 className="team-card__back-name">{member.name}</h3>
-                    <p className="team-card__back-task">{member.task}</p>
+
+                    <div className="team-card__back-divider" />
+
+                    <div className="team-card__back-section-label">THÀNH TỰU</div>
+
+                    <div className="team-card__back-list">
+                      {member.achievements && member.achievements.length > 0 ? (
+                        member.achievements.map((item, aIdx) => (
+                          <div key={aIdx} className="team-card__back-item">
+                            <h4 className="team-card__back-item-title">{item.title}</h4>
+                            {item.desc && (
+                              <p className="team-card__back-item-desc">{item.desc}</p>
+                            )}
+                          </div>
+                        ))
+                      ) : (
+                        <p className="team-card__back-task">{member.task}</p>
+                      )}
+                    </div>
                   </div>
 
-                  <div className="team-card__back-bottom">
-                    <div
-                      className="team-card__back-return-pill"
-                      onClick={(e) => {
-                        e.stopPropagation();
-                        handleCardClick(index);
-                      }}
-                    >
-                      <i className="ri-arrow-go-back-line"></i>
-                      <span>Lật lại</span>
-                    </div>
-                  </div>
+
                 </div>
               </div>
             </div>

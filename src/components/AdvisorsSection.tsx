@@ -97,7 +97,7 @@ const advisors: AdvisorMember[] = [
   {
     name: "TS. HOÀNG THỊNH NHÂN",
     roleTag: "CỐ VẤN CHUYÊN MÔN CNTT",
-    subRole: "Giảng viên Khoa CNTT — ĐH Nguyễn Tất Thành",
+    subRole: "Phó Giám đốc Trung tâm Sáng tạo và Ươm tạo Khởi nghiệp.\nGiảng viên, chuyên gia tại Trường ĐH Nguyễn Tất Thành",
     organization: "ĐH Nguyễn Tất Thành",
     task: "Cố vấn học thuật, mô hình giải thuật toán học & phương pháp nghiên cứu AI chuyên sâu.",
     avatar: "/images/webp/advisors/hoang-thinh-nhan.webp",
@@ -258,7 +258,13 @@ export default function AdvisorsSection() {
 
                   <div className="advisor-card__body">
                     <h3 className="advisor-card__name">{advisor.name}</h3>
-                    <p className="advisor-card__subrole">{advisor.subRole}</p>
+                    <p className="advisor-card__subrole">
+                      {advisor.subRole.split("\n").map((line, lIdx) => (
+                        <span key={lIdx} style={{ display: "block" }} className="advisor-card__subrole-line">
+                          {line}
+                        </span>
+                      ))}
+                    </p>
                   </div>
                 </div>
 
@@ -266,23 +272,16 @@ export default function AdvisorsSection() {
                 <div className="advisor-card__back">
                   <div className="advisor-card__back-main">
                     <h3 className="advisor-card__back-name">{advisor.name}</h3>
-                    <p className="advisor-card__back-subrole">{advisor.subRole}</p>
+                    <p className="advisor-card__back-subrole">
+                      {advisor.subRole.split("\n").map((line, lIdx) => (
+                        <span key={lIdx} style={{ display: "block" }} className="advisor-card__subrole-line">
+                          {line}
+                        </span>
+                      ))}
+                    </p>
                     {advisor.task && (
                       <p className="advisor-card__back-task">{advisor.task}</p>
                     )}
-                  </div>
-
-                  <div className="advisor-card__back-bottom">
-                    <div
-                      className="advisor-card__back-return-pill"
-                      onClick={(e) => {
-                        e.stopPropagation();
-                        handleAdvisorCardClick(index);
-                      }}
-                    >
-                      <i className="ri-arrow-go-back-line"></i>
-                      <span>Lật lại</span>
-                    </div>
                   </div>
                 </div>
               </div>
