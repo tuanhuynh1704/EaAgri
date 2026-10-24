@@ -171,13 +171,13 @@ export default function ProblemSolutionSection({
               <span className="dot dot--yellow"></span>
               <span className="dot dot--green"></span>
             </div>
-            <span className="problem-solution__window-title" title="EaAgri • Video Demo Vấn Đề & Giải Pháp Đột Phá">
+            {/* <span className="problem-solution__window-title" title="EaAgri • Video Demo Vấn Đề & Giải Pháp Đột Phá">
               <span className="window-title--desktop">EaAgri • Video Demo Vấn Đề &amp; Giải Pháp Đột Phá</span>
               <span className="window-title--mobile">Video Giải Pháp</span>
-            </span>
-            <span className="problem-solution__status-pill">
+            </span> */}
+            {/* <span className="problem-solution__status-pill">
               <span className="live-dot" /> Live Video
-            </span>
+            </span> */}
           </div>
 
           {/* Video Player Container với Custom Controls đồng bộ */}
