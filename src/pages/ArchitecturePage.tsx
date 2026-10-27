@@ -1,4 +1,3 @@
-import { useEffect } from "react";
 import { useSEO } from "../hooks/useSEO";
 import VideoSection from "../components/VideoSection";
 import StoryFeatureSection from "../components/StoryFeatureSection";
@@ -28,10 +27,6 @@ export default function ArchitecturePage() {
             }
         }
     });
-
-    useEffect(() => {
-        window.scrollTo(0, 0);
-    }, []);
 
     return (
         <div className="architecture-page section-bg--gradient-soft">

@@ -197,10 +197,10 @@ export default function AdvisorsSection() {
       <div className="team-showcase__container">
         {/* ADVISORY & MENTOR BOARD HEADER */}
         <div className="team-showcase__header" data-aos="fade-up">
-          <span className="team-showcase__label team-showcase__label--gold">
+          {/* <span className="team-showcase__label team-showcase__label--gold">
             <span className="team-showcase__status-dot team-showcase__status-dot--gold"></span>
             EAAGRI / ADVISORY &amp; MENTORS
-          </span>
+          </span> */}
           <h2 className="team-showcase__title">
             Hội Đồng <span className="team-showcase__title-highlight team-showcase__title-highlight--gold">Cố Vấn &amp; Chuyên Gia</span>
           </h2>

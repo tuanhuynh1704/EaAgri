@@ -18,6 +18,7 @@ const ManageNews = lazy(() => import("../pages/ManageNews"));
 const ManageCooperation = lazy(() => import("../pages/ManageCooperation"));
 const ManageTraffic = lazy(() => import("../pages/ManageTraffic"));
 const ChPlayRedirect = lazy(() => import("../pages/ChPlayRedirect"));
+const IntroduceWebsite = lazy(() => import("../components/landing_pages/IntroduceWebsite"));
 
 export const router = createBrowserRouter([
   {
@@ -25,6 +26,7 @@ export const router = createBrowserRouter([
     element: <App />,
     children: [
       { path: "/", element: <HomePage /> },
+      { path: "/gioi-thieu-eaagri", element: <IntroduceWebsite /> },
       { path: "/kien-truc", element: <ArchitecturePage /> },
       { path: "/architecture", element: <Navigate to="/kien-truc" replace /> },
       { path: "/giai-thuong", element: <AwardsPage /> },

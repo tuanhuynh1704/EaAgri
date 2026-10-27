@@ -1,22 +1,18 @@
 export default function EaAgriStoreSection() {
   const storeHighlights = [
     {
-      icon: "ri-shield-check-line",
       title: "100% Chính Hãng",
       desc: "Tem QR truy xuất nguồn gốc, có kiểm định lưu hành",
     },
     {
-      icon: "ri-truck-line",
       title: "Giao Tận Vườn Cây",
       desc: "Đồng kiểm an toàn, miễn phí vận chuyển từ 500k",
     },
     {
-      icon: "ri-user-voice-line",
       title: "Kỹ Sư Tư Vấn 1:1",
       desc: "Bắt bệnh thực địa & kê toa chuẩn liều lượng miễn phí",
     },
     {
-      icon: "ri-arrow-go-back-line",
       title: "Đổi Trả 7 Ngày",
       desc: "Cam kết bồi hoàn minh bạch bảo vệ bà con nông dân",
     },
@@ -27,14 +23,13 @@ export default function EaAgriStoreSection() {
       <div className="section__container store__container">
         <div className="store__compact-card" data-aos="fade-up">
           {/* Top Eyebrow */}
-          <div className="store__badge">
-            <i className="ri-store-2-line"></i>
+          {/* <div className="store__badge">
             <span>EAAGRI STORE • SÀN THƯƠNG MẠI NÔNG NGHIỆP & VẬT TƯ CHÍNH HÃNG</span>
-          </div>
+          </div> */}
 
           {/* Heading */}
           <h2 className="store__title">
-            🛒 EaAgri Store —{" "}
+            EaAgri Store —{" "}
             <span className="highlight">Giải Pháp Toàn Diện Cho Cây Trồng Bội Thu</span>
           </h2>
 
@@ -48,9 +43,6 @@ export default function EaAgriStoreSection() {
           <div className="store__highlights-row">
             {storeHighlights.map((item, idx) => (
               <div key={idx} className="store__highlight-item">
-                <div className="highlight-icon">
-                  <i className={item.icon}></i>
-                </div>
                 <div className="highlight-text">
                   <strong>{item.title}</strong>
                   <span>{item.desc}</span>
@@ -68,9 +60,8 @@ export default function EaAgriStoreSection() {
               className="store__btn store__btn--primary"
               title="Truy cập sàn thương mại EaAgri Store tại store.eaagri.vn"
             >
-              <i className="ri-shopping-cart-line"></i>
               <span>Truy Cập EaAgri Store Ngay</span>
-              <span className="store__btn-badge">store.eaagri.vn ↗</span>
+              <span className="store__btn-badge">store.eaagri.vn</span>
             </a>
 
             <a
@@ -78,7 +69,6 @@ export default function EaAgriStoreSection() {
               className="store__btn store__btn--secondary"
               title="Hotline kỹ sư nông học 1900 886 688"
             >
-              <i className="ri-phone-line"></i>
               <span>Hotline Tư Vấn: <strong>1900 886 688</strong></span>
             </a>
           </div>

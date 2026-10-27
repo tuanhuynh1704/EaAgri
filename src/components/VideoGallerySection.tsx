@@ -50,8 +50,8 @@ export default function VideoGallerySection() {
 
   const promoMode = isMobile ? "9x16" : "16x9";
   const promoVideoSrc = isMobile
-    ? "/assets/EaAgri_Promo_45s_9x16_mobile.mp4"
-    : "/Video/EaAgri_Promo_45s_9x16_pc.mp4";
+    ? "/assets/EaAgri_Promo_45s_9x16.mp4"
+    : "/Video/EaAgri_Promo_45s_9x16.mp4";
   const posterSrc = isMobile
     ? "/Video/promo_9x16_poster.webp"
     : "/Video/promo_16x9_poster.webp";
@@ -115,9 +115,9 @@ export default function VideoGallerySection() {
   return (
     <section className="section__container video-gallery__container">
       <div className="video-gallery__header" data-aos="fade-down">
-        <span className="video-gallery__tag">
+        {/* <span className="video-gallery__tag">
           <i className="ri-play-circle-line"></i> THƯ VIỆN TRUYỀN THÔNG
-        </span>
+        </span> */}
         <h2 className="video-gallery__title">
           Video & <span className="highlight">Trải Nghiệm Thực Tế</span>
         </h2>

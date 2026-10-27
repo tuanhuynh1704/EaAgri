@@ -49,9 +49,9 @@ export default function LogoMarqueeSection() {
   return (
     <section className="logo-marquee" aria-labelledby="logo-marquee-title">
       <div className="logo-marquee__heading">
-        <span className="logo-marquee__eyebrow">
+        {/* <span className="logo-marquee__eyebrow">
           <i className="ri-links-line" /> Hành trình Ea Agri
-        </span>
+        </span> */}
         <h2 id="logo-marquee-title">Dấu ấn kết nối</h2>
         <p>Những môi trường học thuật, đổi mới sáng tạo và công nghệ trên hành trình phát triển dự án.</p>
       </div>

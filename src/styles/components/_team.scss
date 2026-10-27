@@ -871,6 +871,8 @@
   padding: clamp(3rem, 5vw, 4.5rem) 1.5rem 0.5rem;
   width: 100%;
   display: flex;
+  flex-direction: column;
+  align-items: center;
   justify-content: center;
 }
 
@@ -2123,6 +2125,26 @@
 
 .team-card:hover .team-card__rect-avatar-img {
   transform: scale(1.02);
+}
+
+// The third member photo has more empty space around the subject; crop in slightly
+// so its portrait feels as prominent as the other team cards.
+.team-card--purple .team-card__rect-avatar-img {
+  transform: scale(1.8);
+}
+
+.team-card--purple:hover .team-card__rect-avatar-img {
+  transform: scale(1.24);
+}
+
+// The last member portrait has extra space around the subject, so bring it closer
+// while keeping the crop centered inside the card.
+.team-card--orange .team-card__rect-avatar-img {
+  transform: scale(1.12) translateY(18px);
+}
+
+.team-card--orange:hover .team-card__rect-avatar-img {
+  transform: scale(1.16) translateY(18px);
 }
 
 .team-card__role-pill {

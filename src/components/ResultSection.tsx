@@ -1,5 +1,5 @@
 const resultImages = [
-  { src: "/assets/phancung", label: "Bộ thiết bị IoT", icon: "ri-cpu-line" },
+  // { src: "/assets/phancung", label: "Bộ thiết bị IoT", icon: "ri-cpu-line" },
   { src: "/assets/anhthucte", label: "Chẩn đoán sâu bệnh", icon: "ri-scan-2-line" },
   { src: "/assets/anhthucte1", label: "Giám sát vi khí hậu", icon: "ri-radar-line" },
   { src: "/assets/anhthucte2", label: "Tư vấn cùng chuyên gia", icon: "ri-customer-service-2-line" },
@@ -15,7 +15,7 @@ const stats = [
 const ResultSection = () => (
   <section className="section__container download__container result-section" data-aos="fade-up">
     <header className="result__header">
-      <span className="result__eyebrow"><i className="ri-map-pin-2-line" /> Tân Tiến · Đắk Lắk</span>
+      {/* <span className="result__eyebrow"><i className="ri-map-pin-2-line" /> Tân Tiến · Đắk Lắk</span> */}
       <h2 className="section__header">Kết quả <span>triển khai thực tế</span></h2>
       <p className="section__description">
         Ea Agri vận hành ổn định tại vườn thử nghiệm, kết nối dữ liệu IoT, AI và chuyên gia

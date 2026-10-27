@@ -14,12 +14,41 @@ export default function ProblemSolutionSection({
   const progressBarRef = useRef<HTMLDivElement>(null);
   const hideControlsTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
 
-  const [isPlaying, setIsPlaying] = useState<boolean>(true);
-  const [isMuted, setIsMuted] = useState<boolean>(true);
+  const [isPlaying, setIsPlaying] = useState<boolean>(false);
+  const [isMuted, setIsMuted] = useState<boolean>(false);
+  const [videoVisible, setVideoVisible] = useState<boolean>(false);
+  const hasPlayedRef = useRef(false);
   const [currentTime, setCurrentTime] = useState<number>(0);
   const [duration, setDuration] = useState<number>(0);
   const [isFullscreen, setIsFullscreen] = useState<boolean>(false);
   const [showControls, setShowControls] = useState<boolean>(true);
+
+  useEffect(() => {
+    const video = videoRef.current;
+    if (!video) return;
+
+    const observer = new IntersectionObserver(
+      ([entry]) => setVideoVisible(entry.isIntersecting && entry.intersectionRatio >= 0.25),
+      { threshold: [0, 0.25] },
+    );
+    observer.observe(video);
+    return () => observer.disconnect();
+  }, []);
+
+  useEffect(() => {
+    const video = videoRef.current;
+    if (!video) return;
+
+    if (videoVisible) {
+      // Attempt audible playback; browsers may require a user gesture before allowing it.
+      video.muted = isMuted;
+      void video.play().then(() => {
+        hasPlayedRef.current = true;
+      }).catch(() => setIsPlaying(false));
+    } else {
+      video.pause();
+    }
+  }, [videoVisible, isMuted]);
 
   // Định dạng thời gian mm:ss
   const formatTime = (timeInSeconds: number) => {
@@ -151,9 +180,9 @@ export default function ProblemSolutionSection({
 
       {/* Section Header */}
       <div className="problem-solution__header-wrap" data-aos="fade-down">
-        <span className="problem-solution__tag">
+        {/* <span className="problem-solution__tag">
           <i className="ri-lightbulb-line"></i> Tầm Nhìn & Sứ Mệnh
-        </span>
+        </span> */}
         <h2 className="problem-solution__title">
           Vấn Đề & <span className="highlight">Giải Pháp Đột Phá</span>
         </h2>
@@ -164,24 +193,8 @@ export default function ProblemSolutionSection({
 
       {/* Centered Large Video Showcase */}
       <div className="problem-solution__video-showcase" data-aos="fade-up">
-        <div className="problem-solution__image-wrapper">
-          <div className="problem-solution__window-header">
-            <div className="problem-solution__window-dots">
-              <span className="dot dot--red"></span>
-              <span className="dot dot--yellow"></span>
-              <span className="dot dot--green"></span>
-            </div>
-            {/* <span className="problem-solution__window-title" title="EaAgri • Video Demo Vấn Đề & Giải Pháp Đột Phá">
-              <span className="window-title--desktop">EaAgri • Video Demo Vấn Đề &amp; Giải Pháp Đột Phá</span>
-              <span className="window-title--mobile">Video Giải Pháp</span>
-            </span> */}
-            {/* <span className="problem-solution__status-pill">
-              <span className="live-dot" /> Live Video
-            </span> */}
-          </div>
-
-          {/* Video Player Container với Custom Controls đồng bộ */}
-          <div
+        {/* Video Player Container với Custom Controls đồng bộ */}
+        <div
             ref={containerRef}
             className={`problem-solution__video-container ${!isPlaying ? "problem-solution__video-container--paused" : ""}`}
             onClick={togglePlay}
@@ -202,7 +215,10 @@ export default function ProblemSolutionSection({
               preload="metadata"
               onTimeUpdate={handleTimeUpdate}
               onLoadedMetadata={handleLoadedMetadata}
-              onPlay={() => setIsPlaying(true)}
+              onPlay={() => {
+                hasPlayedRef.current = true;
+                setIsPlaying(true);
+              }}
               onPause={() => setIsPlaying(false)}
             />
 
@@ -309,7 +325,6 @@ export default function ProblemSolutionSection({
                 </div>
               </div>
             </div>
-          </div>
         </div>
       </div>
     </section>

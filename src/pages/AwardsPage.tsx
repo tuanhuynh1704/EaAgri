@@ -1,4 +1,3 @@
-import { useEffect } from "react";
 import { Link } from "react-router-dom";
 import { useSEO } from "../hooks/useSEO";
 import { AWARDS_LIST, AWARDS_PATH, awardPath } from "../data/awards";
@@ -51,10 +50,6 @@ export default function AwardsPage() {
       "url": `https://www.eaagri.vn${AWARDS_PATH}`,
     },
   });
-
-  useEffect(() => {
-    window.scrollTo({ top: 0, behavior: "instant" });
-  }, []);
 
   const upcomingEvent = getUpcomingEvent();
 

@@ -66,15 +66,19 @@ const teamMembers: TeamMember[] = [
       },
       {
         title: "Giải Khuyến khích – Khoa học dữ liệu 2026",
-        desc: "Dự án phân tích bán lẻ tích hợp AI Agent và dự báo thông minh · Khoa CNTT",
+        desc: "Khoa Công nghệ Thông tin, Trường Đại học Nguyễn Tất Thành",
       },
       {
-        title: "Á quân & Đội thi được yêu thích nhất",
-        desc: "Dự án khởi nghiệp đổi mới sáng tạo ứng dụng công nghệ số",
+        title: "Giải Khuyến khích – Kỹ thuật phần mềm 2026",
+        desc: "Khoa Công nghệ Thông tin, Trường Đại học Nguyễn Tất Thành",
       },
+      // {
+      //   title: "Á quân & Đội thi được yêu thích nhất",
+      //   desc: "Dự án khởi nghiệp đổi mới sáng tạo ứng dụng công nghệ số",
+      // },
     ],
     avatar: "/images/webp/Huy-CEO.webp",
-    avatarPosition: "40% 15%",
+    avatarPosition: "42% 15%",
     themeColor: "green",
     topIcon: "ri-shield-star-line",
     roleIcon: "ri-vip-crown-fill",
@@ -125,14 +129,19 @@ const teamMembers: TeamMember[] = [
       },
       {
         title: "Giải Khuyến khích – Khoa học dữ liệu 2026",
-        desc: "Dự án phân tích bán lẻ tích hợp AI Agent và dự báo thông minh · Khoa CNTT",
+        desc: "Khoa Công nghệ Thông tin, Trường Đại học Nguyễn Tất Thành",
       },
       {
-        title: "Á quân & Đội thi được yêu thích nhất",
-        desc: "Dự án khởi nghiệp đổi mới sáng tạo ứng dụng công nghệ số",
+        title: "Giải Khuyến khích – Kỹ thuật phần mềm 2026",
+        desc: "Khoa Công nghệ Thông tin, Trường Đại học Nguyễn Tất Thành",
       },
+      // {
+      //   title: "Á quân & Đội thi được yêu thích nhất",
+      //   desc: "Dự án khởi nghiệp đổi mới sáng tạo ứng dụng công nghệ số",
+      // },
     ],
-    avatar: "/images/webp/giang-1.webp",
+    avatar: "/images/webp/Giảng.webp",
+    avatarPosition: "40% 70%",
     themeColor: "blue",
     topIcon: "ri-brain-line",
     roleIcon: "ri-user-fill",
@@ -169,14 +178,19 @@ const teamMembers: TeamMember[] = [
       },
       {
         title: "Giải Khuyến khích – Khoa học dữ liệu 2026",
-        desc: "Dự án phân tích bán lẻ tích hợp AI Agent và dự báo thông minh · Khoa CNTT",
+        desc: "Khoa Công nghệ Thông tin, Trường Đại học Nguyễn Tất Thành",
       },
       {
-        title: "Á quân & Đội thi được yêu thích nhất",
-        desc: "Dự án khởi nghiệp đổi mới sáng tạo ứng dụng công nghệ số",
+        title: "Giải Khuyến khích – Kỹ thuật phần mềm 2026",
+        desc: "Khoa Công nghệ Thông tin, Trường Đại học Nguyễn Tất Thành",
       },
+      // {
+      //   title: "Á quân & Đội thi được yêu thích nhất",
+      //   desc: "Dự án khởi nghiệp đổi mới sáng tạo ứng dụng công nghệ số",
+      // },
     ],
-    avatar: "/images/webp/chung-1.webp",
+    avatar: "/images/webp/Chung_3.webp",
+    avatarPosition: "60% 50%",
     themeColor: "purple",
     topIcon: "ri-code-s-slash-line",
     roleIcon: "ri-user-fill",
@@ -204,12 +218,13 @@ const teamMembers: TeamMember[] = [
         title: "Giải Khuyến khích – Kỹ thuật phần mềm 2026",
         desc: "Dự án quản lí thông tin, lên lịch học và tóm tắt, chấm bài thi, báo cáo thông minh · Khoa CNTT",
       },
-      {
-        title: "Á quân & Đội thi được yêu thích nhất",
-        desc: "Dự án khởi nghiệp đổi mới sáng tạo ứng dụng công nghệ số",
-      },
+      // {
+      //   title: "Á quân & Đội thi được yêu thích nhất",
+      //   desc: "Dự án khởi nghiệp đổi mới sáng tạo ứng dụng công nghệ số",
+      // },
     ],
-    avatar: "/images/webp/tuan1.webp",
+    avatar: "/images/webp/Tuấn.webp",
+    avatarPosition: "45% 10%",
     themeColor: "orange",
     topIcon: "ri-megaphone-line",
     roleIcon: "ri-user-fill",
@@ -307,10 +322,10 @@ export default function CoreTeamSection() {
       <div className="team-showcase__container">
         {/* CORE TEAM: ĐỘI NGŨ VẬN HÀNH */}
         <div className="team-showcase__header" data-aos="fade-up">
-          <span className="team-showcase__label">
+          {/* <span className="team-showcase__label">
             <span className="team-showcase__status-dot"></span>
             BAN ĐIỀU HÀNH &amp; KỸ THUẬT
-          </span>
+          </span> */}
           <h2 className="team-showcase__title">
             Đội Ngũ <span className="team-showcase__title-highlight">Vận Hành</span>
           </h2>

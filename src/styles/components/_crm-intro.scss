@@ -29,28 +29,8 @@
 
 .crm__compact-card {
   position: relative;
-  background: linear-gradient(135deg, rgba(255, 255, 255, 0.96) 0%, rgba(240, 253, 244, 0.9) 100%);
-  border: 1.5px solid rgba(16, 185, 129, 0.28);
-  border-radius: 24px;
-  // padding: clamp(2rem, 4vw, 3rem) clamp(1.5rem, 4vw, 2.8rem);
-  padding: 10px;
-  box-shadow: 0 16px 36px rgba(16, 110, 76, 0.08), 0 0 0 1px rgba(255, 255, 255, 0.9);
-  backdrop-filter: blur(12px);
-  -webkit-backdrop-filter: blur(12px);
+  padding: clamp(1rem, 2vw, 1.5rem) 0;
   text-align: center;
-  overflow: hidden;
-
-  &::after {
-    content: "";
-    position: absolute;
-    top: -50px;
-    right: -50px;
-    width: 220px;
-    height: 220px;
-    border-radius: 50%;
-    background: radial-gradient(circle, rgba(16, 185, 129, 0.16), transparent 70%);
-    pointer-events: none;
-  }
 }
 
 .crm__badge {
@@ -69,10 +49,6 @@
   margin-bottom: 1rem;
   box-shadow: 0 4px 12px rgba(16, 185, 129, 0.08);
 
-  i {
-    font-size: 0.95rem;
-    color: #10b981;
-  }
 }
 
 .crm__title {
@@ -130,37 +106,6 @@
     border-color: rgba(16, 185, 129, 0.4);
   }
 
-  .highlight-icon {
-    width: 44px;
-    height: 44px;
-    border-radius: 12px;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    font-size: 1.35rem;
-    flex-shrink: 0;
-
-    &--emerald {
-      background: rgba(16, 185, 129, 0.12);
-      color: #059669;
-    }
-
-    &--blue {
-      background: rgba(14, 165, 233, 0.12);
-      color: #0284c7;
-    }
-
-    &--purple {
-      background: rgba(168, 85, 247, 0.12);
-      color: #9333ea;
-    }
-
-    &--orange {
-      background: rgba(249, 115, 22, 0.12);
-      color: #ea580c;
-    }
-  }
-
   .highlight-text {
     strong {
       display: block;
@@ -205,11 +150,6 @@
     box-shadow: 0 8px 24px rgba(16, 185, 129, 0.35), inset 0 1px 0 rgba(255, 255, 255, 0.3);
     border: 1px solid rgba(255, 255, 255, 0.3);
 
-    i {
-      font-size: 1.15rem;
-      transition: transform 0.25s ease;
-    }
-
     .crm__btn-badge {
       font-size: 0.74rem;
       padding: 0.18rem 0.65rem;
@@ -225,9 +165,6 @@
       background: linear-gradient(135deg, #059669 0%, #047857 100%);
       color: #ffffff;
 
-      i {
-        transform: translate(2px, -2px);
-      }
     }
   }
 }
@@ -247,16 +184,10 @@
   }
 
   .crm__highlight-item {
-    flex-direction: row;
-    align-items: flex-start;
-    gap: 1rem;
+    flex-direction: column;
+    align-items: stretch;
+    gap: 0;
     padding: 1.1rem 1rem;
-
-    .highlight-icon {
-      width: 40px;
-      height: 40px;
-      font-size: 1.2rem;
-    }
   }
 
   .crm__btn {
