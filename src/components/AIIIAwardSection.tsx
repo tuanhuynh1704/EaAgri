@@ -88,8 +88,7 @@ export default function AIIIAwardSection() {
                 controls
                 playsInline
                 preload="metadata"
-              muted={false}
-              defaultMuted={false}
+                muted={false}
                 poster="/assets/best-student-paper-award.webp"
                 aria-label="Video khoảnh khắc nhóm EaAgri nhận giải tại AIIA 2026"
               >
