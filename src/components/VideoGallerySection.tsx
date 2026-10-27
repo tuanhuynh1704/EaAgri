@@ -51,7 +51,7 @@ export default function VideoGallerySection() {
   const promoMode = isMobile ? "9x16" : "16x9";
   const promoVideoSrc = isMobile
     ? "/assets/EaAgri_Promo_45s_9x16_mobile.mp4"
-    : "/Video/GIOITHIEU.mp4";
+    : "/Video/EaAgri_Promo_45s_9x16_pc.mp4";
   const posterSrc = isMobile
     ? "/Video/promo_9x16_poster.webp"
     : "/Video/promo_16x9_poster.webp";

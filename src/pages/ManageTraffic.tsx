@@ -346,6 +346,31 @@ export default function ManageTraffic() {
     return logs;
   }, [logs, sourceFilter]);
 
+  // A signed-in person may use several devices and networks. Present one account row
+  // while retaining the combined device/IP details for admins.
+  const groupedScopedLogs = useMemo(() => {
+    const groups = new Map<string, VisitorLogItem>();
+    for (const log of scopedLogs) {
+      const key = log.is_authenticated && log.user_id
+        ? `user:${log.user_id}`
+        : `device:${log.device_id}`;
+      const existing = groups.get(key);
+      if (!existing) {
+        groups.set(key, { ...log, ip_address: log.ip_address || "" });
+        continue;
+      }
+      const ips = new Set([...(existing.ip_address || "").split(", "), log.ip_address].filter(Boolean));
+      const devices = new Set([...(existing.os || "").split(" • "), log.os].filter(Boolean));
+      existing.ip_address = [...ips].join(", ");
+      existing.os = [...devices].join(" • ");
+      existing.visit_count = (existing.visit_count || 0) + (log.visit_count || 0);
+      existing.first_visit = new Date(existing.first_visit) < new Date(log.first_visit) ? existing.first_visit : log.first_visit;
+      existing.last_visit = new Date(existing.last_visit) > new Date(log.last_visit) ? existing.last_visit : log.last_visit;
+      existing.is_online = existing.is_online || log.is_online;
+    }
+    return [...groups.values()];
+  }, [scopedLogs]);
+
   // Compute statistics dynamically based on current scope
   const stats = useMemo(() => {
     const totalVisits = scopedLogs.reduce((acc, curr) => acc + (curr.visit_count || 1), 0);
@@ -355,12 +380,12 @@ export default function ManageTraffic() {
 
     // Today's visits
     const todayStr = new Date().toDateString();
-    const todayVisits = scopedLogs
-      .filter((l) => new Date(l.last_visit).toDateString() === todayStr)
-      .reduce((acc, curr) => acc + (curr.visit_count || 1), 0);
+    const todayVisits = historyLogs.length
+      ? historyLogs.filter((event) => (event.action === "pageview" || !event.action) && new Date(event.created_at).toDateString() === todayStr && (sourceFilter !== "Real" || event.is_real !== false) && (sourceFilter !== "Bot" || event.is_bot === true)).length
+      : scopedLogs.filter((l) => new Date(l.last_visit).toDateString() === todayStr).length;
 
     // Auth breakdown inside scope
-    const membersCount = scopedLogs.filter((l) => l.is_authenticated === true).length;
+    const membersCount = new Set(scopedLogs.filter((l) => l.is_authenticated).map((l) => l.user_id || l.user_email || l.device_id)).size;
     const guestsCount = scopedLogs.filter((l) => !l.is_authenticated).length;
 
     // Device breakdown
@@ -433,11 +458,11 @@ export default function ManageTraffic() {
       topBrowsers,
       topPages,
     };
-  }, [scopedLogs]);
+  }, [scopedLogs, historyLogs, sourceFilter]);
 
   // Filtered devices list for recent activity table
   const filteredLogs = useMemo(() => {
-    return scopedLogs.filter((log) => {
+    return groupedScopedLogs.filter((log) => {
       const matchDevice = deviceFilter === "All" || log.device_type === deviceFilter;
       const matchAuth =
         authFilter === "All" ||
@@ -461,7 +486,7 @@ export default function ManageTraffic() {
 
       return matchDevice && matchAuth && matchSearch;
     });
-  }, [scopedLogs, deviceFilter, authFilter, searchQuery]);
+  }, [groupedScopedLogs, deviceFilter, authFilter, searchQuery]);
 
   // Action: Purge bot / crawler logs from Database & Local
   const handlePurgeBots = async () => {
@@ -1023,7 +1048,7 @@ export default function ManageTraffic() {
               <div className="hero-metric-item__text">
                 <span className="hero-metric-item__lbl">Lượt xem hôm nay</span>
                 <strong className="hero-metric-item__val text-gold">{stats.todayVisits} lượt</strong>
-                <span className="hero-metric-item__sub">Trong 24 giờ qua</span>
+                <span className="hero-metric-item__sub">Từ 00:00 hôm nay</span>
               </div>
             </div>
 
@@ -1298,7 +1323,7 @@ export default function ManageTraffic() {
           >
             <i className="ri-computer-line" />
             <span>Quản Lý Thiết Bị & Lưu Lượng</span>
-            <span className="traffic-tab-badge">{scopedLogs.length}</span>
+            <span className="traffic-tab-badge">{groupedScopedLogs.length}</span>
           </button>
 
           <button
@@ -1334,7 +1359,7 @@ export default function ManageTraffic() {
                   className={`filter-pill ${deviceFilter === "All" ? "filter-pill--active" : ""}`}
                   onClick={() => setDeviceFilter("All")}
                 >
-                  Tất cả máy ({scopedLogs.length} máy • {stats.totalVisits} lượt)
+                  Tất cả máy ({groupedScopedLogs.length} nhóm • {stats.totalVisits} lượt)
                 </button>
                 <button
                   type="button"
@@ -1587,7 +1612,7 @@ export default function ManageTraffic() {
 
             <div className="recent-devices-card__footer">
               <span>
-                Đang hiển thị <strong>{filteredLogs.length}</strong> / <strong>{scopedLogs.length}</strong> thiết bị{" "}
+                Đang hiển thị <strong>{filteredLogs.length}</strong> / <strong>{groupedScopedLogs.length}</strong> nhóm thiết bị / tài khoản{" "}
                 {sourceFilter === "Real"
                   ? "(100% thiết bị thật)"
                   : sourceFilter === "Sample"

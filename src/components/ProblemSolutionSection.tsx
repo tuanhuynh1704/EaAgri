@@ -193,7 +193,7 @@ export default function ProblemSolutionSection({
           >
             <video
               ref={videoRef}
-              src="/assets/van-de-giai-phap-dot-pha.mp4"
+              src="/Video/GIOITHIEU.mp4"
               className="problem-solution__video"
               autoPlay
               loop
