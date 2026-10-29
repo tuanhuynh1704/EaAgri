@@ -1,4 +1,6 @@
-import { lazy, Suspense, useMemo, useRef, useState, useEffect, type CSSProperties, type MouseEvent } from "react";
+import { lazy, Suspense, useMemo, useRef,
+  // useState,
+  useEffect, type CSSProperties, type MouseEvent } from "react";
 
 // three.js (~600 KB) chunk preloads in parallel without blocking initial paint
 const EaAgriDurianPromise = import("./eaagri-3d/EaAgriDurian");
