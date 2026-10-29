@@ -134,9 +134,9 @@ export default function AIIIAwardSection() {
           <h2 id="aiia-award-title">
             Nghiên cứu EaAgri được vinh danh <span>Best Student Paper</span>
           </h2>
-          <p className="aiia-award__lead">
+          {/* <p className="aiia-award__lead">
             Công trình nghiên cứu kết hợp thị giác máy tính và RAG để hỗ trợ khuyến nghị bệnh sầu riêng theo định hướng VietGAP.
-          </p>
+          </p> */}
 
           <div className="aiia-award__paper">
             <span className="aiia-award__paper-label">CÔNG TRÌNH ĐƯỢC VINH DANH</span>
@@ -151,7 +151,16 @@ export default function AIIIAwardSection() {
           </div>
 
           <a className="aiia-award__link" href={articleUrl} target="_blank" rel="noopener noreferrer">
-            Đọc bài viết tại<span aria-hidden="true">↗</span>
+            Đọc bài viết tại
+            <svg
+              xmlns="http://www.w3.org/2000/svg"
+              width="24"
+              height="24"
+              viewBox="0 -960 960 960"
+              fill="currentColor"
+            >
+              <path d="M240-240 184-296 608-720H360v-80h384v384h-80v-248L240-240Z" />
+            </svg>
           </a>
         </div>
       </div>

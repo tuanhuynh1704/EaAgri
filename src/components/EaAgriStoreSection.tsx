@@ -35,7 +35,7 @@ export default function EaAgriStoreSection() {
 
           {/* Short Description */}
           <p className="store__desc">
-            Sàn thương mại điện tử kết nối trực tiếp nhà nông với hơn <strong>100+ đại lý vật tư uy tín</strong> tại Tây Nguyên và miền Tây.
+            Sàn thương mại điện tử kết nối trực tiếp nhà nông với hơn <strong>100+ đại lý vật tư uy tín</strong> tại Tây Nguyên.
             Cung cấp phân bón, thuốc BVTV sinh học, hạt giống và dinh dưỡng cây trồng chính hãng, giao tận vườn cùng đội ngũ kỹ sư đồng hành 24/7.
           </p>
 

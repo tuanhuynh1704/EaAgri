@@ -186,9 +186,9 @@ export default function ProblemSolutionSection({
         <h2 className="problem-solution__title">
           Vấn Đề & <span className="highlight">Giải Pháp Đột Phá</span>
         </h2>
-        <p className="problem-solution__lead">
+        {/* <p className="problem-solution__lead">
           EaAgri giải mã <strong>"Tứ giác rủi ro"</strong> bằng hệ sinh thái Nông nghiệp Thông minh toàn diện tích hợp <strong>IoT & Trí tuệ nhân tạo (AI)</strong>.
-        </p>
+        </p> */}
       </div>
 
       {/* Centered Large Video Showcase */}

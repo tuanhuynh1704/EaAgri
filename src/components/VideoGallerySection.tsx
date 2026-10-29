@@ -1,6 +1,6 @@
 import { useState, useEffect } from "react";
 import { createPortal } from "react-dom";
-import { triggerPromoVideo } from "./PromoVideoModal";
+// import { triggerPromoVideo } from "./PromoVideoModal";
 
 interface VideoItem {
   title: string;
@@ -50,8 +50,8 @@ export default function VideoGallerySection() {
 
   const promoMode = isMobile ? "9x16" : "16x9";
   const promoVideoSrc = isMobile
-    ? "/assets/EaAgri_Promo_45s_9x16.mp4"
-    : "/Video/EaAgri_Promo_45s_9x16.mp4";
+    ? "/Video/EaAgri_Promo_45s_9x16.mp4"
+    : "/Video/EaAgri_Promo_45s_16x9.mp4";
   const posterSrc = isMobile
     ? "/Video/promo_9x16_poster.webp"
     : "/Video/promo_16x9_poster.webp";
@@ -114,6 +114,8 @@ export default function VideoGallerySection() {
 
   return (
     <section className="section__container video-gallery__container">
+      {/* Dynamic Background Aurora */}
+      <div className="problem-solution__aurora-bg problem-solution__aurora-bg--emerald" />
       <div className="video-gallery__header" data-aos="fade-down">
         {/* <span className="video-gallery__tag">
           <i className="ri-play-circle-line"></i> THƯ VIỆN TRUYỀN THÔNG
@@ -121,13 +123,13 @@ export default function VideoGallerySection() {
         <h2 className="video-gallery__title">
           Video & <span className="highlight">Trải Nghiệm Thực Tế</span>
         </h2>
-        <p className="video-gallery__subtitle">
+        {/* <p className="video-gallery__subtitle">
           Tìm hiểu câu chuyện phát triển dự án và xem quá trình vận hành trực quan của EaAgri.
-        </p>
+        </p> */}
       </div>
 
       {/* Featured Spotlight Promo Video (Side-by-Side: Video bên trái • Chữ bên phải, Không khung hộp) */}
-      <div className="video-gallery__spotlight video-gallery__spotlight--split" data-aos="fade-up" data-aos-delay="100">
+      <div className="video-gallery__spotlight" data-aos="fade-up" data-aos-delay="100">
         {/* Cột Trái: Trình phát Video tương tác trực tiếp */}
         <div 
           className={`video-gallery__spotlight-media video-gallery__spotlight-media--${promoMode}`}
@@ -144,7 +146,7 @@ export default function VideoGallerySection() {
         </div>
 
         {/* Cột Phải: Thông tin cô đọng, súc tích */}
-        <div className="video-gallery__spotlight-info">
+        {/* <div className="video-gallery__spotlight-info">
           <div className="spotlight-header-meta">
             <span className="spotlight-chip">
               <i className="ri-sparkling-fill" /> TIÊU ĐIỂM DỰ ÁN
@@ -185,7 +187,7 @@ export default function VideoGallerySection() {
               <span>Xem Phóng To Rạp Chiếu (45s)</span>
             </button>
           </div>
-        </div>
+        </div> */}
       </div>
 
       {/* Section Divider */}

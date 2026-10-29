@@ -6,11 +6,11 @@ const resultImages = [
   { src: "/assets/anhthucte3", label: "Phân tích tại vườn", icon: "ri-leaf-line" },
 ];
 
-const stats = [
-  { value: "24/7", label: "Hoạt động liên tục", note: "Hệ thống trực tuyến", icon: "ri-pulse-line" },
-  { value: "< 2s", label: "Độ trễ phản hồi", note: "Dữ liệu thời gian thực", icon: "ri-flashlight-line" },
-  { value: "< 5%", label: "Sai số dự báo giá", note: "Mô hình đã kiểm chứng", icon: "ri-line-chart-line" },
-];
+// const stats = [
+//   { value: "24/7", label: "Hoạt động liên tục", note: "Hệ thống trực tuyến", icon: "ri-pulse-line" },
+//   { value: "< 2s", label: "Độ trễ phản hồi", note: "Dữ liệu thời gian thực", icon: "ri-flashlight-line" },
+//   { value: "< 5%", label: "Sai số dự báo giá", note: "Mô hình đã kiểm chứng", icon: "ri-line-chart-line" },
+// ];
 
 const ResultSection = () => (
   <section className="section__container download__container result-section" data-aos="fade-up">
@@ -23,7 +23,7 @@ const ResultSection = () => (
       </p>
     </header>
 
-    <div className="result__stats">
+    {/* <div className="result__stats">
       {stats.map((stat) => (
         <article className="stat__card" key={stat.label}>
           <span className="stat__icon"><i className={stat.icon} /></span>
@@ -35,7 +35,7 @@ const ResultSection = () => (
           <span className="stat__status"><i /> LIVE</span>
         </article>
       ))}
-    </div>
+    </div> */}
 
     <div className="result__gallery">
       {resultImages.map((image, index) => (

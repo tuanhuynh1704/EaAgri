@@ -6,22 +6,22 @@ const EaAgriDurian = lazy(() => EaAgriDurianPromise);
 import { triggerAppStoreNotice } from "./AppStoreNoticeModal";
 import { triggerPromoVideo } from "./PromoVideoModal";
 
-const ROTATING_HIGHLIGHTS = [
-  { text: "thông minh", tag: "AI • IOT" },
-  { text: "sạch sâu bệnh", tag: "YOLOv9 DETECT" },
-  { text: "chuẩn VietGAP", tag: "VIETGAP 2026" },
-  { text: "tối ưu năng suất", tag: "HIGH YIELD" },
-];
+// const ROTATING_HIGHLIGHTS = [
+//   { text: "thông minh", tag: "AI • IOT" },
+//   { text: "sạch sâu bệnh", tag: "YOLOv9 DETECT" },
+//   { text: "chuẩn VietGAP", tag: "VIETGAP 2026" },
+//   { text: "tối ưu năng suất", tag: "HIGH YIELD" },
+// ];
 
 const Hero = () => {
-  const [highlightIndex, setHighlightIndex] = useState(0);
+  // const [highlightIndex, setHighlightIndex] = useState(0);
 
-  useEffect(() => {
-    const timer = setInterval(() => {
-      setHighlightIndex((prev) => (prev + 1) % ROTATING_HIGHLIGHTS.length);
-    }, 3200);
-    return () => clearInterval(timer);
-  }, []);
+  // useEffect(() => {
+  //   const timer = setInterval(() => {
+  //     setHighlightIndex((prev) => (prev + 1) % ROTATING_HIGHLIGHTS.length);
+  //   }, 3200);
+  //   return () => clearInterval(timer);
+  // }, []);
 
   const fallingLeaves = useMemo(() => (
     Array.from({ length: 5 }, (_, index) => { // Giảm số lượng lá rơi (~35%)
@@ -238,7 +238,7 @@ const Hero = () => {
         {/* RIGHT COLUMN: Heading, Subtext, App links, Key Stats & Social Proof */}
         <div className="hero__content" data-aos="fade-up">
           {/* Green Pill Badge with Live Radar Pulse */}
-          <div className="hero-badge" data-aos="fade-right" data-aos-delay="100">
+          {/* <div className="hero-badge" data-aos="fade-right" data-aos-delay="100">
             <span className="hero-badge__pulse-wrap" aria-hidden="true">
               <span className="hero-badge__pulse-sonar" />
               <span className="hero-badge__pulse-dot" />
@@ -249,7 +249,7 @@ const Hero = () => {
               <span className="hero-badge__live-dot" aria-hidden="true" />
               LIVE AI
             </span>
-          </div>
+          </div> */}
 
           <h1 className="hero-title">
             <span className="text-ea-agri" data-text="Ea Agri">
@@ -257,7 +257,7 @@ const Hero = () => {
               <span className="text-ea-agri__light-beam" aria-hidden="true" />
             </span>
             <span className="text-sub text-gray">Trợ lý cây sầu riêng</span>
-            <span className="text-sub text-sub--accent">
+            {/* <span className="text-sub text-sub--accent">
               <span className="rotating-word-box">
                 <span key={highlightIndex} className="rotating-word-item">
                   {ROTATING_HIGHLIGHTS[highlightIndex].text}
@@ -266,7 +266,7 @@ const Hero = () => {
               <small key={`tag-${highlightIndex}`} className="tech-chip-animated">
                 <i className="ri-flashlight-fill" /> {ROTATING_HIGHLIGHTS[highlightIndex].tag}
               </small>
-            </span>
+            </span> */}
           </h1>
 
           <p className="hero-description">
@@ -333,10 +333,10 @@ const Hero = () => {
 
       {/* Floating Live Tech Marquee Ticker Bar at Bottom */}
       <div className="hero-bottom-ticker-bar" onClick={scrollToNextSection}>
-        <div className="ticker-label">
+        {/* <div className="ticker-label">
           <span className="ticker-live-dot"></span>
           <span>HỆ SINH THÁI 4.0</span>
-        </div>
+        </div> */}
         <div className="ticker-marquee-track">
           <div className="ticker-marquee-content">
             <span><i className="ri-radar-fill"></i> Viễn thám vệ tinh Sentinel-2</span>
