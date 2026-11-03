@@ -12,7 +12,7 @@ import AppStoreNoticeModal from "./components/AppStoreNoticeModal";
 import PromoVideoModal from "./components/PromoVideoModal";
 import { AuthProvider } from "./context/AuthContext";
 import { VoteProvider } from "./context/VoteContext";
-import { usePauseOffscreenAnimations } from "./hooks/usePauseOffscreenAnimations";
+// import { usePauseOffscreenAnimations } from "./hooks/usePauseOffscreenAnimations";
 import { recordVisitorHit } from "./services/visitorTracker";
 
 function RouteFallback() {
@@ -28,7 +28,7 @@ function App() {
   const isAuthPage = pathname === "/login" || pathname === "/register";
   const isAdminPage = pathname.startsWith("/admin");
 
-  usePauseOffscreenAnimations();
+  // usePauseOffscreenAnimations();
 
   useEffect(() => {
     if ('scrollRestoration' in window.history) {
