@@ -1,4 +1,3 @@
-import { useEffect } from "react";
 import { useSEO } from "../hooks/useSEO";
 import VideoSection from "../components/VideoSection";
 import StoryFeatureSection from "../components/StoryFeatureSection";
@@ -29,10 +28,6 @@ export default function ArchitecturePage() {
         }
     });
 
-    useEffect(() => {
-        window.scrollTo(0, 0);
-    }, []);
-
     return (
         <div className="architecture-page section-bg--gradient-soft">
             <section className="architecture-tech-hero section__container" data-aos="fade-up">
@@ -56,7 +51,7 @@ export default function ArchitecturePage() {
                 <div className="architecture-tech-hero__visual">
                     <span className="architecture-tech-hero__glow" aria-hidden="true"></span>
                     <img
-                        src="/Cây 2.webp"
+                        src="/images-1/Cây 2.webp"
                         alt="Mô hình cây sầu riêng ứng dụng IoT và AI của Ea Agri"
                     />
                     <span className="architecture-tech-hero__status">

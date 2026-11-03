@@ -127,7 +127,7 @@ const Navbar = () => {
               handleHome();
             }}
           >
-            <i className="ri-home-5-line nav__link-icon"></i>
+            {/* <i className="ri-home-5-line nav__link-icon"></i> */}
             <span className="nav__link-text">Trang chủ</span>
           </a>
 
@@ -139,7 +139,7 @@ const Navbar = () => {
               navigate("/kien-truc");
             }}
           >
-            <i className="ri-layout-grid-line nav__link-icon"></i>
+            {/* <i className="ri-layout-grid-line nav__link-icon"></i> */}
             <span className="nav__link-text">Kiến trúc</span>
           </a>
 
@@ -151,7 +151,7 @@ const Navbar = () => {
               handleAwards();
             }}
           >
-            <i className="ri-trophy-line nav__link-icon"></i>
+            {/* <i className="ri-trophy-line nav__link-icon"></i> */}
             <span className="nav__link-text">Giải thưởng</span>
           </a>
 
@@ -163,7 +163,7 @@ const Navbar = () => {
               handleNew();
             }}
           >
-            <i className="ri-article-line nav__link-icon"></i>
+            {/* <i className="ri-article-line nav__link-icon"></i> */}
             <span className="nav__link-text">Tin tức</span>
           </a>
 
@@ -174,7 +174,7 @@ const Navbar = () => {
             className="nav__link nav__link--crm"
             title="Nền tảng Quản trị & Bán hàng EaAgri CRM (crm.eaagri.vn)"
           >
-            <i className="ri-building-4-line nav__link-icon"></i>
+            {/* <i className="ri-building -4-line nav__link-icon"></i> */}
             <span className="nav__link-text">Hệ thống CRM</span>
             <i className="ri-arrow-right-up-line nav__link-ext"></i>
           </a>
@@ -303,7 +303,7 @@ const Navbar = () => {
             </div>
           ) : (
             <button className="btn btn--login" onClick={handleLogin}>
-              <i className="ri-user-line"></i>
+              {/* <i className="ri-user-line"></i> */}
               <span>Đăng nhập</span>
             </button>
           )}

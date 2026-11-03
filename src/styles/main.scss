@@ -7,6 +7,7 @@
 @use "./base/global";
 
 @use "./components/navbar";
+@use "./components/introduce-article";
 @use "./components/splash-intro";
 @use "./components/hero";
 @use "./components/durian-scanner";
@@ -17,6 +18,7 @@
 @use "./pages/awards-page";
 @use "./components/logo-marquee";
 @use "./components/problem-solution";
+@use "./components/aiia-award";
 @use "./components/video-gallery";
 @use "./components/crm-intro";
 @use "./components/store-intro";

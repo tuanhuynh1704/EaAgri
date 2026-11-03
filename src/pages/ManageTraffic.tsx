@@ -346,6 +346,31 @@ export default function ManageTraffic() {
     return logs;
   }, [logs, sourceFilter]);
 
+  // A signed-in person may use several devices and networks. Present one account row
+  // while retaining the combined device/IP details for admins.
+  const groupedScopedLogs = useMemo(() => {
+    const groups = new Map<string, VisitorLogItem>();
+    for (const log of scopedLogs) {
+      const key = log.is_authenticated && log.user_id
+        ? `user:${log.user_id}`
+        : `device:${log.device_id}`;
+      const existing = groups.get(key);
+      if (!existing) {
+        groups.set(key, { ...log, ip_address: log.ip_address || "" });
+        continue;
+      }
+      const ips = new Set([...(existing.ip_address || "").split(", "), log.ip_address].filter(Boolean));
+      const devices = new Set([...(existing.os || "").split(" • "), log.os].filter(Boolean));
+      existing.ip_address = [...ips].join(", ");
+      existing.os = [...devices].join(" • ");
+      existing.visit_count = (existing.visit_count || 0) + (log.visit_count || 0);
+      existing.first_visit = new Date(existing.first_visit) < new Date(log.first_visit) ? existing.first_visit : log.first_visit;
+      existing.last_visit = new Date(existing.last_visit) > new Date(log.last_visit) ? existing.last_visit : log.last_visit;
+      existing.is_online = existing.is_online || log.is_online;
+    }
+    return [...groups.values()];
+  }, [scopedLogs]);
+
   // Compute statistics dynamically based on current scope
   const stats = useMemo(() => {
     const totalVisits = scopedLogs.reduce((acc, curr) => acc + (curr.visit_count || 1), 0);
@@ -355,12 +380,12 @@ export default function ManageTraffic() {
 
     // Today's visits
     const todayStr = new Date().toDateString();
-    const todayVisits = scopedLogs
-      .filter((l) => new Date(l.last_visit).toDateString() === todayStr)
-      .reduce((acc, curr) => acc + (curr.visit_count || 1), 0);
+    const todayVisits = historyLogs.length
+      ? historyLogs.filter((event) => (event.action === "pageview" || !event.action) && new Date(event.created_at).toDateString() === todayStr && (sourceFilter !== "Real" || event.is_real !== false) && (sourceFilter !== "Bot" || event.is_bot === true)).length
+      : scopedLogs.filter((l) => new Date(l.last_visit).toDateString() === todayStr).length;
 
     // Auth breakdown inside scope
-    const membersCount = scopedLogs.filter((l) => l.is_authenticated === true).length;
+    const membersCount = new Set(scopedLogs.filter((l) => l.is_authenticated).map((l) => l.user_id || l.user_email || l.device_id)).size;
     const guestsCount = scopedLogs.filter((l) => !l.is_authenticated).length;
 
     // Device breakdown
@@ -433,11 +458,11 @@ export default function ManageTraffic() {
       topBrowsers,
       topPages,
     };
-  }, [scopedLogs]);
+  }, [scopedLogs, historyLogs, sourceFilter]);
 
   // Filtered devices list for recent activity table
   const filteredLogs = useMemo(() => {
-    return scopedLogs.filter((log) => {
+    return groupedScopedLogs.filter((log) => {
       const matchDevice = deviceFilter === "All" || log.device_type === deviceFilter;
       const matchAuth =
         authFilter === "All" ||
@@ -461,7 +486,7 @@ export default function ManageTraffic() {
 
       return matchDevice && matchAuth && matchSearch;
     });
-  }, [scopedLogs, deviceFilter, authFilter, searchQuery]);
+  }, [groupedScopedLogs, deviceFilter, authFilter, searchQuery]);
 
   // Action: Purge bot / crawler logs from Database & Local
   const handlePurgeBots = async () => {
@@ -936,31 +961,6 @@ export default function ManageTraffic() {
                 title={`Dữ liệu mẫu: ${100 - globalSummary.realDevicePercent}%`}
               />
             </div>
-
-            {/* Dải thống kê nhanh lượt truy cập theo 3 loại thiết bị */}
-            <div className="traffic-purity-banner__device-pills">
-              <span
-                className={`purity-device-chip ${deviceFilter === "Desktop" ? "purity-device-chip--active" : ""}`}
-                onClick={() => setDeviceFilter(deviceFilter === "Desktop" ? "All" : "Desktop")}
-                title="Lọc xem máy tính"
-              >
-                <i className="ri-computer-line" /> Máy tính: <strong>{stats.devices.Desktop.visits} lượt</strong> ({stats.devices.Desktop.count} máy • {stats.desktopPercent}%)
-              </span>
-              <span
-                className={`purity-device-chip purity-device-chip--mobile ${deviceFilter === "Mobile" ? "purity-device-chip--active" : ""}`}
-                onClick={() => setDeviceFilter(deviceFilter === "Mobile" ? "All" : "Mobile")}
-                title="Lọc xem điện thoại"
-              >
-                <i className="ri-smartphone-line" /> Điện thoại: <strong>{stats.devices.Mobile.visits} lượt</strong> ({stats.devices.Mobile.count} máy • {stats.mobilePercent}%)
-              </span>
-              <span
-                className={`purity-device-chip purity-device-chip--tablet ${deviceFilter === "Tablet" ? "purity-device-chip--active" : ""}`}
-                onClick={() => setDeviceFilter(deviceFilter === "Tablet" ? "All" : "Tablet")}
-                title="Lọc xem máy tính bảng"
-              >
-                <i className="ri-tablet-line" /> Tablet: <strong>{stats.devices.Tablet.visits} lượt</strong> ({stats.devices.Tablet.count} máy • {stats.tabletPercent}%)
-              </span>
-            </div>
           </div>
 
           {sourceFilter !== "Real" && (
@@ -1012,13 +1012,14 @@ export default function ManageTraffic() {
           <div className="traffic-hero-card__divider" />
 
           <div className="traffic-hero-card__metrics">
+            {/* 1. Tổng thiết bị riêng biệt */}
             <div className="hero-metric-item">
               <div className="hero-metric-item__icon hero-metric-item__icon--devices">
                 <i className={sourceFilter === "Real" ? "ri-shield-check-line" : "ri-computer-line"} />
               </div>
               <div className="hero-metric-item__text">
                 <span className="hero-metric-item__lbl">
-                  {sourceFilter === "Real" ? "Thiết bị thật" : "Số máy / Thiết bị"}
+                  {sourceFilter === "Real" ? "Thiết bị thật" : "Tổng số máy"}
                 </span>
                 <strong className="hero-metric-item__val">{stats.uniqueDevices} máy</strong>
                 <span className="hero-metric-item__sub">
@@ -1027,59 +1028,7 @@ export default function ManageTraffic() {
               </div>
             </div>
 
-            {/* 📱 THỐNG KÊ LƯỢT XEM ĐIỆN THOẠI */}
-            <div
-              className={`hero-metric-item hero-metric-item--clickable ${deviceFilter === "Mobile" ? "hero-metric-item--active" : ""}`}
-              onClick={() => setDeviceFilter(deviceFilter === "Mobile" ? "All" : "Mobile")}
-              title="Nhấn để lọc danh sách chỉ xem thiết bị Điện thoại"
-            >
-              <div className="hero-metric-item__icon hero-metric-item__icon--mobile">
-                <i className="ri-smartphone-line" />
-              </div>
-              <div className="hero-metric-item__text">
-                <span className="hero-metric-item__lbl">Lượt xem Điện thoại</span>
-                <strong className="hero-metric-item__val text-rose">
-                  {stats.devices.Mobile.visits.toLocaleString("vi-VN")} lượt
-                </strong>
-                <span className="hero-metric-item__sub">
-                  {stats.devices.Mobile.count} máy • {stats.mobilePercent}%
-                </span>
-              </div>
-            </div>
-
-            {/* 📟 THỐNG KÊ LƯỢT XEM TABLET */}
-            <div
-              className={`hero-metric-item hero-metric-item--clickable ${deviceFilter === "Tablet" ? "hero-metric-item--active" : ""}`}
-              onClick={() => setDeviceFilter(deviceFilter === "Tablet" ? "All" : "Tablet")}
-              title="Nhấn để lọc danh sách chỉ xem thiết bị Máy tính bảng (Tablet)"
-            >
-              <div className="hero-metric-item__icon hero-metric-item__icon--tablet">
-                <i className="ri-tablet-line" />
-              </div>
-              <div className="hero-metric-item__text">
-                <span className="hero-metric-item__lbl">Lượt xem Tablet</span>
-                <strong className="hero-metric-item__val text-cyan">
-                  {stats.devices.Tablet.visits.toLocaleString("vi-VN")} lượt
-                </strong>
-                <span className="hero-metric-item__sub">
-                  {stats.devices.Tablet.count} máy • {stats.tabletPercent}%
-                </span>
-              </div>
-            </div>
-
-            <div className="hero-metric-item">
-              <div className="hero-metric-item__icon hero-metric-item__icon--members">
-                <i className="ri-user-follow-line" />
-              </div>
-              <div className="hero-metric-item__text">
-                <span className="hero-metric-item__lbl">Đăng nhập / Khách</span>
-                <strong className="hero-metric-item__val">
-                  {stats.membersCount} mem / {stats.guestsCount} khách
-                </strong>
-                <span className="hero-metric-item__sub">Phân loại đối tượng</span>
-              </div>
-            </div>
-
+            {/* 2. Đang trực tuyến (Realtime) */}
             <div className="hero-metric-item">
               <div className="hero-metric-item__icon hero-metric-item__icon--online">
                 <i className="ri-radar-fill" />
@@ -1091,6 +1040,7 @@ export default function ManageTraffic() {
               </div>
             </div>
 
+            {/* 3. Lượt xem hôm nay */}
             <div className="hero-metric-item">
               <div className="hero-metric-item__icon hero-metric-item__icon--today">
                 <i className="ri-calendar-check-line" />
@@ -1098,7 +1048,59 @@ export default function ManageTraffic() {
               <div className="hero-metric-item__text">
                 <span className="hero-metric-item__lbl">Lượt xem hôm nay</span>
                 <strong className="hero-metric-item__val text-gold">{stats.todayVisits} lượt</strong>
-                <span className="hero-metric-item__sub">Trong 24 giờ qua</span>
+                <span className="hero-metric-item__sub">Từ 00:00 hôm nay</span>
+              </div>
+            </div>
+
+            {/* 4. Thành viên đã đăng nhập */}
+            <div
+              className={`hero-metric-item hero-metric-item--clickable ${authFilter === "Member" ? "hero-metric-item--active" : ""}`}
+              onClick={() => setAuthFilter(authFilter === "Member" ? "All" : "Member")}
+              title="Nhấn để lọc xem thành viên đã đăng nhập"
+            >
+              <div className="hero-metric-item__icon hero-metric-item__icon--members">
+                <i className="ri-user-star-line" />
+              </div>
+              <div className="hero-metric-item__text">
+                <span className="hero-metric-item__lbl">Đã đăng nhập</span>
+                <strong className="hero-metric-item__val text-emerald">
+                  {stats.membersCount} thành viên
+                </strong>
+                <span className="hero-metric-item__sub">Tài khoản định danh</span>
+              </div>
+            </div>
+
+            {/* 5. Khách vãng lai */}
+            <div
+              className={`hero-metric-item hero-metric-item--clickable ${authFilter === "Guest" ? "hero-metric-item--active" : ""}`}
+              onClick={() => setAuthFilter(authFilter === "Guest" ? "All" : "Guest")}
+              title="Nhấn để lọc xem khách vãng lai"
+            >
+              <div className="hero-metric-item__icon hero-metric-item__icon--guests">
+                <i className="ri-user-shared-line" />
+              </div>
+              <div className="hero-metric-item__text">
+                <span className="hero-metric-item__lbl">Khách ghé thăm</span>
+                <strong className="hero-metric-item__val">
+                  {stats.guestsCount} khách
+                </strong>
+                <span className="hero-metric-item__sub">Chưa tạo tài khoản</span>
+              </div>
+            </div>
+
+            {/* 6. Trang xem nhiều nhất */}
+            <div className="hero-metric-item">
+              <div className="hero-metric-item__icon hero-metric-item__icon--page">
+                <i className="ri-pages-line" />
+              </div>
+              <div className="hero-metric-item__text">
+                <span className="hero-metric-item__lbl">Trang xem nhiều nhất</span>
+                <strong className="hero-metric-item__val text-cyan" title={stats.topPages[0]?.path || "/"}>
+                  {stats.topPages[0] ? formatPageName(stats.topPages[0].path) : "Trang chủ"}
+                </strong>
+                <span className="hero-metric-item__sub">
+                  {stats.topPages[0] ? `${stats.topPages[0].count} lượt xem` : "Chưa có dữ liệu"}
+                </span>
               </div>
             </div>
           </div>
@@ -1321,7 +1323,7 @@ export default function ManageTraffic() {
           >
             <i className="ri-computer-line" />
             <span>Quản Lý Thiết Bị & Lưu Lượng</span>
-            <span className="traffic-tab-badge">{scopedLogs.length}</span>
+            <span className="traffic-tab-badge">{groupedScopedLogs.length}</span>
           </button>
 
           <button
@@ -1357,7 +1359,7 @@ export default function ManageTraffic() {
                   className={`filter-pill ${deviceFilter === "All" ? "filter-pill--active" : ""}`}
                   onClick={() => setDeviceFilter("All")}
                 >
-                  Tất cả máy ({scopedLogs.length} máy • {stats.totalVisits} lượt)
+                  Tất cả máy ({groupedScopedLogs.length} nhóm • {stats.totalVisits} lượt)
                 </button>
                 <button
                   type="button"
@@ -1610,7 +1612,7 @@ export default function ManageTraffic() {
 
             <div className="recent-devices-card__footer">
               <span>
-                Đang hiển thị <strong>{filteredLogs.length}</strong> / <strong>{scopedLogs.length}</strong> thiết bị{" "}
+                Đang hiển thị <strong>{filteredLogs.length}</strong> / <strong>{groupedScopedLogs.length}</strong> nhóm thiết bị / tài khoản{" "}
                 {sourceFilter === "Real"
                   ? "(100% thiết bị thật)"
                   : sourceFilter === "Sample"

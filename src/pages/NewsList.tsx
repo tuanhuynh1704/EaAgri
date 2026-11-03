@@ -58,7 +58,6 @@ export default function NewsList() {
 
   // Fetch articles from Supabase on mount
   useEffect(() => {
-    window.scrollTo(0, 0);
     const fetchNews = async () => {
       setLoading(true);
       try {

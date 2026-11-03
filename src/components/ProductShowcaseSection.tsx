@@ -91,10 +91,10 @@ export default function ProductShowcaseSection() {
     <section id="section-san-pham" className="app-showcase-slide fullpage-slide">
       <div className="product-showcase__header-container">
         <div className="team-showcase__header" data-aos="fade-up">
-          <span className="team-showcase__label">
+          {/* <span className="team-showcase__label">
             <span className="team-showcase__status-dot"></span>
             GIAO DIỆN &amp; TRẢI NGHIỆM TRỰC QUAN
-          </span>
+          </span> */}
           <h2 className="team-showcase__title">
             Hình Ảnh <span className="team-showcase__title-highlight">Sản Phẩm</span>
           </h2>

@@ -65,27 +65,14 @@
   gap: 1rem;
   overflow: hidden;
   text-align: left;
-  border: 1px solid rgba(16, 133, 98, 0.13);
-  border-radius: 22px;
-  background: linear-gradient(135deg, rgba(255,255,255,.96), rgba(241,250,246,.9));
-  box-shadow: 0 13px 32px rgba(35, 79, 62, 0.075);
-  transition: transform .3s ease, box-shadow .3s ease, border-color .3s ease;
+  transition: color .3s ease;
 
   &::after {
-    content: '';
-    position: absolute;
-    right: -24px;
-    bottom: -34px;
-    width: 110px;
-    height: 110px;
-    border: 1px solid rgba(13, 151, 118, .1);
-    border-radius: 50%;
+    content: none;
   }
 
   &:hover {
-    transform: translateY(-5px);
-    border-color: rgba(11, 145, 111, .28);
-    box-shadow: 0 20px 40px rgba(25, 94, 71, .12);
+    color: #078e72;
   }
 }
 
@@ -121,16 +108,18 @@
 }
 
 .result__gallery {
-  display: grid;
-  grid-template-columns: 1.05fr 1.15fr 1.15fr 1.15fr 1.15fr;
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
   gap: clamp(.55rem, 1vw, .9rem);
-  height: clamp(245px, 39vh, 390px);
+  height: auto;
 }
 
 .result__photo {
   position: relative;
+  flex: 0 1 232px;
   min-width: 0;
-  height: 100%;
+  height: clamp(245px, 39vh, 390px);
   margin: 0;
   overflow: hidden;
   border: 1px solid rgba(17, 112, 83, .1);
@@ -193,19 +182,19 @@
 @media (max-width: 1024px) {
   .result-section { padding-top: 6rem; }
   .result__stats { grid-template-columns: repeat(3, 1fr); gap: 0.85rem; }
-  .result__gallery { grid-template-columns: repeat(3, 1fr); height: auto; gap: 0.75rem; }
+  .result__gallery { gap: 0.75rem; }
   .result__photo { height: 260px; }
 }
 
 @media (max-width: 768px) {
   .result__stats { grid-template-columns: 1fr; }
-  .result__gallery { grid-template-columns: repeat(2, 1fr); height: auto; }
+  .result__gallery { gap: 0.75rem; }
   .result__photo { height: 250px; }
 }
 
 @media (max-width: 560px) {
   .result__header .section__header { font-size: 2rem; }
-  .result__gallery { grid-template-columns: 1fr; }
+  .result__photo { flex-basis: min(100%, 320px); }
   .result__photo { height: 260px; }
 }
 

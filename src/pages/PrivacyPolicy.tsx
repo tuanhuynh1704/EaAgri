@@ -1,4 +1,3 @@
-import { useEffect } from "react";
 import { useSEO } from "../hooks/useSEO";
 
 export default function PrivacyPolicy() {
@@ -16,10 +15,6 @@ export default function PrivacyPolicy() {
       "description": "Chính sách bảo mật thông tin và an toàn dữ liệu người dùng tại EaAgri."
     }
   });
-
-  useEffect(() => {
-    window.scrollTo(0, 0);
-  }, []);
 
   return (
     <div className="privacy-page">
@@ -215,8 +210,8 @@ export default function PrivacyPolicy() {
           <div className="privacy-page__contact-body">
             <div className="privacy-page__contact-info">
               <span>Nếu bạn có bất kỳ câu hỏi nào về chính sách bảo mật hoặc yêu cầu xử lý dữ liệu cá nhân, vui lòng liên hệ:</span>
-              <a href="mailto:eaagri@eaagri.id.vn">
-                <i className="ri-mail-send-line"></i> eaagri@eaagri.id.vn
+              <a href="mailto:info@eaagri.id.vn">
+                <i className="ri-mail-send-line"></i> info@eaagri.vn
               </a>
             </div>
             <a href="mailto:eaagri@eaagri.id.vn" className="privacy-page__contact-btn">

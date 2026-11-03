@@ -1,4 +1,4 @@
-import { useEffect, lazy } from "react";
+import { lazy } from "react";
 import { useSEO } from "../hooks/useSEO";
 import Hero from "../components/Hero";
 import SplashIntro from "../components/SplashIntro";
@@ -9,6 +9,7 @@ import LazySection from "../components/common/LazySection";
 const AdvisorsSection = lazy(() => import("../components/AdvisorsSection"));
 // 2. Hình Ảnh Sản Phẩm
 const ProductShowcaseSection = lazy(() => import("../components/ProductShowcaseSection"));
+const AIIIAwardSection = lazy(() => import("../components/AIIIAwardSection"));
 // 3. Vấn Đề & Giải Pháp Đột Phá
 const ProblemSolutionSection = lazy(() => import("../components/ProblemSolutionSection"));
 // 4. Video & Trải Nghiệm Thực Tế + 5. PHIM TƯ LIỆU & THỰC ĐỊA
@@ -82,10 +83,6 @@ export default function HomePage() {
     }
   });
 
-  useEffect(() => {
-    window.scrollTo(0, 0);
-  }, []);
-
   return (
     <>
       {/* Màn hình chào + Hero Header */}
@@ -95,6 +92,11 @@ export default function HomePage() {
       {/* 1. Hội Đồng Cố Vấn & Chuyên Gia */}
       <LazySection minHeight="650px">
         <AdvisorsSection />
+      </LazySection>
+
+      {/* Giải Best Student Paper tại hội thảo AIIA 2026 */}
+      <LazySection minHeight="430px">
+        <AIIIAwardSection />
       </LazySection>
 
       {/* 2. Hình Ảnh Sản Phẩm */}

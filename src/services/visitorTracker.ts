@@ -388,6 +388,24 @@ export function detectDeviceInfo() {
   return { deviceType, os, browser, screenResolution };
 }
 
+/** Read only browser-provided, low-sensitivity device hints when available. */
+async function enrichDeviceInfo<T extends ReturnType<typeof detectDeviceInfo>>(info: T): Promise<T> {
+  const userAgentData = (navigator as Navigator & {
+    userAgentData?: { getHighEntropyValues?: (hints: string[]) => Promise<{ model?: string; platformVersion?: string }> };
+  }).userAgentData;
+  if (!userAgentData?.getHighEntropyValues) return info;
+  try {
+    const hints = await userAgentData.getHighEntropyValues(["model", "platformVersion"]);
+    const model = hints.model?.trim();
+    const version = hints.platformVersion?.trim();
+    if (model && !info.os.toLowerCase().includes(model.toLowerCase())) info.os = `${model} (${info.os})`;
+    else if (version && /Android|Windows|macOS|iOS/i.test(info.os) && !info.os.includes(version)) info.os = `${info.os} ${version}`;
+  } catch {
+    // Client hints are optional and may be withheld by the browser or permissions policy.
+  }
+  return info;
+}
+
 /**
  * Fetch public IP and Geolocation with high accuracy (ipwho.is)
  */
@@ -524,7 +542,7 @@ export async function recordVisitorHit(
   } catch {}
 
   const deviceId = getOrCreateDeviceId();
-  const info = detectDeviceInfo();
+  const info = await enrichDeviceInfo(detectDeviceInfo());
   const geo = await fetchPublicIpAndLocation();
 
   // 🛑 2. DATACENTER / SCRAPER DETECTION: Block headless Linux 800x600 AWS scanners

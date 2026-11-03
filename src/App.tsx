@@ -1,4 +1,4 @@
-import { useEffect, Suspense } from "react";
+import { useEffect, useRef, Suspense } from "react";
 import "./styles/main.scss";
 import AOS from "aos";
 import "aos/dist/aos.css";
@@ -32,13 +32,22 @@ function RouteFallback() {
 function VisitorTracker() {
   const { pathname } = useLocation();
   const { user, profile } = useAuth();
+  const previousPathname = useRef(pathname);
 
   useEffect(() => {
-    if ('scrollRestoration' in window.history) {
-      window.history.scrollRestoration = 'manual';
+    if ("scrollRestoration" in window.history) {
+      window.history.scrollRestoration = "auto";
     }
-    window.scrollTo(0, 0);
 
+    // Preserve the browser's saved scroll position on reload, but start at the top
+    // when the user navigates to a different route inside the app.
+    if (previousPathname.current !== pathname) {
+      window.scrollTo({ top: 0, behavior: "instant" });
+      previousPathname.current = pathname;
+    }
+  }, [pathname]);
+
+  useEffect(() => {
     // 🛑 1. ANTI-BOT GATE: Headless scrapers & crawlers are completely ignored
     if (isBotOrCrawler()) return;
 

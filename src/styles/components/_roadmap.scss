@@ -54,13 +54,7 @@
 }
 
 .roadmap__mascot-card {
-  background: rgba(255, 255, 255, 0.85);
-  backdrop-filter: blur(12px);
-  -webkit-backdrop-filter: blur(12px);
-  border: 1px solid rgba(255, 255, 255, 0.5);
-  padding: 2rem;
-  border-radius: 24px;
-  box-shadow: $shadow-lg;
+  padding: 1rem;
   text-align: center;
   width: 100%;
   max-width: 340px;
@@ -69,8 +63,7 @@
   align-items: center;
 
   @media (max-height: 820px) {
-    padding: 1.25rem;
-    border-radius: 20px;
+    padding: 0.75rem;
   }
 
   @media (max-width: $tablet) {

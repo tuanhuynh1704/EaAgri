@@ -200,9 +200,9 @@ export default function RoadmapSection() {
         {/* Right Side: Visual Timeline */}
         <div className="roadmap__timeline-side" data-aos="fade-left">
           <div className="roadmap__header">
-            <span className="roadmap__tag">
+            {/* <span className="roadmap__tag">
               <i className="ri-road-map-line"></i> BẢN ĐỒ ĐƯỜNG ĐI
-            </span>
+            </span> */}
             <h2 className="roadmap__title">Lộ Trình Phát Triển</h2>
           </div>
 

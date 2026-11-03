@@ -9,6 +9,7 @@ const baseLogos = [
   { src: "/Logo/Intech.webp", alt: "Intech Innovation and Technology", name: "Intech" },
   { src: "/Logo/BSA.webp", alt: "Trung tâm BSA", name: "BSA" },
   { src: "/Logo/KNX.webp", alt: "Dự án Khởi nghiệp Xanh", name: "Khởi nghiệp Xanh" },
+  { src: "/Logo/felix.jpg", alt: "Touch Of Quality", name: "Felix" },
 ];
 
 // Nhân bản danh sách 3 lần trong mỗi nhóm để đảm bảo chiều dài vượt xa mọi kích thước màn hình
@@ -48,9 +49,9 @@ export default function LogoMarqueeSection() {
   return (
     <section className="logo-marquee" aria-labelledby="logo-marquee-title">
       <div className="logo-marquee__heading">
-        <span className="logo-marquee__eyebrow">
+        {/* <span className="logo-marquee__eyebrow">
           <i className="ri-links-line" /> Hành trình Ea Agri
-        </span>
+        </span> */}
         <h2 id="logo-marquee-title">Dấu ấn kết nối</h2>
         <p>Những môi trường học thuật, đổi mới sáng tạo và công nghệ trên hành trình phát triển dự án.</p>
       </div>

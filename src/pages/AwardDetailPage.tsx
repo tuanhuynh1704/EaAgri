@@ -22,7 +22,6 @@ export default function AwardDetailPage() {
   });
 
   useEffect(() => {
-    window.scrollTo({ top: 0, behavior: "instant" });
     setPhotoIdx(0);
   }, [id]);
 
