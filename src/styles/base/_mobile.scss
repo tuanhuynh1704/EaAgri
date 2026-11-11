@@ -2471,10 +2471,17 @@
 
   .roadmap__grid {
     gap: 1.15rem !important;
+    // Grid item mặc định có min-width:auto -> cột bị nới rộng theo
+    // max-content của carousel ngang và làm tràn ngang màn hình.
+    grid-template-columns: minmax(0, 1fr) !important;
+  }
+  .roadmap__grid > * {
+    min-width: 0 !important;
   }
   .roadmap__timeline-side {
     order: 1 !important;
     width: 100% !important;
+    min-width: 0 !important;
   }
   .roadmap__header {
     margin-bottom: 1rem !important;
@@ -2496,6 +2503,10 @@
 
   .roadmap__timeline {
     display: flex !important;
+    // Bắt buộc phải đặt lại flex-direction: rule gốc dùng "column", nếu thiếu
+    // dòng này các thẻ sẽ xếp DỌC thay vì nằm ngang -> lệch, không vuốt được.
+    flex-direction: row !important;
+    align-items: stretch !important;
     flex-wrap: nowrap !important;
     overflow-x: auto !important;
     overflow-y: hidden !important;
@@ -2503,6 +2514,7 @@
     scroll-snap-type: x mandatory;
     scroll-behavior: smooth;
     gap: 0.85rem !important;
+    // Padding đối xứng 2 bên để thẻ đầu và thẻ cuối cũng CĂN GIỮA khi vuốt tới.
     padding: 0.4rem 0.85rem 1rem !important;
     margin-inline: -0.85rem !important;
     scrollbar-width: none;
@@ -2517,10 +2529,12 @@
   }
 
   .roadmap__timeline-item {
-    flex: 0 0 82% !important;
-    width: 82% !important;
-    min-width: 275px !important;
-    max-width: 320px !important;
+    // 100% của content-box (đã trừ 2 * padding-inline) => thẻ luôn nằm chính
+    // giữa khung nhìn khi scroll-snap dừng, không dưa lệch sang trái/phải.
+    flex: 0 0 100% !important;
+    width: 100% !important;
+    min-width: 0 !important;
+    max-width: none !important;
     scroll-snap-align: center !important;
     scroll-snap-stop: normal !important;
     display: flex !important;
@@ -2673,7 +2687,9 @@
 
   .roadmap__mobile-steps {
     display: grid !important;
-    grid-template-columns: repeat(4, 1fr) !important;
+    // minmax(0, 1fr) để 4 nút luôn BẰNG NHAU: "1fr" mặc định là
+    // minmax(auto, 1fr) nên nút có chữ dài sẽ nới rộng cột, làm lệch hàng.
+    grid-template-columns: repeat(4, minmax(0, 1fr)) !important;
     gap: 0.35rem !important;
     width: 100% !important;
     max-width: 360px !important;
@@ -2683,6 +2699,7 @@
     display: flex !important;
     flex-direction: column !important;
     align-items: center !important;
+    min-width: 0 !important;
     padding: 0.35rem 0.2rem !important;
     border-radius: 10px !important;
     background: rgba(255, 255, 255, 0.8) !important;

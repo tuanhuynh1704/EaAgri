@@ -35,20 +35,16 @@ export default function ProblemSolutionSection({
     return () => observer.disconnect();
   }, []);
 
+  // KHÔNG tự động phát video. Video chỉ chạy khi người dùng bấm nút phát.
+  // Khi lướt khỏi khung nhìn thì dừng lại để không phát nhầm ở nền.
   useEffect(() => {
     const video = videoRef.current;
     if (!video) return;
 
-    if (videoVisible) {
-      // Attempt audible playback; browsers may require a user gesture before allowing it.
-      video.muted = isMuted;
-      void video.play().then(() => {
-        hasPlayedRef.current = true;
-      }).catch(() => setIsPlaying(false));
-    } else {
+    if (!videoVisible) {
       video.pause();
     }
-  }, [videoVisible, isMuted]);
+  }, [videoVisible]);
 
   // Định dạng thời gian mm:ss
   const formatTime = (timeInSeconds: number) => {
@@ -84,12 +80,14 @@ export default function ProblemSolutionSection({
   // Play / Pause toggle
   const togglePlay = (e?: React.MouseEvent) => {
     e?.stopPropagation();
-    if (!videoRef.current) return;
-    if (videoRef.current.paused) {
-      videoRef.current.play();
+    const video = videoRef.current;
+    if (!video) return;
+    if (video.paused) {
+      // Đây là user gesture -> trình duyệt cho phép phát kèm tiếng.
+      void video.play().catch(() => setIsPlaying(false));
       setIsPlaying(true);
     } else {
-      videoRef.current.pause();
+      video.pause();
       setIsPlaying(false);
     }
   };
@@ -97,9 +95,10 @@ export default function ProblemSolutionSection({
   // Mute / Unmute toggle
   const toggleMute = (e?: React.MouseEvent) => {
     e?.stopPropagation();
-    if (!videoRef.current) return;
-    const newMuted = !videoRef.current.muted;
-    videoRef.current.muted = newMuted;
+    const video = videoRef.current;
+    if (!video) return;
+    const newMuted = !video.muted;
+    video.muted = newMuted;
     setIsMuted(newMuted);
   };
 
@@ -208,7 +207,6 @@ export default function ProblemSolutionSection({
               ref={videoRef}
               src="/Video/GIOITHIEU.mp4"
               className="problem-solution__video"
-              autoPlay
               loop
               muted={isMuted}
               playsInline

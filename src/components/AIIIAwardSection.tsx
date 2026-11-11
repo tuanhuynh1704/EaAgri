@@ -23,14 +23,13 @@ export default function AIIIAwardSection() {
     return () => observer.disconnect();
   }, []);
 
+  // KHÔNG tự động phát video. Người dùng tự bấm nút phát của trình duyệt.
+  // Khi lướt khỏi khung nhìn hoặc chuyển slide thì dừng lại.
   useEffect(() => {
     const video = videoRef.current;
     if (!video) return;
-    if (videoVisible && activeSlide === 0) {
-      void video.play().catch(() => {
-        // Keep native controls available if the browser blocks autoplay.
-      });
-    } else {
+
+    if (!videoVisible || activeSlide !== 0) {
       video.pause();
     }
   }, [videoVisible, activeSlide]);
@@ -84,11 +83,9 @@ export default function AIIIAwardSection() {
             <figure className={`aiia-award__slide aiia-award__slide--video${activeSlide === 0 ? " is-active" : ""}`}>
               <video
                 ref={videoRef}
-                autoPlay
                 controls
                 playsInline
                 preload="metadata"
-                muted={false}
                 poster="/assets/best-student-paper-award.webp"
                 aria-label="Video khoảnh khắc nhóm EaAgri nhận giải tại AIIA 2026"
               >

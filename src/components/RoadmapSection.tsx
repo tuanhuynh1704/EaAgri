@@ -18,23 +18,53 @@ export default function RoadmapSection() {
   const [activePhaseIndex, setActivePhaseIndex] = useState(0);
   const timelineScrollRef = useRef<HTMLDivElement>(null);
 
-  const handleTimelineScroll = () => {
-    if (!timelineScrollRef.current) return;
-    const { scrollLeft, scrollWidth, clientWidth } = timelineScrollRef.current;
-    const maxScroll = scrollWidth - clientWidth;
-    if (maxScroll <= 0) return;
-    const ratio = scrollLeft / maxScroll;
-    const newIdx = Math.min(Math.round(ratio * 3), 3);
-    setActivePhaseIndex(newIdx);
+  const getTimelineItems = (): HTMLElement[] => {
+    if (!timelineScrollRef.current) return [];
+    return Array.from(
+      timelineScrollRef.current.querySelectorAll<HTMLElement>(".roadmap__timeline-item")
+    );
   };
 
+  // Tìm thẻ đang nằm gần nhất chính giữa khung nhìn để đánh dấu step tương ứng.
+  const handleTimelineScroll = () => {
+    const container = timelineScrollRef.current;
+    if (!container) return;
+
+    const items = getTimelineItems();
+    if (items.length === 0) return;
+
+    const containerRect = container.getBoundingClientRect();
+    const center = containerRect.left + containerRect.width / 2;
+
+    let bestIndex = 0;
+    let bestDistance = Number.POSITIVE_INFINITY;
+
+    items.forEach((item, index) => {
+      const rect = item.getBoundingClientRect();
+      const distance = Math.abs(rect.left + rect.width / 2 - center);
+      if (distance < bestDistance) {
+        bestDistance = distance;
+        bestIndex = index;
+      }
+    });
+
+    setActivePhaseIndex(bestIndex);
+  };
+
+  // Cuộn ngang để đưa đúng thẻ về giữa khung nhìn.
   const scrollToPhase = (idx: number) => {
-    if (!timelineScrollRef.current) return;
-    const items = timelineScrollRef.current.children;
-    const target = items[idx + 1] as HTMLElement;
-    if (target) {
-      target.scrollIntoView({ behavior: "smooth", block: "nearest", inline: "center" });
-    }
+    const container = timelineScrollRef.current;
+    if (!container) return;
+
+    const target = getTimelineItems()[idx];
+    if (!target) return;
+
+    const containerRect = container.getBoundingClientRect();
+    const targetRect = target.getBoundingClientRect();
+    const delta =
+      targetRect.left + targetRect.width / 2 - (containerRect.left + containerRect.width / 2);
+
+    container.scrollTo({ left: container.scrollLeft + delta, behavior: "smooth" });
   };
 
   const [formData, setFormData] = useState({
