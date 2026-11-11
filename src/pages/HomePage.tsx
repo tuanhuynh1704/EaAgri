@@ -25,7 +25,7 @@ const LogoMarqueeSection = lazy(() => import("../components/LogoMarqueeSection")
 // 9. Đội Ngũ Vận Hành
 const CoreTeamSection = lazy(() => import("../components/CoreTeamSection"));
 // 10. Trợ lý AI Nông nghiệp (AI Chatbot)
-const AIChat = lazy(() => import("../components/AIChat"));
+// const AIChat = lazy(() => import("../components/AIChat"));
 // 11. Lộ trình phát triển & Hợp tác
 const RoadmapSection = lazy(() => import("../components/RoadmapSection"));
 
@@ -142,9 +142,9 @@ export default function HomePage() {
       </LazySection>
 
       {/* 10. Trợ lý AI Nông nghiệp (AI Chatbot) */}
-      <LazySection minHeight="760px" className="section-bg--gradient-soft fullpage-slide">
+      {/* <LazySection minHeight="760px" className="section-bg--gradient-soft fullpage-slide">
         <AIChat />
-      </LazySection>
+      </LazySection> */}
 
       {/* 11. Lộ trình phát triển & Hợp tác */}
       <LazySection minHeight="600px" className="fullpage-slide">
