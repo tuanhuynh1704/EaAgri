@@ -1,8 +1,50 @@
 import fs from "node:fs";
 import path from "node:path";
+import { requireAdmin } from "./_lib/admin-auth.js";
+import { sanitizeVisitorLogs } from "./_lib/visitor-sanitize.js";
+import {
+  allRowsFilter,
+  deleteSupabaseRowsByIds,
+  isSupabaseAdminConfigured,
+  supabaseAdminFetch,
+} from "./_lib/supabase-admin.js";
 
 // Memory cache for serverless environments
 let inMemoryVisitorLogs = null;
+
+const isBotRow = (item) => {
+  const os = String(item?.os || "").toLowerCase();
+  const screen = String(item?.screen_resolution || "").replace(/\s+/g, "");
+  const ip = String(item?.ip_address || "").trim();
+
+  if (item?.is_bot === true) return true;
+  if (
+    os.includes("linux") &&
+    (screen.includes("800×600") || screen.includes("800x600") || screen === "0×0" || screen === "0x0")
+  ) {
+    return true;
+  }
+  return (
+    ip.startsWith("13.57.") ||
+    ip.startsWith("54.183.") ||
+    ip.startsWith("54.215.") ||
+    ip.startsWith("52.53.")
+  );
+};
+
+const isSampleRow = (item) => {
+  if (item?.is_real === false) return true;
+  const deviceId = String(item?.device_id || "").toLowerCase();
+  const id = String(item?.id || "").toLowerCase();
+  return (
+    id.startsWith("log_init") ||
+    deviceId === "dev_test_phone_01" ||
+    deviceId === "dev_pc_owner" ||
+    deviceId.includes("test") ||
+    deviceId.includes("owner") ||
+    deviceId === "server_device"
+  );
+};
 
 export default async function handler(req, res) {
   res.setHeader("Access-Control-Allow-Credentials", "true");
@@ -61,18 +103,43 @@ export default async function handler(req, res) {
     } catch {}
   };
 
-  // GET: Return all visitor logs
+  // The browser anon key can no longer read visitor_logs after the RLS
+  // migration. Env-admin sessions read through the service role on the server.
+  const readSupabaseLogs = async () => {
+    if (!isSupabaseAdminConfigured()) return null;
+    const result = await supabaseAdminFetch(
+      "visitor_logs?select=*&order=last_visit.desc&limit=2000"
+    );
+    if (!result.ok || !Array.isArray(result.data)) return null;
+    return result.data;
+  };
+
+  // GET: Return visitor logs. Guests receive an anonymised projection; admins get full data.
   if (req.method === "GET") {
-    const logs = readLogs();
+    const auth = await requireAdmin(req);
     res.setHeader("Cache-Control", "no-store, no-cache, must-revalidate");
-    return res.status(200).json(logs);
+    res.setHeader("Vary", "Authorization");
+
+    if (auth.ok) {
+      const remoteLogs = await readSupabaseLogs();
+      if (remoteLogs !== null) return res.status(200).json(remoteLogs);
+    }
+
+    const logs = readLogs();
+    return res.status(200).json(auth.ok ? logs : sanitizeVisitorLogs(logs));
   }
 
   // Global rate limiter map in memory
   if (!global.__trafficRateLimit) global.__trafficRateLimit = new Map();
 
-  // DELETE: Delete logs
+  // DELETE: Delete logs (admin only)
   if (req.method === "DELETE") {
+    const auth = await requireAdmin(req);
+    if (!auth.ok) {
+      res.setHeader("Cache-Control", "no-store, no-cache, must-revalidate");
+      return res.status(auth.status || 401).json({ error: auth.error || "Unauthorized" });
+    }
+
     const urlObj = new URL(req.url, "http://localhost");
     const isSampleOnly = urlObj.searchParams.get("type") === "sample";
     const isBotOnly = urlObj.searchParams.get("type") === "bot";
@@ -83,38 +150,11 @@ export default async function handler(req, res) {
 
     if (isBotOnly) {
       const initialCount = logs.length;
-      logs = logs.filter((item) => {
-        const os = String(item.os || "").toLowerCase();
-        const screen = String(item.screen_resolution || "").replace(/\s+/g, "");
-        const ip = String(item.ip_address || "").trim();
-        if (item.is_bot === true) return false;
-        if (os.includes("linux") && (screen.includes("800×600") || screen.includes("800x600") || screen === "0×0" || screen === "0x0")) {
-          return false;
-        }
-        if (ip.startsWith("13.57.") || ip.startsWith("54.183.") || ip.startsWith("54.215.") || ip.startsWith("52.53.")) {
-          return false;
-        }
-        return true;
-      });
+      logs = logs.filter((item) => !isBotRow(item));
       deletedCount = initialCount - logs.length;
     } else if (isSampleOnly) {
       const initialCount = logs.length;
-      logs = logs.filter((item) => {
-        if (item.is_real === false) return false;
-        const devId = (item.device_id || "").toLowerCase();
-        const id = (item.id || "").toLowerCase();
-        if (
-          id.startsWith("log_init") ||
-          devId === "dev_test_phone_01" ||
-          devId === "dev_pc_owner" ||
-          devId.includes("test") ||
-          devId.includes("owner") ||
-          devId === "server_device"
-        ) {
-          return false;
-        }
-        return true;
-      });
+      logs = logs.filter((item) => !isSampleRow(item));
       deletedCount = initialCount - logs.length;
     } else if (targetId) {
       const initialCount = logs.length;
@@ -126,8 +166,52 @@ export default async function handler(req, res) {
     }
 
     writeLogs(logs);
+
+    // Delete the same rows from Supabase when a service role key is available.
+    // This keeps the admin dashboard working after anon DELETE was revoked.
+    let remoteDeleted = 0;
+    let remoteRemaining = null;
+    if (isSupabaseAdminConfigured()) {
+      if (isBotOnly || isSampleOnly) {
+        const columns = isBotOnly
+          ? "id,os,screen_resolution,ip_address,is_bot"
+          : "id,device_id,is_real";
+        const candidates = await supabaseAdminFetch(
+          `visitor_logs?select=${columns}&limit=5000`
+        );
+        if (candidates.ok && Array.isArray(candidates.data)) {
+          const predicate = isBotOnly ? isBotRow : isSampleRow;
+          const ids = candidates.data.filter(predicate).map((item) => item.id);
+          remoteDeleted += await deleteSupabaseRowsByIds("visitor_logs", ids);
+        }
+      } else if (targetId) {
+        const result = await supabaseAdminFetch(
+          `visitor_logs?or=(id.eq.${encodeURIComponent(targetId)},device_id.eq.${encodeURIComponent(
+            targetId
+          )})`,
+          { method: "DELETE", headers: { Prefer: "count=exact" } }
+        );
+        if (result.ok) remoteDeleted += result.count ?? 0;
+      } else {
+        const result = await supabaseAdminFetch(`visitor_logs?${allRowsFilter()}`, {
+          method: "DELETE",
+          headers: { Prefer: "count=exact" },
+        });
+        if (result.ok) remoteDeleted += result.count ?? 0;
+      }
+
+      remoteRemaining = await readSupabaseLogs();
+    }
+
+    const responseLogs = remoteRemaining !== null ? remoteRemaining : logs;
+    const effectiveDeleted = remoteRemaining !== null ? remoteDeleted : deletedCount;
     res.setHeader("Cache-Control", "no-store, no-cache, must-revalidate");
-    return res.status(200).json({ success: true, count: logs.length, deletedCount, logs });
+    return res.status(200).json({
+      success: true,
+      count: responseLogs.length,
+      deletedCount: effectiveDeleted,
+      logs: responseLogs,
+    });
   }
 
   // POST: Record visitor hit / heartbeat / leave
@@ -185,7 +269,7 @@ export default async function handler(req, res) {
           logs[existingIdx].is_online = false;
           writeLogs(logs);
         }
-        return res.status(200).json({ success: true, action: "leave", count: logs.length, logs });
+        return res.status(200).json({ success: true, action: "leave", count: logs.length });
       }
 
       // Handle "heartbeat" action
@@ -197,7 +281,7 @@ export default async function handler(req, res) {
         }
         cleanExpiredOnline(logs);
         writeLogs(logs);
-        return res.status(200).json({ success: true, action: "heartbeat", count: logs.length, logs });
+        return res.status(200).json({ success: true, action: "heartbeat", count: logs.length });
       }
 
       // Normal visit hit
@@ -260,7 +344,7 @@ export default async function handler(req, res) {
       writeLogs(logs);
 
       res.setHeader("Cache-Control", "no-store, no-cache, must-revalidate");
-      return res.status(200).json({ success: true, count: logs.length, logs });
+      return res.status(200).json({ success: true, count: logs.length });
     } catch (err) {
       return res.status(400).json({ error: err.message });
     }

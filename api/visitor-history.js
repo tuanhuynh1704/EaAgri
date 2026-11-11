@@ -1,5 +1,12 @@
 import fs from "node:fs";
 import path from "node:path";
+import { requireAdmin } from "./_lib/admin-auth.js";
+import { sanitizeVisitorHistoryList } from "./_lib/visitor-sanitize.js";
+import {
+  allRowsFilter,
+  isSupabaseAdminConfigured,
+  supabaseAdminFetch,
+} from "./_lib/supabase-admin.js";
 
 let inMemoryHistory = null;
 
@@ -43,18 +50,52 @@ export default async function handler(req, res) {
     } catch {}
   };
 
-  // GET: Return history logs
+  // Env-admin sessions are not Supabase Auth users, so full history has to be
+  // read with the service role key on the server after anon SELECT was revoked.
+  const readSupabaseHistory = async () => {
+    if (!isSupabaseAdminConfigured()) return null;
+    const result = await supabaseAdminFetch(
+      "visitor_history_logs?select=*&order=created_at.desc&limit=500"
+    );
+    if (!result.ok || !Array.isArray(result.data)) return null;
+    return result.data;
+  };
+
+  // GET: Return history logs. Guests receive an anonymised projection.
   if (req.method === "GET") {
-    const history = readHistory();
+    const auth = await requireAdmin(req);
     res.setHeader("Cache-Control", "no-store, no-cache, must-revalidate");
-    return res.status(200).json(history);
+    res.setHeader("Vary", "Authorization");
+
+    if (auth.ok) {
+      const remoteHistory = await readSupabaseHistory();
+      if (remoteHistory !== null) return res.status(200).json(remoteHistory);
+    }
+
+    const history = readHistory();
+    return res.status(200).json(auth.ok ? history : sanitizeVisitorHistoryList(history));
   }
 
-  // DELETE: Clear history
+  // DELETE: Clear history (admin only)
   if (req.method === "DELETE") {
+    const auth = await requireAdmin(req);
+    if (!auth.ok) {
+      res.setHeader("Cache-Control", "no-store, no-cache, must-revalidate");
+      return res.status(auth.status || 401).json({ error: auth.error || "Unauthorized" });
+    }
+
+    let remoteDeleted = 0;
+    if (isSupabaseAdminConfigured()) {
+      const result = await supabaseAdminFetch(
+        `visitor_history_logs?${allRowsFilter()}`,
+        { method: "DELETE", headers: { Prefer: "count=exact" } }
+      );
+      if (result.ok) remoteDeleted = result.count ?? 0;
+    }
+
     writeHistory([]);
     res.setHeader("Cache-Control", "no-store, no-cache, must-revalidate");
-    return res.status(200).json({ success: true, count: 0 });
+    return res.status(200).json({ success: true, count: 0, deletedCount: remoteDeleted });
   }
 
   // POST: Record history event

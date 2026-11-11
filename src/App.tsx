@@ -13,7 +13,7 @@ import AppStoreNoticeModal from "./components/AppStoreNoticeModal";
 import PromoVideoModal from "./components/PromoVideoModal";
 import { AuthProvider, useAuth } from "./context/AuthContext";
 import { VoteProvider } from "./context/VoteContext";
-import { usePauseOffscreenAnimations } from "./hooks/usePauseOffscreenAnimations";
+// import { usePauseOffscreenAnimations } from "./hooks/usePauseOffscreenAnimations";
 import {
   recordVisitorHit,
   sendVisitorHeartbeat,
@@ -131,7 +131,7 @@ function App() {
   const isAuthPage = pathname === "/login" || pathname === "/register";
   const isAdminPage = pathname.startsWith("/admin");
 
-  usePauseOffscreenAnimations();
+  // usePauseOffscreenAnimations();
 
   useEffect(() => {
     AOS.init({

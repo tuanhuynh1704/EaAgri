@@ -1,4 +1,5 @@
 import { supabase } from "../utils/supabase/client";
+import { getAdminToken } from "../utils/adminSession";
 
 export interface VisitorLogItem {
   id: string;
@@ -279,6 +280,47 @@ const LOCAL_HISTORY_KEY = "eaagri_visitor_history_cache";
 const LAST_TRACK_TIME_KEY = "eaagri_last_track_timestamp";
 
 /**
+ * Build an Authorization header for admin-only API routes.
+ * Prefers the server-signed env-admin token, then falls back to a real
+ * Supabase session token (whose profile role is checked on the server).
+ */
+export async function getAdminAuthHeaders(): Promise<Record<string, string>> {
+  const adminToken = getAdminToken();
+  if (adminToken) return { Authorization: `Bearer ${adminToken}` };
+
+  try {
+    const { data } = await supabase.auth.getSession();
+    const accessToken = data.session?.access_token;
+    if (accessToken) return { Authorization: `Bearer ${accessToken}` };
+  } catch {
+    // Not signed in with Supabase; the request will simply be treated as a guest.
+  }
+
+  return {};
+}
+
+/**
+ * Call an admin-only API route with the current admin credentials.
+ * Throws a user-facing error when the server rejects the request so the UI
+ * never reports a fake success after a 401/403.
+ */
+async function callAdminApi(url: string, init: RequestInit, action: string): Promise<Response> {
+  const authHeaders = await getAdminAuthHeaders();
+  const res = await fetch(url, {
+    ...init,
+    headers: { ...(init.headers || {}), ...authHeaders },
+  });
+
+  if (res.status === 401 || res.status === 403) {
+    throw new Error(`Không có quyền ${action}. Vui lòng đăng nhập bằng tài khoản quản trị viên.`);
+  }
+  if (!res.ok) {
+    throw new Error(`${action} thất bại (HTTP ${res.status}).`);
+  }
+  return res;
+}
+
+/**
  * Get or create unique persistent Device ID for this machine
  */
 export function getOrCreateDeviceId(): string {
@@ -457,16 +499,23 @@ export async function fetchPublicIpAndLocation(): Promise<{ ip: string; city: st
     // fallback
   }
 
-  // 2. Fallback to ipapi.co
+  // 2. Fallback to ipinfo.io (no API key required for the free tier).
+  //    ipapi.co was removed because its shared free quota returns HTTP 429
+  //    very quickly, which produced noisy failures in monitoring.
   try {
-    const res = await fetch("https://ipapi.co/json/");
+    const res = await fetch("https://ipinfo.io/json");
     if (res.ok) {
       const data = await res.json();
       if (data && data.ip) {
         let city = data.city || data.region || "Việt Nam";
         if (city.toLowerCase().includes("ho chi minh")) city = "TP. Hồ Chí Minh";
-        let country = data.country_name || (data.country_code === "VN" ? "Việt Nam" : data.country) || "Việt Nam";
-        if (country.toLowerCase().includes("united states") || country.toLowerCase() === "us") country = "Hoa Kỳ";
+        else if (city.toLowerCase().includes("ha noi") || city.toLowerCase().includes("hanoi")) city = "Hà Nội";
+        else if (city.toLowerCase().includes("da nang") || city.toLowerCase().includes("danang")) city = "Đà Nẵng";
+        else if (city.toLowerCase().includes("buon ma thuot") || city.toLowerCase().includes("dak lak")) city = "Buôn Ma Thuột";
+
+        let country = data.country || "Việt Nam";
+        if (country === "VN" || country.toLowerCase() === "vietnam") country = "Việt Nam";
+        else if (country === "US" || country.toLowerCase() === "united states") country = "Hoa Kỳ";
 
         const result = {
           ip: data.ip,
@@ -569,78 +618,77 @@ export async function recordVisitorHit(
     : "Trực tiếp (Direct)";
 
   // 1. Sync to Supabase (Cloud Database for cross-device sync)
-  let cloudSuccess = false;
   let remoteVisitCount = 1;
   let remoteFirstVisit = nowIso;
 
   if (isRealSupabaseConfigured()) {
     try {
-      // Find existing device to calculate cumulative visit count
-      const { data: existingDev } = await supabase
-        .from("visitor_logs")
-        .select("visit_count, first_visit, is_authenticated, user_name, user_email, user_role")
-        .eq("device_id", deviceId)
-        .maybeSingle();
+      // Anonymous clients can no longer read/write the visitor tables directly.
+      // All tracking goes through SECURITY DEFINER RPCs which only touch the
+      // row that belongs to the calling device.
+      const { data: upsertResult, error: upsertError } = await supabase.rpc(
+        "upsert_visitor_log",
+        {
+          p_payload: {
+            device_id: deviceId,
+            ip_address: geo.ip,
+            city: geo.city,
+            region: geo.region,
+            country: geo.country,
+            device_type: info.deviceType,
+            os: info.os,
+            browser: info.browser,
+            screen_resolution: info.screenResolution,
+            last_path: currentPath,
+            referrer: referrerUrl,
+            is_real: true,
+            is_authenticated: Boolean(resolvedUser.isAuthenticated),
+            user_id: resolvedUser.userId || null,
+            user_email: resolvedUser.userEmail || null,
+            user_name: resolvedUser.userName || null,
+            user_role: resolvedUser.userRole || null,
+          },
+        }
+      );
 
-      if (existingDev) {
-        remoteVisitCount = (existingDev.visit_count || 0) + 1;
-        remoteFirstVisit = existingDev.first_visit || nowIso;
-      }
-
-      const upsertPayload: any = {
-        device_id: deviceId,
-        ip_address: geo.ip,
-        city: geo.city,
-        region: geo.region,
-        country: geo.country,
-        device_type: info.deviceType,
-        os: info.os,
-        browser: info.browser,
-        screen_resolution: info.screenResolution,
-        visit_count: remoteVisitCount,
-        last_path: currentPath,
-        referrer: referrerUrl,
-        is_online: true,
-        first_visit: remoteFirstVisit,
-        last_visit: nowIso,
-        is_real: true,
-        is_authenticated: Boolean(resolvedUser.isAuthenticated || existingDev?.is_authenticated),
-        user_id: resolvedUser.userId || null,
-        user_email: resolvedUser.userEmail || existingDev?.user_email || null,
-        user_name: resolvedUser.userName || existingDev?.user_name || null,
-        user_role: resolvedUser.userRole || existingDev?.user_role || null,
-      };
-
-      const { error: upsertErr } = await supabase
-        .from("visitor_logs")
-        .upsert(upsertPayload, { onConflict: "device_id" });
-
-      if (!upsertErr) {
-        cloudSuccess = true;
+      if (!upsertError) {
+        const statsRow = Array.isArray(upsertResult) ? upsertResult[0] : upsertResult;
+        if (statsRow) {
+          remoteVisitCount = statsRow.visit_count || 1;
+          remoteFirstVisit = statsRow.first_visit || nowIso;
+        }
+      } else {
+        console.warn("[VisitorTracker] upsert_visitor_log failed:", upsertError.message);
       }
 
       // Also record to visitor_history_logs (stream of access events)
-      await supabase.from("visitor_history_logs").insert({
-        device_id: deviceId,
-        ip_address: geo.ip,
-        city: geo.city,
-        region: geo.region,
-        country: geo.country,
-        device_type: info.deviceType,
-        os: info.os,
-        browser: info.browser,
-        path: currentPath,
-        referrer: referrerUrl,
-        action: "pageview",
-        is_authenticated: Boolean(resolvedUser.isAuthenticated),
-        user_id: resolvedUser.userId || null,
-        user_email: resolvedUser.userEmail || null,
-        user_name: resolvedUser.userName || null,
-        user_role: resolvedUser.userRole || null,
-        is_real: true,
-        created_at: nowIso,
+      const { error: historyError } = await supabase.rpc("record_visitor_history", {
+        p_payload: {
+          device_id: deviceId,
+          ip_address: geo.ip,
+          city: geo.city,
+          region: geo.region,
+          country: geo.country,
+          device_type: info.deviceType,
+          os: info.os,
+          browser: info.browser,
+          screen_resolution: info.screenResolution,
+          path: currentPath,
+          referrer: referrerUrl,
+          action: "pageview",
+          is_authenticated: Boolean(resolvedUser.isAuthenticated),
+          user_id: resolvedUser.userId || null,
+          user_email: resolvedUser.userEmail || null,
+          user_name: resolvedUser.userName || null,
+          user_role: resolvedUser.userRole || null,
+          is_real: true,
+        },
       });
-    } catch (err) {
+
+      if (historyError) {
+        console.warn("[VisitorTracker] record_visitor_history failed:", historyError.message);
+      }
+    } catch {
       // Supabase table may not exist yet or connection failed
     }
   }
@@ -673,11 +721,10 @@ export async function recordVisitorHit(
       body: JSON.stringify(trackPayload),
     });
 
-    if (res.ok) {
-      const resJson = await res.json();
-      if (!cloudSuccess && resJson?.logs && Array.isArray(resJson.logs)) {
-        localStorage.setItem(LOCAL_LOGS_KEY, JSON.stringify(resJson.logs));
-      }
+    // The API deliberately does not echo the visitor list back: it contains
+    // PII of other devices. The local cache below is enough for this device.
+    if (!res.ok) {
+      console.warn("[VisitorTracker] Could not record visit hit (HTTP " + res.status + ").");
     }
   } catch {}
 
@@ -825,13 +872,48 @@ export async function checkSupabaseVisitorTableStatus(): Promise<{
     return { isConfigured: false, tableExists: false, errorMessage: "Chưa cấu hình Supabase URL hoặc Key" };
   }
   try {
-    const { error } = await supabase.from("visitor_logs").select("id").limit(1);
+    // The table is not directly readable by anonymous clients anymore; the
+    // RPC is the supported health-check entry point.
+    const { error } = await supabase.rpc("get_device_visit_stats", {
+      p_device_id: "__healthcheck__",
+    });
     if (error) {
       return { isConfigured: true, tableExists: false, errorMessage: error.message };
     }
     return { isConfigured: true, tableExists: true };
   } catch (err: any) {
     return { isConfigured: true, tableExists: false, errorMessage: err.message };
+  }
+}
+
+/**
+ * Check that the SECURITY DEFINER tracking RPCs exist.
+ * Missing RPCs mean the visitor_logs.sql migration has not been run yet.
+ */
+export async function checkVisitorTrackingRpcStatus(): Promise<{
+  ok: boolean;
+  errorMessage?: string;
+}> {
+  if (!isRealSupabaseConfigured()) {
+    return { ok: false, errorMessage: "Chưa cấu hình Supabase URL hoặc Key" };
+  }
+
+  try {
+    const { error } = await supabase.rpc("touch_visitor_log", {
+      p_device_id: "__healthcheck__",
+      p_last_path: "/",
+    });
+    if (error) {
+      return {
+        ok: false,
+        errorMessage:
+          error.message ||
+          "Thiếu hàm RPC tracking (upsert_visitor_log / touch_visitor_log). Hãy chạy supabase/visitor_logs.sql.",
+      };
+    }
+    return { ok: true };
+  } catch (err: any) {
+    return { ok: false, errorMessage: err.message };
   }
 }
 
@@ -894,11 +976,28 @@ export function getLocalOrSeedLogs(): VisitorLogItem[] {
 }
 
 /**
+ * Check whether the browser holds an active Supabase Auth session.
+ * The visitor tables are only readable by an authenticated SA/admin session
+ * after the RLS migration, so the client must know if a session exists.
+ */
+async function hasSupabaseSession(): Promise<boolean> {
+  try {
+    const { data } = await supabase.auth.getSession();
+    return Boolean(data.session?.access_token);
+  } catch {
+    return false;
+  }
+}
+
+/**
  * Retrieve visitor logs from Supabase (Cloud Sync), Server API, or fallback to LocalStorage
  */
 export async function getVisitorLogs(): Promise<{ logs: VisitorLogItem[]; isFromCloud: boolean }> {
-  // 1. Query Supabase FIRST if configured (True Cross-Device Cloud Sync)
-  if (isRealSupabaseConfigured()) {
+  // 1. Query Supabase FIRST if configured (True Cross-Device Cloud Sync).
+  //    After the RLS migration the table is only readable by an authenticated
+  //    SA/admin session, so this path is skipped for env-admin sessions
+  //    (they read through the server API, which uses the service role key).
+  if (isRealSupabaseConfigured() && (await hasSupabaseSession())) {
     try {
       const queryPromise = supabase
         .from("visitor_logs")
@@ -938,7 +1037,8 @@ export async function getVisitorLogs(): Promise<{ logs: VisitorLogItem[]; isFrom
 
   // 2. Query central server API (/api/visitor-track) which has multi-device synced data
   try {
-    const apiRes = await fetch("/api/visitor-track");
+    const authHeaders = await getAdminAuthHeaders();
+    const apiRes = await fetch("/api/visitor-track", { headers: authHeaders });
     if (apiRes.ok) {
       const data = await apiRes.json();
       if (Array.isArray(data) && data.length > 0) {
@@ -964,8 +1064,9 @@ export async function getVisitorLogs(): Promise<{ logs: VisitorLogItem[]; isFrom
  * Retrieve detailed chronological access history logs
  */
 export async function getVisitorHistoryLogs(): Promise<{ history: VisitorHistoryItem[]; isFromCloud: boolean }> {
-  // 1. Try Supabase visitor_history_logs
-  if (isRealSupabaseConfigured()) {
+  // 1. Try Supabase visitor_history_logs (only readable by an authenticated
+  //    SA/admin session after the RLS migration).
+  if (isRealSupabaseConfigured() && (await hasSupabaseSession())) {
     try {
       const { data, error } = await supabase
         .from("visitor_history_logs")
@@ -984,7 +1085,8 @@ export async function getVisitorHistoryLogs(): Promise<{ history: VisitorHistory
 
   // 2. Try Server API /api/visitor-history
   try {
-    const res = await fetch("/api/visitor-history");
+    const authHeaders = await getAdminAuthHeaders();
+    const res = await fetch("/api/visitor-history", { headers: authHeaders });
     if (res.ok) {
       const data = await res.json();
       if (Array.isArray(data) && data.length > 0) {
@@ -1013,20 +1115,21 @@ export async function getVisitorHistoryLogs(): Promise<{ history: VisitorHistory
 export async function clearSampleVisitorLogs(): Promise<number> {
   let deletedCount = 0;
 
-  // 1. Request server API to delete sample logs
-  try {
-    const res = await fetch("/api/visitor-track?type=sample", { method: "DELETE" });
-    if (res.ok) {
-      const data = await res.json();
-      if (data?.logs && Array.isArray(data.logs)) {
-        localStorage.setItem(LOCAL_LOGS_KEY, JSON.stringify(data.logs));
-        window.dispatchEvent(new CustomEvent("eaagri_visitor_update"));
-        deletedCount = data.deletedCount || 1;
-      }
-    }
-  } catch {}
+  // 1. Request server API to delete sample logs (server có quyền admin và xóa
+  //    cả dữ liệu JSON lừn dữ liệu Supabase bằng service role key)
+  const res = await callAdminApi(
+    "/api/visitor-track?type=sample",
+    { method: "DELETE" },
+    "xóa dữ liệu mẫu"
+  );
+  const data = await res.json();
+  if (data?.logs && Array.isArray(data.logs)) {
+    localStorage.setItem(LOCAL_LOGS_KEY, JSON.stringify(data.logs));
+    window.dispatchEvent(new CustomEvent("eaagri_visitor_update"));
+    deletedCount = data.deletedCount || 1;
+  }
 
-  // 2. Delete from Supabase if connected
+  // 2. Best-effort: xóa trực tiếp trong Supabase (bề qua RLS cho admin)
   if (isRealSupabaseConfigured()) {
     try {
       await supabase.from("visitor_logs").delete().eq("is_real", false);
@@ -1061,6 +1164,12 @@ export async function clearSampleVisitorLogs(): Promise<number> {
  * Delete a single visitor entry by ID or Device ID
  */
 export async function deleteSingleVisitorLog(idOrDeviceId: string): Promise<void> {
+  await callAdminApi(
+    `/api/visitor-track?id=${encodeURIComponent(idOrDeviceId)}`,
+    { method: "DELETE" },
+    "xóa nhật ký truy cập"
+  );
+
   if (isRealSupabaseConfigured()) {
     try {
       await supabase
@@ -1069,10 +1178,6 @@ export async function deleteSingleVisitorLog(idOrDeviceId: string): Promise<void
         .or(`id.eq.${idOrDeviceId},device_id.eq.${idOrDeviceId}`);
     } catch {}
   }
-
-  try {
-    await fetch(`/api/visitor-track?id=${encodeURIComponent(idOrDeviceId)}`, { method: "DELETE" });
-  } catch {}
 
   try {
     const raw = localStorage.getItem(LOCAL_LOGS_KEY);
@@ -1099,15 +1204,14 @@ export async function deleteSingleVisitorLog(idOrDeviceId: string): Promise<void
  * Clear all visitor logs
  */
 export async function clearVisitorLogs(): Promise<void> {
+  await callAdminApi("/api/visitor-track", { method: "DELETE" }, "xóa toàn bộ nhật ký truy cập");
+
+  // Best-effort: xóa trực tiếp trong Supabase (bỏ qua RLS cho admin)
   if (isRealSupabaseConfigured()) {
     try {
       await supabase.from("visitor_logs").delete().neq("id", "00000000-0000-0000-0000-000000000000");
     } catch {}
   }
-
-  try {
-    await fetch("/api/visitor-track", { method: "DELETE" });
-  } catch {}
 
   try {
     localStorage.removeItem(LOCAL_LOGS_KEY);
@@ -1119,15 +1223,14 @@ export async function clearVisitorLogs(): Promise<void> {
  * Clear all visitor history logs
  */
 export async function clearVisitorHistoryLogs(): Promise<void> {
+  await callAdminApi("/api/visitor-history", { method: "DELETE" }, "xóa lịch sử truy cập");
+
+  // Best-effort: xóa trực tiếp trong Supabase (bỏ qua RLS cho admin)
   if (isRealSupabaseConfigured()) {
     try {
       await supabase.from("visitor_history_logs").delete().neq("id", "00000000-0000-0000-0000-000000000000");
     } catch {}
   }
-
-  try {
-    await fetch("/api/visitor-history", { method: "DELETE" });
-  } catch {}
 
   try {
     localStorage.removeItem(LOCAL_HISTORY_KEY);
@@ -1271,15 +1374,14 @@ export async function sendVisitorHeartbeat(currentPath: string = "/"): Promise<v
   if (typeof document !== "undefined" && document.visibilityState === "hidden") return;
 
   const deviceId = getOrCreateDeviceId();
-  const nowIso = new Date().toISOString();
 
-  // 1. Update Supabase
+  // 1. Update Supabase (RPC an toàn cho thiết bệ của chính người gọi)
   if (isRealSupabaseConfigured()) {
     try {
-      await supabase
-        .from("visitor_logs")
-        .update({ last_visit: nowIso, is_online: true, last_path: currentPath })
-        .eq("device_id", deviceId);
+      await supabase.rpc("touch_visitor_log", {
+        p_device_id: deviceId,
+        p_last_path: currentPath,
+      });
     } catch {}
   }
 
@@ -1313,13 +1415,11 @@ export function sendVisitorLeave(): void {
     is_online: false,
   });
 
-  // 1. Update Supabase
+  // 1. Update Supabase (RPC an toàn cho thiết bệ của chính người gọi)
   if (isRealSupabaseConfigured()) {
     try {
       supabase
-        .from("visitor_logs")
-        .update({ is_online: false })
-        .eq("device_id", deviceId)
+        .rpc("mark_visitor_offline", { p_device_id: deviceId })
         .then(() => {});
     } catch {}
   }
@@ -1415,6 +1515,7 @@ export async function purgeBotLogsFromDatabase(): Promise<{
   message: string;
 }> {
   let deletedCount = 0;
+  let apiError: string | null = null;
 
   // 1. Purge from Supabase
   if (isRealSupabaseConfigured()) {
@@ -1452,14 +1553,18 @@ export async function purgeBotLogsFromDatabase(): Promise<{
 
   // 2. Purge from Serverless API / Local JSON
   try {
-    const res = await fetch("/api/visitor-track?type=bot", { method: "DELETE" });
-    if (res.ok) {
-      const data = await res.json();
-      if (data.deletedCount) {
-        deletedCount = Math.max(deletedCount, data.deletedCount);
-      }
+    const res = await callAdminApi(
+      "/api/visitor-track?type=bot",
+      { method: "DELETE" },
+      "dọn dẹp nhật ký bot"
+    );
+    const data = await res.json();
+    if (data.deletedCount) {
+      deletedCount = Math.max(deletedCount, data.deletedCount);
     }
-  } catch {}
+  } catch (err: any) {
+    apiError = err?.message || "Không thể dọn dẹp nhật ký bot trên máy chủ.";
+  }
 
   // 3. Clean from localStorage cache
   try {
@@ -1481,6 +1586,14 @@ export async function purgeBotLogsFromDatabase(): Promise<{
   // Dispatch update event
   if (typeof window !== "undefined") {
     window.dispatchEvent(new CustomEvent("eaagri_visitor_update"));
+  }
+
+  if (apiError) {
+    return {
+      success: false,
+      deletedCount,
+      message: apiError,
+    };
   }
 
   return {

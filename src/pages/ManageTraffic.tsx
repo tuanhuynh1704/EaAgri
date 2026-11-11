@@ -16,139 +16,22 @@ import {
   exportVisitorHistoryToCsv,
   clearVisitorHistoryLogs,
   checkSupabaseVisitorTableStatus,
+  checkVisitorTrackingRpcStatus,
   isAuthorizedAdminRole,
   type VisitorLogItem,
   type VisitorHistoryItem,
 } from "../services/visitorTracker";
+import { getErrorMessage } from "../utils/getErrorMessage";
+import profilesSql from "../../supabase/profiles.sql?raw";
+import cooperationSql from "../../supabase/cooperation_requests.sql?raw";
+import visitorLogsSql from "../../supabase/visitor_logs.sql?raw";
 
-const SQL_SETUP_SCRIPT = `-- =======================================================
--- SQL MIGRATION FOR EAAGRI VISITOR LOGS & REALTIME ACCESS TRACKING
--- Run this script in your Supabase SQL Editor (SQL Editor -> New Query -> Run)
--- =======================================================
-
-CREATE TABLE IF NOT EXISTS public.visitor_logs (
-    id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
-    device_id TEXT NOT NULL UNIQUE,
-    ip_address TEXT NOT NULL,
-    city TEXT DEFAULT 'Không xác định',
-    region TEXT DEFAULT 'Việt Nam',
-    country TEXT DEFAULT 'Việt Nam',
-    device_type TEXT NOT NULL DEFAULT 'Desktop',
-    os TEXT DEFAULT 'Windows',
-    browser TEXT DEFAULT 'Chrome',
-    screen_resolution TEXT DEFAULT '1920x1080',
-    visit_count INTEGER NOT NULL DEFAULT 1,
-    last_path TEXT DEFAULT '/',
-    referrer TEXT DEFAULT 'Trực tiếp (Direct)',
-    is_online BOOLEAN NOT NULL DEFAULT true,
-    first_visit TIMESTAMPTZ NOT NULL DEFAULT now(),
-    last_visit TIMESTAMPTZ NOT NULL DEFAULT now(),
-    is_real BOOLEAN NOT NULL DEFAULT true,
-    is_bot BOOLEAN NOT NULL DEFAULT false,
-    is_authenticated BOOLEAN NOT NULL DEFAULT false,
-    user_id TEXT,
-    user_email TEXT,
-    user_name TEXT,
-    user_role TEXT,
-    created_at TIMESTAMPTZ NOT NULL DEFAULT now(),
-    updated_at TIMESTAMPTZ NOT NULL DEFAULT now()
-);
-
-CREATE TABLE IF NOT EXISTS public.visitor_history_logs (
-    id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
-    device_id TEXT NOT NULL,
-    ip_address TEXT NOT NULL,
-    city TEXT DEFAULT 'Không xác định',
-    region TEXT DEFAULT 'Việt Nam',
-    country TEXT DEFAULT 'Việt Nam',
-    device_type TEXT NOT NULL DEFAULT 'Desktop',
-    os TEXT DEFAULT 'Windows',
-    browser TEXT DEFAULT 'Chrome',
-    path TEXT NOT NULL DEFAULT '/',
-    referrer TEXT DEFAULT 'Trực tiếp (Direct)',
-    action TEXT NOT NULL DEFAULT 'pageview',
-    is_authenticated BOOLEAN NOT NULL DEFAULT false,
-    user_id TEXT,
-    user_email TEXT,
-    user_name TEXT,
-    user_role TEXT,
-    is_real BOOLEAN NOT NULL DEFAULT true,
-    is_bot BOOLEAN NOT NULL DEFAULT false,
-    created_at TIMESTAMPTZ NOT NULL DEFAULT now()
-);
-
--- Ensure is_bot and is_real columns exist if tables already created
-DO $$ 
-BEGIN
-    IF NOT EXISTS (SELECT 1 FROM information_schema.columns WHERE table_name = 'visitor_logs' AND column_name = 'is_bot') THEN
-        ALTER TABLE public.visitor_logs ADD COLUMN is_bot BOOLEAN NOT NULL DEFAULT false;
-    END IF;
-    IF NOT EXISTS (SELECT 1 FROM information_schema.columns WHERE table_name = 'visitor_history_logs' AND column_name = 'is_bot') THEN
-        ALTER TABLE public.visitor_history_logs ADD COLUMN is_bot BOOLEAN NOT NULL DEFAULT false;
-    END IF;
-END $$;
-
-CREATE INDEX IF NOT EXISTS idx_visitor_logs_last_visit ON public.visitor_logs(last_visit DESC);
-CREATE INDEX IF NOT EXISTS idx_visitor_logs_ip ON public.visitor_logs(ip_address);
-CREATE INDEX IF NOT EXISTS idx_visitor_logs_device_id ON public.visitor_logs(device_id);
-CREATE INDEX IF NOT EXISTS idx_visitor_logs_is_online ON public.visitor_logs(is_online);
-
-CREATE INDEX IF NOT EXISTS idx_visitor_history_created_at ON public.visitor_history_logs(created_at DESC);
-CREATE INDEX IF NOT EXISTS idx_visitor_history_device_id ON public.visitor_history_logs(device_id);
-CREATE INDEX IF NOT EXISTS idx_visitor_history_ip ON public.visitor_history_logs(ip_address);
-
-ALTER TABLE public.visitor_logs ENABLE ROW LEVEL SECURITY;
-ALTER TABLE public.visitor_history_logs ENABLE ROW LEVEL SECURITY;
-
-DROP POLICY IF EXISTS "Allow public to record visit logs" ON public.visitor_logs;
-CREATE POLICY "Allow public to record visit logs"
-ON public.visitor_logs
-FOR ALL
-TO anon, authenticated
-USING (true)
-WITH CHECK (true);
-
-DROP POLICY IF EXISTS "Allow public to record history logs" ON public.visitor_history_logs;
-CREATE POLICY "Allow public to record history logs"
-ON public.visitor_history_logs
-FOR ALL
-TO anon, authenticated
-USING (true)
-WITH CHECK (true);
-
-DO $$
-BEGIN
-    ALTER PUBLICATION supabase_realtime ADD TABLE public.visitor_logs;
-EXCEPTION
-    WHEN duplicate_object THEN NULL;
-    WHEN undefined_object THEN NULL;
-END $$;
-
-DO $$
-BEGIN
-    ALTER PUBLICATION supabase_realtime ADD TABLE public.visitor_history_logs;
-EXCEPTION
-    WHEN duplicate_object THEN NULL;
-    WHEN undefined_object THEN NULL;
-END $$;
-
--- CLEANUP / PURGE BOT & CRAWLER SPAM (Run this if you want to wipe old crawler records)
-DELETE FROM public.visitor_logs
-WHERE os = 'Linux' AND (screen_resolution LIKE '%800%' OR screen_resolution = '0x0')
-   OR ip_address LIKE '13.57.%'
-   OR ip_address LIKE '54.183.%'
-   OR ip_address LIKE '54.215.%'
-   OR ip_address LIKE '52.53.%'
-   OR is_bot = true;
-
-DELETE FROM public.visitor_history_logs
-WHERE os = 'Linux'
-   OR ip_address LIKE '13.57.%'
-   OR ip_address LIKE '54.183.%'
-   OR ip_address LIKE '54.215.%'
-   OR ip_address LIKE '52.53.%'
-   OR is_bot = true;
-`;
+const SQL_SETUP_SCRIPT = [
+  "-- EAAGRI SECURITY SETUP: chay lan luot profiles -> cooperation -> visitor",
+  profilesSql,
+  cooperationSql,
+  visitorLogsSql,
+].join("\n\n");
 
 export default function ManageTraffic() {
   const { user, profile } = useAuth();
@@ -163,6 +46,11 @@ export default function ManageTraffic() {
     tableExists: boolean;
     errorMessage?: string;
   }>({ checked: false, tableExists: true });
+  const [trackingRpcStatus, setTrackingRpcStatus] = useState<{
+    checked: boolean;
+    ok: boolean;
+    errorMessage?: string;
+  }>({ checked: false, ok: true });
   const [isSqlCopied, setIsSqlCopied] = useState(false);
 
   // Filters for Device Summary
@@ -201,6 +89,14 @@ export default function ManageTraffic() {
         tableExists: status.tableExists,
         errorMessage: status.errorMessage,
       });
+    });
+  }, [isAdmin]);
+
+  // Warn when the tracking RPCs from supabase/visitor_logs.sql are missing
+  useEffect(() => {
+    if (!isAdmin) return;
+    checkVisitorTrackingRpcStatus().then((status) => {
+      setTrackingRpcStatus({ checked: true, ok: status.ok, errorMessage: status.errorMessage });
     });
   }, [isAdmin]);
 
@@ -504,12 +400,15 @@ export default function ManageTraffic() {
       const res = await purgeBotLogsFromDatabase();
       await loadData();
       setToast({
-        type: "success",
+        type: res.success ? "success" : "error",
         text: res.message || `Đã dọn dẹp ${globalSummary.totalBotDevices} bot / crawler thành công!`,
       });
-      setSourceFilter("Real");
+      if (res.success) setSourceFilter("Real");
     } catch (err) {
-      setToast({ type: "error", text: "Lỗi khi dọn dẹp bot. Vui lòng thử lại!" });
+      setToast({
+        type: "error",
+        text: getErrorMessage(err, "Lỗi khi dọn dẹp bot. Vui lòng thử lại!"),
+      });
     } finally {
       setIsCleaning(false);
     }
@@ -536,7 +435,10 @@ export default function ManageTraffic() {
       });
       setSourceFilter("Real");
     } catch (err) {
-      setToast({ type: "error", text: "Lỗi khi dọn dẹp dữ liệu mẫu. Vui lòng thử lại!" });
+      setToast({
+        type: "error",
+        text: getErrorMessage(err, "Lỗi khi dọn dẹp dữ liệu mẫu. Vui lòng thử lại!"),
+      });
     } finally {
       setIsCleaning(false);
     }
@@ -559,7 +461,7 @@ export default function ManageTraffic() {
         text: `Đã xóa bản ghi ${item.ip_address || item.os} khỏi danh sách.`,
       });
     } catch (err) {
-      setToast({ type: "error", text: "Không thể xóa bản ghi này." });
+      setToast({ type: "error", text: getErrorMessage(err, "Không thể xóa bản ghi này.") });
     }
   };
 
@@ -591,8 +493,8 @@ export default function ManageTraffic() {
       await clearVisitorHistoryLogs();
       await loadData();
       setToast({ type: "success", text: "Đã xóa toàn bộ nhật ký sự kiện truy cập thành công!" });
-    } catch {
-      setToast({ type: "error", text: "Không thể xóa nhật ký lúc này." });
+    } catch (err) {
+      setToast({ type: "error", text: getErrorMessage(err, "Không thể xóa nhật ký lúc này.") });
     }
   };
 
@@ -618,9 +520,18 @@ export default function ManageTraffic() {
       tableExists: status.tableExists,
       errorMessage: status.errorMessage,
     });
-    if (status.tableExists) {
+
+    const rpcStatus = await checkVisitorTrackingRpcStatus();
+    setTrackingRpcStatus({ checked: true, ok: rpcStatus.ok, errorMessage: rpcStatus.errorMessage });
+
+    if (status.tableExists && rpcStatus.ok) {
       setToast({ type: "success", text: "Tuyệt vời! Bảng visitor_logs trên Supabase đã hoạt động." });
       await loadData();
+    } else if (status.tableExists && !rpcStatus.ok) {
+      setToast({
+        type: "error",
+        text: `Thiếu hàm RPC tracking. Hãy chạy supabase/visitor_logs.sql trong Supabase SQL Editor.`,
+      });
     } else {
       setToast({
         type: "error",
@@ -778,6 +689,45 @@ export default function ManageTraffic() {
                 <h4>Chưa kích hoạt bảng visitor_logs trên Supabase</h4>
                 <p>
                   Để các thiết bị khác nhau (điện thoại, máy tính, mạng khác) đồng bộ chung 100% số lượt truy cập và xem trực tuyến, bạn hãy sao chép mã SQL và chạy trong <strong>Supabase SQL Editor</strong> (chỉ mất 5 giây).
+                </p>
+              </div>
+            </div>
+            <div className="supabase-warning-card__actions">
+              <button
+                type="button"
+                className="btn--copy-sql"
+                onClick={handleCopySql}
+                title="Sao chép mã SQL migration"
+              >
+                <i className="ri-file-copy-line" /> {isSqlCopied ? "Đã sao chép SQL!" : "Sao chép mã SQL Supabase"}
+              </button>
+              <button
+                type="button"
+                className="btn--retry-check"
+                onClick={handleCheckSupabaseAgain}
+              >
+                <i className="ri-refresh-line" /> Kiểm tra lại kết nối
+              </button>
+            </div>
+          </div>
+        )}
+
+        {/* Tracking RPC Missing Warning Card */}
+        {trackingRpcStatus.checked && !trackingRpcStatus.ok && (
+          <div className="supabase-warning-card">
+            <div className="supabase-warning-card__left">
+              <div className="supabase-warning-card__icon-box">
+                <i className="ri-function-line" />
+              </div>
+              <div>
+                <h4>Thiếu hàm RPC tracking (visitor tracking chưa ghi được vào Supabase)</h4>
+                <p>
+                  Sau khi siết RLS, toàn bộ tracking phải đi qua các hàm{" "}
+                  <strong>SECURITY DEFINER</strong> (<code>upsert_visitor_log</code>,{" "}
+                  <code>record_visitor_history</code>, <code>touch_visitor_log</code>,{" "}
+                  <code>mark_visitor_offline</code>). Hãy chạy file{" "}
+                  <strong>supabase/visitor_logs.sql</strong> trong Supabase SQL Editor.{" "}
+                  {trackingRpcStatus.errorMessage}
                 </p>
               </div>
             </div>

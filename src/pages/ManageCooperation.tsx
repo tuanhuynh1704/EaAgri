@@ -2,6 +2,7 @@ import { useEffect, useState, useMemo } from "react";
 import { Link } from "react-router-dom";
 import { supabase } from "../utils/supabase/client";
 import { useAuth } from "../context/AuthContext";
+import { getErrorMessage } from "../utils/getErrorMessage";
 
 export interface CooperationItem {
   id: string;
@@ -93,7 +94,7 @@ export default function ManageCooperation() {
       }
 
       setItems((data as CooperationItem[]) || []);
-    } catch (err: any) {
+    } catch (err) {
       console.warn("Could not fetch cooperation requests:", err);
       setAlert({
         type: "info",
@@ -157,21 +158,12 @@ export default function ManageCooperation() {
       });
 
       handleCloseDetail();
-    } catch (err: any) {
+    } catch (err) {
       console.error("Error updating cooperation request:", err);
-      // Update locally if offline
-      setItems((prev) =>
-        prev.map((it) =>
-          it.id === selectedItem.id
-            ? { ...it, status: modalStatus, notes: modalNotes.trim() || null }
-            : it
-        )
-      );
       setAlert({
-        type: "success",
-        message: `Đã cập nhật thành công (Lưu trên phiên làm việc hiện tại).`,
+        type: "error",
+        message: `Không thể cập nhật yêu cầu: ${getErrorMessage(err, "Lỗi không xác định")}. Vui lòng thử lại.`,
       });
-      handleCloseDetail();
     } finally {
       setIsUpdating(false);
     }
@@ -183,7 +175,7 @@ export default function ManageCooperation() {
     newStatus: CooperationItem["status"]
   ) => {
     try {
-      await supabase
+      const { error } = await supabase
         .from("cooperation_requests")
         .update({
           status: newStatus,
@@ -191,14 +183,21 @@ export default function ManageCooperation() {
         })
         .eq("id", item.id);
 
+      if (error) throw error;
+
       setItems((prev) =>
         prev.map((it) => (it.id === item.id ? { ...it, status: newStatus } : it))
       );
+      setAlert({
+        type: "success",
+        message: `Đã cập nhật trạng thái yêu cầu của ${item.full_name}.`,
+      });
     } catch (err) {
       console.warn("Update status error:", err);
-      setItems((prev) =>
-        prev.map((it) => (it.id === item.id ? { ...it, status: newStatus } : it))
-      );
+      setAlert({
+        type: "error",
+        message: `Không thể đổi trạng thái: ${getErrorMessage(err, "Lỗi không xác định")}. Vui lòng thử lại.`,
+      });
     }
   };
 
@@ -221,14 +220,12 @@ export default function ManageCooperation() {
         message: `Đã xóa yêu cầu hợp tác của "${itemToDelete.full_name}".`,
       });
       setItemToDelete(null);
-    } catch (err: any) {
+    } catch (err) {
       console.error("Delete error:", err);
-      setItems((prev) => prev.filter((it) => it.id !== itemToDelete.id));
       setAlert({
-        type: "success",
-        message: `Đã xóa yêu cầu hợp tác (cập nhật phiên làm việc).`,
+        type: "error",
+        message: `Không thể xóa yêu cầu: ${getErrorMessage(err, "Lỗi không xác định")}. Vui lòng thử lại.`,
       });
-      setItemToDelete(null);
     } finally {
       setIsDeleting(false);
     }

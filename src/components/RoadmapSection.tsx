@@ -111,10 +111,11 @@ export default function RoadmapSection() {
     }
 
     setIsSubmitting(true);
+    setIsSuccess(false);
 
     try {
-      // Attempt saving to Supabase cooperation_requests table
-      await supabase.from("cooperation_requests").insert([
+      // Supabase does not throw on RLS/auth errors; it returns { error }.
+      const { error } = await supabase.from("cooperation_requests").insert([
         {
           full_name: formData.fullName.trim(),
           phone: formData.phone.trim(),
@@ -122,15 +123,31 @@ export default function RoadmapSection() {
           organization: formData.organization.trim() || null,
           cooperation_type: formData.cooperationType,
           message: formData.message.trim() || null,
-          status: "pending",
-          created_at: new Date().toISOString()
-        }
+        },
       ]);
+
+      if (error) {
+        console.error("[RoadmapSection] Cooperation request insert failed:", error);
+        if (error.code === "42501" || error.code === "401" || /row-level security|permission/i.test(error.message)) {
+          setErrorMessage(
+            "Hệ thống chưa được cấp quyền nhận yêu cầu hợp tác. Vui lòng liên hệ trực tiếp qua info@eaagri.vn hoặc Facebook."
+          );
+        } else {
+          setErrorMessage(
+            `Không thể gửi yêu cầu hợp tác: ${error.message}. Vui lòng thử lại hoặc liên hệ trực tiếp qua info@eaagri.vn.`
+          );
+        }
+        return;
+      }
+
+      setIsSuccess(true);
     } catch (err) {
-      console.warn("Cooperation request logged locally:", err);
+      console.error("[RoadmapSection] Cooperation request failed:", err);
+      setErrorMessage(
+        "Không thể gửi yêu cầu do lỗi kết nối. Vui lòng kiểm tra mạng và thử lại, hoặc liên hệ trực tiếp qua info@eaagri.vn."
+      );
     } finally {
       setIsSubmitting(false);
-      setIsSuccess(true);
     }
   };
 

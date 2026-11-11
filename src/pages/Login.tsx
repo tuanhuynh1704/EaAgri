@@ -70,8 +70,8 @@ export default function Login() {
 
     setIsLoading(true);
 
-    // 1. Kiểm tra tài khoản Quản trị viên (Super Admin) từ cấu hình .env
-    if (loginAdminEnv && loginAdminEnv(email.trim(), password)) {
+    // 1. Kiểm tra tài khoản Quản trị viên (Super Admin) qua API xác thực phía server
+    if (await loginAdminEnv(email.trim(), password)) {
       setAlert({
         type: "success",
         message: "Đăng nhập Quản Trị Viên thành công! Đang chuyển đến trang thống kê truy cập..."
