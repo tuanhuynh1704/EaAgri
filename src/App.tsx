@@ -1,4 +1,5 @@
 import { useEffect, useRef, Suspense } from "react";
+import { Analytics } from "@vercel/analytics/react";
 import "./styles/main.scss";
 import AOS from "aos";
 import "aos/dist/aos.css";
@@ -146,6 +147,7 @@ function App() {
   return (
     <AuthProvider>
       <VoteProvider>
+        <Analytics />
         <VisitorTracker />
         {/* {!isAuthPage && !isAdminPage && <VoteAnnouncementBar />} */}
         {!isAuthPage && <Navbar />}
